@@ -13,3 +13,5 @@ Der Bot war anfangs nur als Gimik des Servers gedacht, entwickelt sich aber inzw
 # Wer kann mit machen?
 So ziemlich jeder, der etwas von Java versteht und sich damit abfinden kann, durch die JDA Domumentation durchzulesen. Natürlich sollte er auch Mitglied auf dem Discord Server sein, und ich sollte ihn kennen. Wenn man dann aufgenommen ist, bekommt man außerdem eine violette Rolle und Zugang zum #commands Kanal auf dem Discord Server, sowie Zugang zum Testing Server des Bots, auf dem er zum aktuellen Zeitpunkt ausschließen aktiv ist. Bei Interesse meldet euch einfach auf dem Discord Server!
 
+# Wie arbeiten wir?
+Das ganze Repository ist aufgebaut wie ein Eclipse-Projekt. Wer mit einem anderen Editor arbeiten möchte, kann das Ganze natürlich gerne machen, allerdings muss er dann umständlich die einzelnen Dateien immer vernünftig importieren und in der passenden Ordnerstruktur wieder exportieren und dann wiederum zu GitHub pushen. Ansonsten kommunizieren wir über einen seperaten Channel auf dem oben genannten Discord Server und tauschen und darüber über Aktuelles aus.
