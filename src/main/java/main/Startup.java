@@ -10,7 +10,7 @@ public class Startup {
 	public static String prefix = "#";
 	
 	public static void main(String[] arguments) throws Exception {
-	    JDA jda = JDABuilder.createDefault("Tokenhere").build();
+	    JDA jda = JDABuilder.createDefault("Token_Here!").build();
 	    jda.getPresence().setStatus(OnlineStatus.ONLINE);
 	    jda.addEventListener(new Commands());
 	    while (true) {

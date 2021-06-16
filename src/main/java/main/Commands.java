@@ -18,8 +18,8 @@ public class Commands extends ListenerAdapter {
 	Role mentionedRole;
 	
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		if (event.getMessage().getContentRaw().startsWith(Startup.prefix) && !event.getMessage().getAuthor().isBot()) {
 		raw = event.getMessage().getContentRaw().split("\\s+", 2);
-		if (raw[0].startsWith(Startup.prefix)) {
 			String input = raw[0];
 			try {
 				object = raw[1];
