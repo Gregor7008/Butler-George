@@ -1,7 +1,5 @@
 package functions;
 
-import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -11,36 +9,36 @@ public class rolecheck {
 
 	public rolecheck(GuildMessageReceivedEvent event, Role mentionedRole) {
 		if (mentionedRole == null) {
-			event.getChannel().sendMessage("Incomplete command (add a role)!").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+			event.getChannel().sendMessage("Incomplete command (add a role)!").queue();
 			this.wait(3200);
 		} else {
 		Member member = event.getMessage().getMember();
-		if (hasRole(event, member, mentionedRole)==true) {
-			TextChannel logs = event.getGuild().getTextChannelsByName("logs", true).get(0);
-			logs.sendMessage("Role found").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+		if (hasRole(member, mentionedRole)==true) {
+			TextChannel channel = event.getChannel();
+			channel.sendMessage("Role found").queue();
 		} else {
-			TextChannel logs = event.getGuild().getTextChannelsByName("logs", true).get(0);
-			logs.sendMessage("Role not found").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+			TextChannel channel = event.getChannel();
+			channel.sendMessage("Role not found").queue();
 		}
 		}
 	}
 	
 	public rolecheck(GuildMessageReceivedEvent event, Role mentionedRole, Member member) {
 		if (mentionedRole == null) {
-			event.getChannel().sendMessage("Incomplete command (add a role)!").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+			event.getChannel().sendMessage("Incomplete command (add a role)!").queue();
 			this.wait(3200);
 		} else {
-		if (hasRole(event, member, mentionedRole)==true) {
-			TextChannel logs = event.getGuild().getTextChannelsByName("logs", true).get(0);
-			logs.sendMessage("Role found on " + member.getAsMention()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+		if (hasRole(member, mentionedRole)==true) {
+			TextChannel channel = event.getChannel();
+			channel.sendMessage("Role found on " + member.getAsMention()).queue();
 		} else {
-			TextChannel logs = event.getGuild().getTextChannelsByName("logs", true).get(0);
-			logs.sendMessage("Role not found on " + member.getAsMention()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+			TextChannel channel = event.getChannel();
+			channel.sendMessage("Role not found on " + member.getAsMention()).queue();
 		}
 		}
 	}
 	
-	public boolean hasRole(GuildMessageReceivedEvent event, Member member, Role role) {
+	private boolean hasRole(Member member, Role role) {
 		return member.getRoles().contains(role);
 	}
 	

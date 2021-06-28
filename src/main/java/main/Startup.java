@@ -1,5 +1,5 @@
 package main;
-//https://discord.com/api/oauth2/authorize?client_id=825342692887625738&permissions=268643440&scope=bot
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;

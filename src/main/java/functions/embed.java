@@ -15,6 +15,7 @@ public class embed {
 	boolean ILM;
 	
 	public embed(GuildMessageReceivedEvent event, String object, Member member) {
+		if (!object.equals("none")) {
 		Author = member.getEffectiveName();
 		AvatarURL = member.getUser().getAvatarUrl();
 		channel = event.getChannel();
@@ -24,9 +25,13 @@ public class embed {
 			channel.sendMessage("Something went wrong").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
 		}
 		this.buildMessage();
+		} else {
+			channel.sendMessage("How should I know, what to send?!");
+		}
 	}
 	
 	public embed(GuildMessageReceivedEvent event, String object) {
+		if (!object.equals("none")) {
 		Author = event.getAuthor().getName();
 		AvatarURL = event.getAuthor().getAvatarUrl();
 		channel = event.getChannel();
@@ -36,6 +41,9 @@ public class embed {
 			channel.sendMessage("Something went wrong!").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
 		}
 		this.buildMessage();
+		} else {
+			channel.sendMessage("How should I know, what to send?!");
+		}
 	}
 	
 	private void messagesplit(String message) {

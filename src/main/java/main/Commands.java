@@ -1,9 +1,9 @@
 package main;
 
-import java.util.concurrent.TimeUnit;
-
 import functions.embed;
 import functions.rolecheck;
+import functions.rolesorting;
+import functions.test;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -13,9 +13,8 @@ public class Commands extends ListenerAdapter {
 	
 	String[] raw, command;
 	String object;
-	int onOther;
-	Member executeOn;
-	Role mentionedRole;
+	Member member;
+	Role role;
 	
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		if (event.getMessage().getContentRaw().startsWith(Startup.prefix) && !event.getMessage().getAuthor().isBot()) {
@@ -27,44 +26,32 @@ public class Commands extends ListenerAdapter {
 				object = "none";
 			}
 			try {
-				mentionedRole = event.getMessage().getMentionedRoles().get(0);
+				role = event.getMessage().getMentionedRoles().get(0);
 			} catch (Exception e) {}
 			try {
-				executeOn = event.getMessage().getMentionedMembers().get(0);
-				onOther = 1;
+				member = event.getMessage().getMentionedMembers().get(0);
 			} catch (Exception e) {
-				onOther = 0;
+				member = event.getMember();
 			}
 			command = input.split("(?<=" + Startup.prefix + ")");
-			event.getMessage().delete().queue();
-			switch(onOther) {
-				case(1):
-					switch(command[1]) {
-					case "role-check":
-						new rolecheck(event, mentionedRole, executeOn);
-						break;
-					case "embed":
-						new embed(event, object, executeOn);
-						break;
-					default:
-						event.getChannel().sendMessage("Unknown Command").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
-					}
+			switch(command[1]) {
+				case "role-check":
+					new rolecheck(event, role, member);
 					break;
-				case(0):
-					switch(command[1]) {
-					case "role-check":
-						new rolecheck(event, mentionedRole);
-						break;
-					case "embed":
-						new embed(event, object);
-						break;
-					case "stop":
-						Startup.endMe();
-						break;
-					default:
-						event.getChannel().sendMessage("Unknown Command").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
-					}
+				case "role-sort":
+					new rolesorting(event, member);
 					break;
+				case "embed":
+					new embed(event, object, member);
+					break;
+				case "test":
+					new test(event);
+					break;
+				case "stop":
+					Startup.endMe();
+					break;
+				default:
+					event.getChannel().sendMessage("Unknown Command").queue();
 			}
 		}
 	}
