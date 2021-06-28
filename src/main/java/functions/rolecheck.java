@@ -1,43 +1,25 @@
 package functions;
 
+import main.Answer;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class rolecheck {
 
-	public rolecheck(GuildMessageReceivedEvent event, Role mentionedRole) {
-		if (mentionedRole == null) {
-			event.getChannel().sendMessage("Incomplete command (add a role)!").queue();
-			this.wait(3200);
-		} else {
-		Member member = event.getMessage().getMember();
-		if (hasRole(member, mentionedRole)==true) {
-			TextChannel channel = event.getChannel();
-			channel.sendMessage("Role found").queue();
-		} else {
-			TextChannel channel = event.getChannel();
-			channel.sendMessage("Role not found").queue();
-		}
-		}
-	}
-	
 	public rolecheck(GuildMessageReceivedEvent event, Role mentionedRole, Member member) {
 		if (mentionedRole == null) {
-			event.getChannel().sendMessage("Incomplete command (add a role)!").queue();
+			new Answer("Incomplete command", ":exclamation: | Please mention a role I should check the user for! \n Error code: 004", event, false);
 			this.wait(3200);
 		} else {
 		if (hasRole(member, mentionedRole)==true) {
-			TextChannel channel = event.getChannel();
-			channel.sendMessage("Role found on " + member.getAsMention()).queue();
+			new Answer("Role found!", ":white_check_mark: | The user has the role " + mentionedRole.getAsMention(), event, false);
 		} else {
-			TextChannel channel = event.getChannel();
-			channel.sendMessage("Role not found on " + member.getAsMention()).queue();
+			new Answer("Role not found!", ":x: | The user doesn't have the role " + mentionedRole.getAsMention(), event, false);
 		}
 		}
 	}
-	
+		
 	private boolean hasRole(Member member, Role role) {
 		return member.getRoles().contains(role);
 	}

@@ -1,6 +1,6 @@
 package functions;
 
-import java.util.concurrent.TimeUnit;
+import main.Answer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -22,27 +22,11 @@ public class embed {
 		try {
 			this.messagesplit(object);
 		} catch (Exception e) {
-			channel.sendMessage("Something went wrong").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+			new Answer("Error", ":exclamation: | Something seems to have failed... \n Error code: 002", event, true);
 		}
 		this.buildMessage();
 		} else {
-			channel.sendMessage("How should I know, what to send?!");
-		}
-	}
-	
-	public embed(GuildMessageReceivedEvent event, String object) {
-		if (!object.equals("none")) {
-		Author = event.getAuthor().getName();
-		AvatarURL = event.getAuthor().getAvatarUrl();
-		channel = event.getChannel();
-		try {
-			this.messagesplit(object);
-		} catch (Exception e) {
-			channel.sendMessage("Something went wrong!").queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
-		}
-		this.buildMessage();
-		} else {
-			channel.sendMessage("How should I know, what to send?!");
+			new Answer("?!", ":exclamation: | HOW should I know what to send? \n Error code: 003", event, false);
 		}
 	}
 	

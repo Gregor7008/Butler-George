@@ -51,7 +51,7 @@ public class Commands extends ListenerAdapter {
 					Startup.endMe();
 					break;
 				default:
-					event.getChannel().sendMessage("Unknown Command").queue();
+					new Answer("Unknown Command",":exclamation: | This command doesn't seem to exist! \n Error code: 001", event, false);
 			}
 		}
 	}
