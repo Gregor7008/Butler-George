@@ -9,7 +9,7 @@ public class rolecheck {
 
 	public rolecheck(GuildMessageReceivedEvent event, Role mentionedRole, Member member) {
 		if (mentionedRole == null) {
-			new Answer("Incomplete command", ":exclamation: | Please mention a role I should check the user for! \n Error code: 004", event, false);
+			new Answer("Incomplete command", ":exclamation: | Please mention a role I should check the user for! \n ----> Error code: 004", event, false);
 			this.wait(3200);
 		} else {
 		if (hasRole(member, mentionedRole)==true) {

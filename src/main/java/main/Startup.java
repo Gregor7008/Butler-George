@@ -26,6 +26,7 @@ public class Startup {
 	}
 	
 	public static void endMe() {
+		wait(1000);
 		System.exit(0);
 	}
 	

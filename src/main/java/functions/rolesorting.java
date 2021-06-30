@@ -27,13 +27,23 @@ public class rolesorting {
 	
 	private void rolesorter(GuildMessageReceivedEvent event) {
 		int size = member.getRoles().size();
+		int match1 = 0;
+		int match2 = 0;
 		for (int i = 1; i < size; i++) {
 			if (subroles1.contains(member.getRoles().get(i))) {
 				event.getGuild().addRoleToMember(member, grouping1).queue();
+				match1++;
 			}
 			if (subroles2.contains(member.getRoles().get(i))) {
 				event.getGuild().addRoleToMember(member, grouping2).queue();
+				match2++;	
 			}
+		}
+		if (match1 == 0 && member.getRoles().contains(grouping1)) {
+			event.getGuild().removeRoleFromMember(member, grouping1).queue();
+		}
+		if (match2 == 0 && member.getRoles().contains(grouping2)) {
+			event.getGuild().removeRoleFromMember(member, grouping2).queue();
 		}
 	}
 }

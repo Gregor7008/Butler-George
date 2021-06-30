@@ -22,11 +22,11 @@ public class embed {
 		try {
 			this.messagesplit(object);
 		} catch (Exception e) {
-			new Answer("Error", ":exclamation: | Something seems to have failed... \n Error code: 002", event, true);
+			new Answer("Error", ":exclamation: | Something seems to have failed... \n ----> Error code: 002", event, true);
 		}
 		this.buildMessage();
 		} else {
-			new Answer("?!", ":exclamation: | HOW should I know what to send? \n Error code: 003", event, false);
+			new Answer("?!", ":exclamation: | HOW should I know what to send? \n ----> Error code: 003", event, false);
 		}
 	}
 	

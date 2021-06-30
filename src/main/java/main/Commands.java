@@ -1,5 +1,6 @@
 package main;
 
+import functions.chat;
 import functions.embed;
 import functions.rolecheck;
 import functions.rolesorting;
@@ -18,7 +19,7 @@ public class Commands extends ListenerAdapter {
 	
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		if (event.getMessage().getContentRaw().startsWith(Startup.prefix) && !event.getMessage().getAuthor().isBot()) {
-		raw = event.getMessage().getContentRaw().split("\\s+", 2);
+			raw = event.getMessage().getContentRaw().split("\\s+", 2);
 			String input = raw[0];
 			try {
 				object = raw[1];
@@ -48,10 +49,15 @@ public class Commands extends ListenerAdapter {
 					new test(event);
 					break;
 				case "stop":
+					event.getMessage().delete().queue();
 					Startup.endMe();
 					break;
 				default:
-					new Answer("Unknown Command",":exclamation: | This command doesn't seem to exist! \n Error code: 001", event, false);
+					new Answer("Unknown Command",":exclamation: | This command doesn't seem to exist! \n ---> Error code: 001", event, true);
+			}
+		} else {
+			if (!event.getMessage().getAuthor().isBot()) {
+				new chat(event);
 			}
 		}
 	}

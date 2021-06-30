@@ -16,6 +16,7 @@ public class Answer {
 		eb.setFooter("Official NoLimits Bot! - discord.gg/qHA2vUs");
 		if (delete == true) {
 			event.getChannel().sendMessage(eb.build()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+			event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
 		} else {
 			event.getChannel().sendMessage(eb.build()).queue();
 		}
