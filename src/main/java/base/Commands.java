@@ -4,10 +4,11 @@ import functions.chat;
 import functions.embed;
 import functions.rolecheck;
 import functions.rolesorting;
-import functions.test;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import tools.Answer;
+import tools.test;
 
 public class Commands extends ListenerAdapter {
 	
