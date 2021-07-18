@@ -13,7 +13,7 @@ public class Bot {
 	private static EventWaiter eventWaiter = new EventWaiter();
 	
 	public static void main(String[] arguments) throws LoginException, InterruptedException {
-	    new Bot("ODI1MzQyNjkyODg3NjI1NzM4.YF8iSA.XIuZZ9XSVNbVyEiBXKDV1hH9vTs");
+	    new Bot("Token here");
 	}
 	
 	private Bot(String token) throws LoginException, InterruptedException {
