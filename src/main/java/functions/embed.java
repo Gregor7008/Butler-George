@@ -1,78 +1,93 @@
 package functions;
 
-import main.Answer;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+
+import base.Answer;
+import base.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class embed {
 	
 	String Title, Description, Author, AvatarURL, TNailURL, ImageURL, FooterText;
-	String[] FTitle = new String[4];
-	String[] FText = new String[4];
-	TextChannel channel;
-	boolean ILM;
+	CountDownLatch sync = new CountDownLatch(15);
 	
 	public embed(GuildMessageReceivedEvent event, String object, Member member) {
-		if (!object.equals("none")) {
 		Author = member.getEffectiveName();
 		AvatarURL = member.getUser().getAvatarUrl();
-		channel = event.getChannel();
-		try {
-			this.messagesplit(object);
-		} catch (Exception e) {
-			new Answer("Error", ":exclamation: | Something seems to have failed... \n ----> Error code: 002", event, true);
-		}
-		this.buildMessage();
-		} else {
-			new Answer("?!", ":exclamation: | HOW should I know what to send? \n ----> Error code: 003", event, false);
-		}
+		TextChannel channel = event.getChannel();
+		User user = event.getAuthor();
+		this.definetitle(user, channel, true);
 	}
 	
-	private void messagesplit(String message) {
-		String[] raw = message.split("\\$");
-		for (int i = 0; raw.length-1 >= i; i++) {
-				if (raw[i].contains("-t")) {
-					String[] temp1 = raw[i].split("\\s+", 2);
-					Title = temp1[1];
-			} else { 
-				if (raw[i].contains("-d")) {
-					String[] temp1 = raw[i].split("\\s+", 2);
-					Description = temp1[1];
-			} else { 
-				if (raw[i].contains("-i")) {
-					String[] temp1 = raw[i].split("\\s+", 2);
-					ImageURL = temp1[1];
-			} else {
-				if (raw[i].contains("-o")) {
-					String[] temp1 = raw[i].split("\\s+", 2);
-					FooterText = temp1[1];
-			} else {
-				if (raw[i].contains("-n")) {
-					String[] temp1 = raw[i].split("\\s+", 2);
-					TNailURL = temp1[1];
-			} else {
-				if (raw[i].contains("-m")) {
-					String[] temp1 = raw[i].split("\\s+", 2);
-					if (temp1[1].equalsIgnoreCase("true")) {
-						ILM = true;
-					} else {
-						ILM = false;
-					}
-			} else {
-				if (raw[i].contains("-f")) {
-					String[] temp1 = raw[i].split("\\s+", 2);
-					String[] temp2 = temp1[1].split(";"+"\\s+");
-					for (int o = 0; temp2.length-1 >= o; o++) {
-						String[] temp3 = temp2[o].split("/");
-						FTitle[o] = temp3[0];
-						FText[o] = temp3[1];
-			}}}}}}}}
-		}
+	private void definetitle(User user, TextChannel channel, boolean handoff) {
+		EventWaiter waiter = Bot.getWaiter();
+		new Answer("Define \"Title\"!", "Please respond with your wanted title!", channel, false);
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+							e -> {Title = e.getMessage().getContentRaw();
+								  if(handoff) {this.definedescr(user, channel, true);}},
+							1, TimeUnit.MINUTES,
+							() -> {new Answer("Timeout!", ":exclamation: | You took to long to answer! \\n ---> Error code: 005", channel, true);});
+	}
+
+	private void definedescr(User user, TextChannel channel, boolean handoff) {
+		EventWaiter waiter = Bot.getWaiter();
+		new Answer("Define \"Description\"!", "Please respond with your wanted description!", channel, false);
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+							e -> {Description = e.getMessage().getContentRaw();
+								  if(handoff) {this.definefooter(user, channel, true);}},
+							1, TimeUnit.MINUTES,
+							() -> {new Answer("Timeout!", ":exclamation: | You took to long to answer! \\n ---> Error code: 005", channel, true);});
 	}
 	
-	private void buildMessage() {
+	private void definefooter(User user, TextChannel channel, boolean handoff) {
+		EventWaiter waiter = Bot.getWaiter();
+		new Answer("Define \"Footer-Text\"!", "Please respond with your wanted footer!", channel, false);
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+							e -> {FooterText = e.getMessage().getContentRaw();
+								  if(handoff) {this.defineTNail(user, channel, true);}},
+							1, TimeUnit.MINUTES,
+							() -> {new Answer("Timeout!", ":exclamation: | You took to long to answer! \\n ---> Error code: 005", channel, true);});
+	}
+
+	private void defineTNail(User user, TextChannel channel, boolean handoff) {
+		EventWaiter waiter = Bot.getWaiter();
+		new Answer("Define \"ThumbnailURL\"!", "Please respond with an URL, leading to your Thumbnail!", channel, false);
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+							e -> {TNailURL = e.getMessage().getContentRaw();
+								  if(handoff) {this.defineImag(user, channel, true);}},
+							1, TimeUnit.MINUTES,
+							() -> {new Answer("Timeout!", ":exclamation: | You took to long to answer! \\n ---> Error code: 005", channel, true);});
+	}
+	
+	private void defineImag(User user, TextChannel channel, boolean handoff) {
+		EventWaiter waiter = Bot.getWaiter();
+		new Answer("Define \"ImageURL\"!", "Please respond with an URL, leading to your Image!", channel, false);
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+							e -> {ImageURL = e.getMessage().getContentRaw();
+								  if(handoff) {this.buildMessage(channel);}},
+							1, TimeUnit.MINUTES,
+							() -> {new Answer("Timeout!", ":exclamation: | You took to long to answer! \\n ---> Error code: 005", channel, true);});
+	}
+
+	private void buildMessage(TextChannel channel) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setTitle(Title);
 		eb.setColor(56575);
@@ -81,16 +96,8 @@ public class embed {
 		eb.setFooter(FooterText);
 		eb.setImage(ImageURL);
 		eb.setThumbnail(TNailURL);
-		eb.addField(FTitle[0],FText[0], ILM);
-		if (FTitle[1]!=null) {
-			eb.addField(FTitle[1],FText[1], ILM);
-		}
-		if (FTitle[2]!=null) {
-			eb.addField(FTitle[2],FText[2], ILM);
-		}
-		if (FTitle[3]!=null) {
-			eb.addField(FTitle[3],FText[3], ILM);
-		}
-		channel.sendMessage(eb.build()).queue();
+		eb.addField(null);
+		MessageEmbed embed = eb.build();
+		channel.sendMessageEmbeds(embed).queue();
 	}
 }
