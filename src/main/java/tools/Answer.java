@@ -1,5 +1,9 @@
 package tools;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,5 +25,20 @@ public class Answer {
 		} else {
 			channel.sendMessageEmbeds(embed).queue();
 		}
+	}
+	
+	public String fetchMessage (String input) {
+	
+	String[] temp1 = input.split(":");
+	String path = temp1[0];
+	String key = temp1[1];
+	File propertiesFile = new File(path + ".properties");
+	Properties properties = new Properties();
+	 
+	try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
+	  properties.load(bis);
+	} catch (Exception ex) {}
+	 
+	return properties.getProperty(key);
 	}
 }
