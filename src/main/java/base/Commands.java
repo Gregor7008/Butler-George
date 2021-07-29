@@ -7,7 +7,7 @@ import functions.rolesorting;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import tools.Answer;
+import tools.answer;
 import tools.test;
 
 public class Commands extends ListenerAdapter {
@@ -29,7 +29,7 @@ public class Commands extends ListenerAdapter {
 					new rolecheck(event, member);
 					break;
 				case "role-sort":
-					new rolesorting(event, member);
+					new rolesorting(event);
 					break;
 				case "embed":
 					new embed(event, object, member);
@@ -39,10 +39,11 @@ public class Commands extends ListenerAdapter {
 					break;
 				case "stop":
 					event.getMessage().delete().queue();
-					Bot.endMe();
+					Bot.shutdown();
+					System.out.println("Bot offline");
 					break;
 				default:
-					new Answer("Unknown Command",":exclamation: | This command doesn't seem to exist! \n ---> Error code: 001", event.getChannel(), true);
+					new answer("/commands/commands:unknown", event);
 					event.getMessage().delete().queue();
 			}
 		} else { 

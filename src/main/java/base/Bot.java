@@ -11,13 +11,14 @@ public class Bot {
 	
 	public static String prefix = "#";
 	private static EventWaiter eventWaiter = new EventWaiter();
+	private static JDA jda;
 	
 	public static void main(String[] arguments) throws LoginException, InterruptedException {
 	    new Bot("Token here");
 	}
 	
 	private Bot(String token) throws LoginException, InterruptedException {
-		JDA jda = JDABuilder.createDefault(token).addEventListeners(eventWaiter).build().awaitReady();
+		jda = JDABuilder.createDefault(token).addEventListeners(eventWaiter).build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);
 		jda.addEventListener(new Commands());
 	    while (true) {
@@ -31,9 +32,11 @@ public class Bot {
 			wait(15000);
 	    }
 	}
-	
-	public static void endMe() {
-		wait(1000);
+
+	public static void shutdown() {
+		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
+		jda.shutdown();
+		wait(5000);
 		System.exit(0);
 	}
 	

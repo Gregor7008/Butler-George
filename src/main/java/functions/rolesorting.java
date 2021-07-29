@@ -1,49 +1,85 @@
 package functions;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+
+import base.Bot;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import tools.answer;
 
 public class rolesorting {
 	
-	Role grouping1, grouping2;
-	List<Role> subroles1, subroles2;
+	Role grouprole;
+	List<Role> subroles;
 	Member member;
 
-	public rolesorting(GuildMessageReceivedEvent event, Member tocheck) {
-		grouping1 = event.getGuild().getRolesByName("᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼Gruppen᲼᲼᲼᲼᲼᲼᲼᲼᲼", true).get(0);
-		grouping2 = event.getGuild().getRolesByName("᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼Abos᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼", true).get(0);
-		subroles1 = Arrays.asList(event.getGuild().getRolesByName("Freunde", true).get(0),
-								  event.getGuild().getRolesByName("Bewerber", true).get(0),
-								  event.getGuild().getRolesByName("MC-Server", true).get(0));
-		subroles2 = event.getGuild().getRoles().subList(event.getGuild().getRoles().size() - event.getGuild().getRolesByName("Minecraft", true).get(0).getPosition() - 2,
-				  										event.getGuild().getRoles().size() - event.getGuild().getRolesByName("Valorant", true).get(0).getPosition() - 1);
-		member = tocheck;
-		rolesorter(event);
+	public rolesorting(GuildMessageReceivedEvent event) {
+		definegroup(event);
+	}
+	
+	private void definegroup(GuildMessageReceivedEvent event) {
+		EventWaiter waiter = Bot.getWaiter();
+		new answer("/commands/rolesorting:definegroup", event);
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == event.getAuthor().getIdLong();},
+							e -> {grouprole = e.getMessage().getMentionedRoles().get(0);
+								  this.definesub(event);},
+							1, TimeUnit.MINUTES,
+							() -> {this.cleanup(2, event);
+								   new answer("/commands/rolesorting:timeout", event);});
+	}
+	
+	private void definesub(GuildMessageReceivedEvent event) {
+		EventWaiter waiter = Bot.getWaiter();
+		new answer("/commands/rolesorting:definesub", event);
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == event.getAuthor().getIdLong();},
+							e -> {subroles = e.getMessage().getMentionedRoles();
+								  this.definemember(event);},
+							1, TimeUnit.MINUTES,
+							() -> {this.cleanup(4, event);
+								   new answer("/commands/rolesorting:timeout", event);});
+	}
+
+	private void definemember(GuildMessageReceivedEvent event) {
+		EventWaiter waiter = Bot.getWaiter();
+		new answer("/commands/rolesorting:definemember", event);
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == event.getAuthor().getIdLong();},
+							e -> {member = e.getMessage().getMentionedMembers().get(0);
+								  this.rolesorter(event);},
+							1, TimeUnit.MINUTES,
+							() -> {this.cleanup(6, event);
+								   new answer("/commands/rolesorting:timeout", event);});
 	}
 	
 	private void rolesorter(GuildMessageReceivedEvent event) {
 		int size = member.getRoles().size();
-		int match1 = 0;
-		int match2 = 0;
+		int match = 0;
 		for (int i = 1; i < size; i++) {
-			if (subroles1.contains(member.getRoles().get(i))) {
-				event.getGuild().addRoleToMember(member, grouping1).queue();
-				match1++;
-			}
-			if (subroles2.contains(member.getRoles().get(i))) {
-				event.getGuild().addRoleToMember(member, grouping2).queue();
-				match2++;	
+			if (subroles.contains(member.getRoles().get(i))) {
+				event.getGuild().addRoleToMember(member, grouprole).queue();
+				match++;
 			}
 		}
-		if (match1 == 0 && member.getRoles().contains(grouping1)) {
-			event.getGuild().removeRoleFromMember(member, grouping1).queue();
+		if (match == 0 && member.getRoles().contains(grouprole)) {
+			event.getGuild().removeRoleFromMember(member, grouprole).queue();
 		}
-		if (match2 == 0 && member.getRoles().contains(grouping2)) {
-			event.getGuild().removeRoleFromMember(member, grouping2).queue();
-		}
+		List<Message> messages = event.getChannel().getHistory().retrievePast(7).complete();
+		event.getChannel().deleteMessages(messages).queue();
+		new answer("/commands/rolesorting:success", event);
+	}
+	
+	private void cleanup(int i, GuildMessageReceivedEvent event) {
+		List<Message> messages = event.getChannel().getHistory().retrievePast(i).complete();
+		event.getChannel().deleteMessages(messages).queue();
 	}
 }
