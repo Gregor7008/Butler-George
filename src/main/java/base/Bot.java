@@ -36,6 +36,7 @@ public class Bot {
 	public static void shutdown() {
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
+		System.out.println("Bot offline");
 		wait(5000);
 		System.exit(0);
 	}

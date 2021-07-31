@@ -1,7 +1,6 @@
 package functions;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -17,107 +16,135 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import tools.answer;
 
 public class embed {
-	
-	String Title, Description, Author, AvatarURL, TNailURL, ImageURL, FooterText;
-	CountDownLatch sync = new CountDownLatch(15);
+
 	GuildMessageReceivedEvent oevent;
+	EmbedBuilder eb;
+	int messagecount;
 	
-	public embed(GuildMessageReceivedEvent event, String object, Member member) {
+	public embed(GuildMessageReceivedEvent event) {
 		oevent = event;
-		Author = member.getEffectiveName();
-		AvatarURL = member.getUser().getAvatarUrl();
-		TextChannel channel = event.getChannel();
-		User user = event.getAuthor();
-		this.definetitle(user, channel, true);
+		Member member;
+		try {member = event.getMessage().getMentionedMembers().get(0);
+		} catch (Exception e) {member = event.getMember();}
+		eb = new EmbedBuilder();
+		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());	
+		eb.setColor(56575);
+		messagecount=1;
+		this.definetitle(event.getAuthor(), event.getChannel());
 	}
 	
-	private void definetitle(User user, TextChannel channel, boolean handoff) {
+	private void definetitle(User user, TextChannel channel) {
 		EventWaiter waiter = Bot.getWaiter();
 		new answer("/commands/embed:definetitle", oevent);
+		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-							e -> {Title = e.getMessage().getContentRaw();
-								  if(handoff) {this.definedescr(user, channel, true);}},
+							e -> {eb.setTitle(e.getMessage().getContentRaw());
+								  messagecount++;
+								  this.definedescr(user, channel);},
 							1, TimeUnit.MINUTES,
-							() -> {this.cleanup(2, oevent);
+							() -> {this.cleanup();
 								   new answer("/commands/embed:timeout", oevent);});
 	}
 
-	private void definedescr(User user, TextChannel channel, boolean handoff) {
+	private void definedescr(User user, TextChannel channel) {
 		EventWaiter waiter = Bot.getWaiter();
 		new answer("/commands/embed:definedescr", oevent);
+		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-							e -> {Description = e.getMessage().getContentRaw();
-								  if(handoff) {this.definefooter(user, channel, true);}},
+							e -> {eb.setDescription(e.getMessage().getContentRaw());
+								  messagecount++;
+								  this.definefooter(user, channel);},
 							1, TimeUnit.MINUTES,
-							() -> {this.cleanup(4, oevent);
+							() -> {this.cleanup();
 								   new answer("/commands/embed:timeout", oevent);});
 	}
 	
-	private void definefooter(User user, TextChannel channel, boolean handoff) {
+	private void definefooter(User user, TextChannel channel) {
 		EventWaiter waiter = Bot.getWaiter();
 		new answer("/commands/embed:definefooter", oevent);
+		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-							e -> {if (e.getMessage().getContentRaw()=="none"){} else {FooterText = e.getMessage().getContentRaw();}
-								  if(handoff) {this.defineTNail(user, channel, true);}},
+							e -> {if (e.getMessage().getContentRaw()=="none"){} else {eb.setFooter(e.getMessage().getContentRaw());}
+								  messagecount++;
+								  this.defineTNail(user, channel);},
 							1, TimeUnit.MINUTES,
-							() -> {this.cleanup(6, oevent);
+							() -> {this.cleanup();
 								   new answer("/commands/embed:timeout", oevent);});
 	}
 
-	private void defineTNail(User user, TextChannel channel, boolean handoff) {
+	private void defineTNail(User user, TextChannel channel) {
 		EventWaiter waiter = Bot.getWaiter();
 		new answer("/commands/embed:defineTNail", oevent);
+		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-							e -> {if (e.getMessage().getContentRaw()=="none"){} else {TNailURL = e.getMessage().getContentRaw();}
-								  if(handoff) {this.defineImag(user, channel, true);}},
+							e -> {if (e.getMessage().getContentRaw().contains("none")){} else {eb.setThumbnail(e.getMessage().getContentRaw());}
+								  messagecount++;
+								  this.defineImag(user, channel);},
 							1, TimeUnit.MINUTES,
-							() -> {this.cleanup(8, oevent);
+							() -> {this.cleanup();
 								   new answer("/commands/embed:timeout", oevent);});
 	}
 	
-	private void defineImag(User user, TextChannel channel, boolean handoff) {
+	private void defineImag(User user, TextChannel channel) {
 		EventWaiter waiter = Bot.getWaiter();
 		new answer("/commands/embed:defineImag", oevent);
+		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-							e -> {if (e.getMessage().getContentRaw()=="none"){} else {ImageURL = e.getMessage().getContentRaw();}
-								  if(handoff) {this.buildMessage(channel);}},
+							e -> {if (e.getMessage().getContentRaw().contains("none")){} else {eb.setImage(e.getMessage().getContentRaw());}
+								  messagecount++;
+								  this.wantnewfield(user, channel);},
 							1, TimeUnit.MINUTES,
-							() -> {this.cleanup(10, oevent);
+							() -> {this.cleanup();
 								   new answer("/commands/embed:timeout", oevent);});
 	}
-
-	private void buildMessage(TextChannel channel) {
-		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(Title);
-		eb.setColor(56575);
-		eb.setDescription(Description);
-		eb.setAuthor(Author, null, AvatarURL);
-		if (FooterText == null){} else {eb.setFooter(FooterText);}
-		try {eb.setImage(ImageURL);} catch (Exception e) {};
-		try {eb.setThumbnail(TNailURL);} catch (Exception e) {};
-		eb.addField(null);
-		MessageEmbed embed = eb.build();
-		this.sendMessage(embed, channel);
+	
+	private void wantnewfield(User user, TextChannel channel) {
+		EventWaiter waiter = Bot.getWaiter();
+		new answer("/commands/embed:wantnewfield", oevent);
+		messagecount++;
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+							e -> {messagecount++;
+								  if(e.getMessage().getContentRaw().contains("no")) {this.sendMessage(eb.build(), channel);} else {this.addnewfield(user, channel);}},
+							1, TimeUnit.MINUTES,
+							() -> {this.cleanup();
+								   new answer("/commands/embed:timeout", oevent);});
+	}
+	
+	private void addnewfield(User user, TextChannel channel) {
+		EventWaiter waiter = Bot.getWaiter();
+		new answer("/commands/embed:addnewfield", oevent);
+		messagecount++;
+		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+							e -> {messagecount++;
+								  String[] temp1 = e.getMessage().getContentRaw().split("\\+");
+								  eb.addField(temp1[0], temp1[1], true);
+								  this.wantnewfield(user, channel);},
+							1, TimeUnit.MINUTES,
+							() -> {this.cleanup();
+								   new answer("/commands/embed:timeout", oevent);});
 	}
 	
 	private void sendMessage(MessageEmbed embed, TextChannel channel) {
-		List<Message> messages = channel.getHistory().retrievePast(11).complete();
-		channel.deleteMessages(messages).queue();
+		this.cleanup();
 		channel.sendMessageEmbeds(embed).queue();
 	}
 	
-	private void cleanup(int i, GuildMessageReceivedEvent event) {
-		List<Message> messages = event.getChannel().getHistory().retrievePast(i).complete();
-		event.getChannel().deleteMessages(messages).queue();
+	private void cleanup() {
+		List<Message> messages = oevent.getChannel().getHistory().retrievePast(messagecount).complete();
+		oevent.getChannel().deleteMessages(messages).queue();
 	}
 }

@@ -7,7 +7,10 @@ import tools.answer;
 
 public class rolecheck {
 
-	public rolecheck(GuildMessageReceivedEvent event, Member member) {
+	public rolecheck(GuildMessageReceivedEvent event) {
+		Member member;
+		try {member = event.getMessage().getMentionedMembers().get(0);
+		} catch (Exception e) {member = event.getMember();}
 		Role mentionedRole = event.getMessage().getMentionedRoles().get(0);
 		if (mentionedRole == null) {
 			new answer("/commands/rolecheck:incomplete", event);

@@ -16,7 +16,7 @@ public class rolesorting {
 	
 	Role grouprole;
 	List<Role> subroles;
-	Member member;
+	List<Member> members;
 
 	public rolesorting(GuildMessageReceivedEvent event) {
 		definegroup(event);
@@ -54,7 +54,7 @@ public class rolesorting {
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == event.getAuthor().getIdLong();},
-							e -> {member = e.getMessage().getMentionedMembers().get(0);
+							e -> {members = e.getMessage().getMentionedMembers();
 								  this.rolesorter(event);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup(6, event);
@@ -62,19 +62,21 @@ public class rolesorting {
 	}
 	
 	private void rolesorter(GuildMessageReceivedEvent event) {
-		int size = member.getRoles().size();
-		int match = 0;
-		for (int i = 1; i < size; i++) {
-			if (subroles.contains(member.getRoles().get(i))) {
-				event.getGuild().addRoleToMember(member, grouprole).queue();
-				match++;
+		for (int e = 0; e<=members.size()-1; e++) {
+			Member member = members.get(e);
+			int size = member.getRoles().size();
+			int match = 0;
+			for (int i = 1; i < size; i++) {
+				if (subroles.contains(member.getRoles().get(i))) {
+					event.getGuild().addRoleToMember(member, grouprole).queue();
+					match++;
+				}
+			}
+			if (match == 0 && member.getRoles().contains(grouprole)) {
+				event.getGuild().removeRoleFromMember(member, grouprole).queue();
 			}
 		}
-		if (match == 0 && member.getRoles().contains(grouprole)) {
-			event.getGuild().removeRoleFromMember(member, grouprole).queue();
-		}
-		List<Message> messages = event.getChannel().getHistory().retrievePast(7).complete();
-		event.getChannel().deleteMessages(messages).queue();
+		this.cleanup(7, event);
 		new answer("/commands/rolesorting:success", event);
 	}
 	
