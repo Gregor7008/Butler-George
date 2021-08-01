@@ -22,6 +22,10 @@ public class rolesorting {
 		definegroup(event);
 	}
 	
+	public rolesorting(GuildMessageReceivedEvent event, Member mb, List<Role> sr, Role gr) {
+		this.rs(event, mb, sr, gr);
+	}
+
 	private void definegroup(GuildMessageReceivedEvent event) {
 		EventWaiter waiter = Bot.getWaiter();
 		new answer("/commands/rolesorting:definegroup", event);
@@ -78,6 +82,20 @@ public class rolesorting {
 		}
 		this.cleanup(7, event);
 		new answer("/commands/rolesorting:success", event);
+	}
+	
+	public void rs(GuildMessageReceivedEvent event, Member mb, List<Role> sr, Role gr) {
+			int size = mb.getRoles().size();
+			int match = 0;
+			for (int i = 1; i < size; i++) {
+				if (sr.contains(mb.getRoles().get(i))) {
+					event.getGuild().addRoleToMember(mb, gr).queue();
+					match++;
+				}
+			}
+			if (match == 0 && mb.getRoles().contains(gr)) {
+				event.getGuild().removeRoleFromMember(mb, gr).queue();
+			}
 	}
 	
 	private void cleanup(int i, GuildMessageReceivedEvent event) {
