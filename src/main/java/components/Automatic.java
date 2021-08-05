@@ -1,22 +1,22 @@
-package functions;
+package components;
 
 import java.util.List;
 
+import commands.moderation.Rolesorting;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class chat {
+public class Automatic {
 	
 	String message;
 	TextChannel channel;
 	
-	public chat(GuildMessageReceivedEvent event) {
+	public Automatic(GuildMessageReceivedEvent event) {
 		message = event.getMessage().getContentRaw();
 		channel = event.getChannel();
 		this.autocheck(event);
-		respond(event);
 	}
 	
 	private void autocheck(GuildMessageReceivedEvent event) {
@@ -36,17 +36,11 @@ public class chat {
 		List<Role> sr3 = event.getGuild().getRoles().stream().filter(e -> e.getPosition() < gr3p).toList().stream().filter(e -> e.getPosition() > gr4p).toList();
 		List<Role> sr4 = event.getGuild().getRoles().stream().filter(e -> e.getPosition() < gr4p).toList().stream().filter(e -> e.getPosition() > gr5p).toList();
 		List<Role> sr5 = event.getGuild().getRoles().stream().filter(e -> e.getPosition() < gr5p).toList().stream().filter(e -> e.getPosition() >= event.getGuild().getRoleById("863708141317259294").getPosition()).toList();
-		new rolesorting(event, member, sr1, gr1);
-		new rolesorting(event, member, sr2, gr3);
-		new rolesorting(event, member, sr3, gr3);
-		new rolesorting(event, member, sr4, gr4);
-		new rolesorting(event, member, sr5, gr5);
-	}
-
-	public void respond(GuildMessageReceivedEvent event) {
-		if (message.toLowerCase().contains("minecraft")) {
-			channel.sendMessage("Warum schreibst du \"Minecraft\" aus? :exploding_head:").queue();
-		}
-	}
-	
+		Rolesorting rs = new Rolesorting();
+		rs.sort(event, member, sr1, gr1);
+		rs.sort(event, member, sr2, gr2);
+		rs.sort(event, member, sr3, gr3);
+		rs.sort(event, member, sr4, gr4);
+		rs.sort(event, member, sr5, gr5);
+	}	
 }

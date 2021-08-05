@@ -1,4 +1,4 @@
-package tools;
+package components;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -10,13 +10,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class answer {
+public class Answer {
 
 	String message, title;
 	boolean delete;
 	GuildMessageReceivedEvent event;
 	
-	public answer(String input, GuildMessageReceivedEvent e) {
+	public Answer(String input, GuildMessageReceivedEvent e) {
 		event = e;
 		this.fetchMessage(input);
 		//Input should look like this: new Answer("/folderxy:filexy", event);

@@ -1,4 +1,4 @@
-package functions;
+package commands.utilities;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
+import base.Commands;
+import components.Answer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -13,15 +15,16 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import tools.answer;
 
-public class embed {
+public class Embed implements Commands{
 
 	GuildMessageReceivedEvent oevent;
 	EmbedBuilder eb;
 	int messagecount;
+	Bot bot;
 	
-	public embed(GuildMessageReceivedEvent event) {
+	@Override
+	public void perform(GuildMessageReceivedEvent event, String arguments) {
 		oevent = event;
 		Member member;
 		try {member = event.getMessage().getMentionedMembers().get(0);
@@ -34,8 +37,8 @@ public class embed {
 	}
 	
 	private void definetitle(User user, TextChannel channel) {
-		EventWaiter waiter = Bot.getWaiter();
-		new answer("/commands/embed:definetitle", oevent);
+		EventWaiter waiter = bot.getWaiter();
+		new Answer("/commands/utilities/embed:definetitle", oevent);
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -45,12 +48,12 @@ public class embed {
 								  this.definedescr(user, channel);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   new answer("/commands/embed:timeout", oevent);});
+								   new Answer("/commands/utilities/embed:timeout", oevent);});
 	}
 
 	private void definedescr(User user, TextChannel channel) {
-		EventWaiter waiter = Bot.getWaiter();
-		new answer("/commands/embed:definedescr", oevent);
+		EventWaiter waiter = bot.getWaiter();
+		new Answer("/commands/utilities/embed:definedescr", oevent);
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -60,12 +63,12 @@ public class embed {
 								  this.definefooter(user, channel);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   new answer("/commands/embed:timeout", oevent);});
+								   new Answer("/commands/utilities/embed:timeout", oevent);});
 	}
 	
 	private void definefooter(User user, TextChannel channel) {
-		EventWaiter waiter = Bot.getWaiter();
-		new answer("/commands/embed:definefooter", oevent);
+		EventWaiter waiter = bot.getWaiter();
+		new Answer("/commands/utilities/embed:definefooter", oevent);
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -75,12 +78,12 @@ public class embed {
 								  this.defineTNail(user, channel);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   new answer("/commands/embed:timeout", oevent);});
+								   new Answer("/commands/utilities/embed:timeout", oevent);});
 	}
 
 	private void defineTNail(User user, TextChannel channel) {
-		EventWaiter waiter = Bot.getWaiter();
-		new answer("/commands/embed:defineTNail", oevent);
+		EventWaiter waiter = bot.getWaiter();
+		new Answer("/commands/utilities/embed:defineTNail", oevent);
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -90,12 +93,12 @@ public class embed {
 								  this.defineImag(user, channel);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   new answer("/commands/embed:timeout", oevent);});
+								   new Answer("/commands/utilities/embed:timeout", oevent);});
 	}
 	
 	private void defineImag(User user, TextChannel channel) {
-		EventWaiter waiter = Bot.getWaiter();
-		new answer("/commands/embed:defineImag", oevent);
+		EventWaiter waiter = bot.getWaiter();
+		new Answer("/commands/utilities/embed:defineImag", oevent);
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -105,12 +108,12 @@ public class embed {
 								  this.wantnewfield(user, channel);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   new answer("/commands/embed:timeout", oevent);});
+								   new Answer("/commands/utilities/embed:timeout", oevent);});
 	}
 	
 	private void wantnewfield(User user, TextChannel channel) {
-		EventWaiter waiter = Bot.getWaiter();
-		new answer("/commands/embed:wantnewfield", oevent);
+		EventWaiter waiter = bot.getWaiter();
+		new Answer("/commands/utilities/embed:wantnewfield", oevent);
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -119,12 +122,12 @@ public class embed {
 								  if(e.getMessage().getContentRaw().contains("no")) {this.sendMessage(eb.build(), channel);} else {this.addnewfield(user, channel);}},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   new answer("/commands/embed:timeout", oevent);});
+								   new Answer("/commands/utilities/embed:timeout", oevent);});
 	}
 	
 	private void addnewfield(User user, TextChannel channel) {
-		EventWaiter waiter = Bot.getWaiter();
-		new answer("/commands/embed:addnewfield", oevent);
+		EventWaiter waiter = bot.getWaiter();
+		new Answer("/commands/utilities/embed:addnewfield", oevent);
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -135,7 +138,7 @@ public class embed {
 								  this.wantnewfield(user, channel);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   new answer("/commands/embed:timeout", oevent);});
+								   new Answer("/commands/utilities/embed:timeout", oevent);});
 	}
 	
 	private void sendMessage(MessageEmbed embed, TextChannel channel) {

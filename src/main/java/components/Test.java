@@ -1,10 +1,10 @@
-package tools;
+package components;
 
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class test {
+public class Test {
 
-	public test(GuildMessageReceivedEvent event) {
+	public Test(GuildMessageReceivedEvent event) {
 		int e = event.getGuild().getRolesByName("GTAV", true).get(0).getPosition();
 		System.out.println(e);
 	}	 

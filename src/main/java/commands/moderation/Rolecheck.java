@@ -1,25 +1,27 @@
-package functions;
+package commands.moderation;
 
+import base.Commands;
+import components.Answer;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import tools.answer;
 
-public class rolecheck {
+public class Rolecheck implements Commands{
 
-	public rolecheck(GuildMessageReceivedEvent event) {
+	@Override
+	public void perform(GuildMessageReceivedEvent event, String arguments) {
 		Member member;
 		try {member = event.getMessage().getMentionedMembers().get(0);
 		} catch (Exception e) {member = event.getMember();}
 		Role mentionedRole = event.getMessage().getMentionedRoles().get(0);
 		if (mentionedRole == null) {
-			new answer("/commands/rolecheck:incomplete", event);
+			new Answer("/commands/moderation/rolecheck:incomplete", event);
 			this.wait(3200);
 		} else {
 		if (hasRole(member, mentionedRole)==true) {
-			new answer("/commands/rolecheck:found", event);
+			new Answer("/commands/moderation/rolecheck:found", event);
 		} else {
-			new answer("/commands/rolecheck:notfound", event);
+			new Answer("/commands/moderation/rolecheck:notfound", event);
 		}
 		}
 	}
