@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
-import base.Commands;
+import commands.Commands;
 import components.Answer;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;

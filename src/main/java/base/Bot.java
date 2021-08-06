@@ -11,11 +11,7 @@ import java.util.Properties;
 import javax.security.auth.login.LoginException;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
-import components.music.PlayerManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -26,8 +22,6 @@ public class Bot {
 	public static Bot INSTANCE;
 	
 	public JDA jda;
-	public AudioPlayerManager apm;
-	public PlayerManager pm;
 	private EventWaiter eventWaiter = new EventWaiter();
 	
 	public static void main(String[] arguments) {
@@ -40,19 +34,13 @@ public class Bot {
 	
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
-		
-		JDABuilder builder = JDABuilder.createDefault(this.getConfig("token"));
-				   builder.addEventListeners(eventWaiter);
-				   builder.addEventListeners(new MessageProcessor());
-				   this.apm = new DefaultAudioPlayerManager();
-				   this.pm = new PlayerManager();
-		jda = builder.build();
-		jda.getPresence().setStatus(OnlineStatus.ONLINE);
-		System.out.println("Bot online");
 		this.readConsole();
 		
-		AudioSourceManagers.registerRemoteSources(apm);
-		
+		JDABuilder builder = JDABuilder.createDefault(this.getConfig("token"));
+		builder.addEventListeners(eventWaiter);
+		builder.addEventListeners(new Processor());
+		jda = builder.build();
+		jda.getPresence().setStatus(OnlineStatus.ONLINE);
 	    while (true) {
 			jda.getPresence().setActivity(Activity.listening("Gregor"));
 			this.wait(15000);

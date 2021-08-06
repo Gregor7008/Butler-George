@@ -5,17 +5,11 @@ import java.util.List;
 import commands.moderation.Rolesorting;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class Automatic {
 	
-	String message;
-	TextChannel channel;
-	
 	public Automatic(GuildMessageReceivedEvent event) {
-		message = event.getMessage().getContentRaw();
-		channel = event.getChannel();
 		this.autocheck(event);
 	}
 	

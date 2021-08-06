@@ -1,10 +1,11 @@
-package base;
+package commands;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import commands.moderation.Rolecheck;
 import commands.moderation.Rolesorting;
 import commands.music.Play;
+import commands.music.Stop;
 import commands.utilities.Embed;
 
 public class CommandList {
@@ -21,6 +22,7 @@ public ConcurrentHashMap<String, Commands> CommandList= new ConcurrentHashMap<St
 		
 		//Music
 		this.CommandList.put("play", new Play());
+		this.CommandList.put("stop", new Stop());
 	}
 
 }

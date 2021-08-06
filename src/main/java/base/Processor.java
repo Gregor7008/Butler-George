@@ -1,15 +1,18 @@
 package base;
 
+import commands.CommandList;
+import commands.Commands;
 import components.Answer;
 import components.Automatic;
 import components.Test;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class MessageProcessor extends ListenerAdapter {
+public class Processor extends ListenerAdapter {
 	
 	String arguments;
 	
+	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		if (event.getMessage().getAuthor().isBot()) {return;}
 		if (event.getMessage().getContentRaw().startsWith(Bot.INSTANCE.getConfig("prefix"))) {			
