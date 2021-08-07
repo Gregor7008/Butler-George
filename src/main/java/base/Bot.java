@@ -34,9 +34,10 @@ public class Bot {
 	
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
+		new Configloader();
 		this.readConsole();
 		
-		JDABuilder builder = JDABuilder.createDefault(this.getConfig("token"));
+		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
 		jda = builder.build();
@@ -89,8 +90,8 @@ public class Bot {
 		}).start();
 	}
 	
-	public String getConfig(String key) {
-		File propertiesFile = new File("./src/main/resources/base/config.properties");
+	private String getBotConfig(String key) {
+		File propertiesFile = new File("./src/main/resources/botconfig.properties");
 		Properties properties = new Properties();	 
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
 		  properties.load(bis);
