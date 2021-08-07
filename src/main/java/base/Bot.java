@@ -57,7 +57,7 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
 		System.out.println("Bot offline");
-		this.wait(5000);
+		this.wait(1000);
 		System.exit(0);
 	}
 	
@@ -76,7 +76,7 @@ public class Bot {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 			try {
 				while((line = reader.readLine()) != null) {
-					if(line.equalsIgnoreCase("stop")) {
+					if(line.equalsIgnoreCase("shutdown")) {
 						shutdown();
 					} else {
 						System.out.println("Command undefined");

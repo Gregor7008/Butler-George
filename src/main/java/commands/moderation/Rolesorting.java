@@ -7,7 +7,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
 import commands.Commands;
-import components.Answer;
+import components.AnswerEngine;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -31,7 +31,7 @@ public class Rolesorting implements Commands{
 
 	private void definegroup(GuildMessageReceivedEvent event) {
 		EventWaiter waiter = bot.getWaiter();
-		new Answer("/commands/rolesorting:definegroup", event);
+		AnswerEngine.getInstance().fetchMessage("/commands/rolesorting:definegroup", event).queue();
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == event.getAuthor().getIdLong();},
@@ -39,12 +39,12 @@ public class Rolesorting implements Commands{
 								  this.definesub(event);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup(2, event);
-								   new Answer("/commands/moderation/rolesorting:timeout", event);});
+								   AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolesorting:timeout", event).queue();});
 	}
 	
 	private void definesub(GuildMessageReceivedEvent event) {
 		EventWaiter waiter = bot.getWaiter();
-		new Answer("/commands/moderation/rolesorting:definesub", event);
+		AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolesorting:definesub", event).queue();
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == event.getAuthor().getIdLong();},
@@ -52,12 +52,12 @@ public class Rolesorting implements Commands{
 								  this.definemember(event);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup(4, event);
-								   new Answer("/commands/moderation/rolesorting:timeout", event);});
+								   AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolesorting:timeout", event).queue();});
 	}
 
 	private void definemember(GuildMessageReceivedEvent event) {
 		EventWaiter waiter = bot.getWaiter();
-		new Answer("/commands/moderation/rolesorting:definemember", event);
+		AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolesorting:definemember", event).queue();
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == event.getAuthor().getIdLong();},
@@ -65,7 +65,7 @@ public class Rolesorting implements Commands{
 								  this.rolesorter(event);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup(6, event);
-								   new Answer("/commands/moderation/rolesorting:timeout", event);});
+								   AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolesorting:timeout", event).queue();});
 	}
 	
 	private void rolesorter(GuildMessageReceivedEvent event) {
@@ -84,7 +84,7 @@ public class Rolesorting implements Commands{
 			}
 		}
 		this.cleanup(7, event);
-		new Answer("/commands/moderation/rolesorting:success", event);
+		AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolesorting:success", event).queue();
 	}
 	
 	public void rolesorter(GuildMessageReceivedEvent event, Member mb, List<Role> sr, Role gr) {

@@ -1,16 +1,15 @@
 package commands.music;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import commands.Commands;
-import components.Answer;
+import components.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.managers.AudioManager;
 
 public class Play implements Commands{
 
@@ -21,22 +20,28 @@ public class Play implements Commands{
 		final Member self = event.getGuild().getSelfMember();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
 		if (argument == null) {
-			new Answer("/commands/music/play:wrondusage", event);
+			AnswerEngine.getInstance().fetchMessage("/commands/music/play:wrongusage", event).queue();
 			return;
 		}
-		if (!member.getVoiceState().inVoiceChannel()) {
-			new Answer("/commands/music/play:noVCdefined", event);
+		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
+			this.load(argument, musicManager, channel, member);
 			return;
 		}
 		if (self.getVoiceState().inVoiceChannel()) {
-			new Answer("/commands/music/play:alreadyinuse", event);
+			AnswerEngine.getInstance().fetchMessage("/commands/music/play:alreadyinuse", event).queue();
 			return;
-		} else {
-			final AudioManager audioManager = event.getGuild().getAudioManager();
-			audioManager.openAudioConnection(member.getVoiceState().getChannel());
 		}
+		if (!member.getVoiceState().inVoiceChannel()) {
+			AnswerEngine.getInstance().fetchMessage("/commands/music/play:noVCdefined", event).queue();
+			return;
+		}
+		this.load(argument, musicManager, channel, member);
+	}
+	
+	private void load(String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
+		channel.getGuild().getAudioManager().openAudioConnection(member.getVoiceState().getChannel());
 		if (!isURL(argument)) {
-			String term = "ytsearch;" + argument;
+			String term = "ytsearch:" + argument;
 			musicManager.scheduler.player.setVolume(50);
 			PlayerManager.getInstance().loadAndPlay(channel, term);
 		} else {
@@ -47,9 +52,9 @@ public class Play implements Commands{
 	
 	private boolean isURL(String test) {
 		try {
-			new URI(test);
+			new URL(test);
 			return true;
-		} catch (URISyntaxException e) {
+		} catch (MalformedURLException e) {
 			return false;
 		}
 	}

@@ -32,6 +32,6 @@ public class AudioPlayerSendHandler implements AudioSendHandler {
 
     @Override
     public boolean isOpus() {
-        return AudioSendHandler.super.isOpus();
+        return true;
     }
 }

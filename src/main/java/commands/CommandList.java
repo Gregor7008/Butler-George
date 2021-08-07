@@ -4,7 +4,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import commands.moderation.Rolecheck;
 import commands.moderation.Rolesorting;
+import commands.music.Nowplaying;
 import commands.music.Play;
+import commands.music.Queue;
+import commands.music.Skip;
 import commands.music.Stop;
 import commands.utilities.Embed;
 
@@ -23,6 +26,9 @@ public ConcurrentHashMap<String, Commands> CommandList= new ConcurrentHashMap<St
 		//Music
 		this.CommandList.put("play", new Play());
 		this.CommandList.put("stop", new Stop());
+		this.CommandList.put("skip", new Skip());
+		this.CommandList.put("nowplaying", new Nowplaying());
+		this.CommandList.put("queue", new Queue());
 	}
 
 }

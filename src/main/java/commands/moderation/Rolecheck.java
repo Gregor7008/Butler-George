@@ -1,7 +1,7 @@
 package commands.moderation;
 
 import commands.Commands;
-import components.Answer;
+import components.AnswerEngine;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -15,13 +15,13 @@ public class Rolecheck implements Commands{
 		} catch (Exception e) {member = event.getMember();}
 		Role mentionedRole = event.getMessage().getMentionedRoles().get(0);
 		if (mentionedRole == null) {
-			new Answer("/commands/moderation/rolecheck:incomplete", event);
+			AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolecheck:incomplete", event).queue();
 			this.wait(3200);
 		} else {
 		if (hasRole(member, mentionedRole)==true) {
-			new Answer("/commands/moderation/rolecheck:found", event);
+			AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolecheck:found", event).queue();
 		} else {
-			new Answer("/commands/moderation/rolecheck:notfound", event);
+			AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolecheck:notfound", event).queue();
 		}
 		}
 	}
