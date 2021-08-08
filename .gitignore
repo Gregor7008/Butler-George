@@ -2,3 +2,4 @@ target/
 .settings/
 .classpath
 bin/
+src/main/resources/botconfig.properties
