@@ -4,19 +4,32 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
-import commands.CommandList;
-import commands.Commands;
 import components.AnswerEngine;
 import components.Automatic;
 import components.Test;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import textcommands.moderation.Autorole;
+import textcommands.moderation.Clear;
+import textcommands.moderation.Rolesorting;
+import textcommands.music.Nowplaying;
+import textcommands.music.Play;
+import textcommands.music.Queue;
+import textcommands.music.Skip;
+import textcommands.music.Stop;
+import textcommands.utilities.Embed;
 
 public class Processor extends ListenerAdapter {
 	
@@ -30,14 +43,41 @@ public class Processor extends ListenerAdapter {
 			try {argument = raw[1];
 			} catch (Exception e) {argument = "";}
 			
-			CommandList commandList = new CommandList();
-			Commands mdc;
-			if((mdc = commandList.CommandList.get(command[1])) != null) {
-				mdc.perform(event, argument);
-				return;
-			}
-			
 			switch(command[1]) {
+			//Utilities
+				case("embed"):
+					new Embed(event.getGuild(), event.getMember(), event.getChannel());
+					break;
+					
+			//Moderation
+				case("role-check"):
+					new Rolesorting(event.getGuild(), event.getMember(), event.getChannel());
+					break;
+				case("clear"):
+					new Clear(event.getGuild(), event.getMember(), event.getChannel(), argument);
+					break;
+				case("autorole"):
+					new Autorole(event.getGuild(), event.getMember(), event.getChannel(), event.getMessage().getMentionedRoles().get(0), argument);
+					break;
+					
+			//Music
+				case("play"):
+					new Play(event.getGuild(), event.getMember(), event.getChannel(), argument);
+					break;
+				case("stop"):
+					new Stop(event.getGuild(), event.getMember(), event.getChannel());
+					break;
+				case("skip"):
+					new Skip(event.getGuild(), event.getMember(), event.getChannel());
+					break;
+				case("nowplaying"):
+					new Nowplaying(event.getGuild(), event.getMember(), event.getChannel());
+					break;
+				case("queue"):
+					new Queue(event.getGuild(), event.getMember(), event.getChannel());
+					break;
+			
+			//Developement
 				case("shutdown"):
 					event.getMessage().delete().queue();
 					Bot.INSTANCE.shutdown();
@@ -46,7 +86,7 @@ public class Processor extends ListenerAdapter {
 					new Test(event, argument);
 					break;
 				default:
-					AnswerEngine.getInstance().fetchMessage("/base/processor:unknown", event).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+					AnswerEngine.getInstance().fetchMessage("/base/processor:unknown", event.getGuild(), event.getMember(), event.getChannel()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
 			}
 		} else { 
 			new Automatic(event);
@@ -102,5 +142,19 @@ public class Processor extends ListenerAdapter {
 				newchannel.addMemberPermissionOverride(event.getMember().getIdLong(), allow, null);
 			}
 		}
+	}
+	
+	@Override
+	public void onSlashCommand(SlashCommandEvent event) {
+		
+	}
+	
+	@Override
+	public void onReady(ReadyEvent event) {
+		CommandListUpdateAction commands = event.getJDA().getGuildById("die Discord Server ID").updateCommands();
+		commands.addCommands(
+							 new CommandData("dctest", "Nur ein Test für einen Slashcommand")
+							 				 .addOptions(new OptionData(OptionType.STRING, "Option1", "Die erste Option des ersten Subcommands").setRequired(true)));
+		commands.queue();
 	}
 }

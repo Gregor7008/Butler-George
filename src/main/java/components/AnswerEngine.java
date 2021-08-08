@@ -6,9 +6,10 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 public class AnswerEngine {
@@ -22,7 +23,7 @@ public class AnswerEngine {
 		return INSTANCE;
 	}
 	
-	public MessageAction fetchMessage (String input, GuildMessageReceivedEvent event)  {
+	public MessageAction fetchMessage (String input, Guild guild, Member member, TextChannel channel)  {
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];
@@ -35,12 +36,9 @@ public class AnswerEngine {
 		} catch (Exception e) {}
 		String temp2 = properties.getProperty(key);
 	
-		temp2.replace("{servername}", event.getGuild().getName());
-		temp2.replace("{membername}", event.getMember().getAsMention());
-		temp2.replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
-		try {
-			temp2.replace("{mentionedrole}", event.getMessage().getMentionedRoles().get(0).getAsMention());
-		} catch (IndexOutOfBoundsException e) {}
+		temp2.replace("{servername}", guild.getName());
+		temp2.replace("{membername}", member.getAsMention());
+		temp2.replace("{membercount}", Integer.toString(guild.getMemberCount()));
 	
 		String[] temp3 = temp2.split(";\\s+");
 		eb.setTitle(temp3[0]);
@@ -49,8 +47,7 @@ public class AnswerEngine {
 		eb.setAuthor("NoLimits", null,"https://i.ibb.co/CWJ8nVn/No-Limits-mit-Stern-V1.png");
 		eb.setFooter("Official NoLimits Bot! - discord.gg/qHA2vUs");
 		MessageEmbed embed = eb.build();
-		if (Boolean.parseBoolean(temp3[2])==true) {event.getMessage().delete().queue();}
-		return event.getChannel().sendMessageEmbeds(embed);
+		return channel.sendMessageEmbeds(embed);
 	}
 	
 	public MessageAction buildMessage (String title, String description, TextChannel channel) {

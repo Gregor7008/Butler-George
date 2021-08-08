@@ -1,26 +1,22 @@
-package commands.music;
+package textcommands.music;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import commands.Commands;
 import components.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-public class Play implements Commands{
+public class Play {
 
-	@Override
-	public void perform(GuildMessageReceivedEvent event, String argument) {
-		final TextChannel channel = event.getChannel();
-		final Member member = event.getMember();
-		final Member self = event.getGuild().getSelfMember();
-		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+	public Play(Guild guild, Member member, TextChannel channel, String argument) {
+		final Member self = guild.getSelfMember();
+		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/play:wrongusage", event).queue();
+			AnswerEngine.getInstance().fetchMessage("/commands/music/play:wrongusage", guild, member, channel).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
@@ -28,11 +24,11 @@ public class Play implements Commands{
 			return;
 		}
 		if (self.getVoiceState().inVoiceChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/play:alreadyinuse", event).queue();
+			AnswerEngine.getInstance().fetchMessage("/commands/music/play:alreadyinuse", guild, member, channel).queue();
 			return;
 		}
 		if (!member.getVoiceState().inVoiceChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/play:noVCdefined", event).queue();
+			AnswerEngine.getInstance().fetchMessage("/commands/music/play:noVCdefined", guild, member, channel).queue();
 			return;
 		}
 		this.load(argument, musicManager, channel, member);

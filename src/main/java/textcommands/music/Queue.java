@@ -1,4 +1,4 @@
-package commands.music;
+package textcommands.music;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,31 +8,30 @@ import java.util.concurrent.TimeUnit;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
-import commands.Commands;
 import components.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.TextChannel;
 
-public class Queue implements Commands{
+public class Queue{
 
-	@Override
-	public void perform(GuildMessageReceivedEvent event, String arguments) {
-		final Member member = event.getMember();
-		final Member self = event.getGuild().getSelfMember();
-		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+	public Queue(Guild guild, Member imember, TextChannel channel) {
+		final Member member = imember;
+		final Member self = guild.getSelfMember();
+		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 		if (!self.getVoiceState().inVoiceChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:notconnected", event).queue();
+			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:notconnected", guild, member, channel).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:nopermission", event).queue();
+			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:nopermission", guild, member, channel).queue();
 			return;
 		}
 		if (queue.isEmpty()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:noqueue", event).queue();
+			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:noqueue", guild, member, channel).queue();
 			return;
 		}
 		
@@ -63,7 +62,7 @@ public class Queue implements Commands{
 			  .append(String.valueOf(trackList.size() - trackCount))
 			  .append("` more...");
 		}
-		AnswerEngine.getInstance().buildMessage("Current queue:", sB.toString(), event.getChannel()).queue();
+		AnswerEngine.getInstance().buildMessage("Current queue:", sB.toString(), channel).queue();
 	}
 
 	private String formatTime(long timeInMillis) {

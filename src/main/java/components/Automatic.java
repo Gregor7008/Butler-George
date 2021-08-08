@@ -2,10 +2,10 @@ package components;
 
 import java.util.List;
 
-import commands.moderation.Rolesorting;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import textcommands.moderation.Rolesorting;
 
 public class Automatic {
 	
@@ -33,11 +33,11 @@ public class Automatic {
 		List<Role> sr3 = event.getGuild().getRoles().stream().filter(e -> e.getPosition() < gr3p).toList().stream().filter(e -> e.getPosition() > gr4p).toList();
 		List<Role> sr4 = event.getGuild().getRoles().stream().filter(e -> e.getPosition() < gr4p).toList().stream().filter(e -> e.getPosition() > gr5p).toList();
 		List<Role> sr5 = event.getGuild().getRoles().stream().filter(e -> e.getPosition() < gr5p).toList().stream().filter(e -> e.getPosition() >= event.getGuild().getRoleById("863708141317259294").getPosition()).toList();
-		Rolesorting rs = new Rolesorting();
-		rs.sort(event, member, sr1, gr1);
-		rs.sort(event, member, sr2, gr2);
-		rs.sort(event, member, sr3, gr3);
-		rs.sort(event, member, sr4, gr4);
-		rs.sort(event, member, sr5, gr5);
+		Rolesorting rs = new Rolesorting(event.getGuild(), event.getMember(), event.getChannel());
+		rs.sort(event.getGuild(), member, sr1, gr1);
+		rs.sort(event.getGuild(), member, sr2, gr2);
+		rs.sort(event.getGuild(), member, sr3, gr3);
+		rs.sort(event.getGuild(), member, sr4, gr4);
+		rs.sort(event.getGuild(), member, sr5, gr5);
 	}	
 }

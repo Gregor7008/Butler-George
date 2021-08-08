@@ -40,7 +40,8 @@ public class Bot {
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
-		jda = builder.build();
+		builder.setRawEventsEnabled(true);
+		jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);
 	    while (true) {
 			jda.getPresence().setActivity(Activity.listening("Gregor"));
