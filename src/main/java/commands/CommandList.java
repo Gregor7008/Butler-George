@@ -6,7 +6,6 @@ import commands.moderation.Autorole;
 import commands.moderation.Clear;
 import commands.moderation.Rolecheck;
 import commands.moderation.Rolesorting;
-import commands.moderation.SetPrefix;
 import commands.music.Nowplaying;
 import commands.music.Play;
 import commands.music.Queue;
@@ -27,7 +26,6 @@ public ConcurrentHashMap<String, Commands> CommandList= new ConcurrentHashMap<St
 		this.CommandList.put("role-sort", new Rolesorting());
 		this.CommandList.put("clear", new Clear());
 		this.CommandList.put("autorole", new Autorole());
-		this.CommandList.put("setprefix", new SetPrefix());
 		
 		//Music
 		this.CommandList.put("play", new Play());

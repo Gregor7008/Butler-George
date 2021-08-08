@@ -1,11 +1,5 @@
 package commands.moderation;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 import base.Configloader;
 import commands.Commands;
 import components.AnswerEngine;
@@ -16,64 +10,44 @@ public class Autorole implements Commands{
 
 	@Override
 	public void perform(GuildMessageReceivedEvent event, String argument) {
-		final File configFile = Configloader.INSTANCE.getConfigFile(event.getGuild());
-		final Properties properties = new Properties();
-		final Role role;
 		if (argument.startsWith("add")) {
+			final Role role;
 			try {
 				role = event.getMessage().getMentionedRoles().get(0);
 			} catch (Exception e) {
-				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", event);
+				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", event).queue();
 				return;
 			}
-			try {
-			FileInputStream in = new FileInputStream(configFile);
-			properties.load(in);
-			String autoroles = properties.getProperty("autoroles");
-			in.close();
-			String newautorole = role.getId();
-			String newautoroles;
-			if (autoroles == "") {
-				newautoroles = newautorole;
-			} else {
-				newautoroles = autoroles + ";" + newautorole;
-			}
-			FileOutputStream out = new FileOutputStream(configFile);
-			properties.setProperty(autoroles, newautoroles);
-			properties.store(out, null);
-			out.close();
-			} catch (IOException e) {e.printStackTrace();}
-			AnswerEngine.getInstance().buildMessage("Role added!", ":white_check_mark: | Everytime a new member joins the " + role.getAsMention() + " Role will be given to him!", event.getChannel());
-			return;
+			Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autoroles", role.getId());
 		}
 		if (argument.startsWith("remove")) {
+			final Role role;
 			try {
 				role = event.getMessage().getMentionedRoles().get(0);
 			} catch (Exception e) {
-				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", event);
+				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", event).queue();
 				return;
 			}
-			try {
-				FileInputStream in = new FileInputStream(configFile);
-				properties.load(in);
-				String autoroles = properties.getProperty("autoroles");
-				in.close();
-				if (autoroles == "") {
-					AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:noautoroles", event);
-					return;
-				}
-				String outautorole = role.getId();
-				String newautoroles = autoroles.replace(outautorole + ";", "");
-				FileOutputStream out = new FileOutputStream(configFile);
-				properties.setProperty(autoroles, newautoroles);
-				properties.store(out, null);
-				out.close();
-			} catch (IOException e) {e.printStackTrace();}
-			AnswerEngine.getInstance().buildMessage("Role removed!", ":white_check_mark: | Everytime a new member joins the " + role.getAsMention() + " Role will no longer be given to him!", event.getChannel());
-			return;
+			Configloader.INSTANCE.deleteGuildConfig(event.getGuild(), "autoroles", role.getId());
 		}
 		if (argument.startsWith("list")) {
-			return;
+			final StringBuilder sB = new StringBuilder();
+			final String currentraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "autoroles");
+			if (currentraw == "") {
+				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:noautoroles", event);
+				return;
+			}
+			if (!currentraw.contains(";")) {
+				AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", event.getGuild().getRoleById(currentraw).getAsMention(), event.getChannel()).queue();
+				return;
+			}
+			String[] current = currentraw.split(";");
+			for (int i = 1; i <= current.length; i++) {
+				sB.append('#')
+				  .append(String.valueOf(i) + " ")
+				  .append(event.getGuild().getRoleById(current[i-1]).getAsMention());
+			}
+			AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", sB.toString(), event.getChannel()).queue();
 		}
 	}
 

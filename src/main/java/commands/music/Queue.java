@@ -14,7 +14,6 @@ import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 public class Queue implements Commands{
 
@@ -39,28 +38,32 @@ public class Queue implements Commands{
 		
 		final int trackCount = Math.min(queue.size(), 20);
 		final List<AudioTrack> trackList = new ArrayList<>(queue);
-		final MessageAction messageAction = event.getChannel().sendMessage("Current Queue: \n");
+		final StringBuilder sB = new StringBuilder();
 		
 		for (int i = 0; i < trackCount; i++) {
 			final AudioTrack track = trackList.get(i);
 			final AudioTrackInfo info = track.getInfo();
 			
-			messageAction.append('#')
-						 .append(String.valueOf(i+1))
-						 .append(" `")
-						 .append(info.title)
-						 .append(" by ")
-						 .append(info.author)
-						 .append("`[`")
-						 .append(formatTime(track.getDuration()))
-						 .append("`]/n");
+			sB.append('#')
+			  .append(String.valueOf(i+1))
+			  .append(" `")
+			  .append(info.title)
+			  .append("` by `")
+			  .append(info.author)
+			  .append("`[")
+			  .append(formatTime(track.getDuration()));
+		   if (i+1 != trackCount) {
+			   sB.append("]\n");
+		   } else {
+			   sB.append("]");
+		   }
 		}
 		if(trackList.size() > trackCount) {
-			messageAction.append("And")
-						 .append(String.valueOf(trackList.size() - trackCount))
-						 .append("` more...");
+			sB.append("And")
+			  .append(String.valueOf(trackList.size() - trackCount))
+			  .append("` more...");
 		}
-		messageAction.queue();
+		AnswerEngine.getInstance().buildMessage("Current queue:", sB.toString(), event.getChannel()).queue();
 	}
 
 	private String formatTime(long timeInMillis) {

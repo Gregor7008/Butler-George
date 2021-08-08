@@ -10,6 +10,9 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class Automatic {
 	
 	public Automatic(GuildMessageReceivedEvent event) {
+		if (event.getGuild().getId() != "708381749826289666") {
+			return;
+		}
 		this.autocheck(event);
 	}
 	

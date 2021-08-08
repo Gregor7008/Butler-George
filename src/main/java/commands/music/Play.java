@@ -42,10 +42,10 @@ public class Play implements Commands{
 		channel.getGuild().getAudioManager().openAudioConnection(member.getVoiceState().getChannel());
 		if (!isURL(argument)) {
 			String term = "ytsearch:" + argument;
-			musicManager.scheduler.player.setVolume(50);
+			musicManager.scheduler.player.setVolume(5);
 			PlayerManager.getInstance().loadAndPlay(channel, term);
 		} else {
-			musicManager.scheduler.player.setVolume(50);
+			musicManager.scheduler.player.setVolume(5);
 			PlayerManager.getInstance().loadAndPlay(channel, argument);
 		}
 	}

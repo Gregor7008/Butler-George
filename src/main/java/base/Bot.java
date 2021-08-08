@@ -90,7 +90,7 @@ public class Bot {
 		}).start();
 	}
 	
-	private String getBotConfig(String key) {
+	public String getBotConfig(String key) {
 		File propertiesFile = new File("./src/main/resources/botconfig.properties");
 		Properties properties = new Properties();	 
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {

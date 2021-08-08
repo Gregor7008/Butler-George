@@ -36,7 +36,7 @@ public class AnswerEngine {
 		String temp2 = properties.getProperty(key);
 	
 		temp2.replace("{servername}", event.getGuild().getName());
-		temp2.replace("{membername}", event.getAuthor().getAsMention());
+		temp2.replace("{membername}", event.getMember().getAsMention());
 		temp2.replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
 		try {
 			temp2.replace("{mentionedrole}", event.getMessage().getMentionedRoles().get(0).getAsMention());
