@@ -9,8 +9,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 public class AnswerEngine {
 	
@@ -23,7 +21,7 @@ public class AnswerEngine {
 		return INSTANCE;
 	}
 	
-	public MessageAction fetchMessage (String input, Guild guild, Member member, TextChannel channel)  {
+	public MessageEmbed fetchMessage (String input, Guild guild, Member member)  {
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];
@@ -39,25 +37,23 @@ public class AnswerEngine {
 		temp2.replace("{servername}", guild.getName());
 		temp2.replace("{membername}", member.getAsMention());
 		temp2.replace("{membercount}", Integer.toString(guild.getMemberCount()));
-	
+		
 		String[] temp3 = temp2.split(";\\s+");
 		eb.setTitle(temp3[0]);
 		eb.setColor(56575);
 		eb.setDescription(temp3[1]);
-		eb.setAuthor("NoLimits", null,"https://i.ibb.co/CWJ8nVn/No-Limits-mit-Stern-V1.png");
-		eb.setFooter("Official NoLimits Bot! - discord.gg/qHA2vUs");
+		eb.setFooter("Official-NoLimits Bot! - discord.gg/qHA2vUs");
 		MessageEmbed embed = eb.build();
-		return channel.sendMessageEmbeds(embed);
+		return embed;
 	}
 	
-	public MessageAction buildMessage (String title, String description, TextChannel channel) {
+	public MessageEmbed buildMessage (String title, String description) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setTitle(title);
 		eb.setColor(56575);
 		eb.setDescription(description);
-		eb.setAuthor("NoLimits", null,"https://i.ibb.co/CWJ8nVn/No-Limits-mit-Stern-V1.png");
-		eb.setFooter("Official NoLimits Bot! - discord.gg/qHA2vUs");
+		eb.setFooter("Official NoLimits-Bot! - discord.gg/qHA2vUs");
 		MessageEmbed embed = eb.build();
-		return channel.sendMessageEmbeds(embed);
+		return embed;
 	}
 }

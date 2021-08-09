@@ -1,4 +1,4 @@
-package textcommands.moderation;
+package commands.moderation;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +14,7 @@ public class Clear {
 	public Clear(Guild guild, Member member, TextChannel channel, String argument) {
 		List<Message> messages = channel.getHistory().retrievePast(Integer.parseInt(argument)+1).complete();
 		channel.deleteMessages(messages).queue();
-		AnswerEngine.getInstance().fetchMessage("/commands/moderation/clear:done", guild, member, channel).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/clear:done", guild, member)).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));
 	}
 
 }

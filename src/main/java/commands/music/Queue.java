@@ -1,4 +1,4 @@
-package textcommands.music;
+package commands.music;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +23,15 @@ public class Queue{
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 		if (!self.getVoiceState().inVoiceChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:notconnected", guild, member, channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:notconnected", guild, member)).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:nopermission", guild, member, channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:nopermission", guild, member)).queue();
 			return;
 		}
 		if (queue.isEmpty()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:noqueue", guild, member, channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:noqueue", guild, member)).queue();
 			return;
 		}
 		
@@ -62,7 +62,7 @@ public class Queue{
 			  .append(String.valueOf(trackList.size() - trackCount))
 			  .append("` more...");
 		}
-		AnswerEngine.getInstance().buildMessage("Current queue:", sB.toString(), channel).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Current queue:", sB.toString())).queue();
 	}
 
 	private String formatTime(long timeInMillis) {

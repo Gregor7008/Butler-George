@@ -2,10 +2,10 @@ package components;
 
 import java.util.List;
 
+import commands.moderation.Rolesorting;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import textcommands.moderation.Rolesorting;
 
 public class Automatic {
 	

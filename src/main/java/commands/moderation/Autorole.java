@@ -1,4 +1,4 @@
-package textcommands.moderation;
+package commands.moderation;
 
 import base.Configloader;
 import components.AnswerEngine;
@@ -13,14 +13,14 @@ public class Autorole{
 	public Autorole(Guild guild, Member member, TextChannel channel, Role role, String argument) {
 		if (argument.startsWith("add")) {
 			if (role == null) {
-				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", guild, member, channel).queue();
+				channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", guild, member)).queue();
 				return;
 			}
 			Configloader.INSTANCE.addGuildConfig(guild, "autoroles", role.getId());
 		}
 		if (argument.startsWith("remove")) {
 			if (role == null) {
-				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", guild, member, channel).queue();
+				channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", guild, member)).queue();
 				return;
 			}
 			Configloader.INSTANCE.deleteGuildConfig(guild, "autoroles", role.getId());
@@ -29,11 +29,11 @@ public class Autorole{
 			final StringBuilder sB = new StringBuilder();
 			final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autoroles");
 			if (currentraw == "") {
-				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:noautoroles", guild, member, channel);
+				channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:noautoroles", guild, member));
 				return;
 			}
 			if (!currentraw.contains(";")) {
-				AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", guild.getRoleById(currentraw).getAsMention(), channel).queue();
+				channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", guild.getRoleById(currentraw).getAsMention())).queue();
 				return;
 			}
 			String[] current = currentraw.split(";");
@@ -42,7 +42,7 @@ public class Autorole{
 				  .append(String.valueOf(i) + " ")
 				  .append(guild.getRoleById(current[i-1]).getAsMention());
 			}
-			AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", sB.toString(), channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", sB.toString())).queue();
 		}
 	}
 

@@ -80,8 +80,6 @@ public class Bot {
 				while((line = reader.readLine()) != null) {
 					if(line.equalsIgnoreCase("shutdown")) {
 						shutdown();
-					} else {
-						System.out.println("Command undefined");
 					}
 				}
 			} catch (IOException e) {

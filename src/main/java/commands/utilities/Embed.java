@@ -1,4 +1,4 @@
-package textcommands.utilities;
+package commands.utilities;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
+import commands.Command;
 import components.AnswerEngine;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -14,33 +15,48 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class Embed {
+public class Embed implements Command{
 
 	private EmbedBuilder eb;
 	private int messagecount;
-	private Bot bot;
+	private Bot bot = Bot.INSTANCE;
 	private Guild guild;
 	private Member member;
 	private User user;
 	private TextChannel channel;
 	
-	public Embed(Guild iguild, Member imember, TextChannel ichannel) {
-		guild = iguild;
-		member = imember;
+	@Override
+	public void perform(SlashCommandEvent event) {
+		event.reply("Setup process started...").queue();;
+		guild = event.getGuild();
+		member = event.getMember();
 		user = member.getUser();
-		channel = ichannel;
+		channel = event.getTextChannel();
 		eb = new EmbedBuilder();
 		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());	
 		eb.setColor(56575);
 		messagecount=1;
 		this.definetitle();
 	}
+
+	@Override
+	public CommandData initialize(Guild guild) {
+		CommandData command = new CommandData("embed", "Create an cutom embedded message!");
+		return command;
+	}
+	
+	@Override
+	public String getHelp() {
+		return "Use this command, and it will take you through the setup process!";
+	}
 	
 	private void definetitle() {
 		EventWaiter waiter = bot.getWaiter();
-		AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:definetitle", guild, member, channel).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:definetitle", guild, member)).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -50,12 +66,12 @@ public class Embed {
 								  this.definedescr();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member, channel).queue();});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member)).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void definedescr() {
 		EventWaiter waiter = bot.getWaiter();
-		AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:definedescr", guild, member, channel).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:definedescr", guild, member)).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -65,12 +81,12 @@ public class Embed {
 								  this.definefooter();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member, channel).queue();});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member)).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definefooter() {
 		EventWaiter waiter = bot.getWaiter();
-		AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:definefooter", guild, member, channel).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:definefooter", guild, member)).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -80,12 +96,12 @@ public class Embed {
 								  this.defineTNail();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member, channel).queue();});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member)).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineTNail() {
 		EventWaiter waiter = bot.getWaiter();
-		AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:defineTNail", guild, member, channel).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:defineTNail", guild, member)).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -95,12 +111,12 @@ public class Embed {
 								  this.defineImag();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member, channel).queue();});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member)).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineImag() {
 		EventWaiter waiter = bot.getWaiter();
-		AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:defineImag", guild, member, channel).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:defineImag", guild, member)).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -110,12 +126,12 @@ public class Embed {
 								  this.wantnewfield();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member, channel).queue();});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member)).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void wantnewfield() {
 		EventWaiter waiter = bot.getWaiter();
-		AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:wantnewfield", guild, member, channel).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:wantnewfield", guild, member)).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -124,12 +140,12 @@ public class Embed {
 								  if(e.getMessage().getContentRaw().contains("no")) {this.sendMessage(eb.build());} else {this.addnewfield();}},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member, channel).queue();});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member)).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addnewfield() {
 		EventWaiter waiter = bot.getWaiter();
-		AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:addnewfield", guild, member, channel).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:addnewfield", guild, member)).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -140,7 +156,7 @@ public class Embed {
 								  this.wantnewfield();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member, channel).queue();});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:timeout", guild, member)).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void sendMessage(MessageEmbed embed) {

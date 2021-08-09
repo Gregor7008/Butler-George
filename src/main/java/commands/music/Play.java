@@ -1,4 +1,4 @@
-package textcommands.music;
+package commands.music;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,7 +16,7 @@ public class Play {
 		final Member self = guild.getSelfMember();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/play:wrongusage", guild, member, channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:wrongusage", guild, member)).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
@@ -24,11 +24,11 @@ public class Play {
 			return;
 		}
 		if (self.getVoiceState().inVoiceChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/play:alreadyinuse", guild, member, channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:alreadyinuse", guild, member)).queue();
 			return;
 		}
 		if (!member.getVoiceState().inVoiceChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/play:noVCdefined", guild, member, channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:noVCdefined", guild, member)).queue();
 			return;
 		}
 		this.load(argument, musicManager, channel, member);

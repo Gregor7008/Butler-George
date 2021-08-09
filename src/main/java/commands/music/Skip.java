@@ -1,4 +1,4 @@
-package textcommands.music;
+package commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
@@ -17,24 +17,24 @@ public class Skip{
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final AudioPlayer audioPlayer = musicManager.audioPlayer;
 		if (!self.getVoiceState().inVoiceChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/skip:notconnected", guild, member, channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:notconnected", guild, member)).queue();
 			return;
 		}
 		if (member.getVoiceState().inVoiceChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				AnswerEngine.getInstance().fetchMessage("/commands/music/skip:nopermission", guild, member, channel).queue();
+				channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:nopermission", guild, member)).queue();
 				return;
 			}
 		} else {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/skip:nopermission", guild, member, channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:nopermission", guild, member)).queue();
 			return;
 		}
 		if (audioPlayer.getPlayingTrack() == null) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/skip:noneplaying", guild, member, channel).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:noneplaying", guild, member)).queue();
 			return;
 		}
 		musicManager.scheduler.nextTrack();
-		AnswerEngine.getInstance().fetchMessage("/commands/music/skip:skipped", guild, member, channel).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:skipped", guild, member)).queue();
 	}
 
 }
