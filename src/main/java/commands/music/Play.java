@@ -3,20 +3,30 @@ package commands.music;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import commands.Command;
 import components.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class Play {
+public class Play implements Command{
 
-	public Play(Guild guild, Member member, TextChannel channel, String argument) {
+	@Override
+	public void perform(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
+		final Member member = event.getMember();
+		final TextChannel channel = event.getTextChannel();
+		final String argument = event.getOption("title").toString();
 		final Member self = guild.getSelfMember();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:wrongusage", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:wrongusage")).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
@@ -24,11 +34,11 @@ public class Play {
 			return;
 		}
 		if (self.getVoiceState().inVoiceChannel()) {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:alreadyinuse", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:alreadyinuse")).queue();
 			return;
 		}
 		if (!member.getVoiceState().inVoiceChannel()) {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:noVCdefined", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:noVCdefined")).queue();
 			return;
 		}
 		this.load(argument, musicManager, channel, member);
@@ -53,5 +63,16 @@ public class Play {
 		} catch (MalformedURLException e) {
 			return false;
 		}
+	}
+
+	@Override
+	public CommandData initialize(Guild guild) {
+		CommandData command = new CommandData("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!"));
+		return command;
+	}
+
+	@Override
+	public String getHelp() {
+		return "Use this command to start playing music in your voicechannel or to add a new track to your queue, which is going to be played one by one in your channel!";
 	}
 }

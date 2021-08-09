@@ -8,30 +8,34 @@ import java.util.concurrent.TimeUnit;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
+import commands.Command;
 import components.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class Queue{
+public class Queue implements Command{
 
-	public Queue(Guild guild, Member imember, TextChannel channel) {
-		final Member member = imember;
+	@Override
+	public void perform(SlashCommandEvent event) {
+		final Member member = event.getMember();
+		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 		if (!self.getVoiceState().inVoiceChannel()) {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:notconnected", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:nopermission", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:nopermission")).queue();
 			return;
 		}
 		if (queue.isEmpty()) {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:noqueue", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:noqueue")).queue();
 			return;
 		}
 		
@@ -62,7 +66,7 @@ public class Queue{
 			  .append(String.valueOf(trackList.size() - trackCount))
 			  .append("` more...");
 		}
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Current queue:", sB.toString())).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current queue:", sB.toString())).queue();
 	}
 
 	private String formatTime(long timeInMillis) {
@@ -70,6 +74,17 @@ public class Queue{
 		final long minutes = timeInMillis / TimeUnit.MINUTES.toMillis(1);
 		final long seconds = timeInMillis % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
 		return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+	}
+
+	@Override
+	public CommandData initialize(Guild guild) {
+		CommandData command = new CommandData("queue", "Displays the current queue!");
+		return command;
+	}
+
+	@Override
+	public String getHelp() {
+		return "Use this command to get the current queue of tracks, that are going to be played in your channel!";
 	}
 
 }

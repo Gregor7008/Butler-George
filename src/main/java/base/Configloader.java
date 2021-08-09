@@ -62,10 +62,10 @@ public class Configloader {
 			File propertiesFile = this.getUserConfigFile(member);
 			String current = this.getUserConfig(member, key);
 			FileOutputStream out = new FileOutputStream(propertiesFile);
-			if (current == "") {
+			if (current.equals("")) {
 				properties.setProperty(key, value);
 			} else {
-			properties.setProperty(key, current + ";" + value);
+				properties.setProperty(key, current + ";" + value);
 			}
 			properties.store(out, null);
 			out.close();
@@ -77,10 +77,10 @@ public class Configloader {
 			File propertiesFile = this.getGuildConfigFile(guild);
 			String current = this.getGuildConfig(guild, key);
 			FileOutputStream out = new FileOutputStream(propertiesFile);
-			if (current == "") {
+			if (current.equals("")) {
 				properties.setProperty(key, value);
 			} else {
-			properties.setProperty(key, current + ";" + value);
+				properties.setProperty(key, current + ";" + value);
 			}
 			properties.store(out, null);
 			out.close();
@@ -96,11 +96,15 @@ public class Configloader {
 			if (current.length == 1) {
 				properties.setProperty(key, "");
 			} else {
-				properties.setProperty(key, currentraw.replace(";" + currentraw, ""));
+				if(current[0].equals(value)) {
+					properties.setProperty(key, currentraw.replace(value + ";", ""));
+				} else {
+					properties.setProperty(key, currentraw.replace(";" + value, ""));
+				}
 			}
 			properties.store(out, null);
 			out.close();
-		} catch (Exception e) {}
+		} catch (Exception e) {e.printStackTrace();}
 	}
 	
 	public void deleteUserConfig(Member member, String key, String value) {
@@ -112,7 +116,11 @@ public class Configloader {
 			if (current.length == 1) {
 				properties.setProperty(key, "");
 			} else {
-				properties.setProperty(key, currentraw.replace(";" + currentraw, ""));
+				if(current[0].equals(value)) {
+					properties.setProperty(key, currentraw.replace(value + ";", ""));
+				} else {
+					properties.setProperty(key, currentraw.replace(";" + value, ""));
+				}
 			}
 			properties.store(out, null);
 			out.close();
@@ -130,6 +138,8 @@ public class Configloader {
 				properties.setProperty("suggest", "");
 				properties.setProperty("autoroles", "");
 				properties.setProperty("autobotroles", "");
+				properties.setProperty("modrole", "");
+				properties.setProperty("autopunish", "");
 				properties.store(new FileOutputStream(propertiesFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}
@@ -157,6 +167,7 @@ public class Configloader {
 				properties.setProperty("banned", "");
 				properties.setProperty("tempbanned", "");
 				properties.setProperty("tbuntil", "");
+				properties.setProperty("lastxpgotten", "");
 				properties.setProperty("level", "");
 				properties.setProperty("expe", "");
 				properties.store(new FileOutputStream(propertiesFile), null);

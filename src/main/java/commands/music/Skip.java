@@ -2,39 +2,54 @@ package commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
+import commands.Command;
 import components.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class Skip{
+public class Skip implements Command{
 
-	public Skip(Guild guild, Member imember, TextChannel channel) {
+	@Override
+	public void perform(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
-		final Member member = imember;
+		final Member member = event.getMember();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final AudioPlayer audioPlayer = musicManager.audioPlayer;
 		if (!self.getVoiceState().inVoiceChannel()) {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:notconnected", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().inVoiceChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:nopermission", guild, member)).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:nopermission")).queue();
 				return;
 			}
 		} else {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:nopermission", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:nopermission")).queue();
 			return;
 		}
 		if (audioPlayer.getPlayingTrack() == null) {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:noneplaying", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:noneplaying")).queue();
 			return;
 		}
 		musicManager.scheduler.nextTrack();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:skipped", guild, member)).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/skip:skipped")).queue();
+	}
+
+	@Override
+	public CommandData initialize(Guild guild) {
+		CommandData command = new CommandData("skip", "Skips the currently playing track!");
+		return command;
+	}
+
+	@Override
+	public String getHelp() {
+		return "Use this command to skip the track currently playing in your channel. It will return an Error, if there's none playing!";
 	}
 
 }

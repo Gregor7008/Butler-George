@@ -6,8 +6,6 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class AnswerEngine {
@@ -21,7 +19,7 @@ public class AnswerEngine {
 		return INSTANCE;
 	}
 	
-	public MessageEmbed fetchMessage (String input, Guild guild, Member member)  {
+	public MessageEmbed fetchMessage (String input)  {
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];
@@ -33,11 +31,7 @@ public class AnswerEngine {
 			properties.load(bis);
 		} catch (Exception e) {}
 		String temp2 = properties.getProperty(key);
-	
-		temp2.replace("{servername}", guild.getName());
-		temp2.replace("{membername}", member.getAsMention());
-		temp2.replace("{membercount}", Integer.toString(guild.getMemberCount()));
-		
+
 		String[] temp3 = temp2.split(";\\s+");
 		eb.setTitle(temp3[0]);
 		eb.setColor(56575);

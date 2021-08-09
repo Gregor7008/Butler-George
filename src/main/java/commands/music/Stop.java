@@ -1,34 +1,49 @@
 package commands.music;
 
+import commands.Command;
 import components.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class Stop {
+public class Stop implements Command{
 
-	public Stop(Guild guild, Member imember, TextChannel channel) {
+	@Override
+	public void perform(SlashCommandEvent event) {
+		final Member member = event.getMember();
+		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
-		final Member member = imember;
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (!self.getVoiceState().inVoiceChannel()) {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:notconnected", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().inVoiceChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:nopermission", guild, member)).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:nopermission")).queue();
 				return;
 			}
 		} else {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:nopermission", guild, member)).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:nopermission")).queue();
 			return;
 		}
 		musicManager.scheduler.player.stopTrack();
 		musicManager.scheduler.queue.clear();
 		guild.getAudioManager().closeAudioConnection();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:stopped", guild, member)).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:stopped")).queue();
+	}
+
+	@Override
+	public CommandData initialize(Guild guild) {
+		CommandData command = new CommandData("stop", "Stop the currently playing music!");
+		return command;
+	}
+
+	@Override
+	public String getHelp() {
+		return "Use this command, to stop music which is currently playing in your channel. This also clears the queue!";
 	}
 }
