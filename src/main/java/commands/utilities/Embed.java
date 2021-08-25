@@ -7,10 +7,9 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
 import commands.Command;
-import components.AnswerEngine;
+import components.base.AnswerEngine;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -46,7 +45,7 @@ public class Embed implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("embed", "Create an cutom embedded message!");
 		return command;
 	}

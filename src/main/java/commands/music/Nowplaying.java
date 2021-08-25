@@ -3,7 +3,7 @@ package commands.music;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import commands.Command;
-import components.AnswerEngine;
+import components.base.AnswerEngine;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -30,7 +30,7 @@ public class Nowplaying implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("nowplaying", "Shows you information about the currently playing track!");
 		return command;
 	}

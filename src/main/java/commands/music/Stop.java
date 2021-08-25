@@ -1,7 +1,7 @@
 package commands.music;
 
 import commands.Command;
-import components.AnswerEngine;
+import components.base.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -37,7 +37,7 @@ public class Stop implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("stop", "Stop the currently playing music!");
 		return command;
 	}

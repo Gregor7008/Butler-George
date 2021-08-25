@@ -4,7 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import commands.Command;
-import components.AnswerEngine;
+import components.base.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -66,7 +66,7 @@ public class Play implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!"));
 		return command;
 	}

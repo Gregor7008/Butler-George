@@ -3,7 +3,7 @@ package commands.music;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
 import commands.Command;
-import components.AnswerEngine;
+import components.base.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,7 +42,7 @@ public class Skip implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("skip", "Skips the currently playing track!");
 		return command;
 	}

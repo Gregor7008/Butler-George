@@ -3,12 +3,11 @@ package commands.moderation;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import base.Configloader;
 import commands.Command;
-import components.AnswerEngine;
-import components.Developers;
+import components.Developerlist;
+import components.base.AnswerEngine;
+import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -19,7 +18,7 @@ public class Goodbye implements Command {
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		if (event.getMember().hasPermission(Permission.MANAGE_SERVER) && !Developers.getInstance().developers.contains(event.getMember().getId())) {
+		if (event.getMember().hasPermission(Permission.MANAGE_SERVER) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("No Permission!", ":warning: | You have no permission to use this command!\n You need to have the permission to manage the server to get access to this command!"));
 			return;
 		}
@@ -55,7 +54,7 @@ public class Goodbye implements Command {
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("goodbye", "Configure the goodbye message, that will be send whenever a new member joins your server!")
 				.addSubcommands(new SubcommandData("set", "Set the welcome message")
 						  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {servername} {date} {timejoined}!").setRequired(true))

@@ -1,11 +1,10 @@
 package commands.moderation;
 
-import base.Configloader;
 import commands.Command;
-import components.AnswerEngine;
-import components.Developers;
+import components.Developerlist;
+import components.base.AnswerEngine;
+import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,7 +16,7 @@ public class Join2Create implements Command{
 	@Override
 	public void perform(SlashCommandEvent event) {
 		final Member member = event.getMember();
-		if(!member.hasPermission(Permission.MANAGE_CHANNEL) && !Developers.getInstance().developers.contains(event.getMember().getId())) {
+		if(!member.hasPermission(Permission.MANAGE_CHANNEL) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/join2create:nopermission")).queue();
 			return;
 		}
@@ -26,7 +25,7 @@ public class Join2Create implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("join2create", "Set the join2create channel of the server!").addOptions(new OptionData(OptionType.CHANNEL, "channel", "Enter the voicechannel that should be used as the join2create channel!").setRequired(true));
 		return command;
 	}

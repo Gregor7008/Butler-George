@@ -3,7 +3,7 @@ package components.moderation;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import base.Configloader;
+import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 

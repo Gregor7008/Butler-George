@@ -9,7 +9,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import commands.Command;
-import components.AnswerEngine;
+import components.base.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -77,7 +77,7 @@ public class Queue implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("queue", "Displays the current queue!");
 		return command;
 	}

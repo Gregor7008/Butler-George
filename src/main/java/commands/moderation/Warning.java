@@ -1,9 +1,10 @@
 package commands.moderation;
 
-import base.Configloader;
 import commands.Command;
-import components.AnswerEngine;
-import net.dv8tion.jda.api.entities.Guild;
+import components.Developerlist;
+import components.base.AnswerEngine;
+import components.base.Configloader;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -55,11 +56,11 @@ public class Warning implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("warning", "Warn a member")
-								  .addSubcommands(new SubcommandData("add", "Warns a user and adds a warning to their warnings-list"))
+								  .addSubcommands(new SubcommandData("add", "Warns a user and adds a warning to their warnings-list")
 											  .addOptions(new OptionData(OptionType.USER, "member", "The member you want to warn").setRequired(true))
-											  .addOptions(new OptionData(OptionType.STRING, "reason", "The reason why you warn the member").setRequired(false))
+											  .addOptions(new OptionData(OptionType.STRING, "reason", "The reason why you warn the member").setRequired(false)))
 								  .addSubcommands(new SubcommandData("list", "Shows you the number of warnings a member already has")
 										  	  .addOptions(new OptionData(OptionType.USER, "member", "The member you want to check").setRequired(true)));
 		return command;

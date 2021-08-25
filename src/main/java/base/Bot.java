@@ -12,6 +12,7 @@ import javax.security.auth.login.LoginException;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
+import components.base.Configloader;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -90,7 +91,7 @@ public class Bot {
 	}
 	
 	public String getBotConfig(String key) {
-		File propertiesFile = new File("./src/main/resources/botconfig.properties");
+		File propertiesFile = new File("./resources/botconfig.properties");
 		Properties properties = new Properties();	 
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
 		  properties.load(bis);

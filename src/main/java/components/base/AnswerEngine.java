@@ -1,10 +1,11 @@
-package components;
+package components.base;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import base.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -23,7 +24,7 @@ public class AnswerEngine {
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];
-		File propertiesFile = new File("./src/main/resources" + path + ".properties");
+		File propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + path + ".properties");
 		Properties properties = new Properties();
 		EmbedBuilder eb = new EmbedBuilder();
 	 

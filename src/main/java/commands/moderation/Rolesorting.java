@@ -7,8 +7,8 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
 import commands.Command;
-import components.AnswerEngine;
-import components.Developers;
+import components.Developerlist;
+import components.base.AnswerEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -33,7 +33,7 @@ public class Rolesorting implements Command{
 	public void perform(SlashCommandEvent event) {
 		guild = event.getGuild();
 		member = event.getMember();
-		if (!member.hasPermission(Permission.MANAGE_ROLES) && !Developers.getInstance().developers.contains(event.getMember().getId())) {
+		if (!member.hasPermission(Permission.MANAGE_ROLES) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolesorting:nopermission")).queue();
 			return;
 		}
@@ -42,7 +42,7 @@ public class Rolesorting implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("rolesort", "Use this command to sort groups by grouping roles!");
 		return command;
 	}

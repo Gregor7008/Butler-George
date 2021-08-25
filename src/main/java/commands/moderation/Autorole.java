@@ -1,9 +1,9 @@
 package commands.moderation;
 
-import base.Configloader;
 import commands.Command;
-import components.AnswerEngine;
-import components.Developers;
+import components.Developerlist;
+import components.base.AnswerEngine;
+import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -20,7 +20,7 @@ public class Autorole implements Command {
 	public void perform(SlashCommandEvent event) {
 		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
-		if (!member.hasPermission(Permission.MANAGE_ROLES) && !Developers.getInstance().developers.contains(event.getMember().getId())) {
+		if (!member.hasPermission(Permission.MANAGE_ROLES) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:nopermission")).queue();
 			return;
 		}
@@ -63,7 +63,7 @@ public class Autorole implements Command {
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("autorole", "Configurates the roles given to every new member joining in the future!")
 								  .addSubcommands(new SubcommandData("add", "Adds a new role!").addOptions(new OptionData(OptionType.ROLE, "addrole", "Mention the role you want to add!").setRequired(true)))
 								  .addSubcommands(new SubcommandData("remove", "Removes a role!").addOptions(new OptionData(OptionType.ROLE, "removerole", "Mention the role you want to remove!").setRequired(true)))

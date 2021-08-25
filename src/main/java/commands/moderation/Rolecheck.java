@@ -1,10 +1,9 @@
 package commands.moderation;
 
 import commands.Command;
-import components.AnswerEngine;
-import components.Developers;
+import components.Developerlist;
+import components.base.AnswerEngine;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -17,7 +16,7 @@ public class Rolecheck implements Command {
 	@Override
 	public void perform(SlashCommandEvent event) {
 		final Member member = event.getOption("member").getAsMember();
-		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES) && !Developers.getInstance().developers.contains(event.getMember().getId())) {
+		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolecheck:nopermission")).queue();
 			return;
 		}
@@ -38,7 +37,7 @@ public class Rolecheck implements Command {
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("rolecheck", "Check if a member has a specific role!")
 											  .addOptions(new OptionData(OptionType.USER, "member", "The member that should be checked").setRequired(true))
 											  .addOptions(new OptionData(OptionType.ROLE, "role", "The role that the member should be checked for").setRequired(true));

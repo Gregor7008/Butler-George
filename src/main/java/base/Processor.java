@@ -9,8 +9,10 @@ import java.util.List;
 
 import commands.Command;
 import commands.CommandList;
-import components.AnswerEngine;
+import components.base.AnswerEngine;
+import components.base.Configloader;
 import components.moderation.NoLimitsOnly;
+import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -38,6 +40,8 @@ public class Processor extends ListenerAdapter {
 																				  event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole"))));
 			});
 		}
+		//levelsystem
+		LevelEngine.getInstance().messagereceived(event);
 		//automoderation
 		//-->in developement
 	}
@@ -53,7 +57,7 @@ public class Processor extends ListenerAdapter {
 			commandnames.addAll(commandList.commands.keySet());
 			for (int e = 0; e < commandnames.size(); e++) {
 				Command cmd = commandList.commands.get(commandnames.get(e));
-				clua.addCommands(cmd.initialize(guild));
+				clua.addCommands(cmd.initialize());
 			}
 			clua.queue();
 		}
@@ -67,6 +71,8 @@ public class Processor extends ListenerAdapter {
 		if ((cmd = commandList.commands.get(event.getName())) != null) {
 			cmd.perform(event);
 		}
+		//levelsystem
+		LevelEngine.getInstance().slashcommand(event);
 	}
 	
 	@Override
@@ -132,6 +138,8 @@ public class Processor extends ListenerAdapter {
 				event.getGuild().moveVoiceMember(event.getMember(), event.getGuild().getVoiceChannelsByName(event.getMember().getEffectiveName() + "'s channel!", true).get(0)).queue();
 			}
 		}
+		//levelsystem
+		LevelEngine.getInstance().voicejoin(event);
 	}
 	
 	@Override
@@ -147,5 +155,6 @@ public class Processor extends ListenerAdapter {
 		event.getGuild().getOwner().getUser().openPrivateChannel().queue((channel) -> {
 			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Thanks for inviting me!", ":exclamation: | To finish my setup, please mention me on your server as well as the role that should be able to warn members!\n Thanks :heart:")).queue();
 		});
+		Configloader.INSTANCE.getGuildConfigFile(event.getGuild());
 	}
 }

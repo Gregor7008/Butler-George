@@ -16,7 +16,8 @@ import commands.music.Skip;
 import commands.music.Stop;
 import commands.utilities.Embed;
 import commands.utilities.Help;
-import components.Test;
+import commands.utilities.Level;
+import components.utilities.Test;
 
 public class CommandList {
 	
@@ -26,6 +27,7 @@ public class CommandList {
 		//Utilities
 		this.commands.put("embed", new Embed());
 		this.commands.put("help", new Help());
+		this.commands.put("level", new Level());
 		
 		//Moderation
 		this.commands.put("autorole", new Autorole());

@@ -4,10 +4,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import commands.Command;
-import components.AnswerEngine;
-import components.Developers;
+import components.Developerlist;
+import components.base.AnswerEngine;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -21,7 +20,7 @@ public class Clear implements Command{
 	@Override
 	public void perform(SlashCommandEvent event) {
 		final Member member = event.getMember();
-		if (!member.hasPermission(Permission.MESSAGE_MANAGE) && !Developers.getInstance().developers.contains(event.getMember().getId())) {
+		if (!member.hasPermission(Permission.MESSAGE_MANAGE) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/clear:nopermission")).queue();
 			return;
 		}
@@ -33,7 +32,7 @@ public class Clear implements Command{
 	}
 
 	@Override
-	public CommandData initialize(Guild guild) {
+	public CommandData initialize() {
 		CommandData command = new CommandData("clear", "Clears a specific number of messages from this channel!").addOptions(new OptionData(OptionType.INTEGER, "count", "Hand over the number of messages you want to delete!"));
 		return command;
 	}

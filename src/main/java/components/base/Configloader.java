@@ -1,4 +1,4 @@
-package base;
+package components.base;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
@@ -127,8 +128,8 @@ public class Configloader {
 		} catch (Exception e) {}
 	}
 
-	private File findorCreateGuildConfig(String path) {
-		File propertiesFile = new File(path);
+	private File findorCreateGuildConfig(Guild guild) {
+		File propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/guild/" + guild.getId() + ".properties");
 		if (!propertiesFile.exists()) {
 			try {
 				propertiesFile.createNewFile();
@@ -140,43 +141,45 @@ public class Configloader {
 				properties.setProperty("autobotroles", "");
 				properties.setProperty("modrole", "");
 				properties.setProperty("autopunish", "");
+				properties.setProperty("levelrewards", "");
 				properties.store(new FileOutputStream(propertiesFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}
 		return propertiesFile;
 	}
 	public File getGuildConfigFile(Guild guild) {
-		File configFile = this.findorCreateGuildConfig("./src/main/resources/configs/guild/" + guild.getId() + ".properties");
+		File configFile = this.findorCreateGuildConfig(guild);
 		return configFile;
 	}
 	
-	private File findorCreateUserConfig(String path) {
-		File guilddir = new File(path);
+	private File findorCreateUserConfig(Member member) {
+		File guilddir = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + member.getGuild().getId());
 		if (guilddir.exists() && guilddir.isDirectory()) {
 		} else {
 			guilddir.mkdirs();
 		}
-		File propertiesFile = new File(path);
+		File propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + member.getGuild().getId() + "/" + member.getId() + ".properties");
 		if (!propertiesFile.exists()) {
 			try {
 				propertiesFile.createNewFile();
 				properties.setProperty("warnings", "");
-				properties.setProperty("muted", "");
-				properties.setProperty("tempmuted", "");
+				properties.setProperty("muted", "no");
+				properties.setProperty("tempmuted", "no");
 				properties.setProperty("tmuntil", "");
-				properties.setProperty("banned", "");
-				properties.setProperty("tempbanned", "");
+				properties.setProperty("banned", "no");
+				properties.setProperty("tempbanned", "no");
 				properties.setProperty("tbuntil", "");
-				properties.setProperty("lastxpgotten", "");
-				properties.setProperty("level", "");
-				properties.setProperty("expe", "");
+				properties.setProperty("lastxpgotten", java.time.OffsetDateTime.now().toString());
+				properties.setProperty("level", "0");
+				properties.setProperty("expe", "0");
+				properties.setProperty("levelbackground", "0");
 				properties.store(new FileOutputStream(propertiesFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}
 		return propertiesFile;
 	}
 	private File getUserConfigFile(Member member) {
-		File configFile =this.findorCreateUserConfig("./src/main/resources/configs/user/" + member.getGuild().getId() + "/" + member.getUser().getId() + ".properties");
+		File configFile =this.findorCreateUserConfig(member);
 		return configFile;
 	}
 }
