@@ -11,7 +11,6 @@ import commands.Command;
 import commands.CommandList;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import components.moderation.NoLimitsOnly;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -33,7 +32,7 @@ public class Processor extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		//finishing setup
-		if (event.getMessage().getMentionedMembers().contains(event.getGuild().getSelfMember()) && Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole") == "") {
+		if (event.getMessage().getMentionedMembers().contains(event.getGuild().getSelfMember()) && Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole").equals("")) {
 			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "modrole", event.getMessage().getMentionedRoles().get(0).getId());
 			event.getGuild().getOwner().getUser().openPrivateChannel().queue((channel) -> {
 				channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Thanks for setting me up!", ":white_check_mark: | Setup is completed!\n Your modrole is: " + 
@@ -77,14 +76,23 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		//autocheck only for NoLimits
-		new NoLimitsOnly();
+		Configloader.INSTANCE.findorCreateUserConfig(event.getGuild(), event.getUser());
 		//assign Autoroles
-		String autorolesraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "autoroles");
-		if (autorolesraw != "") {
-			String[] autoroles = autorolesraw.split(";");
-			for (int i = 1; i <= autoroles.length; i++) {
-				event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(autoroles[i-1]));
+		if (event.getMember().getUser().isBot()) {
+			String botautorolesraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "botautoroles");
+			if (botautorolesraw != "") {
+				String[] botautoroles = botautorolesraw.split(";");
+				for (int i = 1; i <= botautoroles.length; i++) {
+					event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(botautoroles[i-1]));
+				}
+			}
+		} else {
+			String autorolesraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "autoroles");
+			if (autorolesraw != "") {
+				String[] autoroles = autorolesraw.split(";");
+				for (int i = 1; i <= autoroles.length; i++) {
+					event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(autoroles[i-1]));
+				}
 			}
 		}
 		//send Welcomemessage
@@ -152,9 +160,10 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onGuildJoin(GuildJoinEvent event) {
+		try {
 		event.getGuild().getOwner().getUser().openPrivateChannel().queue((channel) -> {
 			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Thanks for inviting me!", ":exclamation: | To finish my setup, please mention me on your server as well as the role that should be able to warn members!\n Thanks :heart:")).queue();
-		});
-		Configloader.INSTANCE.getGuildConfigFile(event.getGuild());
+		});} catch (Exception e) {}
+		Configloader.INSTANCE.findorCreateGuildConfig(event.getGuild());
 	}
 }

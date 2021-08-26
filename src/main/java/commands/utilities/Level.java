@@ -36,15 +36,14 @@ public class Level implements Command {
 			User user = event.getOption("member").getAsUser();
 			member = event.getGuild().getMember(user);
 		} catch (IllegalStateException | NullPointerException e) {member = event.getMember();}
-		String levelbackground = Configloader.INSTANCE.getUserConfig(member, "levelbackground");
-		String level = Configloader.INSTANCE.getUserConfig(member, "level");
-		String curxp = Configloader.INSTANCE.getUserConfig(member, "expe");
+		String levelbackground = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "levelbackground");
+		String level = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level");
+		String curxp = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe");
 		String nedxp = String.valueOf(LevelEngine.getInstance().xpfornextlevel(member));
 		int progress;
 		if (Integer.parseInt(level) != 0) {
 			progress = (Integer.parseInt(curxp) - ((Integer.parseInt(level)-1) * 100)) / ((Integer.parseInt(nedxp)-((Integer.parseInt(level)-1) * 100)) / 100);
-		} else {progress = Integer.parseInt(curxp);}
-		
+		} else {progress = Integer.parseInt(curxp) + 1;}	
 		BufferedImage image = null;
 		try {image = ImageIO.read(new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/" + levelbackground + ".png"));
 		} catch (IOException e) {

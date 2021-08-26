@@ -4,20 +4,26 @@ import java.util.List;
 
 import base.Bot;
 import commands.moderation.Rolesorting;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
 public class NoLimitsOnly {
 	
-	final Guild guild;
+	private final Guild guild;
 	
 	public NoLimitsOnly() {
 		guild = Bot.INSTANCE.jda.getGuildById("708381749826289666");
-		this.autocheck();
+		if (guild != null) {
+			while (Bot.INSTANCE.jda.getPresence().getStatus().equals(OnlineStatus.ONLINE)) {
+				this.rolecheck();
+				try {wait(1000);} catch (InterruptedException e) {}
+			}
+		}
 	}
 	
-	private void autocheck() {
+	private void rolecheck() {
 		Role gr1 = guild.getRoleById("837742608604332052");
 		int gr1p = gr1.getPosition();
 		Role gr2 = guild.getRoleById("837744376712265728");
@@ -43,5 +49,5 @@ public class NoLimitsOnly {
 			rs.sorter(guild, member, sr4, gr4);
 			rs.sorter(guild, member, sr5, gr5);
 		}
-	}	
+	}
 }

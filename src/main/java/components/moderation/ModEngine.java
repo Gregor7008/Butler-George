@@ -3,6 +3,8 @@ package components.moderation;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import commands.moderation.Tempban;
+import commands.moderation.Tempmute;
 import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -30,7 +32,7 @@ public class ModEngine {
 		//go through members
 		for (int e = 0; e < members.size(); e++) {
 			Member member = members.get(e);
-			int warningcount = Configloader.INSTANCE.getUserConfig(member, "warnings").split(";").length;
+			int warningcount = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "warnings").split(";").length;
 			if (punishements.get(warningcount) != null) {
 				String punishement = punishements.get(warningcount);
 				//go through punishements
@@ -51,14 +53,14 @@ public class ModEngine {
 						}
 						if (punishement.contains("tempmute")) {
 							String[] temp1 = punishement.split(":");
-							//tempmute with duration of days:
-							Integer.valueOf(temp1[1]);
+							Tempmute tm = new Tempmute();
+							tm.tempmute(Integer.valueOf(temp1[1]), member);
 							return;
 						}
 						if (punishement.contains("tempban")) {
 							String[] temp1 = punishement.split(":");
-							//tempban with duration of days:
-							Integer.valueOf(temp1[1]);
+							Tempban tb = new Tempban();
+							tb.tempban(Integer.valueOf(temp1[1]), member);
 							return;
 						}
 				}

@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import base.Bot;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
@@ -62,24 +63,29 @@ private static LevelEngine INSTANCE;
 	
 	private void givexp(Member member, OffsetDateTime time, int amount, int mindiff, TextChannel channel) {
 		OffsetDateTime now = OffsetDateTime.now();
-		int difference;
-		OffsetDateTime lastxpgotten = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(member, "lastxpgotten"));
-		difference = Duration.between(lastxpgotten, now).toSecondsPart();
+		OffsetDateTime lastxpgotten = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "lastxpgotten"));
+		int difference = Duration.between(lastxpgotten, now).toSecondsPart();
 		if(difference >= mindiff) {
 			this.grantxp(member, amount, channel);
 		}
 	}
 
 	private void grantxp(Member member, int amount, TextChannel channel) {
-		int current = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member, "expe"));
+		try {
+		int current = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe"));
 		int newamount = current + amount;
 		Configloader.INSTANCE.setUserConfig(member, "expe", String.valueOf(newamount));
 		this.checklevel(member, channel);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Something went horribly wrong! Shutting down bot!");
+			Bot.INSTANCE.shutdown();
+		}
 	}
 
 	private void checklevel(Member member, TextChannel channel) {
-		int currentlevel = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member, "level"));
-		int currentxp = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member, "expe"));
+		int currentlevel = Integer.valueOf(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
+		int currentxp = Integer.valueOf(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe"));
 		int xpneededfornextlevel = this.xpfornextlevel(member);
 		if (currentxp > xpneededfornextlevel) {
 			Configloader.INSTANCE.setUserConfig(member, "level", String.valueOf(currentlevel + 1));
@@ -96,7 +102,7 @@ private static LevelEngine INSTANCE;
 		String[] rewards = rawinput.split(";");
 		for (int i = 0; i < rewards.length; i++) {
 			String[] reward = rewards[i].split("_");
-			if (Integer.parseInt(Configloader.INSTANCE.getUserConfig(member, "level")) >= Integer.parseInt(reward[1])) {
+			if (Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level")) >= Integer.parseInt(reward[1])) {
 				Role rewardrole = member.getGuild().getRoleById(reward[0]);
 				member.getGuild().addRoleToMember(member, rewardrole);
 			}
@@ -104,7 +110,7 @@ private static LevelEngine INSTANCE;
 	}
 	
 	public int xpfornextlevel(Member member) {
-		int currentlevel = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member, "level"));
+		int currentlevel = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
 		int xpperlevel = 100;
 		int xpneededfornextlevel = (((currentlevel+1)^2 + (currentlevel+1)) / 2) * xpperlevel;
 		return xpneededfornextlevel;

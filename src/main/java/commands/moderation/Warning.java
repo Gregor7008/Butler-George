@@ -1,10 +1,9 @@
 package commands.moderation;
 
 import commands.Command;
-import components.Developerlist;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,41 +16,44 @@ public class Warning implements Command{
 	@Override
 	public void perform(SlashCommandEvent event) {
 		if (!event.getMember().getRoles().contains(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole")))) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warn:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			final User user = event.getOption("member").getAsUser();
+			Member member = event.getGuild().retrieveMemberById(user.getId()).complete();
 			String reason;
-			if (event.getOption("reason").toString() == "") {
+			if (event.getOption("reason").getAsString().equals("")) {
 				reason = "~Unknown reason~";
 			} else {
-				reason = event.getOption("reason").toString();
+				reason = event.getOption("reason").getAsString();
 			}
-			Configloader.INSTANCE.addUserConfig(event.getGuild().getMemberById(user.getId()), "warnings", reason);
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warn:success"));
+			Configloader.INSTANCE.addUserConfig(member, "warnings", reason);
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:success")).queue();
 			user.openPrivateChannel().queue((channel) -> {
-				 channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", "Reason:\n" + reason)).queue();});
+				 channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", ":white_check_mark: | Reason:\n=>" + reason)).queue();});
 			//ModEngine.getInstance().processWarnings(event.getGuild());
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
 			final User user = event.getOption("member").getAsUser();
-			String allwarnings = Configloader.INSTANCE.getUserConfig(event.getGuild().getMemberById(user.getId()), "warnings");
+			String allwarnings = Configloader.INSTANCE.getUserConfig(event.getGuild(), user, "warnings");
+			if (allwarnings.equals("")) {
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:nowarnings")).queue();
+				return;
+			}
 			String[] warnings = allwarnings.split(";");
 			StringBuilder sB = new StringBuilder();
-			sB.append("Warning-Count:" + warnings.length + "\n");
+			sB.append("Warning-Count:\s" + warnings.length + "\n");
 			for (int i = 0; i < warnings.length; i++) {
 				sB.append('#')
-				  .append(String.valueOf(i) + "\s")
+				  .append(String.valueOf(i+1) + "\s")
 				  .append(warnings[i]);
 				if (i+1 != warnings.length) {
-					sB.append(";\n");
-				} else {
-					sB.append(";");
-				}
+					sB.append("\n");
+				} else {}
 			}
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Warnings of" + event.getGuild().getMemberById(user.getId()).getAsMention(), sB.toString()));
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Warnings of\s" + event.getGuild().getMemberById(user.getId()).getEffectiveName(), sB.toString())).queue();
 		}
 	}
 

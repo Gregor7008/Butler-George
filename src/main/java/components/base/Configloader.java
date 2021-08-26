@@ -10,176 +10,190 @@ import java.util.Properties;
 import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 
 public class Configloader {
 	
 	public static Configloader INSTANCE;
-	private Properties properties;
-	
 	
 	public Configloader() {
 		INSTANCE = this;
-		properties = new Properties();
 	}
 	
 	public String getGuildConfig(Guild guild, String key) {
-		File propertiesFile = this.getGuildConfigFile(guild);
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
-		  properties.load(bis);
-		} catch (Exception e) {}
-		return properties.getProperty(key);
+		Properties properties1 = new Properties();
+		File propertiesFile1 = this.findorCreateGuildConfig(guild);
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile1))) {
+			properties1.load(bis);
+			bis.close();
+		} catch (Exception e) {e.printStackTrace();}
+		return properties1.getProperty(key);
 	}
 	
-	public String getUserConfig(Member member, String key) {
-		File propertiesFile = this.getUserConfigFile(member);
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
-		  properties.load(bis);
-		} catch (Exception e) {}
-		return properties.getProperty(key);
+	public String getUserConfig(Guild guild, User user, String key) {
+		Properties properties2 = new Properties();
+		File propertiesFile2 = this.findorCreateUserConfig(guild, user);
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile2))) {
+			properties2.load(bis);
+			bis.close();
+		} catch (Exception e) {e.printStackTrace();}
+		return properties2.getProperty(key);
 	}
 	
 	public void setUserConfig(Member member, String key, String value) {
-		try {
-		File propertiesFile = this.getUserConfigFile(member);
-		FileOutputStream out = new FileOutputStream(propertiesFile);
-		properties.setProperty(key, value);
-		properties.store(out, null);
-		out.close();
-		} catch (Exception e) {}
+		Properties properties3 = new Properties();
+		File propertiesFile3 = this.findorCreateUserConfig(member.getGuild(), member.getUser());
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile3))) {
+			properties3.load(bis);
+			bis.close();
+			FileOutputStream out1 = new FileOutputStream(propertiesFile3);
+			properties3.setProperty(key, value);
+			properties3.store(out1, null);
+			out1.close();
+		} catch (Exception e) {e.printStackTrace();}
+		
 	}
 	
 	public void setGuildConfig(Guild guild, String key, String value) {
-		try {
-			File propertiesFile = this.getGuildConfigFile(guild);
-			FileOutputStream out = new FileOutputStream(propertiesFile);
-			properties.setProperty(key, value);
-			properties.store(out, null);
-			out.close();
-			} catch (Exception e) {}
+		Properties properties4 = new Properties();
+		File propertiesFile4 = this.findorCreateGuildConfig(guild);
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile4))) {
+			properties4.load(bis);
+			bis.close();
+			FileOutputStream out1 = new FileOutputStream(propertiesFile4);
+			properties4.setProperty(key, value);
+			properties4.store(out1, null);
+			out1.close();
+		} catch (Exception e) {e.printStackTrace();}
 	}
 	
 	public void addUserConfig(Member member, String key, String value) {
-		try {
-			File propertiesFile = this.getUserConfigFile(member);
-			String current = this.getUserConfig(member, key);
-			FileOutputStream out = new FileOutputStream(propertiesFile);
+		Properties properties5 = new Properties();
+		File propertiesFile5 = this.findorCreateUserConfig(member.getGuild(), member.getUser());
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile5));){
+			String current = this.getUserConfig(member.getGuild(), member.getUser(), key);
+			properties5.load(bis);
+			bis.close();
+			FileOutputStream out4 = new FileOutputStream(propertiesFile5);
 			if (current.equals("")) {
-				properties.setProperty(key, value);
+				properties5.setProperty(key, value);
 			} else {
-				properties.setProperty(key, current + ";" + value);
+				properties5.setProperty(key, current + ";" + value);
 			}
-			properties.store(out, null);
-			out.close();
-		} catch (Exception e) {}
+			properties5.store(out4, null);
+			out4.close();
+		} catch (Exception e) {e.printStackTrace();}
 	}
 	
 	public void addGuildConfig(Guild guild, String key, String value) {
-		try {
-			File propertiesFile = this.getGuildConfigFile(guild);
+		Properties properties6 = new Properties();
+		File propertiesFile6 = this.findorCreateGuildConfig(guild);
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile6));){
 			String current = this.getGuildConfig(guild, key);
-			FileOutputStream out = new FileOutputStream(propertiesFile);
+			properties6.load(bis);
+			bis.close();
+			FileOutputStream out4 = new FileOutputStream(propertiesFile6);
 			if (current.equals("")) {
-				properties.setProperty(key, value);
+				properties6.setProperty(key, value);
 			} else {
-				properties.setProperty(key, current + ";" + value);
+				properties6.setProperty(key, current + ";" + value);
 			}
-			properties.store(out, null);
-			out.close();
-		} catch (Exception e) {}
+			properties6.store(out4, null);
+			out4.close();
+		} catch (Exception e) {e.printStackTrace();}
 	}
 	
 	public void deleteGuildConfig(Guild guild, String key, String value) {
-		try {
-			File propertiesFile = this.getGuildConfigFile(guild);
+		Properties properties7 = new Properties();
+		File propertiesFile7 = this.findorCreateGuildConfig(guild);
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile7));){
 			String currentraw = this.getGuildConfig(guild, key);
-			FileOutputStream out = new FileOutputStream(propertiesFile);
+			properties7.load(bis);
+			bis.close();
+			FileOutputStream out5 = new FileOutputStream(propertiesFile7);
 			String[] current = currentraw.split(";");
 			if (current.length == 1) {
-				properties.setProperty(key, "");
+				properties7.setProperty(key, "");
 			} else {
 				if(current[0].equals(value)) {
-					properties.setProperty(key, currentraw.replace(value + ";", ""));
+					properties7.setProperty(key, currentraw.replace(value + ";", ""));
 				} else {
-					properties.setProperty(key, currentraw.replace(";" + value, ""));
+					properties7.setProperty(key, currentraw.replace(";" + value, ""));
 				}
 			}
-			properties.store(out, null);
-			out.close();
+			properties7.store(out5, null);
+			out5.close();
 		} catch (Exception e) {e.printStackTrace();}
 	}
 	
 	public void deleteUserConfig(Member member, String key, String value) {
-		try {
-			File propertiesFile = this.getUserConfigFile(member);
-			String currentraw = this.getUserConfig(member, key);
-			FileOutputStream out = new FileOutputStream(propertiesFile);
+		Properties properties8 = new Properties();
+		File propertiesFile8 = this.findorCreateUserConfig(member.getGuild(), member.getUser());
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile8));){
+			String currentraw = this.getUserConfig(member.getGuild(), member.getUser(), key);
+			properties8.load(bis);
+			bis.close();
+			FileOutputStream out6 = new FileOutputStream(propertiesFile8);
 			String[] current = currentraw.split(";");
 			if (current.length == 1) {
-				properties.setProperty(key, "");
+				properties8.setProperty(key, "");
 			} else {
 				if(current[0].equals(value)) {
-					properties.setProperty(key, currentraw.replace(value + ";", ""));
+					properties8.setProperty(key, currentraw.replace(value + ";", ""));
 				} else {
-					properties.setProperty(key, currentraw.replace(";" + value, ""));
+					properties8.setProperty(key, currentraw.replace(";" + value, ""));
 				}
 			}
-			properties.store(out, null);
-			out.close();
+			properties8.store(out6, null);
+			out6.close();
 		} catch (Exception e) {}
 	}
 
-	private File findorCreateGuildConfig(Guild guild) {
-		File propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/guild/" + guild.getId() + ".properties");
-		if (!propertiesFile.exists()) {
+	public File findorCreateGuildConfig(Guild guild) {
+		Properties properties9 = new Properties();
+		File guildpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/guild/" + guild.getId() + ".properties");
+		if (!guildpropertiesFile.exists()) {
 			try {
-				propertiesFile.createNewFile();
-				properties.setProperty("welcomemsg", "");
-				properties.setProperty("goodbyemsg", "");
-				properties.setProperty("join2create", "");
-				properties.setProperty("suggest", "");
-				properties.setProperty("autoroles", "");
-				properties.setProperty("autobotroles", "");
-				properties.setProperty("modrole", "");
-				properties.setProperty("autopunish", "");
-				properties.setProperty("levelrewards", "");
-				properties.store(new FileOutputStream(propertiesFile), null);
+				guildpropertiesFile.createNewFile();
+				properties9.setProperty("welcomemsg", "");
+				properties9.setProperty("goodbyemsg", "");
+				properties9.setProperty("join2create", "");
+				properties9.setProperty("suggest", "");
+				properties9.setProperty("autoroles", "");
+				properties9.setProperty("botautoroles", "");
+				properties9.setProperty("modrole", "");
+				properties9.setProperty("autopunish", "");
+				properties9.setProperty("levelrewards", "");
+				properties9.store(new FileOutputStream(guildpropertiesFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}
-		return propertiesFile;
-	}
-	public File getGuildConfigFile(Guild guild) {
-		File configFile = this.findorCreateGuildConfig(guild);
-		return configFile;
+		return guildpropertiesFile;
 	}
 	
-	private File findorCreateUserConfig(Member member) {
-		File guilddir = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + member.getGuild().getId());
-		if (guilddir.exists() && guilddir.isDirectory()) {
-		} else {
+	public File findorCreateUserConfig(Guild guild, User user) {
+		Properties properties10 = new Properties();
+		File guilddir = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guild.getId());
+		if (!guilddir.exists()) {
 			guilddir.mkdirs();
 		}
-		File propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + member.getGuild().getId() + "/" + member.getId() + ".properties");
-		if (!propertiesFile.exists()) {
+		
+		File userpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
+		if (!userpropertiesFile.exists()) {
 			try {
-				propertiesFile.createNewFile();
-				properties.setProperty("warnings", "");
-				properties.setProperty("muted", "no");
-				properties.setProperty("tempmuted", "no");
-				properties.setProperty("tmuntil", "");
-				properties.setProperty("banned", "no");
-				properties.setProperty("tempbanned", "no");
-				properties.setProperty("tbuntil", "");
-				properties.setProperty("lastxpgotten", java.time.OffsetDateTime.now().toString());
-				properties.setProperty("level", "0");
-				properties.setProperty("expe", "0");
-				properties.setProperty("levelbackground", "0");
-				properties.store(new FileOutputStream(propertiesFile), null);
+				userpropertiesFile.createNewFile();
+				properties10.setProperty("warnings", "");
+				properties10.setProperty("muted", "false");
+				properties10.setProperty("tempmuted", "false");
+				properties10.setProperty("tmuntil", "");
+				properties10.setProperty("tempbanned", "false");
+				properties10.setProperty("tbuntil", "");
+				properties10.setProperty("lastxpgotten", java.time.OffsetDateTime.now().toString());
+				properties10.setProperty("level", "0");
+				properties10.setProperty("expe", "0");
+				properties10.setProperty("levelbackground", "0");
+				properties10.store(new FileOutputStream(userpropertiesFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}
-		return propertiesFile;
-	}
-	private File getUserConfigFile(Member member) {
-		File configFile =this.findorCreateUserConfig(member);
-		return configFile;
+		return userpropertiesFile;
 	}
 }

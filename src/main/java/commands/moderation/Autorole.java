@@ -65,7 +65,7 @@ public class Autorole implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("autorole", "Configurates the roles given to every new member joining in the future!")
-								  .addSubcommands(new SubcommandData("add", "Adds a new role!").addOptions(new OptionData(OptionType.ROLE, "addrole", "Mention the role you want to add!").setRequired(true)))
+								  .addSubcommands(new SubcommandData("add", "Adds a role!").addOptions(new OptionData(OptionType.ROLE, "addrole", "Mention the role you want to add!").setRequired(true)))
 								  .addSubcommands(new SubcommandData("remove", "Removes a role!").addOptions(new OptionData(OptionType.ROLE, "removerole", "Mention the role you want to remove!").setRequired(true)))
 								  .addSubcommands(new SubcommandData("list", "Displays the roles currently given to every new member!"));
 		return command;

@@ -36,7 +36,7 @@ public class CommandList {
 		this.commands.put("rolesort", new Rolesorting());
 		this.commands.put("welcome", new Welcome());
 		this.commands.put("goodbye", new Goodbye());
-		this.commands.put("warn", new Warning());
+		this.commands.put("warning", new Warning());
 		
 		//Music
 		this.commands.put("nowplaying", new Nowplaying());
