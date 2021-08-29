@@ -36,6 +36,23 @@ public class Level implements Command {
 			User user = event.getOption("member").getAsUser();
 			member = event.getGuild().getMember(user);
 		} catch (IllegalStateException | NullPointerException e) {member = event.getMember();}
+		File finalimage = this.renderLevelcard(member);
+        event.reply("").addFile(finalimage).queue();
+	}
+
+	@Override
+	public CommandData initialize() {
+		CommandData command = new CommandData("level", "Check your current level or the one of another user!")
+											  .addOptions(new OptionData(OptionType.USER, "member", "Mention another user (optional)").setRequired(false));
+		return command;
+	}
+
+	@Override
+	public String getHelp() {
+		return "Use this command to display your current server level, or the level of another member!";
+	}
+	
+	public File renderLevelcard(Member member) {
 		String levelbackground = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "levelbackground");
 		String level = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level");
 		String curxp = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe");
@@ -48,7 +65,7 @@ public class Level implements Command {
 		try {image = ImageIO.read(new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/" + levelbackground + ".png"));
 		} catch (IOException e) {
 			e.printStackTrace();
-			return;}		
+			return null;}		
 		BufferedImage avatar = null;
 		try {
 			URL url = new URL(member.getUser().getAvatarUrl());
@@ -90,20 +107,10 @@ public class Level implements Command {
 		File finalimage = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/cache/temp.png");
 		try {
 		ImageIO.write(image, "png", finalimage);
-		}catch (IOException e) {}
-        event.reply("").addFile(finalimage).queue();
-	}
-
-	@Override
-	public CommandData initialize() {
-		CommandData command = new CommandData("level", "Check your current level or the one of another user!")
-											  .addOptions(new OptionData(OptionType.USER, "member", "Mention another user (optional)").setRequired(false));
-		return command;
-	}
-
-	@Override
-	public String getHelp() {
-		return "Use this command to display your current server level, or the level of another member!";
+		}catch (IOException e) {
+			return null;
+		}
+		return finalimage;
 	}
 	
 	private BufferedImage makeRoundedCorner(BufferedImage image, int cornerRadius) {

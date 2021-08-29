@@ -3,6 +3,7 @@ package commands.moderation;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import components.moderation.AutoPunishEngine;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -32,28 +33,11 @@ public class Warning implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:success")).queue();
 			user.openPrivateChannel().queue((channel) -> {
 				 channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", ":white_check_mark: | Reason:\n=>" + reason)).queue();});
-			//ModEngine.getInstance().processWarnings(event.getGuild());
+			AutoPunishEngine.getInstance().processWarnings(event.getGuild());
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
-			final User user = event.getOption("member").getAsUser();
-			String allwarnings = Configloader.INSTANCE.getUserConfig(event.getGuild(), user, "warnings");
-			if (allwarnings.equals("")) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:nowarnings")).queue();
-				return;
-			}
-			String[] warnings = allwarnings.split(";");
-			StringBuilder sB = new StringBuilder();
-			sB.append("Warning-Count:\s" + warnings.length + "\n");
-			for (int i = 0; i < warnings.length; i++) {
-				sB.append('#')
-				  .append(String.valueOf(i+1) + "\s")
-				  .append(warnings[i]);
-				if (i+1 != warnings.length) {
-					sB.append("\n");
-				} else {}
-			}
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Warnings of\s" + event.getGuild().getMemberById(user.getId()).getEffectiveName(), sB.toString())).queue();
+			this.listwarnings(event);
 		}
 	}
 
@@ -71,5 +55,26 @@ public class Warning implements Command{
 	@Override
 	public String getHelp() {
 		return "Warn a member for rude behavior etc. The bot will keep track of it and the serveradmin can define automatic punishements when a specific number of warnings is reached!";
+	}
+	
+	private void listwarnings(SlashCommandEvent event) {
+		final User user = event.getOption("member").getAsUser();
+		String allwarnings = Configloader.INSTANCE.getUserConfig(event.getGuild(), user, "warnings");
+		if (allwarnings.equals("")) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:nowarnings")).queue();
+			return;
+		}
+		String[] warnings = allwarnings.split(";");
+		StringBuilder sB = new StringBuilder();
+		sB.append("Warning-Count:\s" + warnings.length + "\n");
+		for (int i = 0; i < warnings.length; i++) {
+			sB.append('#')
+			  .append(String.valueOf(i+1) + "\s")
+			  .append(warnings[i]);
+			if (i+1 != warnings.length) {
+				sB.append("\n");
+			} else {}
+		}
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Warnings of\s" + event.getGuild().getMemberById(user.getId()).getEffectiveName(), sB.toString())).queue();
 	}
 }

@@ -23,9 +23,7 @@ public class Test implements Command{
 	public void perform(SlashCommandEvent event) {
 		if (!Developerlist.getInstance().developers.contains(event.getMember().getId())) {
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("No Permission!", ":warning: | You have no permission to use this command!\n You must be a developer of this bot to use this command!"));
-		}
-		event.reply("\"Test.java\" reached!").queue();
-		
+		}		
 	}
 
 }

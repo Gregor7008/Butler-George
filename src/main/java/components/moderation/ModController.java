@@ -44,7 +44,7 @@ public class ModController {
 				}
 			}));
 			for (int i = 0; i < users.size(); i++) {
-				String[] temp1 = users.get(i).split(".");
+				String[] temp1 = users.get(i).split(".properties");
 				User user = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
 				if (Configloader.INSTANCE.getGuildConfig(guild, "muterole") == "") {
 					RoleAction cr = guild.createRole()
@@ -69,11 +69,16 @@ public class ModController {
 						user.openPrivateChannel().queue(channel -> {
 							channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/components/moderation/modcontroller:unmuted"));
 						});
+						Configloader.INSTANCE.setUserConfig(guild.getMember(user), "muted", "false");
 					}
 				}
 				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
 					if (!guild.getMember(user).getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
 						guild.addRoleToMember(guild.getMember(user),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+					}
+				} else {
+					if (!guild.getMember(user).getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
+						guild.removeRoleFromMember(guild.getMember(user),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
 					}
 				}
 				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempbanned"))) {
@@ -90,5 +95,4 @@ public class ModController {
 			}
 		}
 	}
-
 }

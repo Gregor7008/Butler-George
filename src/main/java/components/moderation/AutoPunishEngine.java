@@ -9,13 +9,13 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
-public class ModEngine {
+public class AutoPunishEngine {
 	
-	private static ModEngine INSTANCE;
+	private static AutoPunishEngine INSTANCE;
 	
-	public static ModEngine getInstance() {
+	public static AutoPunishEngine getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE = new ModEngine();
+			INSTANCE = new AutoPunishEngine();
 		}
 		return INSTANCE;
 	}

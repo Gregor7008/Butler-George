@@ -18,7 +18,7 @@ public class Help implements Command{
 		if ((cmd = commandList.commands.get(event.getOption("command").toString())) != null) {
 			help = cmd.getHelp();
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Help for:" + event.getOption("command").toString() +"-command", help));
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Help for the\s" + event.getOption("command").toString() +"-command", help));
 	}
 
 	@Override

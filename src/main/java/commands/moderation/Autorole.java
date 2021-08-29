@@ -37,28 +37,7 @@ public class Autorole implements Command {
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
-			final StringBuilder sB = new StringBuilder();
-			final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autoroles");
-			if (currentraw.equals("")) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:noautoroles")).queue();;
-				return;
-			}
-			if (!currentraw.contains(";")) {
-				event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
-				return;
-			}
-			String[] current = currentraw.split(";");
-			for (int i = 1; i <= current.length; i++) {
-				sB.append('#')
-				  .append(String.valueOf(i) + "\s\s");
-				if (i == current.length) {
-					sB.append(guild.getRoleById(current[i-1]).getAsMention());
-				} else {
-					sB.append(guild.getRoleById(current[i-1]).getAsMention() + "\n");
-				}
-			}
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", sB.toString())).queue();
-			return;
+			this.listroles(event, guild);
 		}
 	}
 
@@ -75,5 +54,28 @@ public class Autorole implements Command {
 	public String getHelp() {
 		return "Use this command to configure, which roles should be given each new joining member!";
 	}
-
+	
+	private void listroles(SlashCommandEvent event, Guild guild) {
+		final StringBuilder sB = new StringBuilder();
+		final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autoroles");
+		if (currentraw.equals("")) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:noautoroles")).queue();;
+			return;
+		}
+		if (!currentraw.contains(";")) {
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
+			return;
+		}
+		String[] current = currentraw.split(";");
+		for (int i = 1; i <= current.length; i++) {
+			sB.append('#')
+			  .append(String.valueOf(i) + "\s\s");
+			if (i == current.length) {
+				sB.append(guild.getRoleById(current[i-1]).getAsMention());
+			} else {
+				sB.append(guild.getRoleById(current[i-1]).getAsMention() + "\n");
+			}
+		}
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", sB.toString())).queue();
+	}
 }
