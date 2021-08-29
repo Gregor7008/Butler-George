@@ -6,7 +6,7 @@
 
   <groupId>NoLimits</groupId>
   <artifactId>NoLimits</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0</version>
 
   <name>NoLimits</name>
   <url>https://github.com/Gregor7008/NoLimits-Bot</url>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
-      <version>4.3.0_306</version>
+      <version>4.3.0_307</version>
     </dependency>
       <dependency>
       <groupId>com.sedmelluq</groupId>
@@ -58,11 +58,32 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.8.1</version>
           <configuration>
-             <source>16.0.1</source>
-             <target>16.0.1</target>
+             <source>16</source>
+             <target>16</target>
           </configuration>
        </plugin>
+       <plugin>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.2.4</version>
+          <configuration>
+              <transformers>
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  	  <manifestEntries>
+                  	       <mainClass>base.Bot</mainClass>
+                  	  </manifestEntries>
+                  </transformer>
+              </transformers>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+          </configuration>
+          <executions>
+              <execution>
+                  <phase>package</phase>
+                      <goals>
+                          <goal>shade</goal>
+                      </goals>
+              </execution>
+          </executions>
+       </plugin>
     </plugins>
-  </build>
-  
+  </build> 
 </project>

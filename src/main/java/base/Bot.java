@@ -12,10 +12,14 @@ import javax.security.auth.login.LoginException;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
+import components.base.Configloader;
+import components.moderation.ModController;
+import components.moderation.NoLimitsOnly;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public class Bot {
 	
@@ -33,25 +37,31 @@ public class Bot {
 	}
 	
 	private Bot() throws LoginException, InterruptedException {
-		INSTANCE = this;
-		new Configloader();
-		this.readConsole();
-		
+		INSTANCE = this;		
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
-		jda = builder.build();
+		builder.setRawEventsEnabled(true);
+		builder.enableIntents(GatewayIntent.GUILD_MEMBERS);
+		jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);
-	    while (true) {
-			jda.getPresence().setActivity(Activity.listening("Gregor"));
-			this.wait(15000);
-			jda.getPresence().setActivity(Activity.competing("NoLimits"));
-			this.wait(15000);
-			jda.getPresence().setActivity(Activity.watching("NoLimits"));
-			this.wait(15000);
-			jda.getPresence().setActivity(Activity.playing("discord.gg/qHA2vUs"));
-			this.wait(15000);
-	    }
+		new Thread(() -> {
+			while (true) {
+				jda.getPresence().setActivity(Activity.listening("Gregor"));
+				this.wait(15000);
+				jda.getPresence().setActivity(Activity.competing("NoLimits"));
+				this.wait(15000);
+				jda.getPresence().setActivity(Activity.watching("NoLimits"));
+				this.wait(15000);
+				jda.getPresence().setActivity(Activity.playing("discord.gg/qHA2vUs"));
+				this.wait(15000);
+		    }
+		}).start();
+		
+	    new Configloader();
+	    new NoLimitsOnly();
+	    new ModController();
+	    this.readConsole();
 	}
 
 	public void shutdown() {
@@ -79,8 +89,6 @@ public class Bot {
 				while((line = reader.readLine()) != null) {
 					if(line.equalsIgnoreCase("shutdown")) {
 						shutdown();
-					} else {
-						System.out.println("Command undefined");
 					}
 				}
 			} catch (IOException e) {
@@ -90,8 +98,8 @@ public class Bot {
 		}).start();
 	}
 	
-	private String getBotConfig(String key) {
-		File propertiesFile = new File("./src/main/resources/botconfig.properties");
+	public String getBotConfig(String key) {
+		File propertiesFile = new File("./resources/botconfig.properties");
 		Properties properties = new Properties();	 
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
 		  properties.load(bis);

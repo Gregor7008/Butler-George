@@ -13,7 +13,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import components.AnswerEngine;
+import components.base.AnswerEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 
@@ -52,11 +52,7 @@ public class PlayerManager {
 			@Override
 			public void trackLoaded(AudioTrack track) {
 				musicManager.scheduler.queue(track);
-				if (getMusicManager(channel.getGuild()).audioPlayer.getPlayingTrack() != null) {
-					AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!", channel).queue();;
-				} else {
-					AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was loaded succesfully!", channel).queue();;
-				}
+				channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!")).queue();
 			}
 			
 			@Override
@@ -66,32 +62,24 @@ public class PlayerManager {
 					for (final AudioTrack track : tracks) {
 						musicManager.scheduler.queue.add(track);
 					}
-					if (getMusicManager(channel.getGuild()).audioPlayer.getPlayingTrack() != null) {
-						AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | The playlist `" + playlist.getName() + "` with `" + String.valueOf(tracks.size()) + "` tracks was added to the queue!", channel).queue();
-					} else {
-						AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | The playlist `" + playlist.getName() + "` with `" + String.valueOf(tracks.size()) + "` tracks was loaded succesfully!", channel).queue();
-					}
+					channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | The playlist `" + playlist.getName() + "` with `" + String.valueOf(tracks.size()) + "` tracks was added to the queue!")).queue();
 					return;
 				} else {
 					AudioTrack track = tracks.get(0);
 					musicManager.scheduler.queue(track);
-					if (getMusicManager(channel.getGuild()).audioPlayer.getPlayingTrack() != null) {
-						AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!", channel).queue();
-					} else {
-						AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was loaded succesfully!", channel).queue();
-					}
+					channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!")).queue();
 				}
 			}
 			
 			@Override
 			public void noMatches() {
-				AnswerEngine.getInstance().buildMessage("Error!",":x: | I'm sorry, but I couldn't find anything for your search term!", channel).queue();
+				channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Error!",":x: | I'm sorry, but I couldn't find anything for your search term!")).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			}
 			
 			@Override
 			public void loadFailed(FriendlyException exception) {
-				AnswerEngine.getInstance().buildMessage("Error!",":x: | I'm sorry, but I couldn't load your song...", channel).queue();
+				channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Error!",":x: | I'm sorry, but I couldn't load your song...")).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			}
 		});

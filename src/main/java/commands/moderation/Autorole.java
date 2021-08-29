@@ -1,80 +1,81 @@
 package commands.moderation;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
-
-import base.Configloader;
-import commands.Commands;
-import components.AnswerEngine;
+import commands.Command;
+import components.Developerlist;
+import components.base.AnswerEngine;
+import components.base.Configloader;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-public class Autorole implements Commands{
+public class Autorole implements Command {
 
 	@Override
-	public void perform(GuildMessageReceivedEvent event, String argument) {
-		final File configFile = Configloader.INSTANCE.getConfigFile(event.getGuild());
-		final Properties properties = new Properties();
-		final Role role;
-		if (argument.startsWith("add")) {
-			try {
-				role = event.getMessage().getMentionedRoles().get(0);
-			} catch (Exception e) {
-				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", event);
-				return;
-			}
-			try {
-			FileInputStream in = new FileInputStream(configFile);
-			properties.load(in);
-			String autoroles = properties.getProperty("autoroles");
-			in.close();
-			String newautorole = role.getId();
-			String newautoroles;
-			if (autoroles == "") {
-				newautoroles = newautorole;
-			} else {
-				newautoroles = autoroles + ";" + newautorole;
-			}
-			FileOutputStream out = new FileOutputStream(configFile);
-			properties.setProperty(autoroles, newautoroles);
-			properties.store(out, null);
-			out.close();
-			} catch (IOException e) {e.printStackTrace();}
-			AnswerEngine.getInstance().buildMessage("Role added!", ":white_check_mark: | Everytime a new member joins the " + role.getAsMention() + " Role will be given to him!", event.getChannel());
+	public void perform(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
+		final Member member = event.getMember();
+		if (!member.hasPermission(Permission.MANAGE_ROLES) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:nopermission")).queue();
 			return;
 		}
-		if (argument.startsWith("remove")) {
-			try {
-				role = event.getMessage().getMentionedRoles().get(0);
-			} catch (Exception e) {
-				AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:needrole", event);
-				return;
-			}
-			try {
-				FileInputStream in = new FileInputStream(configFile);
-				properties.load(in);
-				String autoroles = properties.getProperty("autoroles");
-				in.close();
-				if (autoroles == "") {
-					AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:noautoroles", event);
-					return;
-				}
-				String outautorole = role.getId();
-				String newautoroles = autoroles.replace(outautorole + ";", "");
-				FileOutputStream out = new FileOutputStream(configFile);
-				properties.setProperty(autoroles, newautoroles);
-				properties.store(out, null);
-				out.close();
-			} catch (IOException e) {e.printStackTrace();}
-			AnswerEngine.getInstance().buildMessage("Role removed!", ":white_check_mark: | Everytime a new member joins the " + role.getAsMention() + " Role will no longer be given to him!", event.getChannel());
+		if (event.getSubcommandName().equals("add")) {
+			final Role role = event.getOption("addrole").getAsRole();
+			Configloader.INSTANCE.addGuildConfig(guild, "autoroles", role.getId());
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:addsuccess")).queue();;
 			return;
 		}
-		if (argument.startsWith("list")) {
+		if (event.getSubcommandName().equals("remove")) {
+			final Role role = event.getOption("removerole").getAsRole();
+			Configloader.INSTANCE.deleteGuildConfig(guild, "autoroles", role.getId());
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:removesuccess")).queue();
 			return;
+		}
+		if (event.getSubcommandName().equals("list")) {
+			this.listroles(event, guild);
 		}
 	}
 
+	@Override
+	public CommandData initialize() {
+		CommandData command = new CommandData("autorole", "Configurates the roles given to every new member joining in the future!")
+								  .addSubcommands(new SubcommandData("add", "Adds a role!").addOptions(new OptionData(OptionType.ROLE, "addrole", "Mention the role you want to add!").setRequired(true)))
+								  .addSubcommands(new SubcommandData("remove", "Removes a role!").addOptions(new OptionData(OptionType.ROLE, "removerole", "Mention the role you want to remove!").setRequired(true)))
+								  .addSubcommands(new SubcommandData("list", "Displays the roles currently given to every new member!"));
+		return command;
+	}
+
+	@Override
+	public String getHelp() {
+		return "Use this command to configure, which roles should be given each new joining member!";
+	}
+	
+	private void listroles(SlashCommandEvent event, Guild guild) {
+		final StringBuilder sB = new StringBuilder();
+		final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autoroles");
+		if (currentraw.equals("")) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:noautoroles")).queue();;
+			return;
+		}
+		if (!currentraw.contains(";")) {
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
+			return;
+		}
+		String[] current = currentraw.split(";");
+		for (int i = 1; i <= current.length; i++) {
+			sB.append('#')
+			  .append(String.valueOf(i) + "\s\s");
+			if (i == current.length) {
+				sB.append(guild.getRoleById(current[i-1]).getAsMention());
+			} else {
+				sB.append(guild.getRoleById(current[i-1]).getAsMention() + "\n");
+			}
+		}
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", sB.toString())).queue();
+	}
 }

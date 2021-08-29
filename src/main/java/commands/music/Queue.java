@@ -8,59 +8,65 @@ import java.util.concurrent.TimeUnit;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
-import commands.Commands;
-import components.AnswerEngine;
+import commands.Command;
+import components.base.AnswerEngine;
 import components.music.GuildMusicManager;
 import components.music.PlayerManager;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class Queue implements Commands{
+public class Queue implements Command{
 
 	@Override
-	public void perform(GuildMessageReceivedEvent event, String arguments) {
+	public void perform(SlashCommandEvent event) {
 		final Member member = event.getMember();
-		final Member self = event.getGuild().getSelfMember();
-		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+		final Guild guild = event.getGuild();
+		final Member self = guild.getSelfMember();
+		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 		if (!self.getVoiceState().inVoiceChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:notconnected", event).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:nopermission", event).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:nopermission")).queue();
 			return;
 		}
 		if (queue.isEmpty()) {
-			AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:noqueue", event).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:noqueue")).queue();
 			return;
 		}
 		
 		final int trackCount = Math.min(queue.size(), 20);
 		final List<AudioTrack> trackList = new ArrayList<>(queue);
-		final MessageAction messageAction = event.getChannel().sendMessage("Current Queue: \n");
+		final StringBuilder sB = new StringBuilder();
 		
 		for (int i = 0; i < trackCount; i++) {
 			final AudioTrack track = trackList.get(i);
 			final AudioTrackInfo info = track.getInfo();
 			
-			messageAction.append('#')
-						 .append(String.valueOf(i+1))
-						 .append(" `")
-						 .append(info.title)
-						 .append(" by ")
-						 .append(info.author)
-						 .append("`[`")
-						 .append(formatTime(track.getDuration()))
-						 .append("`]/n");
+			sB.append('#')
+			  .append(String.valueOf(i+1))
+			  .append(" `")
+			  .append(info.title)
+			  .append("` by `")
+			  .append(info.author)
+			  .append("`[")
+			  .append(formatTime(track.getDuration()));
+		   if (i+1 != trackCount) {
+			   sB.append("]\n");
+		   } else {
+			   sB.append("]");
+		   }
 		}
 		if(trackList.size() > trackCount) {
-			messageAction.append("And")
-						 .append(String.valueOf(trackList.size() - trackCount))
-						 .append("` more...");
+			sB.append("And")
+			  .append(String.valueOf(trackList.size() - trackCount))
+			  .append("` more...");
 		}
-		messageAction.queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current queue:", sB.toString())).queue();
 	}
 
 	private String formatTime(long timeInMillis) {
@@ -68,6 +74,17 @@ public class Queue implements Commands{
 		final long minutes = timeInMillis / TimeUnit.MINUTES.toMillis(1);
 		final long seconds = timeInMillis % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
 		return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+	}
+
+	@Override
+	public CommandData initialize() {
+		CommandData command = new CommandData("queue", "Displays the current queue!");
+		return command;
+	}
+
+	@Override
+	public String getHelp() {
+		return "Use this command to get the current queue of tracks, that are going to be played in your channel!";
 	}
 
 }
