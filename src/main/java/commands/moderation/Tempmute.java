@@ -22,7 +22,7 @@ public class Tempmute implements Command{
 			return;
 		}
 		User user = event.getOption("member").getAsUser();
-		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), event.getGuild().getMember(user));
+		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), event.getGuild().retrieveMember(user).complete());
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully muted for\s" + event.getOption("days").getAsString() + "\sdays!"));
 	}
 

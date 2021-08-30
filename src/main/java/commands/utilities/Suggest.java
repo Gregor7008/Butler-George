@@ -20,16 +20,16 @@ public class Suggest implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		if (!event.getOption("setchannel").getAsGuildChannel().equals(null)) {
+		if (!event.getOption("setchannel").getAsMessageChannel().equals(null)) {
 			if (!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
 				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:nopermission")).queue();
-				return;
 			} else {
 				Configloader.INSTANCE.setGuildConfig(event.getGuild(), "suggest", event.getOption("setchannel").getAsGuildChannel().getId());
 				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:successset")).queue();
 			}
+			return;
 		}
-		if (!event.getOption("suggestion").getAsString().equals("")) {
+		if (!event.getOption("idea").getAsString().equals("")) {
 			TextChannel channel = event.getGuild().getTextChannelById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "suggest"));
 			EmbedBuilder eb = new EmbedBuilder();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
@@ -49,7 +49,7 @@ public class Suggest implements Command{
 	public CommandData initialize() {
 		CommandData command = new CommandData("suggest", "Suggest an idea!")
 										.addOptions(new OptionData(OptionType.CHANNEL, "setchannel", "Set the channel for suggestions!").setRequired(false))
-										.addOptions(new OptionData(OptionType.STRING, "suggestion", "Write down your suggestions").setRequired(false));	
+										.addOptions(new OptionData(OptionType.STRING, "idea", "Write down your suggestions!").setRequired(false));	
 		return command;
 	}
 

@@ -36,7 +36,7 @@ public class Levelreward implements Command{
 					Configloader.INSTANCE.deleteGuildConfig(event.getGuild(), "levelrewards", rewards[i]);
 					String[] reward = rewards[i].split("_");
 					event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The role\s"
-								+ event.getGuild().getRoleById(reward[0]) + "\swill no longer be given to every member reaching level\s" + reward[1] + "!")).queue();
+								+ event.getGuild().getRoleById(reward[0]).getAsMention() + "\swill no longer be given to every member reaching level\s" + reward[1] + "!")).queue();
 					return;
 				}
 			}

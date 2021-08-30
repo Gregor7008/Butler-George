@@ -25,7 +25,7 @@ public class AutoPunishEngine {
 		String pms = Configloader.INSTANCE.getGuildConfig(guild, "autopunish");
 		String[] pm = pms.split(";");
 		for (int a = 0; a < pm.length; a++) {
-			String[] temp1 = pm[a].split("_");
+			String[] temp1 = pm[a].split("_", 2);
 			punishements.put(Integer.valueOf(temp1[0]), temp1[1]);
 		}
 		List<Member> members = guild.loadMembers().get();
@@ -45,20 +45,20 @@ public class AutoPunishEngine {
 						break;
 					default:
 						if (punishement.contains("removerole")) {
-							String[] temp1 = punishement.split(":");
+							String[] temp1 = punishement.split("_");
 							guild.removeRoleFromMember(member, guild.getRoleById(temp1[1]));
 							Configloader.INSTANCE.setUserConfig(member, "expe", "0");
 							Configloader.INSTANCE.setUserConfig(member, "level", "0");
 							return;
 						}
 						if (punishement.contains("tempmute")) {
-							String[] temp1 = punishement.split(":");
+							String[] temp1 = punishement.split("_");
 							Tempmute tm = new Tempmute();
 							tm.tempmute(Integer.valueOf(temp1[1]), member);
 							return;
 						}
 						if (punishement.contains("tempban")) {
-							String[] temp1 = punishement.split(":");
+							String[] temp1 = punishement.split("_");
 							Tempban tb = new Tempban();
 							tb.tempban(Integer.valueOf(temp1[1]), member);
 							return;

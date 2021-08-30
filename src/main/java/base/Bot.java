@@ -37,7 +37,8 @@ public class Bot {
 	}
 	
 	private Bot() throws LoginException, InterruptedException {
-		INSTANCE = this;		
+		INSTANCE = this;
+		System.out.println("Still not ready:\n-> Level.java\n-> Suggest.java");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());

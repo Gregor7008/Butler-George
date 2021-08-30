@@ -164,6 +164,7 @@ public class Configloader {
 				properties9.setProperty("modrole", "");
 				properties9.setProperty("autopunish", "");
 				properties9.setProperty("levelrewards", "");
+				properties9.setProperty("muterole", "");
 				properties9.store(new FileOutputStream(guildpropertiesFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}

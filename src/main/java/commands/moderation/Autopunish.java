@@ -8,6 +8,7 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -23,6 +24,10 @@ public class Autopunish implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		if (!event.getMember().hasPermission(Permission.BAN_MEMBERS)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:nopermission")).queue();
+			return;
+		}
 		channel = event.getTextChannel();
 		user = event.getUser();
 		if (event.getSubcommandName().equals("add")) {
@@ -61,33 +66,38 @@ public class Autopunish implements Command{
 			return;
 		}
 		if (!currentraw.contains(";")) {
-			String[] temp1 = currentraw.split(":");
+			String[] temp1 = currentraw.split("_");
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current punishements:", "#" + temp1[1] + "\s\s" + temp1[0])).queue();
 		} else {
 			for (int i = 1; i <= current.length; i++) {
-				String[] temp2 = current[i].split(":");
-				sB.append('#')
-				  .append(temp2[1] + "\s\s");
-				if (i == current.length) {
-				sB.append(temp2[0]);
-				} else {
-				sB.append(temp2[0] + "\n");
-				}
+				 String[] temp2 = current[i-1].split("_");
+				 sB.append(temp2[1] + "\son\s");
+				 if (i == current.length) {
+				 	 sB.append(temp2[0] + "\swarnings");
+				 } else {
+					 sB.append(temp2[0] + "\swarnings,\n");
+				 }
 			}
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current punishements: (Reply with warning count to remove)", sB.toString())).queue();
 		}
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-				e -> {for (int i = 1; i <= current.length; i++) {
-					   	  String[] temp3 = current[i].split(":");
-					   	  if (temp3[1].contains(e.getMessage().getContentRaw())) {
-					   		  Configloader.INSTANCE.deleteGuildConfig(event.getGuild(), "autopunish", current[i]);
-					   		  e.getMessage().addReaction(":white_check_mark:");
-					   	  }
-					  }},
+				e -> {this.removefinal(e, current);},
 				1, TimeUnit.MINUTES,
 				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+	}
+	
+	private void removefinal(GuildMessageReceivedEvent e, String[] current) {
+		for (int i = 1; i <= current.length; i++) {
+		   	 String[] temp3 = current[i-1].split("_", 2);
+		   	if (temp3[0].contains(e.getMessage().getContentRaw())) {
+		   	    Configloader.INSTANCE.deleteGuildConfig(e.getGuild(), "autopunish", current[i-1]);
+		   	    e.getMessage().addReaction("U+2705").queue();
+		    } else {
+		    	e.getMessage().addReaction("U+0078").queue();
+		    }
+		}
 	}
 	
 	private void addpunishements1(SlashCommandEvent event) {
@@ -122,14 +132,16 @@ public class Autopunish implements Command{
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {if (plannedpunish == 2) {
-						  String punishement = String.valueOf(warnings) + "_tempmute:" + e.getMessage().getContentRaw();
-						  Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", punishement);
-						  event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:successtempmute")).queue();
+						  	String punishement = String.valueOf(warnings) + "_tempmute_" + e.getMessage().getContentRaw();
+						  	Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", punishement);
+						  	event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:successtempmute")).queue();
+						  	return;
 						  }
-						  if (plannedpunish == 2) {
-						  String punishement = String.valueOf(warnings) + "_tempban:" + e.getMessage().getContentRaw();
-						  Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", punishement);
-						  event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:successtempban")).queue();
+						  if (plannedpunish == 5) {
+							  String punishement = String.valueOf(warnings) + "_tempban_" + e.getMessage().getContentRaw();
+							  Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", punishement);
+							  event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:successtempban")).queue();
+							  return;
 						  }},
 					1, TimeUnit.MINUTES,
 					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
@@ -141,7 +153,7 @@ public class Autopunish implements Command{
 			waiter.waitForEvent(GuildMessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-					e -> {String punishement = String.valueOf(warnings) + "_removerole:" + e.getMessage().getContentRaw();
+					e -> {String punishement = String.valueOf(warnings) + "_removerole_" + e.getMessage().getContentRaw();
 						  Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", punishement);
 						  event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:successrole")).queue();
 						  },
@@ -149,7 +161,22 @@ public class Autopunish implements Command{
 					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			return;
 		}
-		event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:success")).queue();
+		if (plannedpunish == 4) {
+			Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", String.valueOf(warnings) + "_kick");
+			event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:successkick")).queue();
+			return;
+		}
+		if (plannedpunish == 3) {
+			Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", String.valueOf(warnings) + "_mute");
+			event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:successmute")).queue();
+			return;
+		}
+		if (plannedpunish == 6) {
+			Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", String.valueOf(warnings) + "_ban");
+			event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autopunish:successban")).queue();
+			return;
+		}
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Error!", ":x: | Something went horribly wrong!")).queue();
 	}
 	
 	private void listpunishements(SlashCommandEvent event) {
@@ -161,19 +188,18 @@ public class Autopunish implements Command{
 			return;
 		}
 		if (!currentraw.contains(";")) {
-			String[] temp1 = currentraw.split(":");
+			String[] temp1 = currentraw.split("_");
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current punishements:", "#" + temp1[1] + "\s\s" + temp1[0])).queue();
 			return;
 		}
 		String[] current = currentraw.split(";");
 		for (int i = 1; i <= current.length; i++) {
-			String[] temp2 = current[i].split(":");
-			sB.append('#')
-			  .append(temp2[1] + "\s\s");
+			String[] temp2 = current[i-1].split("_");
+			sB.append(temp2[1] + "\son\s");
 			if (i == current.length) {
-				sB.append(temp2[0]);
+				sB.append(temp2[0] + "\swarnings");
 			} else {
-				sB.append(temp2[0] + "\n");
+				sB.append(temp2[0] + "\swarnings,\n");
 			}
 		}
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current punishements:", sB.toString())).queue();

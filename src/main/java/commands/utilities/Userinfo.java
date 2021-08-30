@@ -57,14 +57,14 @@ public class Userinfo implements Command{
 		eb.addField(":name_badge:  Nickname", "`" + member.getEffectiveName() + "`", true);
 		eb.addField(":registered:  Discriminator", "`" + member.getUser().getDiscriminator() + "`", true);
 		eb.addField(":id:  ID", "`" + member.getUser().getId() + "`", true);
-		eb.addField(":robot:  Bot", "`" + String.valueOf(member.getUser().isBot()) + "`", false);
+		eb.addField(":robot:  Bot", "`" + String.valueOf(member.getUser().isBot()) + "`", true);
 		eb.addField(":rocket:  Booster", "`" + booster + "`", true);
-		eb.addField(":calendar:  Joined", "`" + member.getTimeJoined().format(formatter) + "`", false);
+		eb.addField(":calendar:  Joined", "`" + member.getTimeJoined().format(formatter) + "`", true);
 		eb.addField(":calendar:  Account created", "`" + member.getUser().getTimeCreated().format(formatter) + "`", true);
-		eb.addField(":warning:  Warnings", "`" + String.valueOf(Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "warnings").split(";").length - 91) + "`", false);
+		eb.addField(":warning:  Warnings", "`" + String.valueOf(Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "warnings").split(";").length - 1) + "`", true);
 		eb.addField(":card_index:  Experience", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
 		eb.addField(":pager:  Level", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
-		eb.addField(":alarm_clock:  Status", "`" + member.getOnlineStatus().toString() + "`", false);
+		eb.addField(":alarm_clock:  Status", "`" + member.getOnlineStatus().toString() + "`", true);
 		eb.addField(":abacus:  Role-Count", "`" + String.valueOf(member.getRoles().size()) + "`", true);
 		eb.addField(":arrow_up:  Highest role", "`" + member.getRoles().get(0).getName() + "`", true);
 		
@@ -93,12 +93,12 @@ public class Userinfo implements Command{
 		
 		eb.addField(":diamond_shape_with_a_dot_inside: Name", "`" + member.getEffectiveName() + "`", true);
 		eb.addField(":registered: Discriminator", "`" + member.getUser().getDiscriminator() + "`", true);
-		eb.addField(":robot: Bot", "`" + String.valueOf(member.getUser().isBot()) + "`", false);
+		eb.addField(":robot: Bot", "`" + String.valueOf(member.getUser().isBot()) + "`", true);
 		eb.addField(":rocket: Booster", "`" + booster + "`", true);
-		eb.addField(":calendar: Joined", "`" + member.getTimeJoined().format(formatter) + "`", false);
-		eb.addField(":card_index: Experience", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", false);
+		eb.addField(":calendar: Joined", "`" + member.getTimeJoined().format(formatter) + "`", true);
+		eb.addField(":card_index: Experience", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
 		eb.addField(":pager: Level", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
-		eb.addField(":alarm_clock: Status", "`" + member.getOnlineStatus().toString() + "`", false);
+		eb.addField(":alarm_clock: Status", "`" + member.getOnlineStatus().toString() + "`", true);
 		eb.addField(":abacus: Role-Count", "`" + String.valueOf(member.getRoles().size()) + "`", true);
 		eb.addField(":arrow_up: Hoisted role", "`" + member.getRoles().get(0).getName() + "`", true);
 		

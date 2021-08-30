@@ -45,8 +45,8 @@ public class ModController {
 			}));
 			for (int i = 0; i < users.size(); i++) {
 				String[] temp1 = users.get(i).split(".properties");
-				User user = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
-				if (Configloader.INSTANCE.getGuildConfig(guild, "muterole") == "") {
+				User user = guild.retrieveMemberById(temp1[0]).complete().getUser();
+				if (Configloader.INSTANCE.getGuildConfig(guild, "muterole").equals("")) {
 					RoleAction cr = guild.createRole()
 										 .setName("Muted");
 					Role newrole = cr.complete();
@@ -56,7 +56,6 @@ public class ModController {
 						TextChannel channel = channels.get(o);
 						channel.createPermissionOverride(newrole)
 							   .setDeny(Permission.MESSAGE_WRITE)
-							   .setDeny(Permission.MESSAGE_ADD_REACTION)
 							   .queue();
 					}
 				}
@@ -67,18 +66,20 @@ public class ModController {
 					if (difference <= 0) {
 						guild.removeRoleFromMember(guild.retrieveMember(user).complete(), guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
 						user.openPrivateChannel().queue(channel -> {
-							channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/components/moderation/modcontroller:unmuted"));
+							try {
+								channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Hey\s" + user.getName() + "!", ":tada: | You were just unmuted over at the\s" + guild.getName() + "\sserver!\nYou can chat again now!")).queue();
+							} catch (Exception e1) {}
 						});
-						Configloader.INSTANCE.setUserConfig(guild.getMember(user), "muted", "false");
+						Configloader.INSTANCE.setUserConfig(guild.retrieveMember(user).complete(), "muted", "false");
 					}
 				}
 				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
-					if (!guild.getMember(user).getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
-						guild.addRoleToMember(guild.getMember(user),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+					if (!guild.retrieveMember(user).complete().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
+						guild.addRoleToMember(guild.retrieveMember(user).complete(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
 					}
 				} else {
-					if (!guild.getMember(user).getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
-						guild.removeRoleFromMember(guild.getMember(user),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+					if (!guild.retrieveMember(user).complete().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
+						guild.removeRoleFromMember(guild.retrieveMember(user).complete(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
 					}
 				}
 				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempbanned"))) {
@@ -88,7 +89,9 @@ public class ModController {
 					if (difference <= 0) {
 						guild.unban(user).queue();
 						user.openPrivateChannel().queue(channel -> {
-							channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/components/moderation/modcontroller:unbanned")).queue();
+							try {
+								channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Hey\s" + user.getName() + "!", ":tada: | You were just unbanned over at the\s" + guild.getName() + "\sserver!\nYou can join again now!")).queue();
+							} catch (Exception e1) {}
 						});
 					}
 				}

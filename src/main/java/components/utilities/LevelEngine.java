@@ -89,7 +89,7 @@ private static LevelEngine INSTANCE;
 		int xpneededfornextlevel = this.xpfornextlevel(member);
 		if (currentxp > xpneededfornextlevel) {
 			Configloader.INSTANCE.setUserConfig(member, "level", String.valueOf(currentlevel + 1));
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":confetti_ball: Congrats\s" + member.getAsMention() + "\s! :confetti_ball:", "You just reached level" + String.valueOf(currentlevel+1) + "!")).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":confetti_ball: Congrats\s" + member.getEffectiveName() + "\s! :confetti_ball:", "You just reached level\s" + String.valueOf(currentlevel+1) + "!")).queue();
 		}
 		this.checkforreward(member);
 	}
@@ -113,6 +113,6 @@ private static LevelEngine INSTANCE;
 		int currentlevel = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
 		int xpperlevel = 100;
 		int xpneededfornextlevel = (((currentlevel+1)^2 + (currentlevel+1)) / 2) * xpperlevel;
-		return xpneededfornextlevel;
+		return 100000000;
 	}
 }
