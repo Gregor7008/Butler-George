@@ -112,7 +112,7 @@ private static LevelEngine INSTANCE;
 	public int xpfornextlevel(Member member) {
 		int currentlevel = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
 		int xpperlevel = 100;
-		int xpneededfornextlevel = (((currentlevel+1)^2 + (currentlevel+1)) / 2) * xpperlevel;
-		return 100000000;
+		int xpneededfornextlevel = ((currentlevel * (currentlevel+1)) / 2) * xpperlevel;
+		return xpneededfornextlevel;
 	}
 }
