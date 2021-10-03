@@ -30,7 +30,7 @@ public class Play implements Command{
 			return;
 		}
 		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
-			this.load(argument, musicManager, channel, member);
+			this.load(event, argument, musicManager, channel, member);
 			return;
 		}
 		if (self.getVoiceState().inVoiceChannel()) {
@@ -41,18 +41,18 @@ public class Play implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:noVCdefined")).queue();
 			return;
 		}
-		this.load(argument, musicManager, channel, member);
+		this.load(event, argument, musicManager, channel, member);
 	}
 	
-	private void load(String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
+	private void load(SlashCommandEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
 		channel.getGuild().getAudioManager().openAudioConnection(member.getVoiceState().getChannel());
 		if (!isURL(argument)) {
 			String term = "ytsearch:" + argument;
 			musicManager.scheduler.player.setVolume(5);
-			PlayerManager.getInstance().loadAndPlay(channel, term);
+			PlayerManager.getInstance().loadAndPlay(event, term);
 		} else {
 			musicManager.scheduler.player.setVolume(5);
-			PlayerManager.getInstance().loadAndPlay(channel, argument);
+			PlayerManager.getInstance().loadAndPlay(event, argument);
 		}
 	}
 	

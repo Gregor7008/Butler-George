@@ -27,7 +27,11 @@ public class Clear implements Command{
 		final TextChannel channel = event.getTextChannel();
 		final int count = Integer.parseInt(event.getOption("count").getAsString());
 		List<Message> messages = channel.getHistory().retrievePast(count).complete();
-		channel.deleteMessages(messages).queue();
+		try {channel.deleteMessages(messages).queue();} catch (Exception e) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/clear:error")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			e.printStackTrace();
+			return;
+		}
 		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/clear:done")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 

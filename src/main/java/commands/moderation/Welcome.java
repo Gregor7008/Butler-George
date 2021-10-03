@@ -23,7 +23,7 @@ public class Welcome implements Command{
 			return;
 		}
 		if (event.getSubcommandName().equals("set")) {
-			final String message = event.getOption("message").toString();
+			final String message = event.getOption("message").getAsString();
 			final String channelid = event.getOption("channel").getAsGuildChannel().getId();
 			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "welcomemsg", message + ";" + channelid);
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/welcome:setsuccess"));

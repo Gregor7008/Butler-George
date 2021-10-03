@@ -35,7 +35,6 @@ public class ModController {
 			}}));
 		for (int e = 0; e < guildids.size(); e++) {
 			Guild guild = Bot.INSTANCE.jda.getGuildById(guildids.get(e));
-			
 			File file2 = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guildids.get(e));
 			List<String> users = Arrays.asList(file2.list(new FilenameFilter() {
 				@Override
