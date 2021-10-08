@@ -45,24 +45,30 @@ public class Bot {
 		builder.setRawEventsEnabled(true);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS);
 		jda = builder.build().awaitReady();
-		jda.getPresence().setStatus(OnlineStatus.ONLINE);
-		new Thread(() -> {
-			while (true) {
-				jda.getPresence().setActivity(Activity.listening("Gregor"));
-				this.wait(15000);
-				jda.getPresence().setActivity(Activity.competing("NoLimits"));
-				this.wait(15000);
-				jda.getPresence().setActivity(Activity.watching("NoLimits"));
-				this.wait(15000);
-				jda.getPresence().setActivity(Activity.playing("discord.gg/qHA2vUs"));
-				this.wait(15000);
-		    }
-		}).start();
-		
-	    new Configloader();
-	    new NoLimitsOnly();
-	    new ModController();
-	    this.readConsole();
+		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
+	    new Thread (() -> {
+	    	while (jda.getPresence().getStatus().equals(OnlineStatus.ONLINE)) {
+	    		jda.getPresence().setActivity(Activity.listening("Gregor"));
+	    		this.wait(15000);
+	    		jda.getPresence().setActivity(Activity.competing("NoLimits"));
+	    		this.wait(15000);
+	    		jda.getPresence().setActivity(Activity.watching("NoLimits"));
+	    		this.wait(15000);
+	    		jda.getPresence().setActivity(Activity.playing("discord.gg/qHA2vUs"));
+	    		this.wait(15000);
+	    	}
+	    }).start();
+    	new Thread(() -> {
+    		ModController mc = new ModController();
+    	    NoLimitsOnly nlo = new NoLimitsOnly();
+    		while(jda.getPresence().getStatus().equals(OnlineStatus.ONLINE)) {
+    			nlo.noliRolecheck();
+    			//mc.modcheck();
+    		}
+    	}).start();
+    	
+    	new Configloader();
+    	this.readConsole();
 	}
 
 	public void shutdown() {
@@ -88,14 +94,11 @@ public class Bot {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 			try {
 				while((line = reader.readLine()) != null) {
-					if(line.equalsIgnoreCase("shutdown")) {
-						shutdown();
+					if(line.equalsIgnoreCase("stop")) {
+						this.shutdown();
 					}
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
+			} catch (IOException e){}
 		}).start();
 	}
 	

@@ -1,54 +1,37 @@
 package components.moderation;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 import base.Bot;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.requests.restaction.RoleAction;
 
 public class ModController {
 	
-	public ModController () {
-		while (Bot.INSTANCE.jda.getPresence().getStatus().equals(OnlineStatus.ONLINE)) {
-			 this.modcheck();
-		}
+	public ModController() {
+		
 	}
 
-	private void modcheck() {		
-		File file1 = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user");
-		List<String> guildids = Arrays.asList(file1.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return new File(dir, name).isDirectory();
-			}}));
-		for (int e = 0; e < guildids.size(); e++) {
-			Guild guild = Bot.INSTANCE.jda.getGuildById(guildids.get(e));
-			File file2 = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guildids.get(e));
-			List<String> users = Arrays.asList(file2.list(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return new File(dir, name).isFile();
-				}
-			}));
-			for (int i = 0; i < users.size(); i++) {
-				String[] temp1 = users.get(i).split(".properties");
-				User user = guild.retrieveMemberById(temp1[0]).complete().getUser();
+	public void modcheck() {		
+		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
+		for (int e = 0; e < guilds.size(); e++) {
+			Guild guild = guilds.get(e);
+			List<Member> members = guild.loadMembers().get();
+			for (int i = 0; i < members.size(); i++) {
+				User user = members.get(i).getUser();
+				//Create "Muted" role
 				if (Configloader.INSTANCE.getGuildConfig(guild, "muterole").equals("")) {
-					RoleAction cr = guild.createRole()
-										 .setName("Muted");
-					Role newrole = cr.complete();
+					Role newrole = guild.createRole()
+										 .setName("Muted")
+										 .complete();
 					Configloader.INSTANCE.setGuildConfig(guild, "muterole", newrole.getId());
 					List<TextChannel> channels = guild.getTextChannels();
 					for (int o = 0; o < channels.size(); o++) {
@@ -58,6 +41,7 @@ public class ModController {
 							   .queue();
 					}
 				}
+				//Check the user
 				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempmuted"))) {
 					OffsetDateTime tmuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tmuntil"));
 					OffsetDateTime now = OffsetDateTime.now();

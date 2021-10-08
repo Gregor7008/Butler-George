@@ -100,16 +100,19 @@ public class Rolesorting implements Command{
 	}
 	
 	public void sorter(Guild iguild, Member mb, List<Role> sr, Role gr) {
-			int size = mb.getRoles().size();
 			int match = 0;
-			for (int i = 1; i < size; i++) {
+			for (int i = 0; i < mb.getRoles().size(); i++) {
 				if (sr.contains(mb.getRoles().get(i))) {
-					iguild.addRoleToMember(mb, gr).queue();
 					match++;
 				}
 			}
+			if (match > 0 && !mb.getRoles().contains(gr)) {
+				iguild.addRoleToMember(mb, gr).queue();
+				System.out.println("Role " + gr.getName() + " added to " + mb.getEffectiveName());
+			}
 			if (match == 0 && mb.getRoles().contains(gr)) {
 				iguild.removeRoleFromMember(mb, gr).queue();
+				System.out.println("Role " + gr.getName() + " removed from " + mb.getEffectiveName());
 			}
 	}
 	

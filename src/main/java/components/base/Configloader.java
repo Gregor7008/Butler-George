@@ -192,6 +192,7 @@ public class Configloader {
 				properties10.setProperty("level", "0");
 				properties10.setProperty("expe", "0");
 				properties10.setProperty("levelbackground", "0");
+				properties10.setProperty("lastmail", java.time.OffsetDateTime.now().toString());
 				properties10.store(new FileOutputStream(userpropertiesFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}

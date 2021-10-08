@@ -11,6 +11,7 @@ import commands.Command;
 import commands.CommandList;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import components.moderation.ModMail;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,6 +24,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -44,7 +46,6 @@ public class Processor extends ListenerAdapter {
 		//automoderation
 		//-->in developement
 	}
-	
 	@Override
 	public void onReady(ReadyEvent event) {
 		//initialize Slash-Commands
@@ -61,7 +62,6 @@ public class Processor extends ListenerAdapter {
 			clua.queue();
 		}
 	}
-	
 	@Override
 	public void onSlashCommand(SlashCommandEvent event) {
 		//perform Slash-Command
@@ -73,7 +73,6 @@ public class Processor extends ListenerAdapter {
 		//levelsystem
 		LevelEngine.getInstance().slashcommand(event);
 	}
-	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		Configloader.INSTANCE.findorCreateUserConfig(event.getGuild(), event.getUser());
@@ -109,7 +108,6 @@ public class Processor extends ListenerAdapter {
 			event.getGuild().getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
 		}
 	}
-	
 	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
 		//send goodbyemessage
@@ -127,7 +125,6 @@ public class Processor extends ListenerAdapter {
 			event.getGuild().getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
 		}
 	}
-	
 	@Override
 	public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
 		//check for Join2create-channel & create User-channel if true
@@ -141,15 +138,13 @@ public class Processor extends ListenerAdapter {
 				allow.add(Permission.CREATE_INSTANT_INVITE);
 				allow.add(Permission.VOICE_MUTE_OTHERS);
 				allow.add(Permission.VOICE_SPEAK);
-				newchannel.addMemberPermissionOverride(event.getMember().getIdLong(), allow, null);
-				newchannel.queue();
+				newchannel.addMemberPermissionOverride(event.getMember().getIdLong(), allow, null).queue();
 				event.getGuild().moveVoiceMember(event.getMember(), event.getGuild().getVoiceChannelsByName(event.getMember().getEffectiveName() + "'s channel!", true).get(0)).queue();
 			}
 		}
 		//levelsystem
 		LevelEngine.getInstance().voicejoin(event);
 	}
-	
 	@Override
 	public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
 		//check if VoiceChannelLeft was a Userchannel
@@ -157,7 +152,6 @@ public class Processor extends ListenerAdapter {
 			event.getChannelLeft().delete().queue();
 		}
 	}
-	
 	@Override
 	public void onGuildJoin(GuildJoinEvent event) {
 		try {
@@ -165,5 +159,9 @@ public class Processor extends ListenerAdapter {
 			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Thanks for inviting me!", ":exclamation: | To finish my setup, please mention me on your server as well as the role that should be able to warn members!\n Thanks :heart:")).queue();
 		});} catch (Exception e) {}
 		Configloader.INSTANCE.findorCreateGuildConfig(event.getGuild());
+	}
+	@Override
+	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
+		new ModMail(event);
 	}
 }
