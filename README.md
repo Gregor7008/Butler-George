@@ -13,7 +13,7 @@ Unser Ziel ist es langfristig alle Bots, die auf dem Server ihr Unwesen treiben,
 
 # Wer kann mit machen?
 So ziemlich jeder, der etwas von Java versteht und sich damit abfinden kann, sich durch die JDA Domumentation durchzulesen. Natürlich sollte er auch Mitglied auf dem Discord Server sein, und ich sollte ihn kennen.
-Wenn man dann aufgenommen ist, bekommt man außerdem eine violette "Developer" Rolle und Zugang zum #📝-commands Kanal auf dem Discord Server, sowie Zugang zum Testing Server des Bots, auf dem man dann auch Zugang zur Testing Version des Bots bekommt. Bei Interesse meldet euch einfach auf dem Discord Server!
+Wenn man dann aufgenommen ist, bekommt man außerdem eine violette "Developer" Rolle und Zugang zum #📝-commands Kanal auf dem Discord Server, sowie Zugang zur Testing Version des Bots. Bei Interesse meldet euch einfach auf dem Discord Server!
 
 # Wie arbeiten wir?
 Das ganze Repository ist aufgebaut wie ein Maven-Projekt. Welchen Editor ihr dafür benutzt ist eigentlich komplett egal, allerdings arbeite ich mit Eclipse und wenn wir uns bei Problemen gegenseitig helfen können wollen, wäre es sinnvoller, dass wir alle mit einem Editor arbeiten. Wenn ihr darauf allerdings keinen Wert legt, werde ich euch nicht im Wege stehen, wenn ihr einen Anderen verwenden wollt.
