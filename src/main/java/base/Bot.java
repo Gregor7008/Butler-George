@@ -13,7 +13,6 @@ import javax.security.auth.login.LoginException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import components.base.Configloader;
-import components.moderation.ModController;
 import components.moderation.NoLimitsOnly;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -38,7 +37,7 @@ public class Bot {
 	
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
-		System.out.println("Still not ready:\n-> Level.java\n-> Suggest.java");
+		System.out.println("Still not ready:\n-> Suggest.java\n-> Poll.java\n-> ModMail.java");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
@@ -59,11 +58,10 @@ public class Bot {
 	    	}
 	    }).start();
     	new Thread(() -> {
-    		ModController mc = new ModController();
-    	    NoLimitsOnly nlo = new NoLimitsOnly();
     		while(jda.getPresence().getStatus().equals(OnlineStatus.ONLINE)) {
-    			nlo.noliRolecheck();
-    			//mc.modcheck();
+    			new NoLimitsOnly().noliRolecheck();
+    			//new ModController().modcheck();
+    			this.wait(10000);
     		}
     	}).start();
     	

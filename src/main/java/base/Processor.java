@@ -1,5 +1,8 @@
 package base;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -15,6 +18,8 @@ import components.moderation.ModMail;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -25,6 +30,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -44,7 +50,12 @@ public class Processor extends ListenerAdapter {
 		//levelsystem
 		LevelEngine.getInstance().messagereceived(event);
 		//automoderation
-		//-->in developement
+			//-->in developement
+		//Anonymous ModMail
+		if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getName()) != null) {
+			PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(Configloader.INSTANCE.getMailConfig1(event.getChannel().getName())).complete();
+			pc.sendMessage(event.getMessage().getContentDisplay()).queue();
+		}
 	}
 	@Override
 	public void onReady(ReadyEvent event) {
@@ -162,6 +173,25 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
-		new ModMail(event);
+		File file = Configloader.INSTANCE.findorCreateMailConfig2();
+		String str = "";
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			byte[] data = new byte[(int) file.length()];
+			fis.read(data);
+			fis.close();
+			str = new String(data, "UTF-8");
+		} catch (IOException e) {e.printStackTrace();}
+		if (str.contains("=" + event.getAuthor().getId())) {
+			TextChannel tc = Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID")).getTextChannelsByName(Configloader.INSTANCE.getMailConfig2(event.getAuthor().getId()), true).get(0);
+			tc.sendMessage(event.getMessage().getContentDisplay()).queue();
+		} else {
+			new ModMail(event);
+		}
+	}
+	@Override
+	public void onMessageReactionAdd(MessageReactionAddEvent event) {
+		//check if it was on a poll, then call up "Poll.addAnswer(event);"
+		//also implement reactionrole support
 	}
 }

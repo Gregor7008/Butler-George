@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import base.Bot;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
@@ -64,34 +63,26 @@ private static LevelEngine INSTANCE;
 	private void givexp(Member member, OffsetDateTime time, int amount, int mindiff, TextChannel channel) {
 		OffsetDateTime now = OffsetDateTime.now();
 		OffsetDateTime lastxpgotten = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "lastxpgotten"));
-		int difference = Duration.between(lastxpgotten, now).toSecondsPart();
-		if(difference >= mindiff) {
+		long difference = Duration.between(lastxpgotten, now).toSeconds();
+		if(difference >= Long.parseLong(String.valueOf(mindiff))) {
 			this.grantxp(member, amount, channel);
+			this.checklevel(member, channel);
+			this.checkforreward(member);
 		}
 	}
 
 	private void grantxp(Member member, int amount, TextChannel channel) {
-		try {
 		int current = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe"));
 		int newamount = current + amount;
 		Configloader.INSTANCE.setUserConfig(member, "expe", String.valueOf(newamount));
-		this.checklevel(member, channel);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Something went horribly wrong! Shutting down bot!");
-			Bot.INSTANCE.shutdown();
-		}
 	}
 
 	private void checklevel(Member member, TextChannel channel) {
 		int currentlevel = Integer.valueOf(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
-		int currentxp = Integer.valueOf(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe"));
-		int xpneededfornextlevel = this.xpfornextlevel(member);
-		if (currentxp > xpneededfornextlevel) {
+		if (this.xpleftfornextlevel(member) < 1) {
 			Configloader.INSTANCE.setUserConfig(member, "level", String.valueOf(currentlevel + 1));
 			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":confetti_ball: Congrats\s" + member.getEffectiveName() + "\s! :confetti_ball:", "You just reached level\s" + String.valueOf(currentlevel+1) + "!")).queue();
 		}
-		this.checkforreward(member);
 	}
 
 	private void checkforreward(Member member) {
@@ -109,11 +100,19 @@ private static LevelEngine INSTANCE;
 		}
 	}
 	
-	public int xpfornextlevel(Member member) {
+	public int xpneededfornextlevel(Member member) {
 		int currentlevel = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
-		if (currentlevel <1) {return 100;} else {
-			int xpneededfornextlevel = ((currentlevel * (currentlevel+1)) / 2) * 100;
-			return xpneededfornextlevel;
+		if (currentlevel == 0) {return 100;} else {
+			return ((((currentlevel+1) * (currentlevel+1))+currentlevel+1)/2)*100;
 		}
+	}
+	
+	public int xpleftfornextlevel(Member member) {
+		int xpneededfornextlevel = this.xpneededfornextlevel(member);
+		return xpneededfornextlevel - Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe"));
+	}
+	
+	public String devtest(Member member) {
+		return String.valueOf(xpneededfornextlevel(member)) + " | " + String.valueOf(xpleftfornextlevel(member)) + " | " + Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe");
 	}
 }

@@ -38,6 +38,7 @@ public class Level implements Command {
 		} catch (IllegalStateException | NullPointerException e) {member = event.getMember();}
 		File finalimage = this.renderLevelcard(member);
         event.reply("").addFile(finalimage).queue();
+		//event.reply(LevelEngine.getInstance().devtest(member)).queue();
 	}
 
 	@Override
@@ -54,13 +55,22 @@ public class Level implements Command {
 	
 	public File renderLevelcard(Member member) {
 		String levelbackground = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "levelbackground");
-		String level = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level");
+		int level = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
 		String curxp = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe");
-		String nedxp = String.valueOf(LevelEngine.getInstance().xpfornextlevel(member));
+		int nedxp = LevelEngine.getInstance().xpneededfornextlevel(member);
 		int progress;
-		if (Integer.parseInt(level) != 0) {
-			progress = (Integer.parseInt(curxp) - ((Integer.parseInt(level)-1) * 100)) / ((Integer.parseInt(nedxp)-((Integer.parseInt(level)-1) * 100)) / 100);
-		} else {progress = Integer.parseInt(curxp) + 1;}	
+		if (level != 0) {
+			double temp1 = Double.valueOf(curxp);
+			double temp2 = (double) nedxp;
+			double temp3 = temp1 / temp2 * 100;
+			progress = (int) temp3;
+		} else {
+			if (Integer.valueOf(curxp) != 0) {
+				progress = Integer.parseInt(curxp);
+			} else {
+				progress = 1;
+			}
+		}	
 		BufferedImage image = null;
 		try {image = ImageIO.read(new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/" + levelbackground + ".png"));
 		} catch (IOException e) {
@@ -83,11 +93,11 @@ public class Level implements Command {
 		//write Level
 		g2d.setFont(new Font("Calibri", Font.PLAIN, 65));
 		g2d.setColor(Color.decode("#5773c9"));
-        g2d.drawString(level, 813, 95);
+        g2d.drawString(String.valueOf(level), 813, 95);
 		//write XP
         g2d.setFont(new Font("Calibri", Font.PLAIN, 30));
         g2d.setColor(Color.WHITE);
-        String temp1 = String.valueOf(curxp) + "\s/\s" + String.valueOf(nedxp);
+        String temp1 = curxp + "\s/\s" + String.valueOf(nedxp);
         g2d.drawString(temp1, 820 - g2d.getFontMetrics().stringWidth(temp1), 170);
 		//write Username
         g2d.setFont(new Font("Calibri", Font.PLAIN, 50));
