@@ -1,8 +1,5 @@
 package base;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -12,19 +9,22 @@ import java.util.List;
 
 import commands.Command;
 import commands.CommandList;
+import commands.utilities.Suggest;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import components.moderation.ModMail;
+import components.moderation.NoLimitsOnly;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -39,22 +39,28 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		//finishing setup
-		if (event.getMessage().getMentionedMembers().contains(event.getGuild().getSelfMember()) && Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole").equals("")) {
-			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "modrole", event.getMessage().getMentionedRoles().get(0).getId());
-			event.getGuild().getOwner().getUser().openPrivateChannel().queue((channel) -> {
-				channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Thanks for setting me up!", ":white_check_mark: | Setup is completed!\n Your modrole is: " + 
-																				  event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole"))));
-			});
-		}
+		//ModController
+		new Thread (() -> {
+			//new ModController().modcheck();
+		}).start();
 		//levelsystem
 		LevelEngine.getInstance().messagereceived(event);
 		//automoderation
 			//-->in developement
 		//Anonymous ModMail
 		if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getName()) != null) {
+			if (event.getAuthor().isBot()) {
+				return;
+			}
 			PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(Configloader.INSTANCE.getMailConfig1(event.getChannel().getName())).complete();
 			pc.sendMessage(event.getMessage().getContentDisplay()).queue();
+			return;
+		}
+		//Suggestions
+		String suggestid = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "suggest");
+		if (suggestid != null && event.getChannel().getId().equals(suggestid) && !event.getAuthor().isBot()) {
+			new Suggest().sendsuggestion(event.getGuild(), event.getMember(), event.getMessage().getContentRaw());
+			event.getMessage().delete().queue();
 		}
 	}
 	@Override
@@ -167,31 +173,32 @@ public class Processor extends ListenerAdapter {
 	public void onGuildJoin(GuildJoinEvent event) {
 		try {
 		event.getGuild().getOwner().getUser().openPrivateChannel().queue((channel) -> {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Thanks for inviting me!", ":exclamation: | To finish my setup, please mention me on your server as well as the role that should be able to warn members!\n Thanks :heart:")).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Thanks for inviting me!", ":exclamation: | To finish my setup, please reply with the ID of a role, that should be able ot f.e. warn members!\n Thanks :heart:")).queue();
 		});} catch (Exception e) {}
 		Configloader.INSTANCE.findorCreateGuildConfig(event.getGuild());
 	}
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
-		File file = Configloader.INSTANCE.findorCreateMailConfig2();
-		String str = "";
-		try {
-			FileInputStream fis = new FileInputStream(file);
-			byte[] data = new byte[(int) file.length()];
-			fis.read(data);
-			fis.close();
-			str = new String(data, "UTF-8");
-		} catch (IOException e) {e.printStackTrace();}
-		if (str.contains("=" + event.getAuthor().getId())) {
-			TextChannel tc = Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID")).getTextChannelsByName(Configloader.INSTANCE.getMailConfig2(event.getAuthor().getId()), true).get(0);
-			tc.sendMessage(event.getMessage().getContentDisplay()).queue();
-		} else {
-			new ModMail(event);
-		}
+		//finish setup
+			//-->in developement
+		//process modmail
+		new ModMail(event);
 	}
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
 		//check if it was on a poll, then call up "Poll.addAnswer(event);"
 		//also implement reactionrole support
+	}
+	@Override
+	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
+		new Thread (() -> {
+			new NoLimitsOnly().noliRolecheck();
+		}).start();
+	}
+	@Override
+	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
+		new Thread (() -> {
+			new NoLimitsOnly().noliRolecheck();
+		}).start();
 	}
 }

@@ -1,14 +1,16 @@
 package commands.utilities;
 
-import java.awt.Color;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.awt.Color;
 
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -20,41 +22,46 @@ public class Suggest implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		if (!event.getOption("setchannel").getAsMessageChannel().equals(null)) {
-			if (!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:nopermission")).queue();
-			} else {
-				Configloader.INSTANCE.setGuildConfig(event.getGuild(), "suggest", event.getOption("setchannel").getAsGuildChannel().getId());
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:successset")).queue();
+		if (!event.getOption("suggestion").getAsString().equals("")) {
+			String channelid = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "suggest");
+			if (channelid.equals(null)) {
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:nochannelset")).queue();
+				return;
 			}
-			return;
+			OffsetDateTime lastsuggestion = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(event.getGuild(), event.getUser(), "lastsuggestion"));
+			if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:nospam")).queue();
+				return;
+			}
+			this.sendsuggestion(event.getGuild(), event.getMember(), event.getOption("suggestion").getAsString());
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:success")).queue();
+		} else {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:noargs")).queue();
 		}
-		if (!event.getOption("idea").getAsString().equals("")) {
-			TextChannel channel = event.getGuild().getTextChannelById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "suggest"));
-			EmbedBuilder eb = new EmbedBuilder();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
-			eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-			eb.setColor(Color.YELLOW);
-			eb.setFooter("Suggestion on " + OffsetDateTime.now().format(formatter));
-			eb.setDescription(event.getOption("suggestion").getAsString());
-			Message message = channel.sendMessageEmbeds(eb.build()).complete();
-			message.addReaction(":thumbsup:").queue();
-			message.addReaction(":thumbsdown:").queue();
-			return;
-		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:noargs")).queue();
 	}
 
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("suggest", "Suggest an idea!")
-										.addOptions(new OptionData(OptionType.CHANNEL, "setchannel", "Set the channel for suggestions!").setRequired(false))
-										.addOptions(new OptionData(OptionType.STRING, "idea", "Write down your suggestions!").setRequired(false));	
+										.addOptions(new OptionData(OptionType.STRING, "suggestion", "Write down your suggestions!", true));	
 		return command;
 	}
 
 	@Override
 	public String getHelp() {
 		return "Use this command to suggest a new idea to the server team!";
+	}
+	
+	public void sendsuggestion(Guild guild, Member member, String idea) {
+		TextChannel channel = guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "suggest"));
+		EmbedBuilder eb = new EmbedBuilder();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
+		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());
+		eb.setColor(Color.YELLOW);
+		eb.setFooter(OffsetDateTime.now().format(formatter));
+		eb.setDescription(idea);
+		Message message = channel.sendMessageEmbeds(eb.build()).complete();
+		message.addReaction("U+1F44D").queue();
+		message.addReaction("U+1F44E").queue();
 	}
 }

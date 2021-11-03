@@ -15,10 +15,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
 public class ModController {
-	
-	public ModController() {
-		
-	}
 
 	public void modcheck() {		
 		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
@@ -58,11 +54,17 @@ public class ModController {
 				}
 				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
 					if (!guild.retrieveMember(user).complete().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
-						guild.addRoleToMember(guild.retrieveMember(user).complete(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+						guild.addRoleToMember(user.getId(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+						if (guild.getId().equals(Bot.INSTANCE.getBotConfig("NoLiID"))) {
+							guild.removeRoleFromMember(user.getId(), guild.getRoleById("709478250253910103")).queue();
+						}
 					}
 				} else {
 					if (!guild.retrieveMember(user).complete().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
-						guild.removeRoleFromMember(guild.retrieveMember(user).complete(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+						guild.removeRoleFromMember(user.getId(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+						if (guild.getId().equals(Bot.INSTANCE.getBotConfig("NoLiID"))) {
+							guild.addRoleToMember(user.getId(), guild.getRoleById("709478250253910103")).queue();
+						}
 					}
 				}
 				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempbanned"))) {

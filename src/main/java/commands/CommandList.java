@@ -6,12 +6,14 @@ import commands.moderation.Autopunish;
 import commands.moderation.Autorole;
 import commands.moderation.Botautorole;
 import commands.moderation.Clear;
+import commands.moderation.Close;
 import commands.moderation.Goodbye;
 import commands.moderation.Join2Create;
 import commands.moderation.Levelreward;
 import commands.moderation.Mute;
 import commands.moderation.Rolecheck;
 import commands.moderation.Rolesorting;
+import commands.moderation.Setsuggestionchannel;
 import commands.moderation.Tempban;
 import commands.moderation.Tempmute;
 import commands.moderation.Warning;
@@ -59,6 +61,8 @@ public class CommandList {
 		this.commands.put("tempmute", new Tempmute());
 		this.commands.put("warning", new Warning());
 		this.commands.put("welcome", new Welcome());
+		this.commands.put("close", new Close());
+		this.commands.put("setsuggestionchannel", new Setsuggestionchannel());
 		
 		//Music
 		this.commands.put("nowplaying", new Nowplaying());

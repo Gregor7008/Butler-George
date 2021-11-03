@@ -32,7 +32,7 @@ public class Embed implements Command{
 	public void perform(SlashCommandEvent event) {
 		member = event.getMember();
 		if (!member.hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/embed:nopermission"));
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/embed:nopermission")).queue();
 			return;
 		}
 		user = member.getUser();

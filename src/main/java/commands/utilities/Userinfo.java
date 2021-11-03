@@ -43,6 +43,10 @@ public class Userinfo implements Command{
 		} else {
 			member = event.getGuild().getMember(event.getOption("member").getAsUser());
 		}
+		if (member.getEffectiveName().equals(event.getGuild().getSelfMember().getEffectiveName())) {
+			event.reply("You think you're funny or what?").queue();
+			return;
+		}
 		if (member.getTimeBoosted() == null) {
 			booster = "false";
 		} else {
@@ -64,7 +68,7 @@ public class Userinfo implements Command{
 		eb.addField(":warning:  Warnings", "`" + String.valueOf(Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "warnings").split(";").length - 1) + "`", true);
 		eb.addField(":card_index:  Experience", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
 		eb.addField(":pager:  Level", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
-		eb.addField(":alarm_clock:  Status", "`" + member.getOnlineStatus().toString() + "`", true);
+		//eb.addField(":alarm_clock:  Status", "`" + member.getOnlineStatus().toString() + "`", true);
 		eb.addField(":abacus:  Role-Count", "`" + String.valueOf(member.getRoles().size()) + "`", true);
 		eb.addField(":arrow_up:  Highest role", "`" + member.getRoles().get(0).getName() + "`", true);
 		
@@ -80,6 +84,10 @@ public class Userinfo implements Command{
 			member = event.getMember();
 		} else {
 			member = event.getGuild().getMember(event.getOption("member").getAsUser());
+		}
+		if (member.getEffectiveName().equals(event.getGuild().getSelfMember().getEffectiveName())) {
+			event.reply("You think you're funny or what?").queue();
+			return;
 		}
 		if (member.getTimeBoosted() == null) {
 			booster = "false";
@@ -98,7 +106,7 @@ public class Userinfo implements Command{
 		eb.addField(":calendar: Joined", "`" + member.getTimeJoined().format(formatter) + "`", true);
 		eb.addField(":card_index: Experience", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
 		eb.addField(":pager: Level", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
-		eb.addField(":alarm_clock: Status", "`" + member.getOnlineStatus().toString() + "`", true);
+		//eb.addField(":alarm_clock: Status", "`" + member.getOnlineStatus().toString() + "`", true);
 		eb.addField(":abacus: Role-Count", "`" + String.valueOf(member.getRoles().size()) + "`", true);
 		eb.addField(":arrow_up: Hoisted role", "`" + member.getRoles().get(0).getName() + "`", true);
 		

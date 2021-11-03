@@ -3,7 +3,6 @@ package components.moderation;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Random;
 
 import base.Bot;
@@ -11,47 +10,40 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 public class ModMail {
 
 	public ModMail(PrivateMessageReceivedEvent event) {
+		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID"));
 		if (event.getAuthor().isBot()) {
 			return;
 		}
-		if (this.checkPresence(event.getAuthor())) {
-			event.getChannel().sendMessage("ModMail currently only works for members of the NoLimits server.\nJoin here: https://discord.gg/qHA2vUs").queue();
+		if (Configloader.INSTANCE.getMailConfig2(event.getAuthor().getId()) != null) {
+			TextChannel channel = guild.getTextChannelsByName(Configloader.INSTANCE.getMailConfig2(event.getAuthor().getId()), true).get(0);
+			channel.sendMessage(event.getMessage().getContentRaw()).queue();
 			return;
 		}
 		if (!event.getMessage().getContentRaw().contains("anonym")) {
-			OffsetDateTime lastmail = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID")), event.getAuthor(), "lastmail"));
+			OffsetDateTime lastmail = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, event.getAuthor(), "lastmail"));
 			if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 300) {
-				event.getChannel().sendMessage("Your message was directly sent to one of the moderators!").queue();
+				event.getChannel().sendMessage("Your message was directly sent to the server team.\nThey will contact you shortly!").queue();
+				Configloader.INSTANCE.setUserConfig(guild.getMember(event.getAuthor()), "lastmail", OffsetDateTime.now().toString());
 				this.processMessage(event);
 			} else {
 				int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
 				event.getChannel().sendMessage("You need to wait another " + timeleft + " seconds, to send another message to the moderators!\nIf you start to spam, we will automatically warn you for your behavior!").queue();
 			}
 		} else {
-			OffsetDateTime lastmail = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID")), event.getAuthor(), "lastmail"));
+			OffsetDateTime lastmail = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, event.getAuthor(), "lastmail"));
 			if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 1) {
-				event.getChannel().sendMessage("Your message was processed and my team will reply soon. Thanks for trusting us!").queue();
+				event.getChannel().sendMessage("Your message was processed and the team will reply soon. Thanks for trusting us!").queue();
+				Configloader.INSTANCE.setUserConfig(guild.getMember(event.getAuthor()), "lastmail", OffsetDateTime.now().toString());
 				this.processAnonymousMessage(event);
 			} else {
 				int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
 				event.getChannel().sendMessage("You need to wait another " + timeleft + " seconds, to send another message to the moderators!\nIf you start to spam, we will automatically warn you for your behavior!").queue();
 			}
-		}
-	}
-
-	private boolean checkPresence(User user) {
-		Guild guild = Bot.INSTANCE.jda.getGuildById("708381749826289666");
-		List<Guild> guilds = user.getMutualGuilds();
-		if (guilds.contains(guild)) {
-			return true;
-		} else {
-			return false;
 		}
 	}
 	
@@ -75,7 +67,8 @@ public class ModMail {
 			rn = rng.nextInt(100);
 		}
 		TextChannel nc = guild.createTextChannel("#" + String.valueOf(rn), guild.getCategoryById("896011407303270402")).complete();
-		nc.sendMessage(event.getMessage().getContentDisplay()).queue();
+		String message = event.getMessage().getContentDisplay().replaceAll("#anonymous", "");
+		nc.sendMessage(message).queue();
 		Configloader.INSTANCE.setMailConfig(String.valueOf(rn), event.getAuthor().getId());
 	}
 }

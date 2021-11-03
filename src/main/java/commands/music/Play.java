@@ -51,7 +51,7 @@ public class Play implements Command{
 			musicManager.scheduler.player.setVolume(5);
 			PlayerManager.getInstance().loadAndPlay(event, term);
 		} else {
-			musicManager.scheduler.player.setVolume(5);
+			musicManager.scheduler.player.setVolume(10);
 			PlayerManager.getInstance().loadAndPlay(event, argument);
 		}
 	}

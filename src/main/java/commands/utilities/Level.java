@@ -36,6 +36,10 @@ public class Level implements Command {
 			User user = event.getOption("member").getAsUser();
 			member = event.getGuild().getMember(user);
 		} catch (IllegalStateException | NullPointerException e) {member = event.getMember();}
+		if (member.getEffectiveName().equals(event.getGuild().getSelfMember().getEffectiveName())) {
+			event.reply("You think you're funny or what?").queue();
+			return;
+		}
 		File finalimage = this.renderLevelcard(member);
         event.reply("").addFile(finalimage).queue();
 		//event.reply(LevelEngine.getInstance().devtest(member)).queue();

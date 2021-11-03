@@ -75,6 +75,7 @@ private static LevelEngine INSTANCE;
 		int current = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe"));
 		int newamount = current + amount;
 		Configloader.INSTANCE.setUserConfig(member, "expe", String.valueOf(newamount));
+		Configloader.INSTANCE.setUserConfig(member, "lastxpgotten", OffsetDateTime.now().toString());
 	}
 
 	private void checklevel(Member member, TextChannel channel) {

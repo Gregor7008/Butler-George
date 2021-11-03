@@ -53,7 +53,7 @@ public class Configloader {
 	
 	public String getMailConfig2(String userID) {
 		Properties pps = new Properties();
-		File pFile = this.findorCreateMailConfig1();
+		File pFile = this.findorCreateMailConfig2();
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile))) {
 			pps.load(bis);
 			bis.close();
@@ -315,6 +315,7 @@ public class Configloader {
 				pps.setProperty("expe", "0");
 				pps.setProperty("levelbackground", "0");
 				pps.setProperty("lastmail", OffsetDateTime.now().toString());
+				pps.setProperty("lastsuggestion", OffsetDateTime.now().toString());
 				pps.store(new FileOutputStream(pFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}

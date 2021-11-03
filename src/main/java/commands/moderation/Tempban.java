@@ -18,7 +18,7 @@ public class Tempban implements Command{
 	@Override
 	public void perform(SlashCommandEvent event) {
 		if (!event.getMember().hasPermission(Permission.BAN_MEMBERS)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/command/moderation/tempban:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/tempban:nopermission")).queue();
 			return;
 		}
 		User user = event.getOption("member").getAsUser();

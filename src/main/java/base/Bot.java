@@ -13,12 +13,12 @@ import javax.security.auth.login.LoginException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import components.base.Configloader;
-import components.moderation.NoLimitsOnly;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 public class Bot {
 	
@@ -37,12 +37,14 @@ public class Bot {
 	
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
-		System.out.println("Still not ready:\n-> Suggest.java\n-> Poll.java\n-> ModMail.java");
+		System.out.println("Still not ready:\n-> Poll.java");
+		System.out.println("In developement:\n-> Setup of the bot\n-> Pollreactions and editing of the original message\n-> automoderation");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
 		builder.setRawEventsEnabled(true);
-		builder.enableIntents(GatewayIntent.GUILD_MEMBERS);
+		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES);
+		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    new Thread (() -> {
@@ -57,14 +59,6 @@ public class Bot {
 	    		this.wait(15000);
 	    	}
 	    }).start();
-    	new Thread(() -> {
-    		while(jda.getPresence().getStatus().equals(OnlineStatus.ONLINE)) {
-    			new NoLimitsOnly().noliRolecheck();
-    			//new ModController().modcheck();
-    			this.wait(10000);
-    		}
-    	}).start();
-    	
     	new Configloader();
     	this.readConsole();
 	}
