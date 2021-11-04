@@ -28,6 +28,7 @@ import commands.utilities.Help;
 import commands.utilities.Level;
 import commands.utilities.Levelbackground;
 import commands.utilities.Poll;
+import commands.utilities.Setlanguage;
 import commands.utilities.Suggest;
 import commands.utilities.Userinfo;
 import components.utilities.Test;
@@ -45,6 +46,7 @@ public class CommandList {
 		this.commands.put("suggest", new Suggest());
 		this.commands.put("userinfo", new Userinfo());
 		this.commands.put("poll", new Poll());
+		this.commands.put("setlanguage", new Setlanguage());
 		
 		//Moderation
 		this.commands.put("autopunish", new Autopunish());

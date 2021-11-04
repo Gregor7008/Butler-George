@@ -26,12 +26,12 @@ public class Goodbye implements Command {
 			final String message = event.getOption("message").toString();
 			final String channelid = event.getOption("channel").getAsGuildChannel().getId();
 			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "goodbyemsg", message + ";" + channelid);
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/goodbye:setsuccess"));
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/goodbye:setsuccess"));
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
 			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "goodbyemsg", "");
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/goodbye:offsuccess"));
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/goodbye:offsuccess"));
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
@@ -48,7 +48,7 @@ public class Goodbye implements Command {
 				goodbyemsg[0].replace("{timejoined}", event.getMember().getTimeJoined().format(formatter));
 				event.getGuild().getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/goodbye:nonedefined"));
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/goodbye:nonedefined"));
 			}
 		}
 	}

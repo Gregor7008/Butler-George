@@ -18,7 +18,7 @@ public class Tempmute implements Command{
 	@Override
 	public void perform(SlashCommandEvent event) {
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/command/moderation/tempmute:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/command/moderation/tempmute:nopermission")).queue();
 			return;
 		}
 		User user = event.getOption("member").getAsUser();

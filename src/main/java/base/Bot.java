@@ -38,7 +38,7 @@ public class Bot {
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
 		System.out.println("Still not ready:\n-> Poll.java");
-		System.out.println("In developement:\n-> Setup of the bot\n-> Pollreactions and editing of the original message\n-> automoderation");
+		System.out.println("In developement:\n-> Setup of the bot\n-> Pollreactions and editing of the original message\n-> Automoderation");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());

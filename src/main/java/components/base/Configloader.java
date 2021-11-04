@@ -316,6 +316,7 @@ public class Configloader {
 				pps.setProperty("levelbackground", "0");
 				pps.setProperty("lastmail", OffsetDateTime.now().toString());
 				pps.setProperty("lastsuggestion", OffsetDateTime.now().toString());
+				pps.setProperty("language", "en");
 				pps.store(new FileOutputStream(pFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}

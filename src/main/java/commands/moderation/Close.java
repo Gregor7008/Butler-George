@@ -12,7 +12,7 @@ public class Close implements Command {
 	@Override
 	public void perform(SlashCommandEvent event) {
 		if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getName()).equals(null)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/close:nochannel")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/close:nochannel")).queue();
 			return;
 		}
 		String cname = event.getChannel().getName();

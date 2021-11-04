@@ -21,19 +21,19 @@ public class Autorole implements Command {
 		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
 		if (!member.hasPermission(Permission.MANAGE_ROLES) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autorole:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			final Role role = event.getOption("addrole").getAsRole();
 			Configloader.INSTANCE.addGuildConfig(guild, "autoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:addsuccess")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autorole:addsuccess")).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			final Role role = event.getOption("removerole").getAsRole();
 			Configloader.INSTANCE.deleteGuildConfig(guild, "autoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:removesuccess")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autorole:removesuccess")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
@@ -59,7 +59,7 @@ public class Autorole implements Command {
 		final StringBuilder sB = new StringBuilder();
 		final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autoroles");
 		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:noautoroles")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autorole:noautoroles")).queue();;
 			return;
 		}
 		if (!currentraw.contains(";")) {

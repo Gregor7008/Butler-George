@@ -17,11 +17,11 @@ public class Join2Create implements Command{
 	public void perform(SlashCommandEvent event) {
 		final Member member = event.getMember();
 		if(!member.hasPermission(Permission.MANAGE_CHANNEL) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/join2create:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/join2create:nopermission")).queue();
 			return;
 		}
 		Configloader.INSTANCE.addGuildConfig(event.getGuild(), "join2create", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/join2create:success!")).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/join2create:success!")).queue();
 	}
 
 	@Override

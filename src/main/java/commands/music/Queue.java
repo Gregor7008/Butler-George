@@ -27,15 +27,15 @@ public class Queue implements Command{
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 		if (!self.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:notconnected")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/nowplaying:notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/nowplaying:nopermission")).queue();
 			return;
 		}
 		if (queue.isEmpty()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/nowplaying:noqueue")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/nowplaying:noqueue")).queue();
 			return;
 		}
 		

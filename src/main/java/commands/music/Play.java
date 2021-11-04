@@ -10,6 +10,7 @@ import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -26,7 +27,7 @@ public class Play implements Command{
 		final Member self = guild.getSelfMember();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:wrongusage")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/play:wrongusage")).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
@@ -34,18 +35,22 @@ public class Play implements Command{
 			return;
 		}
 		if (self.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:alreadyinuse")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/play:alreadyinuse")).queue();
 			return;
 		}
 		if (!member.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/play:noVCdefined")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/play:noVCdefined")).queue();
 			return;
 		}
 		this.load(event, argument, musicManager, channel, member);
 	}
 	
 	private void load(SlashCommandEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
-		channel.getGuild().getAudioManager().openAudioConnection(member.getVoiceState().getChannel());
+		VoiceChannel vc = member.getVoiceState().getChannel();
+		channel.getGuild().getAudioManager().openAudioConnection(vc);
+		if (vc.getUserLimit() != 0) {
+			vc.getManager().setUserLimit(vc.getUserLimit() + 1).queue();
+		}
 		if (!isURL(argument)) {
 			String term = "ytsearch:" + argument;
 			musicManager.scheduler.player.setVolume(5);

@@ -26,12 +26,12 @@ public class Welcome implements Command{
 			final String message = event.getOption("message").getAsString();
 			final String channelid = event.getOption("channel").getAsGuildChannel().getId();
 			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "welcomemsg", message + ";" + channelid);
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/welcome:setsuccess"));
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/welcome:setsuccess"));
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
 			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "welcomemsg", "");
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/welcome:offsuccess"));
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/welcome:offsuccess"));
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
@@ -47,7 +47,7 @@ public class Welcome implements Command{
 				welcomemsg[0].replace("{date}", currentdate);
 				event.getGuild().getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/welcome:nonedefined"));
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/welcome:nonedefined"));
 			}
 		}
 	}

@@ -25,7 +25,5 @@ public class Test implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("No Permission!", ":warning: | You have no permission to use this command!\n You must be a developer of this bot to use this command!"));
 			return;
 		}
-		
 	}
-
 }

@@ -21,18 +21,18 @@ public class Clear implements Command{
 	public void perform(SlashCommandEvent event) {
 		final Member member = event.getMember();
 		if (!member.hasPermission(Permission.MESSAGE_MANAGE) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/clear:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/clear:nopermission")).queue();
 			return;
 		}
 		final TextChannel channel = event.getTextChannel();
 		final int count = Integer.parseInt(event.getOption("count").getAsString());
 		List<Message> messages = channel.getHistory().retrievePast(count).complete();
 		try {channel.deleteMessages(messages).queue();} catch (Exception e) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/clear:error")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/clear:error")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			e.printStackTrace();
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/clear:done")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/clear:done")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 
 	@Override

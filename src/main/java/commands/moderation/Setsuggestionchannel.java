@@ -15,13 +15,13 @@ public class Setsuggestionchannel implements Command{
 	public void perform(SlashCommandEvent event) {
 		if (event.getOption("channel") != null) {
 			if (!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/setsuggestionchannel:nopermission")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/setsuggestionchannel:nopermission")).queue();
 			} else {
 				Configloader.INSTANCE.setGuildConfig(event.getGuild(), "suggest", event.getOption("channel").getAsGuildChannel().getId());
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/setsuggestionchannel:successset")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/setsuggestionchannel:successset")).queue();
 			}
 		} else {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/setsuggestionchannel:noargs")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/setsuggestionchannel:noargs")).queue();
 		}
 	}
 

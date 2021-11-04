@@ -7,7 +7,9 @@ import java.util.Properties;
 
 import base.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 
 public class AnswerEngine {
 	
@@ -20,14 +22,17 @@ public class AnswerEngine {
 		return INSTANCE;
 	}
 	
-	public MessageEmbed fetchMessage (String input)  {
+	public MessageEmbed fetchMessage (Guild guild, User user, String input)  {
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];
-		File propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + path + ".properties");
+		File propertiesFile;
 		Properties properties = new Properties();
 		EmbedBuilder eb = new EmbedBuilder();
 	 
+		String lang = Configloader.INSTANCE.getUserConfig(guild, user, "language");
+		propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/languages/" + lang + "/" + path + ".properties");
+		
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
 			properties.load(bis);
 		} catch (Exception e) {}

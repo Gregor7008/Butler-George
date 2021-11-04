@@ -96,18 +96,18 @@ public class Processor extends ListenerAdapter {
 		//assign Autoroles
 		if (event.getMember().getUser().isBot()) {
 			String botautorolesraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "botautoroles");
-			if (botautorolesraw != "") {
+			if (!botautorolesraw.equals("")) {
 				String[] botautoroles = botautorolesraw.split(";");
-				for (int i = 1; i <= botautoroles.length; i++) {
-					event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(botautoroles[i-1]));
+				for (int i = 0; i < botautoroles.length; i++) {
+					event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(botautoroles[i])).queue();
 				}
 			}
 		} else {
 			String autorolesraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "autoroles");
-			if (autorolesraw != "") {
+			if (!autorolesraw.equals("")) {
 				String[] autoroles = autorolesraw.split(";");
-				for (int i = 1; i <= autoroles.length; i++) {
-					event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(autoroles[i-1]));
+				for (int i = 0; i < autoroles.length; i++) {
+					event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(autoroles[i])).queue();
 				}
 			}
 		}
@@ -116,7 +116,7 @@ public class Processor extends ListenerAdapter {
 		LocalDateTime date = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 		String currentdate = date.format(formatter);
-		if (welcomemsgraw != "") {
+		if (!welcomemsgraw.equals("")) {
 			String[] welcomemsg = welcomemsgraw.split(";");
 			welcomemsg[0].replace("{servername}", event.getGuild().getName());
 			welcomemsg[0].replace("{membername}", event.getMember().getAsMention());
@@ -132,7 +132,7 @@ public class Processor extends ListenerAdapter {
 		LocalDateTime date = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 		String currentdate = date.format(formatter);
-		if (goodbyemsgraw != "") {
+		if (goodbyemsgraw != null) {
 			String[] goodbyemsg = goodbyemsgraw.split(";");
 			goodbyemsg[0].replace("{servername}", event.getGuild().getName());
 			goodbyemsg[0].replace("{member}", event.getMember().getEffectiveName());

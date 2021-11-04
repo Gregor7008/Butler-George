@@ -21,19 +21,19 @@ public class Botautorole implements Command{
 		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
 		if (!member.hasPermission(Permission.MANAGE_ROLES) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/botautorole:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/botautorole:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			final Role role = event.getOption("addrole").getAsRole();
 			Configloader.INSTANCE.addGuildConfig(guild, "botautoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/botautorole:addsuccess")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/botautorole:addsuccess")).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			final Role role = event.getOption("removerole").getAsRole();
 			Configloader.INSTANCE.deleteGuildConfig(guild, "botautoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/botautorole:removesuccess")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/botautorole:removesuccess")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
@@ -59,7 +59,7 @@ public class Botautorole implements Command{
 		final StringBuilder sB = new StringBuilder();
 		final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "botautoroles");
 		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/autorole:nobotautoroles")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autorole:nobotautoroles")).queue();;
 			return;
 		}
 		if (!currentraw.contains(";")) {

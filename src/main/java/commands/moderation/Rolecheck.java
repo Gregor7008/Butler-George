@@ -17,22 +17,22 @@ public class Rolecheck implements Command {
 	public void perform(SlashCommandEvent event) {
 		final Member member = event.getOption("member").getAsMember();
 		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolecheck:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/rolecheck:nopermission")).queue();
 			return;
 		}
 		final Role mentionedRole = event.getOption("role").getAsRole();
 		if (member == null) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolecheck:nomember")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/rolecheck:nomember")).queue();
 			return;
 		}
 		if (mentionedRole == null) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolecheck:incomplete")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/rolecheck:incomplete")).queue();
 			return;
 		}
 		if (hasRole(member, mentionedRole)==true) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolecheck:found")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/rolecheck:found")).queue();
 		} else {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/rolecheck:notfound")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/rolecheck:notfound")).queue();
 		}
 	}
 

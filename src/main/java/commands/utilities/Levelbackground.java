@@ -16,16 +16,15 @@ public class Levelbackground implements Command{
 		if (event.getSubcommandName().equals("set")) {
 			Level lv = new Level();
 			if (Integer.parseInt(event.getOption("number").getAsString()) > 4 || Integer.parseInt(event.getOption("number").getAsString()) < 0) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/levelbackground:wrongarg")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/levelbackground:wrongarg")).queue();
 			} else {
 				Configloader.INSTANCE.setUserConfig(event.getMember(), "levelbackground", event.getOption("number").getAsString());
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/levelbackground:success")).queue();
-				event.getChannel().sendMessage("").addFile(lv.renderLevelcard(event.getMember())).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/levelbackground:success")).addFile(lv.renderLevelcard(event.getMember())).queue();
 			}
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
-			this.listlevelrewards(event);
+			this.listlevelcards(event);
 		}
 	}
 
@@ -42,7 +41,7 @@ public class Levelbackground implements Command{
 		return "Configure your personal levelbackground so it will be displayed, whenever you use /level";
 	}
 	
-	private void listlevelrewards(SlashCommandEvent event) {
+	private void listlevelcards(SlashCommandEvent event) {
 		EmbedBuilder eb0 = new EmbedBuilder();
 		EmbedBuilder eb1 = new EmbedBuilder();
 		EmbedBuilder eb2 = new EmbedBuilder();

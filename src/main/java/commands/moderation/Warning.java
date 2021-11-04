@@ -24,7 +24,7 @@ public class Warning implements Command{
 	@Override
 	public void perform(SlashCommandEvent event) {
 		if (!event.getMember().getRoles().contains(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole")))) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
@@ -37,7 +37,7 @@ public class Warning implements Command{
 				reason = event.getOption("reason").getAsString();
 			}
 			Configloader.INSTANCE.addUserConfig(member, "warnings", reason);
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:success")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:success")).queue();
 			user.openPrivateChannel().queue((channel) -> {
 				 channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", ":white_check_mark: | Reason:\n=>" + reason)).queue();});
 			AutoPunishEngine.getInstance().processWarnings(event.getGuild());
@@ -61,7 +61,7 @@ public class Warning implements Command{
 							  Configloader.INSTANCE.deleteUserConfig(e.getMember(), "warnings", warnings[w-1]);
 							  channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The warning for " + warnings[w-1] + " was successfully removed of the user!")).queue();},
 						1, TimeUnit.MINUTES,
-						() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+						() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			}
 		}
 	}
@@ -88,7 +88,7 @@ public class Warning implements Command{
 		final User user = event.getOption("member").getAsUser();
 		String allwarnings = Configloader.INSTANCE.getUserConfig(event.getGuild(), user, "warnings");
 		if (allwarnings.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/warning:nowarnings")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:nowarnings")).queue();
 			return false;
 		}
 		String[] warnings = allwarnings.split(";");

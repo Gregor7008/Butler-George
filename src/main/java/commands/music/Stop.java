@@ -6,6 +6,7 @@ import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
@@ -18,22 +19,26 @@ public class Stop implements Command{
 		final Member self = guild.getSelfMember();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (!self.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:notconnected")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/stop:notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().inVoiceChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:nopermission")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/stop:nopermission")).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/stop:nopermission")).queue();
 			return;
 		}
 		musicManager.scheduler.player.stopTrack();
 		musicManager.scheduler.queue.clear();
+		VoiceChannel vc = guild.getSelfMember().getVoiceState().getChannel();
 		guild.getAudioManager().closeAudioConnection();
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/music/stop:stopped")).queue();
+		if (vc.getUserLimit() != 0) {
+			vc.getManager().setUserLimit(vc.getUserLimit() - 1).queue();
+		}
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/stop:stopped")).queue();
 	}
 
 	@Override

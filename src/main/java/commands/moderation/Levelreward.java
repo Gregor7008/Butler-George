@@ -15,7 +15,7 @@ public class Levelreward implements Command{
 	@Override
 	public void perform(SlashCommandEvent event) {
 		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/levelreward:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/levelreward:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
@@ -27,7 +27,7 @@ public class Levelreward implements Command{
 		if (event.getSubcommandName().equals("remove")) {
 			String rawinput = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "levelrewards");
 			if (rawinput.equals("")) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/levelreward:norewards")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/levelreward:norewards")).queue();
 				return;
 			}
 			String[] rewards = rawinput.split(";");
@@ -66,7 +66,7 @@ public class Levelreward implements Command{
 		final StringBuilder sB = new StringBuilder();
 		final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards");
 		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/moderation/levelreward:norewards")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/levelreward:norewards")).queue();;
 			return;
 		}
 		if (!currentraw.contains(";")) {

@@ -25,18 +25,18 @@ public class Suggest implements Command{
 		if (!event.getOption("suggestion").getAsString().equals("")) {
 			String channelid = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "suggest");
 			if (channelid.equals(null)) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:nochannelset")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/suggest:nochannelset")).queue();
 				return;
 			}
 			OffsetDateTime lastsuggestion = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(event.getGuild(), event.getUser(), "lastsuggestion"));
 			if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:nospam")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/suggest:nospam")).queue();
 				return;
 			}
 			this.sendsuggestion(event.getGuild(), event.getMember(), event.getOption("suggestion").getAsString());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:success")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/suggest:success")).queue();
 		} else {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage("/commands/utilities/suggest:noargs")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/suggest:noargs")).queue();
 		}
 	}
 
