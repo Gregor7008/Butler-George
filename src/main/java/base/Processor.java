@@ -6,27 +6,30 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import commands.Command;
 import commands.CommandList;
 import commands.utilities.Suggest;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import components.moderation.ModController;
 import components.moderation.ModMail;
 import components.moderation.NoLimitsOnly;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -39,9 +42,12 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		if (event.getAuthor().isBot()) {
+			return;
+		}
 		//ModController
 		new Thread (() -> {
-			//new ModController().modcheck();
+			new ModController().modcheck();
 		}).start();
 		//levelsystem
 		LevelEngine.getInstance().messagereceived(event);
@@ -81,6 +87,10 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onSlashCommand(SlashCommandEvent event) {
+		if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "ignored").contains(event.getChannel().getId())) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			return;
+		}
 		//perform Slash-Command
 		CommandList commandList = new CommandList();
 		Command cmd;
@@ -92,7 +102,6 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		Configloader.INSTANCE.findorCreateUserConfig(event.getGuild(), event.getUser());
 		//assign Autoroles
 		if (event.getMember().getUser().isBot()) {
 			String botautorolesraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "botautoroles");
@@ -110,23 +119,26 @@ public class Processor extends ListenerAdapter {
 					event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(autoroles[i])).queue();
 				}
 			}
-		}
-		//send Welcomemessage
-		String welcomemsgraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "welcomemsg");
-		LocalDateTime date = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
-		String currentdate = date.format(formatter);
-		if (!welcomemsgraw.equals("")) {
-			String[] welcomemsg = welcomemsgraw.split(";");
-			welcomemsg[0].replace("{servername}", event.getGuild().getName());
-			welcomemsg[0].replace("{membername}", event.getMember().getAsMention());
-			welcomemsg[0].replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
-			welcomemsg[0].replace("{date}", currentdate);
-			event.getGuild().getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
+			//send Welcomemessage
+			String welcomemsgraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "welcomemsg");
+			LocalDateTime date = LocalDateTime.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
+			String currentdate = date.format(formatter);
+			if (!welcomemsgraw.equals("")) {
+				String[] welcomemsg = welcomemsgraw.split(";");
+				welcomemsg[0].replace("{servername}", event.getGuild().getName());
+				welcomemsg[0].replace("{membername}", event.getMember().getAsMention());
+				welcomemsg[0].replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
+				welcomemsg[0].replace("{date}", currentdate);
+				event.getGuild().getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
+			}
 		}
 	}
 	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
+		if (event.getUser().isBot()) {
+			return;
+		}
 		//send goodbyemessage
 		String goodbyemsgraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "welcomemsg");
 		LocalDateTime date = LocalDateTime.now();
@@ -143,49 +155,89 @@ public class Processor extends ListenerAdapter {
 		}
 	}
 	@Override
-	public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
-		//check for Join2create-channel & create User-channel if true
-		String j2cid = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "join2create");
-		if (j2cid != "") {
-			if (event.getChannelJoined().getId() == j2cid) {
-				ChannelAction<VoiceChannel> newchannel = event.getGuild().createVoiceChannel(event.getMember().getEffectiveName() + "'s channel!", event.getChannelJoined().getParent());
-				Collection<Permission> allow = new LinkedList<Permission>();
-				allow.add(Permission.MANAGE_CHANNEL);
-				allow.add(Permission.MANAGE_PERMISSIONS);
-				allow.add(Permission.CREATE_INSTANT_INVITE);
-				allow.add(Permission.VOICE_MUTE_OTHERS);
-				allow.add(Permission.VOICE_SPEAK);
-				newchannel.addMemberPermissionOverride(event.getMember().getIdLong(), allow, null).queue();
-				event.getGuild().moveVoiceMember(event.getMember(), event.getGuild().getVoiceChannelsByName(event.getMember().getEffectiveName() + "'s channel!", true).get(0)).queue();
-			}
+	public void onGuildVoiceMove(GuildVoiceMoveEvent event) {
+		if (event.getMember().getUser().isBot()) {
+			return;
 		}
+		//check for Join2create-channel & create User-channel if true
+		this.managej2cjoin(event.getGuild(), event.getMember(), event.getChannelJoined());
+		//check if VoiceChannelLeft was a Userchannel
+		this.managej2cleave(event.getGuild(), event.getMember(), event.getChannelLeft());
+		//levelsystem
+		LevelEngine.getInstance().voicemove(event);
+	}
+	@Override
+	public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
+		if (event.getMember().getUser().isBot()) {
+			return;
+		}
+		//check for Join2create-channel & create User-channel if true
+		this.managej2cjoin(event.getGuild(), event.getMember(), event.getChannelJoined());
 		//levelsystem
 		LevelEngine.getInstance().voicejoin(event);
 	}
 	@Override
 	public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
+		if (event.getMember().getUser().isBot()) {
+			return;
+		}
 		//check if VoiceChannelLeft was a Userchannel
-		if (event.getChannelLeft().getName().contains(event.getMember().getEffectiveName() + "'s channel!")) {
-			event.getChannelLeft().delete().queue();
+		this.managej2cleave(event.getGuild(), event.getMember(), event.getChannelLeft());
+	}
+	
+	private void managej2cjoin(Guild guild, Member member, VoiceChannel channeljoined) {
+		//check for Join2create-channel & create User-channel if true
+		String j2cid = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
+		if (channeljoined.getId().equals(j2cid)) {
+			ChannelAction<VoiceChannel> newchannel = guild.createVoiceChannel(member.getEffectiveName() + "'s channel", channeljoined.getParent());
+			Collection<Permission> perms = new LinkedList<Permission>();
+			perms.add(Permission.MANAGE_CHANNEL);
+			perms.add(Permission.MANAGE_PERMISSIONS);
+			perms.add(Permission.CREATE_INSTANT_INVITE);
+			perms.add(Permission.VOICE_MUTE_OTHERS);
+			perms.add(Permission.VOICE_SPEAK);
+			VoiceChannel nc = newchannel.addMemberPermissionOverride(member.getIdLong(), perms, null).complete();
+			guild.moveVoiceMember(member, nc).queue();
+			Configloader.INSTANCE.addGuildConfig(guild, "j2cs", nc.getId() + "-" + member.getUser().getId());
+		}
+	}
+	
+	private void managej2cleave(Guild guild, Member member, VoiceChannel channelleft) {
+		//check if VoiceChannelLeft was a Userchannel
+		VoiceChannel vc = channelleft;
+		if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId())) {
+			if (vc.getMembers().size() == 0) {
+				Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", vc.getId() + "-" + member.getUser().getId());
+				vc.delete().queue();
+			} else {
+				if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId() + "-" + member.getUser().getId())) {
+					Collection<Permission> perms = new LinkedList<Permission>();
+					perms.add(Permission.MANAGE_CHANNEL);
+					perms.add(Permission.MANAGE_PERMISSIONS);
+					perms.add(Permission.CREATE_INSTANT_INVITE);
+					perms.add(Permission.VOICE_MUTE_OTHERS);
+					perms.add(Permission.VOICE_SPEAK);
+					Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", vc.getId() + "-" + member.getUser().getId());
+					Member newowner =  vc.getMembers().get(0);
+					Configloader.INSTANCE.addGuildConfig(guild, "j2cs", vc.getId() + "-" + newowner.getUser().getId());
+					vc.getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(member).setName(newowner.getEffectiveName() + "'s channel").queue();
+				}
+			}
 		}
 	}
 	@Override
-	public void onGuildJoin(GuildJoinEvent event) {
-		try {
-		event.getGuild().getOwner().getUser().openPrivateChannel().queue((channel) -> {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Thanks for inviting me!", ":exclamation: | To finish my setup, please reply with the ID of a role, that should be able ot f.e. warn members!\n Thanks :heart:")).queue();
-		});} catch (Exception e) {}
-		Configloader.INSTANCE.findorCreateGuildConfig(event.getGuild());
-	}
-	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
-		//finish setup
-			//-->in developement
+		if (event.getAuthor().isBot()) {
+			return;
+		}		
 		//process modmail
 		new ModMail(event);
 	}
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
+		if (event.getUser().isBot()) {
+			return;
+		}
 		//check if it was on a poll, then call up "Poll.addAnswer(event);"
 		//also implement reactionrole support
 	}

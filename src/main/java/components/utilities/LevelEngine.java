@@ -2,15 +2,14 @@ package components.utilities;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.List;
 
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
@@ -27,62 +26,63 @@ private static LevelEngine INSTANCE;
 	
 	public void messagereceived(GuildMessageReceivedEvent event) {
 		Member member = event.getMember();
-		if (event.getAuthor().isBot()) {
-			return;
-		}
 		OffsetDateTime time = event.getMessage().getTimeCreated();
-		this.givexp(member, time, 10, 30, event.getChannel());
+		this.givexp(member, time, 10, 30);
 	}
 	
 	public void slashcommand(SlashCommandEvent event) {
-		if (event.getUser().isBot()) {
-			return;
-		}
 		Member member = event.getMember();
 		OffsetDateTime time = java.time.OffsetDateTime.now();
-		this.givexp(member, time, 20, 30, event.getTextChannel());
+		this.givexp(member, time, 20, 30);
 	}
 
 	public void voicejoin(GuildVoiceJoinEvent event) {
-		if (event.getMember().getUser().isBot()) {
-			return;
-		}
 		Member member = event.getMember();
 		OffsetDateTime time = java.time.OffsetDateTime.now();
-		TextChannel channel = null;
-		List<TextChannel> channels = event.getGuild().getTextChannels();
-		for (int i = 0; i < channels.size(); i++) {
-			if (member.hasPermission(channels.get(i), Permission.MESSAGE_WRITE)) {
-				channel = channels.get(i);
-				i = i + 2 + channels.size();
-			}
-		}
-		this.givexp(member, time, 50, 600, channel);
+		this.givexp(member, time, 50, 600);
 	}
 	
-	private void givexp(Member member, OffsetDateTime time, int amount, int mindiff, TextChannel channel) {
+	public void voicemove(GuildVoiceMoveEvent event) {
+		Member member = event.getMember();
+		OffsetDateTime time = java.time.OffsetDateTime.now();
+		this.givexp(member, time, 50, 600);
+	}
+	
+	private void givexp(Member member, OffsetDateTime time, int amount, int mindiff) {
 		OffsetDateTime now = OffsetDateTime.now();
 		OffsetDateTime lastxpgotten = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "lastxpgotten"));
 		long difference = Duration.between(lastxpgotten, now).toSeconds();
 		if(difference >= Long.parseLong(String.valueOf(mindiff))) {
-			this.grantxp(member, amount, channel);
-			this.checklevel(member, channel);
+			Configloader.INSTANCE.setUserConfig(member, "levelspamcount", "0");
+			this.grantxp(member, amount);
+			this.checklevel(member);
 			this.checkforreward(member);
+		} else {
+			int newcount = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "levelspamcount")) + 1;
+			Configloader.INSTANCE.setUserConfig(member, "levelspamcount", String.valueOf(newcount));
+			if (newcount > 20) {
+				Configloader.INSTANCE.addUserConfig(member, "warnings", "Levelspamming");
+				member.getUser().openPrivateChannel().complete()
+						.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Warning!", ":warning: | You have been warned on the " + member.getGuild().getName() + " server for spamming to level up faster!")).queue();
+			}
 		}
 	}
 
-	private void grantxp(Member member, int amount, TextChannel channel) {
+	private void grantxp(Member member, int amount) {
 		int current = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe"));
 		int newamount = current + amount;
 		Configloader.INSTANCE.setUserConfig(member, "expe", String.valueOf(newamount));
 		Configloader.INSTANCE.setUserConfig(member, "lastxpgotten", OffsetDateTime.now().toString());
 	}
 
-	private void checklevel(Member member, TextChannel channel) {
+	private void checklevel(Member member) {
 		int currentlevel = Integer.valueOf(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
 		if (this.xpleftfornextlevel(member) < 1) {
 			Configloader.INSTANCE.setUserConfig(member, "level", String.valueOf(currentlevel + 1));
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":confetti_ball: Congrats\s" + member.getEffectiveName() + "\s! :confetti_ball:", "You just reached level\s" + String.valueOf(currentlevel+1) + "!")).queue();
+			TextChannel channel = member.getGuild().getTextChannelById(Configloader.INSTANCE.getGuildConfig(member.getGuild(), "levelmsgch"));
+			if (channel != null) {
+				channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":confetti_ball: Congrats\s" + member.getEffectiveName() + "\s! :confetti_ball:", "You just reached level\s" + String.valueOf(currentlevel+1) + "!")).queue();
+			}
 		}
 	}
 

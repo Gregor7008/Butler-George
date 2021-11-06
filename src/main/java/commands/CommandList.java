@@ -8,11 +8,14 @@ import commands.moderation.Botautorole;
 import commands.moderation.Clear;
 import commands.moderation.Close;
 import commands.moderation.Goodbye;
+import commands.moderation.Ignorechannel;
 import commands.moderation.Join2Create;
 import commands.moderation.Levelreward;
 import commands.moderation.Mute;
 import commands.moderation.Rolecheck;
 import commands.moderation.Rolesorting;
+import commands.moderation.Setlevelchannel;
+import commands.moderation.Setmodrole;
 import commands.moderation.Setsuggestionchannel;
 import commands.moderation.Tempban;
 import commands.moderation.Tempmute;
@@ -28,7 +31,6 @@ import commands.utilities.Help;
 import commands.utilities.Level;
 import commands.utilities.Levelbackground;
 import commands.utilities.Poll;
-import commands.utilities.Setlanguage;
 import commands.utilities.Suggest;
 import commands.utilities.Userinfo;
 import components.utilities.Test;
@@ -46,7 +48,7 @@ public class CommandList {
 		this.commands.put("suggest", new Suggest());
 		this.commands.put("userinfo", new Userinfo());
 		this.commands.put("poll", new Poll());
-		this.commands.put("setlanguage", new Setlanguage());
+		//this.commands.put("setlanguage", new Setlanguage());
 		
 		//Moderation
 		this.commands.put("autopunish", new Autopunish());
@@ -65,6 +67,9 @@ public class CommandList {
 		this.commands.put("welcome", new Welcome());
 		this.commands.put("close", new Close());
 		this.commands.put("setsuggestionchannel", new Setsuggestionchannel());
+		this.commands.put("setlevelchannel", new Setlevelchannel());
+		this.commands.put("ignorechannel", new Ignorechannel());
+		this.commands.put("setmodrole", new Setmodrole());
 		
 		//Music
 		this.commands.put("nowplaying", new Nowplaying());

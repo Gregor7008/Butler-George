@@ -4,6 +4,7 @@ import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -32,8 +33,8 @@ public class Mute implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Use this command to permanently mute a user on this guild";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/mute:help");
 	}
 	
 	public void mute(Member member) {

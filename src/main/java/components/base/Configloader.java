@@ -287,6 +287,9 @@ public class Configloader {
 				pps.setProperty("autopunish", "");
 				pps.setProperty("levelrewards", "");
 				pps.setProperty("muterole", "");
+				pps.setProperty("j2cs", "");
+				pps.setProperty("levelmsgch", "");
+				pps.setProperty("ignored", "");
 				pps.store(new FileOutputStream(pFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}
@@ -317,6 +320,7 @@ public class Configloader {
 				pps.setProperty("lastmail", OffsetDateTime.now().toString());
 				pps.setProperty("lastsuggestion", OffsetDateTime.now().toString());
 				pps.setProperty("language", "en");
+				pps.setProperty("levelspamcount", "0");
 				pps.store(new FileOutputStream(pFile), null);
 			} catch (IOException e) {e.printStackTrace();}
 		}

@@ -72,8 +72,8 @@ public class Poll implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "This command is used to create a poll in the chanenl, the command is executed in";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/poll:help");
 	}
 	
 	private void createPoll() {

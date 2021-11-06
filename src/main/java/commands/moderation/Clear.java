@@ -7,9 +7,11 @@ import commands.Command;
 import components.Developerlist;
 import components.base.AnswerEngine;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -42,8 +44,8 @@ public class Clear implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Use this command to clear messages from the channel you use the command in.";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/clear:help");
 	}
 
 }

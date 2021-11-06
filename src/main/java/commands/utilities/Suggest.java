@@ -1,9 +1,9 @@
 package commands.utilities;
 
+import java.awt.Color;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.awt.Color;
 
 import commands.Command;
 import components.base.AnswerEngine;
@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -48,8 +49,8 @@ public class Suggest implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Use this command to suggest a new idea to the server team!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/suggest:help");
 	}
 	
 	public void sendsuggestion(Guild guild, Member member, String idea) {

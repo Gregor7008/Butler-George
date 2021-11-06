@@ -4,6 +4,8 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
@@ -28,8 +30,8 @@ public class Close implements Command {
 	}
 
 	@Override
-	public String getHelp() {
-		return "This command is used to close a conversation with an anonymous user, which was opened by him via the ModMail function.\nUse this command in the channel the conversation took place in!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/close:help");
 	}
 
 }

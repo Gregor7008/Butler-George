@@ -9,6 +9,7 @@ import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import components.moderation.AutoPunishEngine;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -23,6 +24,10 @@ public class Warning implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole").equals("")) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/warning:nomodrole")).queue();
+			return;
+		}
 		if (!event.getMember().getRoles().contains(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole")))) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:nopermission")).queue();
 			return;
@@ -80,8 +85,8 @@ public class Warning implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Warn a member for rude behavior etc. The bot will keep track of it and the serveradmin can define automatic punishements when a specific number of warnings is reached!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/warning:help");
 	}
 	
 	private boolean listwarnings(SlashCommandEvent event) {

@@ -10,6 +10,7 @@ import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -77,7 +78,7 @@ public class Play implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Use this command to start playing music in your voicechannel or to add a new track to your queue, which is going to be played one by one in your channel!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/music/play:help");
 	}
 }

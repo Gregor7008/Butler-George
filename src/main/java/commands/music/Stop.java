@@ -6,6 +6,7 @@ import components.music.GuildMusicManager;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -48,7 +49,7 @@ public class Stop implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Use this command, to stop music which is currently playing in your channel. This also clears the queue!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/music/stop:help");
 	}
 }

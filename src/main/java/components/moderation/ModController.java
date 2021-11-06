@@ -1,5 +1,6 @@
 package components.moderation;
 
+import java.io.File;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -16,7 +17,7 @@ import net.dv8tion.jda.api.entities.User;
 
 public class ModController {
 
-	public void modcheck() {		
+	public void modcheck() {	
 		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
 		for (int e = 0; e < guilds.size(); e++) {
 			Guild guild = guilds.get(e);
@@ -38,46 +39,52 @@ public class ModController {
 					}
 				}
 				//Check the user
-				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempmuted"))) {
-					OffsetDateTime tmuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tmuntil"));
-					OffsetDateTime now = OffsetDateTime.now();
-					int difference = Duration.between(tmuntil, now).toSecondsPart();
-					if (difference <= 0) {
-						guild.removeRoleFromMember(guild.retrieveMember(user).complete(), guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
-						user.openPrivateChannel().queue(channel -> {
-							try {
-								channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Hey\s" + user.getName() + "!", ":tada: | You were just unmuted over at the\s" + guild.getName() + "\sserver!\nYou can chat again now!")).queue();
-							} catch (Exception e1) {}
-						});
-						Configloader.INSTANCE.setUserConfig(guild.retrieveMember(user).complete(), "muted", "false");
-					}
-				}
-				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
-					if (!guild.retrieveMember(user).complete().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
-						guild.addRoleToMember(user.getId(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
-						if (guild.getId().equals(Bot.INSTANCE.getBotConfig("NoLiID"))) {
-							guild.removeRoleFromMember(user.getId(), guild.getRoleById("709478250253910103")).queue();
+				File guilddir = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guild.getId());
+				if (guilddir.exists()) {
+					File pFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
+					if (pFile.exists() && !user.isBot()) {
+						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempmuted"))) {
+							OffsetDateTime tmuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tmuntil"));
+							OffsetDateTime now = OffsetDateTime.now();
+							int difference = Duration.between(tmuntil, now).toSecondsPart();
+							if (difference <= 0) {
+								guild.removeRoleFromMember(guild.retrieveMember(user).complete(), guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+								user.openPrivateChannel().queue(channel -> {
+									try {
+										channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Hey\s" + user.getName() + "!", ":tada: | You were just unmuted over at the\s" + guild.getName() + "\sserver!\nYou can chat again now!")).queue();
+									} catch (Exception e1) {}
+								});
+								Configloader.INSTANCE.setUserConfig(guild.retrieveMember(user).complete(), "muted", "false");
+							}
 						}
-					}
-				} else {
-					if (!guild.retrieveMember(user).complete().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
-						guild.removeRoleFromMember(user.getId(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
-						if (guild.getId().equals(Bot.INSTANCE.getBotConfig("NoLiID"))) {
-							guild.addRoleToMember(user.getId(), guild.getRoleById("709478250253910103")).queue();
+						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
+							if (!guild.retrieveMember(user).complete().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
+								guild.addRoleToMember(user.getId(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+								if (guild.getId().equals(Bot.INSTANCE.getBotConfig("NoLiID"))) {
+									guild.removeRoleFromMember(user.getId(), guild.getRoleById("709478250253910103")).queue();
+								}
+							}
+						} else {
+							if (!guild.retrieveMember(user).complete().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
+								guild.removeRoleFromMember(user.getId(),guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole"))).queue();
+								if (guild.getId().equals(Bot.INSTANCE.getBotConfig("NoLiID"))) {
+									guild.addRoleToMember(user.getId(), guild.getRoleById("709478250253910103")).queue();
+								}
+							}
 						}
-					}
-				}
-				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempbanned"))) {
-					OffsetDateTime tbuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tbuntil"));
-					OffsetDateTime now = OffsetDateTime.now();
-					int difference = Duration.between(tbuntil, now).toSecondsPart();
-					if (difference <= 0) {
-						guild.unban(user).queue();
-						user.openPrivateChannel().queue(channel -> {
-							try {
-								channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Hey\s" + user.getName() + "!", ":tada: | You were just unbanned over at the\s" + guild.getName() + "\sserver!\nYou can join again now!")).queue();
-							} catch (Exception e1) {}
-						});
+						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempbanned"))) {
+							OffsetDateTime tbuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tbuntil"));
+							OffsetDateTime now = OffsetDateTime.now();
+							int difference = Duration.between(tbuntil, now).toSecondsPart();
+							if (difference <= 0) {
+								guild.unban(user).queue();
+								user.openPrivateChannel().queue(channel -> {
+									try {
+										channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Hey\s" + user.getName() + "!", ":tada: | You were just unbanned over at the\s" + guild.getName() + "\sserver!\nYou can join again now!")).queue();
+									} catch (Exception e1) {}
+								});
+							}
+						}
 					}
 				}
 			}

@@ -23,6 +23,9 @@ public class AutoPunishEngine {
 	public void processWarnings(Guild guild) {
 		ConcurrentHashMap<Integer, String> punishements = new ConcurrentHashMap<>();
 		String pms = Configloader.INSTANCE.getGuildConfig(guild, "autopunish");
+		if (pms.equals("")) {
+			return;
+		}
 		String[] pm = pms.split(";");
 		for (int a = 0; a < pm.length; a++) {
 			String[] temp1 = pm[a].split("_", 2);

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -51,8 +52,8 @@ public class Botautorole implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Use this command to configure, which roles should be given each new joining bot!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/botautorole:help");
 	}
 	
 	private void listroles(SlashCommandEvent event, Guild guild) {

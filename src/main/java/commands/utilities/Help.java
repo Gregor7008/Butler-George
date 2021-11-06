@@ -3,6 +3,8 @@ package commands.utilities;
 import commands.Command;
 import commands.CommandList;
 import components.base.AnswerEngine;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -14,11 +16,14 @@ public class Help implements Command{
 	public void perform(SlashCommandEvent event) {
 		CommandList commandList = new CommandList();
 		Command cmd;
-		String help = "An Error occured";
-		if ((cmd = commandList.commands.get(event.getOption("command").toString())) != null) {
-			help = cmd.getHelp();
+		String help = null;
+		if ((cmd = commandList.commands.get(event.getOption("command").getAsString())) != null) {
+			help = cmd.getHelp(event.getGuild(), event.getUser());
+			String[] helpsplit = help.split(";\\s+");
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], helpsplit[1])).queue();
+		} else {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/utilities/help:error")).queue();
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Help for the\s" + event.getOption("command").toString() +"-command", help));
 	}
 
 	@Override
@@ -28,8 +33,8 @@ public class Help implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return ":face_with_symbols_over_mouth: | WHY WOULD YOU DO THIS?!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/help:help");
 	}
 
 }

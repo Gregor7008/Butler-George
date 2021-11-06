@@ -4,6 +4,8 @@ import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -37,8 +39,8 @@ public class Levelbackground implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Configure your personal levelbackground so it will be displayed, whenever you use /level";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/levelbackground:help");
 	}
 	
 	private void listlevelcards(SlashCommandEvent event) {

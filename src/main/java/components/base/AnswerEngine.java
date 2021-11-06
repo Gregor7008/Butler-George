@@ -23,28 +23,7 @@ public class AnswerEngine {
 	}
 	
 	public MessageEmbed fetchMessage (Guild guild, User user, String input)  {
-		String[] temp1 = input.split(":");
-		String path = temp1[0];
-		String key = temp1[1];
-		File propertiesFile;
-		Properties properties = new Properties();
-		EmbedBuilder eb = new EmbedBuilder();
-	 
-		String lang = Configloader.INSTANCE.getUserConfig(guild, user, "language");
-		propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/languages/" + lang + "/" + path + ".properties");
-		
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
-			properties.load(bis);
-		} catch (Exception e) {}
-		String temp2 = properties.getProperty(key);
-
-		String[] temp3 = temp2.split(";\\s+");
-		eb.setTitle(temp3[0]);
-		eb.setColor(56575);
-		eb.setDescription(temp3[1]);
-		eb.setFooter("Official-NoLimits Bot! - discord.gg/qHA2vUs");
-		MessageEmbed embed = eb.build();
-		return embed;
+		return this.buildMessage(this.getTitle(guild, user, input), this.getDescription(guild, user, input));
 	}
 	
 	public MessageEmbed buildMessage (String title, String description) {
@@ -55,5 +34,30 @@ public class AnswerEngine {
 		eb.setFooter("Official NoLimits-Bot! - discord.gg/qHA2vUs");
 		MessageEmbed embed = eb.build();
 		return embed;
+	}
+	
+	public String getTitle(Guild guild, User user, String input) {
+		String[] temp1 = this.getRaw(guild, user, input).split(";\\s+");
+		return temp1[0];
+	}
+
+	public String getDescription(Guild guild, User user, String input) {
+		String[] temp1 = this.getRaw(guild, user, input).split(";\\s+");
+		return temp1[1];
+	}
+	
+	public String getRaw(Guild guild, User user, String input) {
+		String lang = Configloader.INSTANCE.getUserConfig(guild, user, "language");
+		String[] temp1 = input.split(":");
+		String path = temp1[0];
+		String key = temp1[1];
+		File propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/languages/" + lang + "/" + path + ".properties");
+		Properties properties = new Properties();
+		
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
+			properties.load(bis);
+		} catch (Exception e) {}
+		String temp2 = properties.getProperty(key);
+		return temp2;
 	}
 }

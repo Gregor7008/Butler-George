@@ -17,8 +17,10 @@ import org.apache.commons.io.FileUtils;
 
 import base.Bot;
 import commands.Command;
+import components.base.AnswerEngine;
 import components.base.Configloader;
 import components.utilities.LevelEngine;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -53,8 +55,8 @@ public class Level implements Command {
 	}
 
 	@Override
-	public String getHelp() {
-		return "Use this command to display your current server level, or the level of another member!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/level:help");
 	}
 	
 	public File renderLevelcard(Member member) {

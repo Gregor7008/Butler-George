@@ -4,8 +4,10 @@ import commands.Command;
 import components.Developerlist;
 import components.base.AnswerEngine;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -46,8 +48,8 @@ public class Rolecheck implements Command {
 	}
 
 	@Override
-	public String getHelp() {
-		return "Provide the bot with a member, a role and the command and it will check if the member has the provided role!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/rolecheck:help");
 	}
 	
 	private boolean hasRole(Member member, Role role) {

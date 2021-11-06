@@ -10,6 +10,7 @@ import commands.Command;
 import components.base.AnswerEngine;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -53,8 +54,8 @@ public class Embed implements Command{
 	}
 	
 	@Override
-	public String getHelp() {
-		return "Use this command, and it will take you through the setup process!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/embed:help");
 	}
 	
 	private void definetitle() {

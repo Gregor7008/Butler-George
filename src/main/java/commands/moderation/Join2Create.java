@@ -5,7 +5,9 @@ import components.Developerlist;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -20,8 +22,8 @@ public class Join2Create implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/join2create:nopermission")).queue();
 			return;
 		}
-		Configloader.INSTANCE.addGuildConfig(event.getGuild(), "join2create", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/join2create:success!")).queue();
+		Configloader.INSTANCE.setGuildConfig(event.getGuild(), "join2create", event.getOption("channel").getAsGuildChannel().getId());
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/join2create:success")).queue();
 	}
 
 	@Override
@@ -31,8 +33,8 @@ public class Join2Create implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "This command is used to set the Join2Create channel, with which members can create their own private voicechannel, by simply joining!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/join2create:help");
 	}
 
 }

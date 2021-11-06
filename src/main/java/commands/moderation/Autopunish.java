@@ -52,8 +52,8 @@ public class Autopunish implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Use this command to edit the punishements that should be automatically enforced, when a member hits a certain number of warnings!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/autopunish:help");
 	}
 	
 	private void removepunishements(SlashCommandEvent event) {

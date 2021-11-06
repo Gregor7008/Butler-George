@@ -16,7 +16,9 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
@@ -37,13 +39,13 @@ public class Bot {
 	
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
-		System.out.println("Still not ready:\n-> Poll.java");
-		System.out.println("In developement:\n-> Setup of the bot\n-> Pollreactions and editing of the original message\n-> Automoderation");
+		System.out.println("Still not ready:\n-> Poll.java\n-> Ignorechannel.java");
+		System.out.println("In developement:\n-> Pollreactions and editing of the original message\n-> Automoderation");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
 		builder.setRawEventsEnabled(true);
-		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES);
+		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
@@ -60,10 +62,24 @@ public class Bot {
 	    	}
 	    }).start();
     	new Configloader();
+    	//new NoLimitsOnly().staticTalksOff();
     	this.readConsole();
+    	for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
+    		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
+    		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("")) {
+    			guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create")).putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
+    		}
+    	}
 	}
 
 	public void shutdown() {
+		//new NoLimitsOnly().staticTalksOn();
+		for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
+    		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
+    		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("")) {
+    			guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
+    		}
+    	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
 		System.out.println("Bot offline");

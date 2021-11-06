@@ -7,6 +7,7 @@ import components.base.AnswerEngine;
 import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
@@ -36,8 +37,8 @@ public class Nowplaying implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Using this command enables you to look at information concerning the currently playing track in your channel!";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/music/nowplaying:help");
 	}
 
 }

@@ -3,9 +3,12 @@ package commands.utilities;
 import java.time.format.DateTimeFormatter;
 
 import commands.Command;
+import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -29,8 +32,8 @@ public class Userinfo implements Command{
 	}
 
 	@Override
-	public String getHelp() {
-		return "Use this command, to get access to server side information about a user. Depending on your permission level, you'll also see how many warnings a user has etc.";
+	public String getHelp(Guild guild, User user) {
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/userinfo:help");
 	}
 	
 	private void listModInfo (SlashCommandEvent event) {
@@ -80,7 +83,7 @@ public class Userinfo implements Command{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
-		if (event.getOption("member").getAsUser().getId().equals("")) {
+		if (event.getOption("member") == null) {
 			member = event.getMember();
 		} else {
 			member = event.getGuild().getMember(event.getOption("member").getAsUser());
