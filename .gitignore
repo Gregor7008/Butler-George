@@ -3,3 +3,5 @@ target/
 .classpath
 bin/
 src/main/resources/botconfig.properties
+src/test/
+resources/configs/
