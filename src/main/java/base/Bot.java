@@ -78,6 +78,14 @@ public class Bot {
     		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("")) {
     			guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
+    			String j2csraw = Configloader.INSTANCE.getGuildConfig(guild, "j2cs");
+    			if (!j2csraw.equals("")) {
+    				String[] j2cs = j2csraw.split(";");
+    				for (int e = 0; e < j2cs.length; e++) {
+        				String[] temp1 = j2cs[e].split("-");
+        				guild.getVoiceChannelById(temp1[0]).delete().queue();
+        			}
+    			}
     		}
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);

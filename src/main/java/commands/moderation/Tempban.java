@@ -24,7 +24,7 @@ public class Tempban implements Command{
 		}
 		User user = event.getOption("member").getAsUser();
 		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), event.getGuild().getMember(user));
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully banned for\s" + event.getOption("days").getAsString() + "\sdays!"));
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully banned for\s" + event.getOption("days").getAsString() + "\sdays!")).queue();
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class ModMail {
 		if (!event.getMessage().getContentRaw().contains("anonym")) {
 			OffsetDateTime lastmail = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, event.getAuthor(), "lastmail"));
 			if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 300) {
-				event.getChannel().sendMessage("Your message was directly sent to the server team.\nThey will contact you shortly!").queue();
+				event.getChannel().sendMessage("Your message was directly sent to the server team.\nThey will contact you as soon as the responsible person is online!").queue();
 				Configloader.INSTANCE.setUserConfig(guild.getMember(event.getAuthor()), "lastmail", OffsetDateTime.now().toString());
 				this.processMessage(event);
 			} else {

@@ -144,7 +144,7 @@ public class Processor extends ListenerAdapter {
 		LocalDateTime date = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 		String currentdate = date.format(formatter);
-		if (goodbyemsgraw != null) {
+		if (!goodbyemsgraw.equals("")) {
 			String[] goodbyemsg = goodbyemsgraw.split(";");
 			goodbyemsg[0].replace("{servername}", event.getGuild().getName());
 			goodbyemsg[0].replace("{member}", event.getMember().getEffectiveName());
