@@ -202,7 +202,7 @@ public class Configloader {
 			bis.close();
 			FileOutputStream out6 = new FileOutputStream(pFile);
 			String[] current = currentraw.split(";");
-			if (current.length == 1) {
+			if (current.length <= 1) {
 				pps.setProperty(key, "");
 			} else {
 				if(current[0].equals(value)) {
@@ -276,6 +276,7 @@ public class Configloader {
 		File pFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/guild/" + guild.getId() + ".properties");
 		if (!pFile.exists()) {
 			try {
+				FileOutputStream fop = new FileOutputStream(pFile);
 				pFile.createNewFile();
 				pps.setProperty("welcomemsg", "");
 				pps.setProperty("goodbyemsg", "");
@@ -290,7 +291,9 @@ public class Configloader {
 				pps.setProperty("j2cs", "");
 				pps.setProperty("levelmsgch", "");
 				pps.setProperty("ignored", "");
-				pps.store(new FileOutputStream(pFile), null);
+				pps.setProperty("forbidden", "");
+				pps.store(fop, null);
+				fop.close();
 			} catch (IOException e) {e.printStackTrace();}
 		}
 		return pFile;
@@ -306,6 +309,7 @@ public class Configloader {
 		File pFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
 		if (!pFile.exists()) {
 			try {
+				FileOutputStream fop = new FileOutputStream(pFile);
 				pFile.createNewFile();
 				pps.setProperty("warnings", "");
 				pps.setProperty("muted", "false");
@@ -321,7 +325,8 @@ public class Configloader {
 				pps.setProperty("lastsuggestion", OffsetDateTime.now().toString());
 				pps.setProperty("language", "en");
 				pps.setProperty("levelspamcount", "0");
-				pps.store(new FileOutputStream(pFile), null);
+				pps.store(fop, null);
+				fop.close();
 			} catch (IOException e) {e.printStackTrace();}
 		}
 		return pFile;
@@ -347,8 +352,8 @@ public class Configloader {
 		return mailpropertiesFile;
 	}
 	
-	public File findPollConfig(Guild guild, String title) {
-		File pollpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId() + "/" + title + ".properties");
+	public File findPollConfig(Guild guild, String msgid) {
+		File pollpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId() + "/" + msgid + ".properties");
 		if (pollpropertiesFile.exists()) {
 			return pollpropertiesFile;
 		} else {
@@ -364,19 +369,23 @@ public class Configloader {
 		}
 		File pollpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId() + "/" + title + ".properties");
 		try {
+			FileOutputStream fop = new FileOutputStream(pollpropertiesFile);
 			pollpropertiesFile.createNewFile();
 			pps.setProperty("description", "");
+			pps.setProperty("title", "");
 			pps.setProperty("answers", "");
 			pps.setProperty("answercount", "");
 			pps.setProperty("thumbnail", "");
 			pps.setProperty("days", "");
 			pps.setProperty("anonymous", "");
 			pps.setProperty("guild", "");
-			pps.setProperty("user", "");
+			pps.setProperty("owner", "");
 			pps.setProperty("channel", "");
-			pps.setProperty("msgid", "");
+			pps.setProperty("footer", "");
+			pps.setProperty("users", "");
 			pps.setProperty("creation", OffsetDateTime.now().toString());
-			pps.store(new FileOutputStream(pollpropertiesFile), null);
+			pps.store(fop, null);
+			fop.close();
 		} catch (IOException e) {e.printStackTrace();}
 		return pollpropertiesFile;
 	}

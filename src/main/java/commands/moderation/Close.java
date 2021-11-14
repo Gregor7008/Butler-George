@@ -19,7 +19,8 @@ public class Close implements Command {
 		}
 		String cname = event.getChannel().getName();
 		event.getTextChannel().delete().queue();
-		Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cname)).openPrivateChannel().complete().sendMessage("Your anonymous conversation has been closed. Everything send from now on, will be processed as a new ModMail message!").queue();
+		Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cname)).openPrivateChannel().complete().sendMessageEmbeds(
+				AnswerEngine.getInstance().fetchMessage(event.getGuild(), Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cname)), "/commands/moderation/close:closed")).queue();
 		Configloader.INSTANCE.deleteMailConfig(cname);
 	}
 

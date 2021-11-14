@@ -39,8 +39,8 @@ public class Bot {
 	
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
-		System.out.println("Still not ready:\n-> Poll.java\n-> Ignorechannel.java");
-		System.out.println("In developement:\n-> Pollreactions and editing of the original message\n-> Automoderation");
+		System.out.println("Still not ready:\n-> ");
+		System.out.println("In developement:\n-> Report system\n-> Ping to move");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
@@ -51,9 +51,9 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    new Thread (() -> {
 	    	while (jda.getPresence().getStatus().equals(OnlineStatus.ONLINE)) {
-	    		jda.getPresence().setActivity(Activity.listening("Gregor"));
+	    		jda.getPresence().setActivity(Activity.playing("Discord"));
 	    		this.wait(15000);
-	    		jda.getPresence().setActivity(Activity.competing("NoLimits"));
+	    		jda.getPresence().setActivity(Activity.watching("private messages"));
 	    		this.wait(15000);
 	    		jda.getPresence().setActivity(Activity.watching("NoLimits"));
 	    		this.wait(15000);

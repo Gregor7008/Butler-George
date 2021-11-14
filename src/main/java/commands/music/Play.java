@@ -49,15 +49,17 @@ public class Play implements Command{
 	private void load(SlashCommandEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
 		VoiceChannel vc = member.getVoiceState().getChannel();
 		channel.getGuild().getAudioManager().openAudioConnection(vc);
-		if (vc.getUserLimit() != 0) {
-			vc.getManager().setUserLimit(vc.getUserLimit() + 1).queue();
+		if (!event.getGuild().getAudioManager().isConnected()) {
+			if (vc.getUserLimit() != 0) {
+				vc.getManager().setUserLimit(vc.getUserLimit() + 1).queue();
+			}
 		}
 		if (!isURL(argument)) {
 			String term = "ytsearch:" + argument;
 			musicManager.scheduler.player.setVolume(5);
 			PlayerManager.getInstance().loadAndPlay(event, term);
 		} else {
-			musicManager.scheduler.player.setVolume(10);
+			musicManager.scheduler.player.setVolume(20);
 			PlayerManager.getInstance().loadAndPlay(event, argument);
 		}
 	}

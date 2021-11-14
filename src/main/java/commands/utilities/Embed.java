@@ -43,7 +43,7 @@ public class Embed implements Command{
 		eb = new EmbedBuilder();
 		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());	
 		eb.setColor(56575);
-		messagecount=1;
+		messagecount=0;
 		this.definetitle();
 	}
 

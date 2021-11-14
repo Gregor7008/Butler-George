@@ -36,15 +36,18 @@ public class Warning implements Command{
 			final User user = event.getOption("member").getAsUser();
 			Member member = event.getGuild().retrieveMemberById(user.getId()).complete();
 			String reason;
-			if (event.getOption("reason").getAsString().equals("")) {
+			if (event.getOption("reason") == null) {
 				reason = "~Unknown reason~";
 			} else {
 				reason = event.getOption("reason").getAsString();
 			}
 			Configloader.INSTANCE.addUserConfig(member, "warnings", reason);
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:success")).queue();
-			user.openPrivateChannel().queue((channel) -> {
-				 channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", ":white_check_mark: | Reason:\n=>" + reason)).queue();});
+			try {
+				user.openPrivateChannel().queue(channel -> {
+					channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + event.getGuild().getName() + "\nReason:\n=> " + reason)).queue();
+				});
+			} catch (Exception e) {}
 			AutoPunishEngine.getInstance().processWarnings(event.getGuild());
 			return;
 		}
@@ -57,14 +60,15 @@ public class Warning implements Command{
 				EventWaiter waiter = Bot.INSTANCE.getWaiter();
 				TextChannel channel = event.getTextChannel();
 				User user = event.getUser();
+				Member member = event.getOption("member").getAsMember();
 				waiter.waitForEvent(GuildMessageReceivedEvent.class,
 						e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 						  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(event.getGuild(), event.getOption("user").getAsUser(), "warnings");
+						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(event.getGuild(), event.getOption("member").getAsUser(), "warnings");
 							  String[] warnings = allwarnings.split(";");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
-							  Configloader.INSTANCE.deleteUserConfig(e.getMember(), "warnings", warnings[w-1]);
-							  channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The warning for " + warnings[w-1] + " was successfully removed of the user!")).queue();},
+							  Configloader.INSTANCE.deleteUserConfig(member, "warnings", warnings[w-1]);
+							  channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The warning for \"" + warnings[w-1] + "\" was successfully removed of " + member.getEffectiveName())).queue();},
 						1, TimeUnit.MINUTES,
 						() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			}

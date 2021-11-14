@@ -13,6 +13,7 @@ import commands.CommandList;
 import commands.utilities.Suggest;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import components.moderation.AutoModerator;
 import components.moderation.ModController;
 import components.moderation.ModMail;
 import components.moderation.NoLimitsOnly;
@@ -21,6 +22,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -52,7 +54,7 @@ public class Processor extends ListenerAdapter {
 		//levelsystem
 		LevelEngine.getInstance().messagereceived(event);
 		//automoderation
-			//-->in developement
+		AutoModerator.getInstance().messagereceived(event);
 		//Anonymous ModMail
 		if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getName()) != null) {
 			if (event.getAuthor().isBot()) {
@@ -75,11 +77,25 @@ public class Processor extends ListenerAdapter {
 		for (int i = 0; i < event.getJDA().getGuilds().size(); i++) {
 			Guild guild = event.getJDA().getGuilds().get(i);
 			CommandListUpdateAction clua = guild.updateCommands();
-			CommandList commandList = new CommandList();
-			List<String> commandnames = new ArrayList<>();
-			commandnames.addAll(commandList.commands.keySet());
-			for (int e = 0; e < commandnames.size(); e++) {
-				Command cmd = commandList.commands.get(commandnames.get(e));
+			CommandList utilitycmdList = new CommandList();
+			List<String> utilitycmdnames = new ArrayList<>();
+			utilitycmdnames.addAll(utilitycmdList.utilitycmds.keySet());
+			for (int e = 0; e < utilitycmdnames.size(); e++) {
+				Command cmd = utilitycmdList.utilitycmds.get(utilitycmdnames.get(e));
+				clua.addCommands(cmd.initialize());
+			}
+			CommandList modcmdList = new CommandList();
+			List<String> modcmdnames = new ArrayList<>();
+			modcmdnames.addAll(modcmdList.moderationcmds.keySet());
+			for (int e = 0; e < modcmdnames.size(); e++) {
+				Command cmd = modcmdList.moderationcmds.get(modcmdnames.get(e));
+				clua.addCommands(cmd.initialize());
+			}
+			CommandList musiccmdList = new CommandList();
+			List<String> musiccmdnames = new ArrayList<>();
+			musiccmdnames.addAll(musiccmdList.musiccmds.keySet());
+			for (int e = 0; e < musiccmdnames.size(); e++) {
+				Command cmd = musiccmdList.musiccmds.get(musiccmdnames.get(e));
 				clua.addCommands(cmd.initialize());
 			}
 			clua.queue();
@@ -87,15 +103,27 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onSlashCommand(SlashCommandEvent event) {
-		if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "ignored").contains(event.getChannel().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-			return;
-		}
 		//perform Slash-Command
 		CommandList commandList = new CommandList();
-		Command cmd;
-		if ((cmd = commandList.commands.get(event.getName())) != null) {
-			cmd.perform(event);
+		Command utilitycmd;
+		if ((utilitycmd = commandList.utilitycmds.get(event.getName())) != null) {
+			if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "ignored").contains(event.getChannel().getId()) && !event.getName().equals("embed") && !event.getName().equals("poll")) {
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+				return;
+			}
+			utilitycmd.perform(event);
+		}
+		Command modcmd;
+		if ((modcmd = commandList.moderationcmds.get(event.getName())) != null) {
+			modcmd.perform(event);
+		}
+		Command musiccmd;
+		if ((musiccmd = commandList.musiccmds.get(event.getName())) != null) {
+			if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "ignored").contains(event.getChannel().getId())) {
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+				return;
+			}
+			musiccmd.perform(event);
 		}
 		//levelsystem
 		LevelEngine.getInstance().slashcommand(event);
@@ -206,6 +234,9 @@ public class Processor extends ListenerAdapter {
 		//check if VoiceChannelLeft was a Userchannel
 		VoiceChannel vc = channelleft;
 		if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId())) {
+			if (vc.getMembers().get(0).equals(guild.getSelfMember()) && vc.getMembers().size() == 1) {
+				guild.getAudioManager().closeAudioConnection();
+			}
 			if (vc.getMembers().size() == 0) {
 				Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", vc.getId() + "-" + member.getUser().getId());
 				vc.delete().queue();
@@ -238,8 +269,48 @@ public class Processor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
-		//check if it was on a poll, then call up "Poll.addAnswer(event);"
-		//also implement reactionrole support
+		//if reaction on poll, process reaction
+		if (Configloader.INSTANCE.findPollConfig(event.getGuild(), event.getMessageId()) != null) {
+			if (!event.getReactionEmote().getAsCodepoints().contains("U+20e3")) {
+				event.getTextChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getUser()).queue();
+			} else {
+				this.addPollAnswer(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getGuild(), event.getUser());
+				if (Boolean.parseBoolean(Configloader.INSTANCE.getPollConfig(event.getGuild(), event.getMessageId(), "anonymous"))) {
+					event.getTextChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getUser()).queue();
+				}
+			}
+			return;
+		}
+		//if reaction on reactionrole message, process reaction
+		//--> in developement
+	}
+	
+	public void addPollAnswer(String msgid, String emojiUnicode, Guild guild, User user) {
+		String currentusers = Configloader.INSTANCE.getPollConfig(guild, msgid, "users");
+		if (currentusers.contains(user.getId())) {
+			return;
+		}
+		String[] old = Configloader.INSTANCE.getPollConfig(guild, msgid, "answercount").split(";");
+		String[] temp1 = emojiUnicode.split("U");
+		int choice = Integer.parseInt(temp1[1])-31;
+		String current = String.valueOf(Integer.parseInt(old[choice])+1);
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < old.length; i++) {
+			if (i != choice) {
+				sb.append(old[i]);
+			} else {
+				sb.append(current);
+			}
+			if (i+1 != old.length) {
+				sb.append(";");
+			}
+		}
+		Configloader.INSTANCE.setPollConfig(guild, msgid, "answercount", sb.toString());
+		if (currentusers.equals("")) {
+			Configloader.INSTANCE.setPollConfig(guild, msgid, "users", user.getId() + "_" + String.valueOf(choice));
+		} else {
+			Configloader.INSTANCE.setPollConfig(guild, msgid, "users", currentusers + ";" + user.getId() + "_" + String.valueOf(choice));
+		}
 	}
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {

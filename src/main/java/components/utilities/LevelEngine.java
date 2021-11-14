@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class LevelEngine {
 	
-private static LevelEngine INSTANCE;
+	private static LevelEngine INSTANCE;
 	
 	public static LevelEngine getInstance() {
 		if (INSTANCE == null) {
@@ -101,19 +101,19 @@ private static LevelEngine INSTANCE;
 		}
 	}
 	
-	public int xpneededfornextlevel(Member member) {
-		int currentlevel = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
+	public int xpneededforlevel(int currentlevel) {
 		if (currentlevel == 0) {return 100;} else {
 			return ((((currentlevel+1) * (currentlevel+1))+currentlevel+1)/2)*100;
 		}
 	}
 	
 	public int xpleftfornextlevel(Member member) {
-		int xpneededfornextlevel = this.xpneededfornextlevel(member);
+		int xpneededfornextlevel = this.xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level")));
 		return xpneededfornextlevel - Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe"));
 	}
 	
 	public String devtest(Member member) {
-		return String.valueOf(xpneededfornextlevel(member)) + " | " + String.valueOf(xpleftfornextlevel(member)) + " | " + Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe");
+		return String.valueOf(xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level")))) 
+				+ " | " + String.valueOf(xpleftfornextlevel(member)) + " | " + Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe");
 	}
 }

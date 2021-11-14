@@ -41,8 +41,7 @@ public class Ignorechannel implements Command{
 		CommandData command = new CommandData("ignorechannel", "Tells the bot to ignore a channel")
 										.addSubcommands(new SubcommandData("add", "Adds a new ignored channel")
 												.addOption(OptionType.CHANNEL, "channel", "Mention a channel", true))
-										.addSubcommands(new SubcommandData("list", "Lists all currently ignored channels")
-												.addOption(OptionType.CHANNEL, "channel", "Mention a channel", true))
+										.addSubcommands(new SubcommandData("list", "Lists all currently ignored channels"))
 										.addSubcommands(new SubcommandData("remove", "Removes a channel from the \"ignored\" list")
 												.addOption(OptionType.CHANNEL, "channel", "Mention a channel", true));
 		return command;
@@ -54,6 +53,22 @@ public class Ignorechannel implements Command{
 	}
 	
 	private void listignoredchannels(SlashCommandEvent event) {
-		//->in developement
+		String channelids = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "ignored");
+		if (channelids.equals("")) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/ignorechannel:nochannels")).queue();
+			return;
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append(AnswerEngine.getInstance().getDescription(event.getGuild(), event.getUser(), "/commands/moderation/ignorechannel:list"));
+		String[] channelid = channelids.split(";");
+		for (int i = 0; i < channelid.length; i++) {
+			sb.append("#" + String.valueOf(i + 1) + " ");
+			sb.append(event.getGuild().getTextChannelById(channelid[i]).getAsMention());
+			if (i+1 != channelid.length) {
+				sb.append("\n");
+			}
+		}
+		String title = AnswerEngine.getInstance().getTitle(event.getGuild(), event.getUser(), "/commands/moderation/ignorechannel:list");
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(title, sb.toString())).queue();
 	}
 }

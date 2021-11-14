@@ -37,49 +37,52 @@ import components.utilities.Test;
 
 public class CommandList {
 	
-	public ConcurrentHashMap<String, Command> commands = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<String, Command> utilitycmds = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<String, Command> moderationcmds = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<String, Command> musiccmds = new ConcurrentHashMap<>();
 	
 	public CommandList() {
 		//Utilities
-		this.commands.put("embed", new Embed());
-		this.commands.put("help", new Help());
-		this.commands.put("level", new Level());
-		this.commands.put("levelbackground", new Levelbackground());
-		this.commands.put("suggest", new Suggest());
-		this.commands.put("userinfo", new Userinfo());
-		this.commands.put("poll", new Poll());
-		//this.commands.put("setlanguage", new Setlanguage());
+		this.utilitycmds.put("embed", new Embed());
+		this.utilitycmds.put("help", new Help());
+		this.utilitycmds.put("level", new Level());
+		this.utilitycmds.put("levelbackground", new Levelbackground());
+		this.utilitycmds.put("suggest", new Suggest());
+		this.utilitycmds.put("userinfo", new Userinfo());
+		this.utilitycmds.put("poll", new Poll());
+		//this.utilitycommands.put("setlanguage", new Setlanguage());
 		
 		//Moderation
-		this.commands.put("autopunish", new Autopunish());
-		this.commands.put("autorole", new Autorole());
-		this.commands.put("botautorole", new Botautorole());
-		this.commands.put("clear", new Clear());
-		this.commands.put("goodbye", new Goodbye());
-		this.commands.put("join2create", new Join2Create());
-		this.commands.put("levelreward", new Levelreward());
-		this.commands.put("mute", new Mute());
-		this.commands.put("rolecheck", new Rolecheck());
-		this.commands.put("rolesort", new Rolesorting());
-		this.commands.put("tempban", new Tempban());
-		this.commands.put("tempmute", new Tempmute());
-		this.commands.put("warning", new Warning());
-		this.commands.put("welcome", new Welcome());
-		this.commands.put("close", new Close());
-		this.commands.put("setsuggestionchannel", new Setsuggestionchannel());
-		this.commands.put("setlevelchannel", new Setlevelchannel());
-		this.commands.put("ignorechannel", new Ignorechannel());
-		this.commands.put("setmodrole", new Setmodrole());
+		this.moderationcmds.put("autopunish", new Autopunish());
+		this.moderationcmds.put("autorole", new Autorole());
+		this.moderationcmds.put("botautorole", new Botautorole());
+		this.moderationcmds.put("clear", new Clear());
+		this.moderationcmds.put("goodbye", new Goodbye());
+		this.moderationcmds.put("join2create", new Join2Create());
+		this.moderationcmds.put("levelreward", new Levelreward());
+		this.moderationcmds.put("mute", new Mute());
+		this.moderationcmds.put("rolecheck", new Rolecheck());
+		this.moderationcmds.put("rolesort", new Rolesorting());
+		this.moderationcmds.put("tempban", new Tempban());
+		this.moderationcmds.put("tempmute", new Tempmute());
+		this.moderationcmds.put("warning", new Warning());
+		this.moderationcmds.put("welcome", new Welcome());
+		this.moderationcmds.put("close", new Close());
+		this.moderationcmds.put("setsuggestionchannel", new Setsuggestionchannel());
+		this.moderationcmds.put("setlevelchannel", new Setlevelchannel());
+		this.moderationcmds.put("ignorechannel", new Ignorechannel());
+		this.moderationcmds.put("setmodrole", new Setmodrole());
+		//Developement
+		this.moderationcmds.put("test", new Test());
 		
 		//Music
-		this.commands.put("nowplaying", new Nowplaying());
-		this.commands.put("play", new Play());
-		this.commands.put("queue", new Queue());
-		this.commands.put("skip", new Skip());
-		this.commands.put("stop", new Stop());
+		this.musiccmds.put("nowplaying", new Nowplaying());
+		this.musiccmds.put("play", new Play());
+		this.musiccmds.put("queue", new Queue());
+		this.musiccmds.put("skip", new Skip());
+		this.musiccmds.put("stop", new Stop());
 		
-		//Developement
-		this.commands.put("test", new Test());
+		
 	}
 
 }

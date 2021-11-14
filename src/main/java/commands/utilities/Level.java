@@ -59,15 +59,12 @@ public class Level implements Command {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/level:help");
 	}
 	
-	public File renderLevelcard(Member member) {
-		String levelbackground = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "levelbackground");
-		int level = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
-		String curxp = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe");
-		int nedxp = LevelEngine.getInstance().xpneededfornextlevel(member);
+	private int calculateProgress(int level, int nedxp, String curxp) {
 		int progress;
+		int xpforlast = LevelEngine.getInstance().xpneededforlevel(level - 1);
 		if (level != 0) {
-			double temp1 = Double.valueOf(curxp);
-			double temp2 = (double) nedxp;
+			double temp1 = Double.valueOf(curxp) - xpforlast;
+			double temp2 = (double) nedxp - xpforlast;
 			double temp3 = temp1 / temp2 * 100;
 			progress = (int) temp3;
 		} else {
@@ -76,7 +73,16 @@ public class Level implements Command {
 			} else {
 				progress = 1;
 			}
-		}	
+		}
+		return progress;
+	}
+	
+	public File renderLevelcard(Member member) {
+		String levelbackground = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "levelbackground");
+		int level = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
+		String curxp = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe");
+		int nedxp = LevelEngine.getInstance().xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level")));
+		int progress = this.calculateProgress(level, nedxp, curxp);
 		BufferedImage image = null;
 		try {image = ImageIO.read(new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/" + levelbackground + ".png"));
 		} catch (IOException e) {

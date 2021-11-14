@@ -41,7 +41,7 @@ public class Userinfo implements Command{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
-		if (event.getOption("member").getAsUser().getId().equals("")) {
+		if (event.getOption("member") == null) {
 			member = event.getMember();
 		} else {
 			member = event.getGuild().getMember(event.getOption("member").getAsUser());

@@ -6,7 +6,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import base.Bot;
-import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -52,12 +51,9 @@ public class ModController {
 							int difference = Duration.between(now, tmuntil).toSecondsPart();
 							if (difference <= 0) {
 								guild.removeRoleFromMember(member, muterole).queue();
-								user.openPrivateChannel().queue(channel -> {
-									try {
-										channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Hey\s" + user.getName() + "!", ":tada: | You were just unmuted over at the\s" + guild.getName() + "\sserver!\nYou can chat again now!")).queue();
-									} catch (Exception e1) {}
-								});
 								Configloader.INSTANCE.setUserConfig(guild.retrieveMember(user).complete(), "muted", "false");
+								Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tempmuted", "false");
+								Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tmuntil", "");
 							}
 						}
 						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
@@ -70,6 +66,7 @@ public class ModController {
 						} else {
 							if (member.getRoles().contains(muterole)) {
 								guild.removeRoleFromMember(member, muterole).queue();
+								Configloader.INSTANCE.setUserConfig(guild.getMember(user), "muted", "false");
 								if (guild.getId().equals(Bot.INSTANCE.getBotConfig("NoLiID"))) {
 									guild.addRoleToMember(member, guild.getRoleById("709478250253910103")).queue();
 								}
@@ -85,14 +82,11 @@ public class ModController {
 				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempbanned"))) {
 					OffsetDateTime tbuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tbuntil"));
 					OffsetDateTime now = OffsetDateTime.now();
-					int difference = Duration.between(now, tbuntil).toSecondsPart();
+					long difference = Duration.between(now, tbuntil).toSeconds();
 					if (difference <= 0) {
 						guild.unban(user).queue();
-						user.openPrivateChannel().queue(channel -> {
-							try {
-								channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Hey\s" + user.getName() + "!", ":tada: | You were just unbanned over at the\s" + guild.getName() + "\sserver!\nYou can join again now!")).queue();
-							} catch (Exception e1) {}
-						});
+						Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tempbanned", "false");
+						Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tbuntil", "");
 					}
 				}
 			}

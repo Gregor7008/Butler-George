@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -30,32 +31,37 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class Poll implements Command{
 	
-	private SlashCommandEvent oevent;
 	private int messagecount = 0;
 	private TextChannel channel;
 	private User user;
 	private Guild guild;
-	private String title, url, description, answers;
+	private String url, description, answers, title, tempname;
 	private boolean anym;
 	
 	@Override
 	public void perform(SlashCommandEvent event) {
-		oevent = event;
+		channel = event.getTextChannel();
+		user = event.getUser();
+		guild = event.getGuild();
+		if (!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:nopermission")).queue();
+			return;
+		}
 		switch (event.getSubcommandName()) {
 		case "create":
-			this.createPoll();
+			this.createPoll(event);
 			break;
 		case "remove":
-			this.removePoll();
+			this.removePoll(event);
 			break;
 		case "list":
-			this.listPoll();
+			this.listPoll(event);
 			break;
 		case "info":
-			this.infoPoll();
+			this.infoPoll(event);
 			break;
 		default:
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/poll:error")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:error")).queue();
 		}
 	}
 
@@ -64,10 +70,10 @@ public class Poll implements Command{
 		CommandData command = new CommandData("poll", "Manage polls")
 											 .addSubcommands(new SubcommandData("create", "Create a poll"))
 											 .addSubcommands(new SubcommandData("remove", "Delete a poll")
-													 		 .addOption(OptionType.STRING, "title", "Define the title of the poll you want to delete", true))
+													 		 .addOption(OptionType.STRING, "msgid", "The message ID of the poll", true))
 											 .addSubcommands(new SubcommandData("list", "Lists all active polls"))
 											 .addSubcommands(new SubcommandData("info", "Show details about a specific poll")
-													 	     .addOption(OptionType.STRING, "title", "Define the title of the poll you want to delete", true));
+													 	     .addOption(OptionType.STRING, "msgid", "The message ID of the poll", true));
 		return command;
 	}
 
@@ -76,103 +82,97 @@ public class Poll implements Command{
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/poll:help");
 	}
 	
-	private void createPoll() {
-		if (!oevent.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
-			oevent.replyEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:nopermission")).queue();
-			return;
-		}
-		channel = oevent.getTextChannel();
-		user = oevent.getUser();
-		guild = oevent.getGuild();
-		
+	private void createPoll(SlashCommandEvent event) {
+		tempname = String.valueOf(new Random().nextInt(100));
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		oevent.replyEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:definetitle")).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:definetitle")).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {title = e.getMessage().getContentRaw();
-								  Configloader.INSTANCE.createPollConfig(guild, title);
-								  Configloader.INSTANCE.setPollConfig(guild, title, "guild", guild.getId());
-								  Configloader.INSTANCE.setPollConfig(guild, title, "user", user.getId());
-								  Configloader.INSTANCE.setPollConfig(guild, title, "channel", channel.getId());
+								  Configloader.INSTANCE.createPollConfig(guild, tempname);
+								  Configloader.INSTANCE.setPollConfig(guild, tempname, "guild", guild.getId());
+								  Configloader.INSTANCE.setPollConfig(guild, tempname, "owner", user.getId());
+								  Configloader.INSTANCE.setPollConfig(guild, tempname, "channel", channel.getId());
+								  Configloader.INSTANCE.setPollConfig(guild, tempname, "title", title);
 								  messagecount++;
 								  this.definedescr();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definedescr() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:definedescr")).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:definedescr")).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {description = e.getMessage().getContentRaw();
-								  Configloader.INSTANCE.setPollConfig(guild, title, "description", description);
+								  Configloader.INSTANCE.setPollConfig(guild, tempname, "description", description);
 								  messagecount++;
 								  this.defineAnswers();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineAnswers() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:defineAnswers")).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:defineAnswers")).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {answers = e.getMessage().getContentRaw();
-								  Configloader.INSTANCE.setPollConfig(guild, title, "answers", answers);
+								  Configloader.INSTANCE.setPollConfig(guild, tempname, "answers", answers);
 								  messagecount++;
 								  this.defineThumbnail();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineThumbnail() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:defineTNURL")).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:defineTNURL")).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {if(e.getMessage().getContentRaw().equals("none")) {
-									  url = "";
+									  url = guild.getIconUrl();
 								  } else {
 									  url = e.getMessage().getContentRaw();
 								  }
-								  Configloader.INSTANCE.setPollConfig(guild, title, "thumbnail", url);
+								  Configloader.INSTANCE.setPollConfig(guild, tempname, "thumbnail", url);
 								  messagecount++;
 								  this.defineDays();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineDays() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:definedays")).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:definedays")).queue();
 		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-							e -> {Configloader.INSTANCE.setPollConfig(guild, title, "days", e.getMessage().getContentRaw());
+							e -> {Configloader.INSTANCE.setPollConfig(guild, tempname, "days", e.getMessage().getContentRaw());
 								  messagecount++;
 								  this.defineAnonymous();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineAnonymous() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		Message msg = channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:defineanonymous")).complete();
+		Message msg = channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:defineanonymous")).complete();
 		msg.addReaction("U+2705").queue();
 		msg.addReaction("U+274C").queue();
 		messagecount++;
@@ -180,15 +180,15 @@ public class Poll implements Command{
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getUser().getIdLong() == user.getIdLong();},
 							e -> {if (e.getReactionEmote().getAsCodepoints().equals("U+2705")) {anym = true;} else {anym = false;}
-								  Configloader.INSTANCE.setPollConfig(guild, title, "anonymous", String.valueOf(anym));
-								  messagecount++;
+								  Configloader.INSTANCE.setPollConfig(guild, tempname, "anonymous", String.valueOf(anym));
 								  this.sendPoll();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void sendPoll() {
+		this.cleanup();
 		EmbedBuilder eb = new EmbedBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyy");
 		StringBuilder sb = new StringBuilder();
@@ -202,41 +202,54 @@ public class Poll implements Command{
 			}
 		}
 		
+		String footer = OffsetDateTime.now().format(formatter) + "\s--\s"+ AnswerEngine.getInstance().getDescription(guild, user, "/commands/utilities/poll:field") + "\s" + String.valueOf(anym);
 		eb.setAuthor(user.getName(), null, user.getAvatarUrl());
 		if (!url.equals("")) {
 			eb.setThumbnail(url);
 		}
 		eb.setTitle(title);
 		eb.setDescription(description);
-		eb.setFooter(OffsetDateTime.now().format(formatter) + "\s--\sAnonymous: " + String.valueOf(anym));
-		eb.addField("Total answers so far: 0\nPossible answers:", sb.toString(), false);
+		eb.setFooter(footer);
+		Configloader.INSTANCE.setPollConfig(guild, tempname, "footer", footer);
+		eb.addField(AnswerEngine.getInstance().getTitle(guild, user, "/commands/utilities/poll:field"), sb.toString(), false);
 		eb.setColor(56575);
 		
 		Message msg = channel.sendMessageEmbeds(eb.build()).complete();
 		if (ansplit.length < 10) {
 			for (int i = 1; i <= ansplit.length; i++) {
-				msg.addReaction("U+003" + String.valueOf(i)).queue();
+				msg.addReaction("U+003" + String.valueOf(i) + " U+20E3").queue();
+				if (Configloader.INSTANCE.getPollConfig(guild, tempname, "answercount").equals("")) {
+					Configloader.INSTANCE.setPollConfig(guild, tempname, "answercount", "0");
+				} else {
+					String current = Configloader.INSTANCE.getPollConfig(guild, tempname, "answercount");
+					Configloader.INSTANCE.setPollConfig(guild, tempname, "answercount", current + ";0");
+				}
 			}
 		}
-		Configloader.INSTANCE.setPollConfig(guild, title, "msgid", msg.getId());
+		String path = Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId() + "/";
+		File renamed = new File(path + msg.getId() + ".properties");
+		File pollfile = Configloader.INSTANCE.findPollConfig(guild, tempname);
+		while (!pollfile.exists()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
+		}
+		pollfile.renameTo(renamed);
 	}
 
-	private void removePoll() {
-		TextChannel channel = oevent.getGuild().getTextChannelById(Configloader.INSTANCE.getPollConfig(oevent.getGuild(), oevent.getOption("title").getAsString(), "channel"));
-		channel.retrieveMessageById(Configloader.INSTANCE.getPollConfig(oevent.getGuild(), oevent.getOption("title").getAsString(), "msgid")).complete().delete().queue();
-		if (Configloader.INSTANCE.findPollConfig(oevent.getGuild(), oevent.getOption("title").getAsString()).delete()) {
-			oevent.replyEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:removesuccess")).queue();
+	private void removePoll(SlashCommandEvent event) {
+		String msgID = event.getOption("msgid").getAsString();
+		TextChannel channel = guild.getTextChannelById(Configloader.INSTANCE.getPollConfig(guild, msgID, "channel"));
+		channel.retrieveMessageById(msgID).complete().delete().queue();
+		if (Configloader.INSTANCE.findPollConfig(guild, msgID).delete()) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:removesuccess")).queue();
 		} else {
-			oevent.replyEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:removefailed")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:removefailed")).queue();
 		}
 	}
 	
-	private void listPoll() {
-		if (!oevent.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			oevent.replyEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:nopermission")).queue();
-			return;
-		}
-		File fl = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + oevent.getGuild().getId());
+	private void listPoll(SlashCommandEvent event) {
+		File fl = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId());
 		StringBuilder sb = new StringBuilder();
 		EmbedBuilder eb = new EmbedBuilder();
 		List<String> pollfiles = Arrays.asList(fl.list(new FilenameFilter() {
@@ -246,56 +259,75 @@ public class Poll implements Command{
 			}}));
 		for (int i = 0; i < pollfiles.size(); i++) {
 			String[] temp = pollfiles.get(i).split(".properties");
-			sb.append("#" + String.valueOf(i+1) + "\s" + temp[0] + "\sby\s");
+			sb.append("#" + String.valueOf(i+1) + "\s" + Configloader.INSTANCE.getPollConfig(guild, temp[0], "title") + "\sby\s");
 			if (i+1 == pollfiles.size()) {
-				sb.append(Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getPollConfig(oevent.getGuild(), temp[0], "user")).getName());
+				sb.append(Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getPollConfig(guild, temp[0], "user")).getName());
 			} else {
-				sb.append(Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getPollConfig(oevent.getGuild(), temp[0], "user")).getName() + "\n");
+				sb.append(Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getPollConfig(guild, temp[0], "user")).getName() + "\n");
 			}
 		}
-		eb.setTitle("All the polls on this server:");
-		eb.setAuthor(oevent.getUser().getName(), null, oevent.getUser().getAvatarUrl());
+		eb.setTitle(AnswerEngine.getInstance().getTitle(guild, user, "/commands/utilities/poll:list"));
+		eb.setAuthor(user.getName(), null, user.getAvatarUrl());
 		eb.setFooter("Official-NoLimits Bot! - discord.gg/qHA2vUs");
 		eb.setColor(56575);
-		eb.setDescription(sb.toString());
-		oevent.replyEmbeds(eb.build()).queue();
+		if (sb.toString().equals("")) {
+			eb.setDescription(AnswerEngine.getInstance().getDescription(guild, user, "/commands/utilities/poll:list"));
+		} else {
+			eb.setDescription(sb.toString());
+		}
+		event.replyEmbeds(eb.build()).queue();
 	}
 	
-	private void infoPoll() {
-		if (Configloader.INSTANCE.findPollConfig(oevent.getGuild(), oevent.getOption("title").getAsString()) == null) {
-			oevent.replyEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/poll:pollnf")).queue();
+	private void infoPoll(SlashCommandEvent event) {
+		if (Configloader.INSTANCE.findPollConfig(guild, event.getOption("msgid").getAsString()) == null) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:pollnf")).queue();
+			return;
+		}
+		if (!Configloader.INSTANCE.getPollConfig(guild, event.getOption("msgid").getAsString(), "owner").equals(user.getId())) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/poll:noinfoperm")).queue();
 			return;
 		}
 		EmbedBuilder eb = new EmbedBuilder();
 		StringBuilder sb = new StringBuilder();
-		String title = oevent.getOption("title").getAsString();
+		String name = event.getOption("msgid").getAsString();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyy");
-		Guild guild = oevent.getGuild();
-		String useranswers = Configloader.INSTANCE.getPollConfig(guild, title, "answercount");
-		String[] answers = Configloader.INSTANCE.getPollConfig(guild, title, "answers").split(";");
-		sb.append("Author:\s" + Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getPollConfig(guild, title, "user")).getName() + "\n");
-		sb.append("Time created:\s" + OffsetDateTime.parse(Configloader.INSTANCE.getPollConfig(guild, title, "creation")).format(formatter) + "\n");
+		String[] useranswers = Configloader.INSTANCE.getPollConfig(guild, name, "answercount").split(";");
+		String[] users = Configloader.INSTANCE.getPollConfig(guild, name, "users").split(";");
+		String[] answers = Configloader.INSTANCE.getPollConfig(guild, name, "answers").split(";");
+		String creation = OffsetDateTime.parse(Configloader.INSTANCE.getPollConfig(guild, event.getOption("msgid").getAsString(), "creation")).format(formatter);
+		sb.append("Author:\s" + Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getPollConfig(guild, name, "owner")).getName() + "\n");
+		sb.append("Time created:\s" + creation + "\n");
+		sb.append("Anonymous:\s" + Configloader.INSTANCE.getPollConfig(guild, name, "anonymous") + "\n\n");
 		sb.append("Answers:\n");
 		for (int i = 0; i < answers.length; i++) {
-			sb.append("->\s" + answers[i] + ":\s" + String.valueOf(useranswers.split(String.valueOf(i+1)).length - 1) + "\n");
-			//If the command was executed by the author of the poll and the poll isn't anonymous, list users as well 
+			sb.append("=>\s" + answers[i] + ":\s" + useranswers[i] + "\n");
+			if (!Boolean.parseBoolean(Configloader.INSTANCE.getPollConfig(guild, name, "anonymous"))) {
+				int temp3 = 0;
+				for (int e = 0; e < users.length; e++) {
+					String[] temp2 = users[e].split("_");
+					if (temp2[1].contains(String.valueOf(i))) {
+						if (temp3 == 0) {
+							sb.append("\s\s>\s ");
+							temp3++;
+						}
+						sb.append(guild.getMemberById(temp2[0]).getEffectiveName() + ",\s");
+					}
+				}
+				sb.append("\n");
+			}
 		}
 		sb.append("Time left:\s" + Duration.between(OffsetDateTime.now(),
-				  OffsetDateTime.parse(Configloader.INSTANCE.getPollConfig(guild, title, "creation")).plusDays(Long.parseLong(Configloader.INSTANCE.getPollConfig(guild, title, "days")))).toHours() + "\shours");
-		eb.setTitle("Information about the poll titled\s\"" + title + "\":");
+				  OffsetDateTime.parse(Configloader.INSTANCE.getPollConfig(guild, name, "creation")).plusDays(Long.parseLong(Configloader.INSTANCE.getPollConfig(guild, name, "days")))).toHours() + "\shours");
+		eb.setTitle("Information about the poll titled\s\"" + Configloader.INSTANCE.getPollConfig(guild, name, "title") + "\":");
 		eb.setDescription(sb.toString());
-		eb.setAuthor(oevent.getUser().getName(), null, oevent.getUser().getAvatarUrl());
+		eb.setAuthor(user.getName(), null, user.getAvatarUrl());
 		eb.setFooter("Official-NoLimits Bot! - discord.gg/qHA2vUs");
 		eb.setColor(56575);
-		oevent.replyEmbeds(eb.build()).queue();
+		event.replyEmbeds(eb.build()).queue(response -> response.deleteOriginal().queueAfter(30, TimeUnit.SECONDS));
 	}
 	
 	private void cleanup() {
 		List<Message> messages = channel.getHistory().retrievePast(messagecount).complete();
 		channel.deleteMessages(messages).queue();
-	}
-	
-	public void addAnswer(MessageReactionAddEvent event) {
-		//implement method
 	}
 }
