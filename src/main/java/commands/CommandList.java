@@ -16,6 +16,7 @@ import commands.moderation.Rolecheck;
 import commands.moderation.Rolesorting;
 import commands.moderation.Setlevelchannel;
 import commands.moderation.Setmodrole;
+import commands.moderation.Setreportchannel;
 import commands.moderation.Setsuggestionchannel;
 import commands.moderation.Tempban;
 import commands.moderation.Tempmute;
@@ -31,6 +32,8 @@ import commands.utilities.Help;
 import commands.utilities.Level;
 import commands.utilities.Levelbackground;
 import commands.utilities.Poll;
+import commands.utilities.Report;
+import commands.utilities.Serverinfo;
 import commands.utilities.Suggest;
 import commands.utilities.Userinfo;
 import components.utilities.Test;
@@ -50,6 +53,8 @@ public class CommandList {
 		this.utilitycmds.put("suggest", new Suggest());
 		this.utilitycmds.put("userinfo", new Userinfo());
 		this.utilitycmds.put("poll", new Poll());
+		this.utilitycmds.put("report", new Report());
+		this.utilitycmds.put("serverinfo", new Serverinfo());
 		//this.utilitycommands.put("setlanguage", new Setlanguage());
 		
 		//Moderation
@@ -72,6 +77,7 @@ public class CommandList {
 		this.moderationcmds.put("setlevelchannel", new Setlevelchannel());
 		this.moderationcmds.put("ignorechannel", new Ignorechannel());
 		this.moderationcmds.put("setmodrole", new Setmodrole());
+		this.moderationcmds.put("setreportchannel", new Setreportchannel());
 		//Developement
 		this.moderationcmds.put("test", new Test());
 		

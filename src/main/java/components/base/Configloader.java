@@ -292,6 +292,7 @@ public class Configloader {
 				pps.setProperty("levelmsgch", "");
 				pps.setProperty("ignored", "");
 				pps.setProperty("forbidden", "");
+				pps.setProperty("reportchannel", "");
 				pps.store(fop, null);
 				fop.close();
 			} catch (IOException e) {e.printStackTrace();}

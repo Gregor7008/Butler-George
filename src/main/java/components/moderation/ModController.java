@@ -36,6 +36,7 @@ public class ModController {
 						TextChannel channel = channels.get(o);
 						channel.createPermissionOverride(newrole)
 							   .setDeny(Permission.MESSAGE_WRITE)
+							   .setDeny(Permission.USE_SLASH_COMMANDS)
 							   .queue();
 					}
 				}

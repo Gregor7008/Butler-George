@@ -101,6 +101,7 @@ public class Userinfo implements Command{
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
 		eb.setFooter("Official NoLimits-Bot! - discord.gg/qHA2vUs");
+		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside: Name", "`" + member.getEffectiveName() + "`", true);
 		eb.addField(":registered: Discriminator", "`" + member.getUser().getDiscriminator() + "`", true);
