@@ -21,7 +21,7 @@ public class Close implements Command {
 		event.getTextChannel().delete().queue();
 		Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cname)).openPrivateChannel().complete().sendMessageEmbeds(
 				AnswerEngine.getInstance().fetchMessage(event.getGuild(), Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cname)), "/commands/moderation/close:closed")).queue();
-		Configloader.INSTANCE.deleteMailConfig(cname);
+		Configloader.INSTANCE.removeMailConfig(cname);
 	}
 
 	@Override

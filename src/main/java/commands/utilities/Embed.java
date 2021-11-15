@@ -24,11 +24,11 @@ public class Embed implements Command{
 
 	private SlashCommandEvent oevent;
 	private EmbedBuilder eb;
-	private int messagecount;
 	private Bot bot = Bot.INSTANCE;
 	private Member member;
 	private User user;
 	private TextChannel channel;
+	private List<Message> messages;
 	
 	@Override
 	public void perform(SlashCommandEvent event) {
@@ -43,7 +43,6 @@ public class Embed implements Command{
 		eb = new EmbedBuilder();
 		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());	
 		eb.setColor(56575);
-		messagecount=0;
 		this.definetitle();
 	}
 
@@ -61,12 +60,11 @@ public class Embed implements Command{
 	private void definetitle() {
 		EventWaiter waiter = bot.getWaiter();
 		oevent.replyEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:definetitle")).queue();
-		messagecount++;
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {eb.setTitle(e.getMessage().getContentRaw());
-								  messagecount++;
+								  messages.add(e.getMessage());
 								  this.definedescr();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
@@ -75,13 +73,12 @@ public class Embed implements Command{
 
 	private void definedescr() {
 		EventWaiter waiter = bot.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:definedescr")).queue();
-		messagecount++;
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:definedescr")).complete());
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {eb.setDescription(e.getMessage().getContentRaw());
-								  messagecount++;
+								  messages.add(e.getMessage());
 								  this.definefooter();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
@@ -90,13 +87,12 @@ public class Embed implements Command{
 	
 	private void definefooter() {
 		EventWaiter waiter = bot.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:definefooter")).queue();
-		messagecount++;
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:definefooter")).complete());
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {if (e.getMessage().getContentRaw()=="none"){} else {eb.setFooter(e.getMessage().getContentRaw());}
-								  messagecount++;
+							  	  messages.add(e.getMessage());
 								  this.defineTNail();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
@@ -105,13 +101,12 @@ public class Embed implements Command{
 
 	private void defineTNail() {
 		EventWaiter waiter = bot.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:defineTNail")).queue();
-		messagecount++;
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:defineTNail")).complete());
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {if (e.getMessage().getContentRaw().contains("none")){} else {eb.setThumbnail(e.getMessage().getContentRaw());}
-								  messagecount++;
+								  messages.add(e.getMessage());
 								  this.defineImag();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
@@ -120,13 +115,12 @@ public class Embed implements Command{
 	
 	private void defineImag() {
 		EventWaiter waiter = bot.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:defineImag")).queue();
-		messagecount++;
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:defineImag")).complete());
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {if (e.getMessage().getContentRaw().contains("none")){} else {eb.setImage(e.getMessage().getContentRaw());}
-								  messagecount++;
+								  messages.add(e.getMessage());
 								  this.wantnewfield();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
@@ -135,12 +129,11 @@ public class Embed implements Command{
 	
 	private void wantnewfield() {
 		EventWaiter waiter = bot.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:wantnewfield")).queue();
-		messagecount++;
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:wantnewfield")).complete());
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-							e -> {messagecount++;
+							e -> {messages.add(e.getMessage());
 								  if(e.getMessage().getContentRaw().contains("no")) {this.sendMessage(eb.build());} else {this.addnewfield();}},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
@@ -149,12 +142,11 @@ public class Embed implements Command{
 	
 	private void addnewfield() {
 		EventWaiter waiter = bot.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:addnewfield")).queue();
-		messagecount++;
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/utilities/embed:addnewfield")).complete());
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-							e -> {messagecount++;
+							e -> {messages.add(e.getMessage());
 								  String[] temp1 = e.getMessage().getContentRaw().split("\\+");
 								  eb.addField(temp1[0], temp1[1], true);
 								  this.wantnewfield();},
@@ -169,7 +161,7 @@ public class Embed implements Command{
 	}
 	
 	private void cleanup() {
-		List<Message> messages = channel.getHistory().retrievePast(messagecount).complete();
 		channel.deleteMessages(messages).queue();
+		oevent.getHook().deleteOriginal().queue();
 	}
 }

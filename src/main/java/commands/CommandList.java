@@ -12,6 +12,7 @@ import commands.moderation.Ignorechannel;
 import commands.moderation.Join2Create;
 import commands.moderation.Levelreward;
 import commands.moderation.Mute;
+import commands.moderation.Reactionrole;
 import commands.moderation.Rolecheck;
 import commands.moderation.Rolesorting;
 import commands.moderation.Setlevelchannel;
@@ -78,6 +79,7 @@ public class CommandList {
 		this.moderationcmds.put("ignorechannel", new Ignorechannel());
 		this.moderationcmds.put("setmodrole", new Setmodrole());
 		this.moderationcmds.put("setreportchannel", new Setreportchannel());
+		this.moderationcmds.put("reactionrole", new Reactionrole());
 		//Developement
 		this.moderationcmds.put("test", new Test());
 		

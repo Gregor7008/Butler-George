@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -34,8 +35,9 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -265,24 +267,51 @@ public class Processor extends ListenerAdapter {
 		new ModMail(event);
 	}
 	@Override
-	public void onMessageReactionAdd(MessageReactionAddEvent event) {
+	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
 		if (event.getUser().isBot()) {
 			return;
 		}
 		//if reaction on poll, process reaction
 		if (Configloader.INSTANCE.findPollConfig(event.getGuild(), event.getMessageId()) != null) {
 			if (!event.getReactionEmote().getAsCodepoints().contains("U+20e3")) {
-				event.getTextChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getUser()).queue();
+				event.getChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getUser()).queue();
 			} else {
 				this.addPollAnswer(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getGuild(), event.getUser());
 				if (Boolean.parseBoolean(Configloader.INSTANCE.getPollConfig(event.getGuild(), event.getMessageId(), "anonymous"))) {
-					event.getTextChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getUser()).queue();
+					event.getChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getUser()).queue();
 				}
 			}
 			return;
 		}
 		//if reaction on reactionrole message, process reaction
-		//--> in developement
+		if (Configloader.INSTANCE.getReactionroleConfig(event.getGuild(), event.getChannel(), event.getMessageId()) != null) {
+			Guild guild = event.getGuild();
+			TextChannel channel = event.getChannel();
+			String msgid = event.getMessageId();
+			String[] actions = Configloader.INSTANCE.getReactionroleConfig(guild, channel, msgid).split(";");
+			for (int i = 0; i < actions.length; i++) {
+				String[] temp1 = actions[i].split("_");
+				if (temp1[0].contains(event.getReactionEmote().getAsCodepoints())) {
+					guild.addRoleToMember(event.getMember(), guild.getRoleById(temp1[1])).queue();
+				}
+			}
+		}
+	}
+	@Override
+	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
+		//if reaction on reactionrole message, process reaction
+		if (Configloader.INSTANCE.getReactionroleConfig(event.getGuild(), event.getChannel(), event.getMessageId()) != null) {
+			Guild guild = event.getGuild();
+			TextChannel channel = event.getChannel();
+			String msgid = event.getMessageId();
+			String[] actions = Configloader.INSTANCE.getReactionroleConfig(guild, channel, msgid).split(";");
+			for (int i = 0; i < actions.length; i++) {
+				String[] temp1 = actions[i].split("_");
+				if (temp1[0].contains(event.getReactionEmote().getAsCodepoints())) {
+					guild.removeRoleFromMember(event.getMember(), guild.getRoleById(temp1[1])).queue();
+				}
+			}
+		}
 	}
 	
 	public void addPollAnswer(String msgid, String emojiUnicode, Guild guild, User user) {

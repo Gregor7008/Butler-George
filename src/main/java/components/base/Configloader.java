@@ -11,6 +11,7 @@ import java.util.Properties;
 import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
 public class Configloader {
@@ -21,254 +22,126 @@ public class Configloader {
 		INSTANCE = this;
 	}
 	
+	//Change file in any way
 	public String getGuildConfig(Guild guild, String key) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateGuildConfig(guild);
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile))) {
-			pps.load(bis);
-			bis.close();
-		} catch (Exception e) {e.printStackTrace();}
-		return pps.getProperty(key);
+		return this.getProperty(this.findorCreateGuildConfig(guild), key);
 	}
 	
 	public String getUserConfig(Guild guild, User user, String key) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateUserConfig(guild, user);
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile))) {
-			pps.load(bis);
-			bis.close();
-		} catch (Exception e) {e.printStackTrace();}
-		return pps.getProperty(key);
+		return this.getProperty(this.findorCreateUserConfig(guild, user), key);
 	}
 	
 	public String getMailConfig1(String randomNumber) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateMailConfig1();
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile))) {
-			pps.load(bis);
-			bis.close();
-		} catch (Exception e) {e.printStackTrace();}
-		return pps.getProperty(randomNumber);
+		return this.getProperty(this.findorCreateMailConfig1(), randomNumber);
 	}
 	
 	public String getMailConfig2(String userID) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateMailConfig2();
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile))) {
-			pps.load(bis);
-			bis.close();
-		} catch (Exception e) {e.printStackTrace();}
-		return pps.getProperty(userID);
+		return this.getProperty(this.findorCreateMailConfig2(), userID);
+	}
+	
+	public String getReactionroleConfig(Guild guild, TextChannel channel, String msgid) {
+		return this.getProperty(this.findorCreateRRConfig(guild, channel), msgid);
 	}
 	
 	public String getPollConfig(Guild guild, String title, String key) {
-		Properties pps = new Properties();
-		File pFile = this.findPollConfig(guild, title);
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile))) {
-			pps.load(bis);
-			bis.close();
-		} catch (Exception e) {e.printStackTrace();}
-		return pps.getProperty(key);
+		return this.getProperty(this.findPollConfig(guild, title), key);
 	}
 	
 	public void setUserConfig(Member member, String key, String value) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateUserConfig(member.getGuild(), member.getUser());
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile))) {
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out1 = new FileOutputStream(pFile);
-			pps.setProperty(key, value);
-			pps.store(out1, null);
-			out1.close();
-		} catch (Exception e) {e.printStackTrace();}
-		
+		this.setProperty(this.findorCreateUserConfig(member.getGuild(), member.getUser()), key, value);
 	}
 	
 	public void setGuildConfig(Guild guild, String key, String value) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateGuildConfig(guild);
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile))) {
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out1 = new FileOutputStream(pFile);
-			pps.setProperty(key, value);
-			pps.store(out1, null);
-			out1.close();
-		} catch (Exception e) {e.printStackTrace();}
+		this.setProperty(this.findorCreateGuildConfig(guild), key, value);
 	}
 	
 	public void setMailConfig(String randomNumber, String userID) {
-		Properties pps1 = new Properties();
-		File pFile1 = this.findorCreateMailConfig1();
-		try (BufferedInputStream bis1 = new BufferedInputStream(new FileInputStream(pFile1))) {
-			pps1.load(bis1);
-			bis1.close();
-			FileOutputStream out1 = new FileOutputStream(pFile1);
-			pps1.setProperty(randomNumber, userID);
-			pps1.store(out1, null);
-			out1.close();
-		} catch (Exception e) {e.printStackTrace();}
-		Properties pps2 = new Properties();
-		File pFile2 = this.findorCreateMailConfig2();
-		try (BufferedInputStream bis2 = new BufferedInputStream(new FileInputStream(pFile2))) {
-			pps2.load(bis2);
-			bis2.close();
-			FileOutputStream out2 = new FileOutputStream(pFile2);
-			pps2.setProperty(userID, randomNumber);
-			pps2.store(out2, null);
-			out2.close();
-		} catch (Exception e) {e.printStackTrace();}
+		this.setProperty(this.findorCreateMailConfig1(), randomNumber, userID);
+		this.setProperty(this.findorCreateMailConfig2(), userID, randomNumber);
 	}
 	
-	public void setPollConfig(Guild guild, String title, String key, String value) {
-		Properties pps = new Properties();
-		File pFile = this.findPollConfig(guild, title);
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile))) {
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out1 = new FileOutputStream(pFile);
-			pps.setProperty(key, value);
-			pps.store(out1, null);
-			out1.close();
-		} catch (Exception e) {e.printStackTrace();}
+	public void setReactionroleConfig(Guild guild, TextChannel channel, String msgid, String value) {
+		this.setProperty(this.findorCreateRRConfig(guild, channel), msgid, value);
+	}
+	
+	public void setPollConfig(Guild guild, String msgid, String key, String value) {
+		this.setProperty(this.findPollConfig(guild, msgid), key, value);
 	}
 	
 	public void addUserConfig(Member member, String key, String value) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateUserConfig(member.getGuild(), member.getUser());
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile));){
-			String current = this.getUserConfig(member.getGuild(), member.getUser(), key);
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out4 = new FileOutputStream(pFile);
-			if (current.equals("")) {
-				pps.setProperty(key, value);
-			} else {
-				pps.setProperty(key, current + ";" + value);
-			}
-			pps.store(out4, null);
-			out4.close();
-		} catch (Exception e) {e.printStackTrace();}
+		this.addProperty(this.findorCreateUserConfig(member.getGuild(), member.getUser()), key, value, this.getUserConfig(member.getGuild(), member.getUser(), key));
 	}
 	
 	public void addGuildConfig(Guild guild, String key, String value) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateGuildConfig(guild);
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile));){
-			String current = this.getGuildConfig(guild, key);
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out4 = new FileOutputStream(pFile);
-			if (current.equals("")) {
-				pps.setProperty(key, value);
-			} else {
-				pps.setProperty(key, current + ";" + value);
-			}
-			pps.store(out4, null);
-			out4.close();
-		} catch (Exception e) {e.printStackTrace();}
+		this.addProperty(this.findorCreateGuildConfig(guild), key, value, this.getGuildConfig(guild, key));
+	}
+	
+	public void addReactionroleConfig(Guild guild, TextChannel channel, String msgid, String value) {
+		this.addProperty(this.findorCreateRRConfig(guild, channel), msgid, value, this.getReactionroleConfig(guild, channel, msgid));
 	}
 	
 	public void deleteGuildConfig(Guild guild, String key, String value) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateGuildConfig(guild);
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile));){
-			String currentraw = this.getGuildConfig(guild, key);
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out5 = new FileOutputStream(pFile);
-			String[] current = currentraw.split(";");
-			if (current.length == 1) {
-				pps.setProperty(key, "");
-			} else {
-				if(current[0].equals(value)) {
-					pps.setProperty(key, currentraw.replace(value + ";", ""));
-				} else {
-					pps.setProperty(key, currentraw.replace(";" + value, ""));
-				}
-			}
-			pps.store(out5, null);
-			out5.close();
-		} catch (Exception e) {e.printStackTrace();}
+		this.deleteProperty(this.findorCreateGuildConfig(guild), key, value, this.getGuildConfig(guild, key));
 	}
 	
 	public void deleteUserConfig(Member member, String key, String value) {
-		Properties pps = new Properties();
-		File pFile = this.findorCreateUserConfig(member.getGuild(), member.getUser());
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(pFile));){
-			String currentraw = this.getUserConfig(member.getGuild(), member.getUser(), key);
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out6 = new FileOutputStream(pFile);
-			String[] current = currentraw.split(";");
-			if (current.length <= 1) {
-				pps.setProperty(key, "");
-			} else {
-				if(current[0].equals(value)) {
-					pps.setProperty(key, currentraw.replace(value + ";", ""));
-				} else {
-					pps.setProperty(key, currentraw.replace(";" + value, ""));
-				}
-			}
-			pps.store(out6, null);
-			out6.close();
-		} catch (Exception e) {}
+		this.deleteProperty(this.findorCreateUserConfig(member.getGuild(), member.getUser()), key, value, this.getUserConfig(member.getGuild(), member.getUser(), key));
 	}
 	
-	public void deleteMailConfig(String key) {
+	public void removeReactionRoleConfig(Guild guild, TextChannel channel, String msgid) {
+		this.removeProperty(this.findorCreateRRConfig(guild, channel), msgid);
+	}
+	
+	public void removeMailConfig(String key) {
 		if (this.getMailConfig1(key) != null) {
-			String userID = "";
-			Properties pps1 = new Properties();
-			File pFile1 = this.findorCreateMailConfig1();
-			try (BufferedInputStream bis1 = new BufferedInputStream(new FileInputStream(pFile1));){
-				pps1.load(bis1);
-				bis1.close();
-				FileOutputStream out1 = new FileOutputStream(pFile1);
-				userID = pps1.getProperty(key);
-				pps1.remove(key);
-				pps1.store(out1, null);
-				out1.close();
-			} catch (Exception e) {}
-			Properties pps2 = new Properties();
-			File pFile2 = this.findorCreateMailConfig2();
-			try (BufferedInputStream bis2 = new BufferedInputStream(new FileInputStream(pFile2));){
-				pps2.load(bis2);
-				bis2.close();
-				FileOutputStream out2 = new FileOutputStream(pFile2);
-				pps2.remove(userID);
-				pps2.store(out2, null);
-				out2.close();
-			} catch (Exception e) {}
+			String userID = this.getMailConfig1(key);
+			this.removeProperty(this.findorCreateMailConfig1(), key);
+			this.removeProperty(this.findorCreateMailConfig2(), userID);
 		} else {
-			String randomNumber = "";
-			Properties pps1 = new Properties();
-			File pFile1 = this.findorCreateMailConfig2();
-			try (BufferedInputStream bis1 = new BufferedInputStream(new FileInputStream(pFile1));){
-				pps1.load(bis1);
-				bis1.close();
-				FileOutputStream out1 = new FileOutputStream(pFile1);
-				randomNumber = pps1.getProperty(key);
-				pps1.remove(key);
-				pps1.store(out1, null);
-				out1.close();
-			} catch (Exception e) {}
-			Properties pps2 = new Properties();
-			File pFile2 = this.findorCreateMailConfig1();
-			try (BufferedInputStream bis2 = new BufferedInputStream(new FileInputStream(pFile2));){
-				pps2.load(bis2);
-				bis2.close();
-				FileOutputStream out2 = new FileOutputStream(pFile2);
-				pps2.remove(randomNumber);
-				pps2.store(out2, null);
-				out2.close();
-			} catch (Exception e) {}
+			String randomNumber = this.getMailConfig2(key);
+			this.removeProperty(this.findorCreateMailConfig2(), key);
+			this.removeProperty(this.findorCreateMailConfig1(), randomNumber);
 		}
 	}
 	
 	public void deletePollConfig(Guild guild, String title) {
 		File pollpropertiesFile = this.findPollConfig(guild, title);
 		pollpropertiesFile.delete();
+	}
+	
+	//Find or create files
+	public File findorCreateMailConfig1() {
+		File mailpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/modmail/708381749826289666/cache1.properties");
+		if (!mailpropertiesFile.exists()) {
+			try {
+				mailpropertiesFile.createNewFile();
+			} catch (IOException e) {e.printStackTrace();}
+		}
+		return mailpropertiesFile;
+	}
+	
+	public File findorCreateMailConfig2() {
+		File mailpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/modmail/708381749826289666/cache2.properties");
+		if (!mailpropertiesFile.exists()) {
+			try {
+				mailpropertiesFile.createNewFile();
+			} catch (IOException e) {e.printStackTrace();}
+		}
+		return mailpropertiesFile;
+	}
+	
+	public File findorCreateRRConfig(Guild guild, TextChannel channel) {
+		File guilddir = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/reactionroles/" + guild.getId());
+		if (!guilddir.exists()) {
+			guilddir.mkdirs();
+		}
+		File rrpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/reactionroles/" + guild.getId() + "/" + channel.getId() + ".properties");
+		if (!rrpropertiesFile.exists()) {
+			try {
+				rrpropertiesFile.createNewFile();
+			} catch (IOException e) {e.printStackTrace();}
+		}
+		return rrpropertiesFile;
 	}
 
 	public File findorCreateGuildConfig(Guild guild) {
@@ -333,26 +206,6 @@ public class Configloader {
 		return pFile;
 	}
 	
-	public File findorCreateMailConfig1() {
-		File mailpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/modmail/cache1.properties");
-		if (!mailpropertiesFile.exists()) {
-			try {
-				mailpropertiesFile.createNewFile();
-			} catch (IOException e) {e.printStackTrace();}
-		}
-		return mailpropertiesFile;
-	}
-	
-	public File findorCreateMailConfig2() {
-		File mailpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/modmail/cache2.properties");
-		if (!mailpropertiesFile.exists()) {
-			try {
-				mailpropertiesFile.createNewFile();
-			} catch (IOException e) {e.printStackTrace();}
-		}
-		return mailpropertiesFile;
-	}
-	
 	public File findPollConfig(Guild guild, String msgid) {
 		File pollpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId() + "/" + msgid + ".properties");
 		if (pollpropertiesFile.exists()) {
@@ -389,5 +242,86 @@ public class Configloader {
 			fop.close();
 		} catch (IOException e) {e.printStackTrace();}
 		return pollpropertiesFile;
+	}
+	
+	//Tool-Methods
+	private String getProperty(File file, String key) {
+		Properties pps = new Properties();
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+			pps.load(bis);
+			bis.close();
+		} catch (Exception e) {e.printStackTrace();}
+		return pps.getProperty(key);
+	}
+	
+	private boolean setProperty(File file, String key, String value) {
+		Properties pps = new Properties();
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+			pps.load(bis);
+			bis.close();
+			FileOutputStream out = new FileOutputStream(file);
+			pps.setProperty(key, value);
+			pps.store(out, null);
+			out.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private boolean addProperty(File file, String key, String value, String current) {
+		Properties pps = new Properties();
+		try {
+			FileOutputStream out = new FileOutputStream(file);
+			if (current.equals("") || current.equals(null)) {
+				pps.setProperty(key, value);
+			} else {
+				pps.setProperty(key, current + ";" + value);
+			}
+			pps.store(out, null);
+			out.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private boolean deleteProperty(File file, String key, String value, String currentraw) {
+		Properties pps = new Properties();
+		try {
+			FileOutputStream out = new FileOutputStream(file);
+			String[] current = currentraw.split(";");
+			if (current.length <= 1) {
+				pps.setProperty(key, "");
+			} else {
+				if(current[0].equals(value)) {
+					pps.setProperty(key, currentraw.replace(value + ";", ""));
+				} else {
+					pps.setProperty(key, currentraw.replace(";" + value, ""));
+				}
+			}
+			pps.store(out, null);
+			out.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private boolean removeProperty(File file, String key) {
+		Properties pps = new Properties();
+		try {
+			FileOutputStream out1 = new FileOutputStream(file);
+			pps.remove(key);
+			pps.store(out1, null);
+			out1.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
  }
