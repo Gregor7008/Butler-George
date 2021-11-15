@@ -164,7 +164,7 @@ public class Configloader {
 				pps.setProperty("j2cs", "");
 				pps.setProperty("levelmsgch", "");
 				pps.setProperty("ignored", "");
-				pps.setProperty("forbidden", "");
+				pps.setProperty("forbidden", "\\//\\//\\//");
 				pps.setProperty("reportchannel", "");
 				pps.store(fop, null);
 				fop.close();
@@ -272,7 +272,9 @@ public class Configloader {
 	
 	private boolean addProperty(File file, String key, String value, String current) {
 		Properties pps = new Properties();
-		try {
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+			pps.load(bis);
+			bis.close();
 			FileOutputStream out = new FileOutputStream(file);
 			if (current.equals("") || current.equals(null)) {
 				pps.setProperty(key, value);
@@ -290,7 +292,9 @@ public class Configloader {
 	
 	private boolean deleteProperty(File file, String key, String value, String currentraw) {
 		Properties pps = new Properties();
-		try {
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+			pps.load(bis);
+			bis.close();
 			FileOutputStream out = new FileOutputStream(file);
 			String[] current = currentraw.split(";");
 			if (current.length <= 1) {
@@ -313,7 +317,9 @@ public class Configloader {
 	
 	private boolean removeProperty(File file, String key) {
 		Properties pps = new Properties();
-		try {
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+			pps.load(bis);
+			bis.close();
 			FileOutputStream out1 = new FileOutputStream(file);
 			pps.remove(key);
 			pps.store(out1, null);

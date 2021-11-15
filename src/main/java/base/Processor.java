@@ -235,11 +235,15 @@ public class Processor extends ListenerAdapter {
 	private void managej2cleave(Guild guild, Member member, VoiceChannel channelleft) {
 		//check if VoiceChannelLeft was a Userchannel
 		VoiceChannel vc = channelleft;
+		int conmemb = vc.getMembers().size();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId())) {
-			if (vc.getMembers().get(0).equals(guild.getSelfMember()) && vc.getMembers().size() == 1) {
-				guild.getAudioManager().closeAudioConnection();
+			if (conmemb == 1) {
+				if (vc.getMembers().get(0).equals(guild.getSelfMember())) {
+					guild.getAudioManager().closeAudioConnection();
+					conmemb--;
+				}
 			}
-			if (vc.getMembers().size() == 0) {
+			if (conmemb == 0) {
 				Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", vc.getId() + "-" + member.getUser().getId());
 				vc.delete().queue();
 			} else {
