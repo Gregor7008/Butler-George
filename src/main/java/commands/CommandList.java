@@ -21,6 +21,7 @@ import commands.moderation.Setreportchannel;
 import commands.moderation.Setsuggestionchannel;
 import commands.moderation.Setsupportchat;
 import commands.moderation.Setsupportrole;
+import commands.moderation.Setsupporttalk;
 import commands.moderation.Tempban;
 import commands.moderation.Tempmute;
 import commands.moderation.Warning;
@@ -83,6 +84,7 @@ public class CommandList {
 		this.moderationcmds.put("reactionrole", new Reactionrole());
 		this.moderationcmds.put("setsupportrole", new Setsupportrole());
 		this.moderationcmds.put("setsupportchat", new Setsupportchat());
+		this.moderationcmds.put("setsupporttalk", new Setsupporttalk());
 		this.moderationcmds.put("move", new Move());
 		//Developement
 		this.moderationcmds.put("test", new Test());

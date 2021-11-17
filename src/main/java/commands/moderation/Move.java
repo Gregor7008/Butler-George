@@ -44,7 +44,7 @@ public class Move implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("move", "Move a member into the support talk").addOption(OptionType.USER, "member", "The member you want to move");
+		CommandData command = new CommandData("move", "Move a member into the support talk").addOption(OptionType.USER, "member", "The member you want to move", true);
 		return command;
 	}
 
@@ -52,5 +52,4 @@ public class Move implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/move:help");
 	}
-
 }
