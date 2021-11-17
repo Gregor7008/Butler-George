@@ -18,18 +18,19 @@ public class Stop implements Command{
 		final Member member = event.getMember();
 		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
+		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (!self.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/stop:notconnected")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/stop:notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().inVoiceChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/stop:nopermission")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/stop:nopermission")).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/stop:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/stop:nopermission")).queue();
 			return;
 		}
 		musicManager.scheduler.player.stopTrack();
@@ -39,7 +40,7 @@ public class Stop implements Command{
 		if (vc.getUserLimit() != 0) {
 			vc.getManager().setUserLimit(vc.getUserLimit() - 1).queue();
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/stop:stopped")).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/stop:stopped")).queue();
 	}
 
 	@Override

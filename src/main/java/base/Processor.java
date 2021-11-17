@@ -19,6 +19,7 @@ import components.moderation.ModMail;
 import components.moderation.NoLimitsOnly;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
@@ -70,6 +71,25 @@ public class Processor extends ListenerAdapter {
 		String suggestid = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "suggest");
 		if (suggestid != null && event.getChannel().getId().equals(suggestid) && !event.getAuthor().isBot()) {
 			new Suggest().sendsuggestion(event.getGuild(), event.getMember(), event.getMessage().getContentRaw());
+			event.getMessage().delete().queue();
+			return;
+		}
+		//Support channel
+		String supportid = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportchat");
+		if (supportid != null && event.getChannel().getId().equals(supportid) && !event.getAuthor().isBot() && !Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportrole").equals("")) {
+			if (event.getGuild().getCategoryById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportcategory")) == null) {
+				Category cat = event.getGuild().createCategory("Supportchat").complete();
+				cat.createPermissionOverride(event.getGuild().getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+				cat.createPermissionOverride(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportrole"))).setAllow(Permission.VIEW_CHANNEL).queue();
+				Configloader.INSTANCE.setGuildConfig(event.getGuild(), "supportcategory", cat.getId());
+			}
+			TextChannel ntc = event.getGuild().createTextChannel(
+					event.getAuthor().getName().toLowerCase() + "-support",
+					event.getGuild().getCategoryById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportcategory"))).complete();
+			ntc.putPermissionOverride(event.getGuild().getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+			ntc.putPermissionOverride(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportrole"))).setAllow(Permission.VIEW_CHANNEL).queue();
+			ntc.putPermissionOverride(event.getMember()).setAllow(Permission.VIEW_CHANNEL).queue();
+			ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" + event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportrole")).getAsMention()).queue();
 			event.getMessage().delete().queue();
 		}
 	}

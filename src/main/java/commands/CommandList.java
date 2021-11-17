@@ -11,14 +11,16 @@ import commands.moderation.Goodbye;
 import commands.moderation.Ignorechannel;
 import commands.moderation.Join2Create;
 import commands.moderation.Levelreward;
+import commands.moderation.Move;
 import commands.moderation.Mute;
 import commands.moderation.Reactionrole;
-import commands.moderation.Rolecheck;
 import commands.moderation.Rolesorting;
 import commands.moderation.Setlevelchannel;
 import commands.moderation.Setmodrole;
 import commands.moderation.Setreportchannel;
 import commands.moderation.Setsuggestionchannel;
+import commands.moderation.Setsupportchat;
+import commands.moderation.Setsupportrole;
 import commands.moderation.Tempban;
 import commands.moderation.Tempmute;
 import commands.moderation.Warning;
@@ -67,7 +69,6 @@ public class CommandList {
 		this.moderationcmds.put("join2create", new Join2Create());
 		this.moderationcmds.put("levelreward", new Levelreward());
 		this.moderationcmds.put("mute", new Mute());
-		this.moderationcmds.put("rolecheck", new Rolecheck());
 		this.moderationcmds.put("rolesort", new Rolesorting());
 		this.moderationcmds.put("tempban", new Tempban());
 		this.moderationcmds.put("tempmute", new Tempmute());
@@ -80,6 +81,9 @@ public class CommandList {
 		this.moderationcmds.put("setmodrole", new Setmodrole());
 		this.moderationcmds.put("setreportchannel", new Setreportchannel());
 		this.moderationcmds.put("reactionrole", new Reactionrole());
+		this.moderationcmds.put("setsupportrole", new Setsupportrole());
+		this.moderationcmds.put("setsupportchat", new Setsupportchat());
+		this.moderationcmds.put("move", new Move());
 		//Developement
 		this.moderationcmds.put("test", new Test());
 		

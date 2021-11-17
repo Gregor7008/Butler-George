@@ -15,29 +15,31 @@ public class Help implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
 		CommandList commandList = new CommandList();
 		Command cmd;
 		String help = null;
 		if ((cmd = commandList.utilitycmds.get(event.getOption("command").getAsString())) != null) {
-			help = cmd.getHelp(event.getGuild(), event.getUser());
+			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], helpsplit[1])).queue();
 			return;
 		}
 		if ((cmd = commandList.moderationcmds.get(event.getOption("command").getAsString())) != null 
-				&& event.getMember().getRoles().contains(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole")))) {
-			help = cmd.getHelp(event.getGuild(), event.getUser());
+				&& event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
+			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], helpsplit[1])).queue();
 			return;
 		}
 		if ((cmd = commandList.musiccmds.get(event.getOption("command").getAsString())) != null) {
-			help = cmd.getHelp(event.getGuild(), event.getUser());
+			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], helpsplit[1])).queue();
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/utilities/help:error")).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/help:error")).queue();
 	}
 
 	@Override
@@ -50,5 +52,4 @@ public class Help implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/help:help");
 	}
-
 }

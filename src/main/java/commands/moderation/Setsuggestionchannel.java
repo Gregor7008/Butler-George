@@ -15,16 +15,14 @@ public class Setsuggestionchannel implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		if (event.getOption("channel") != null) {
-			if (!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/setsuggestionchannel:nopermission")).queue();
-			} else {
-				Configloader.INSTANCE.setGuildConfig(event.getGuild(), "suggest", event.getOption("channel").getAsGuildChannel().getId());
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/setsuggestionchannel:successset")).queue();
-			}
-		} else {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/setsuggestionchannel:noargs")).queue();
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/setsuggestionchannel:nopermission")).queue();
+			return;
 		}
+		Configloader.INSTANCE.setGuildConfig(guild, "suggest", event.getOption("channel").getAsGuildChannel().getId());
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/setsuggestionchannel:successset")).queue();
 	}
 
 	@Override
@@ -38,5 +36,4 @@ public class Setsuggestionchannel implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/setsuggestionchannel:help");
 	}
-
 }

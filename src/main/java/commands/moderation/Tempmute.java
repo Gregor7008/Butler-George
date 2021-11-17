@@ -18,12 +18,13 @@ public class Tempmute implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
+		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/command/moderation/tempmute:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/command/moderation/tempmute:nopermission")).queue();
 			return;
 		}
-		User user = event.getOption("member").getAsUser();
-		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), event.getGuild().retrieveMember(user).complete());
+		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), guild.retrieveMember(user).complete());
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully muted for\s" + event.getOption("days").getAsString() + "\sdays!")).queue();
 	}
 

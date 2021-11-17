@@ -26,8 +26,6 @@ public class Setlanguage implements Command{
 				.addOption("Deutsch", "de")
 				.addOption("Español", "es")
 				.addOption("Français", "fr")
-				.addOption("Italiano", "it")
-				.addOption("日本", "jp")
 				.addOption("Nederlands", "nl")
 				.addOption("Pусский", "ru")
 				.build();
@@ -55,14 +53,6 @@ public class Setlanguage implements Command{
 				      case "fr":
 				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "fr");
 				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:successfr")).queue();
-				    	  break;
-				      case "it":
-				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "it");
-				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:successit")).queue();
-				    	  break;
-				      case "jp":
-				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "jp");
-				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:successjp")).queue();
 				    	  break;
 				      case "nl":
 				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "nl");

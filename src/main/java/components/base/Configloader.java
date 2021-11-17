@@ -166,6 +166,10 @@ public class Configloader {
 				pps.setProperty("ignored", "");
 				pps.setProperty("forbidden", "\\//\\//\\//");
 				pps.setProperty("reportchannel", "");
+				pps.setProperty("supportrole", "");
+				pps.setProperty("supportchat", "");
+				pps.setProperty("supporttalk", "");
+				pps.setProperty("supportcategory", "");
 				pps.store(fop, null);
 				fop.close();
 			} catch (IOException e) {e.printStackTrace();}

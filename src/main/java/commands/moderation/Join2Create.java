@@ -1,12 +1,10 @@
 package commands.moderation;
 
 import commands.Command;
-import components.Developerlist;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,13 +15,14 @@ public class Join2Create implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		final Member member = event.getMember();
-		if(!member.hasPermission(Permission.MANAGE_CHANNEL) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/join2create:nopermission")).queue();
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		if(!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/join2create:nopermission")).queue();
 			return;
 		}
-		Configloader.INSTANCE.setGuildConfig(event.getGuild(), "join2create", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/join2create:success")).queue();
+		Configloader.INSTANCE.setGuildConfig(guild, "join2create", event.getOption("channel").getAsGuildChannel().getId());
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/join2create:success")).queue();
 	}
 
 	@Override
@@ -36,5 +35,4 @@ public class Join2Create implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/join2create:help");
 	}
-
 }

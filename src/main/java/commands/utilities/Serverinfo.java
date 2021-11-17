@@ -47,5 +47,4 @@ public class Serverinfo implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/serverinfo:help");
 	}
-
 }

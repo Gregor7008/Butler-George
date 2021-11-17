@@ -24,17 +24,19 @@ public class Warning implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole").equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/warning:nomodrole")).queue();
+		Guild guild = event.getGuild();
+		User user = event.getUser();
+		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").equals("")) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/warning:nomodrole")).queue();
 			return;
 		}
-		if (!event.getMember().getRoles().contains(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole")))) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:nopermission")).queue();
+		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/warning:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
-			final User user = event.getOption("member").getAsUser();
-			Member member = event.getGuild().retrieveMemberById(user.getId()).complete();
+			final User iuser = event.getOption("member").getAsUser();
+			Member member = guild.retrieveMemberById(iuser.getId()).complete();
 			String reason;
 			if (event.getOption("reason") == null) {
 				reason = "~Unknown reason~";
@@ -42,13 +44,13 @@ public class Warning implements Command{
 				reason = event.getOption("reason").getAsString();
 			}
 			Configloader.INSTANCE.addUserConfig(member, "warnings", reason);
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:success")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/warning:success")).queue();
 			try {
-				user.openPrivateChannel().queue(channel -> {
-					channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + event.getGuild().getName() + "\nReason:\n=> " + reason)).queue();
+				iuser.openPrivateChannel().queue(channel -> {
+					channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + guild.getName() + "\nReason:\n=> " + reason)).queue();
 				});
 			} catch (Exception e) {}
-			AutoPunishEngine.getInstance().processWarnings(event.getGuild());
+			AutoPunishEngine.getInstance().processWarnings(guild);
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
@@ -59,18 +61,17 @@ public class Warning implements Command{
 				event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Choose a warning!", ":envelope_with_arrow: | Please reply with the number of the warning you want to remove!")).queue();
 				EventWaiter waiter = Bot.INSTANCE.getWaiter();
 				TextChannel channel = event.getTextChannel();
-				User user = event.getUser();
 				Member member = event.getOption("member").getAsMember();
 				waiter.waitForEvent(GuildMessageReceivedEvent.class,
 						e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 						  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(event.getGuild(), event.getOption("member").getAsUser(), "warnings");
+						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(guild, event.getOption("member").getAsUser(), "warnings");
 							  String[] warnings = allwarnings.split(";");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
 							  Configloader.INSTANCE.deleteUserConfig(member, "warnings", warnings[w-1]);
 							  channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The warning for \"" + warnings[w-1] + "\" was successfully removed of " + member.getEffectiveName())).queue();},
 						1, TimeUnit.MINUTES,
-						() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+						() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/warning:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			}
 		}
 	}
@@ -94,10 +95,12 @@ public class Warning implements Command{
 	}
 	
 	private boolean listwarnings(SlashCommandEvent event) {
-		final User user = event.getOption("member").getAsUser();
-		String allwarnings = Configloader.INSTANCE.getUserConfig(event.getGuild(), user, "warnings");
+		Guild guild = event.getGuild();
+		User user = event.getUser();
+		final User iuser = event.getOption("member").getAsUser();
+		String allwarnings = Configloader.INSTANCE.getUserConfig(guild, iuser, "warnings");
 		if (allwarnings.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/warning:nowarnings")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/warning:nowarnings")).queue();
 			return false;
 		}
 		String[] warnings = allwarnings.split(";");
@@ -111,7 +114,7 @@ public class Warning implements Command{
 				sB.append("\n");
 			} else {}
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Warnings of\s" + event.getGuild().getMemberById(user.getId()).getEffectiveName(), sB.toString())).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Warnings of\s" + guild.getMemberById(iuser.getId()).getEffectiveName(), sB.toString())).queue();
 		return true;
 	}
 }

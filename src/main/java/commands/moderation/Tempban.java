@@ -18,12 +18,13 @@ public class Tempban implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
+		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.BAN_MEMBERS)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/tempban:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/commands/moderation/tempban:nopermission")).queue();
 			return;
 		}
-		User user = event.getOption("member").getAsUser();
-		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), event.getGuild().getMember(user));
+		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), guild.getMember(user));
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully banned for\s" + event.getOption("days").getAsString() + "\sdays!")).queue();
 	}
 
@@ -46,5 +47,4 @@ public class Tempban implements Command{
 		Configloader.INSTANCE.setUserConfig(member, "tempbanned", "true");
 		member.ban(0).queue();
 	}	
-
 }

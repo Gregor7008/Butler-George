@@ -14,12 +14,14 @@ public class Setlevelchannel implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/setlevelchannel:nopermission")).queue();
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/setlevelchannel:nopermission")).queue();
 			return;
 		}
-		Configloader.INSTANCE.setGuildConfig(event.getGuild(), "levelmsgch", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/setlevelchannel:success")).queue();
+		Configloader.INSTANCE.setGuildConfig(guild, "levelmsgch", event.getOption("channel").getAsGuildChannel().getId());
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/setlevelchannel:success")).queue();
 	}
 
 	@Override
@@ -32,5 +34,4 @@ public class Setlevelchannel implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/setlevelchannel:help");
 	}
-
 }

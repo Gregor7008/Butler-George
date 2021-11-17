@@ -12,15 +12,18 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
 public class Autopunish implements Command{
 	
-	TextChannel channel;
-	User user;
+	private TextChannel channel;
+	private User user;
+	private Guild guild;
 
 	@Override
 	public void perform(SlashCommandEvent event) {
@@ -30,6 +33,7 @@ public class Autopunish implements Command{
 		}
 		channel = event.getTextChannel();
 		user = event.getUser();
+		guild = event.getGuild();
 		if (event.getSubcommandName().equals("add")) {
 			this.addpunishements1(event);
 		}
@@ -58,11 +62,11 @@ public class Autopunish implements Command{
 	
 	private void removepunishements(SlashCommandEvent event) {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		final StringBuilder sB = new StringBuilder();
-		final String currentraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "autopunish");
-		final String[] current = currentraw.split(";");
+		StringBuilder sB = new StringBuilder();
+		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autopunish");
+		String[] current = currentraw.split(";");
 		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:nopunishements")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:nopunishements")).queue();;
 			return;
 		}
 		if (!currentraw.contains(";")) {
@@ -85,7 +89,7 @@ public class Autopunish implements Command{
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {this.removefinal(e, current);},
 				1, TimeUnit.MINUTES,
-				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void removefinal(GuildMessageReceivedEvent e, String[] current) {
@@ -101,88 +105,98 @@ public class Autopunish implements Command{
 	}
 	
 	private void addpunishements1(SlashCommandEvent event) {
+		SelectionMenu menu = SelectionMenu.create("menu:class")
+				.addOption("Removal of role", "rr")
+				.addOption("Temporary mute", "tm")
+				.addOption("Permanent mute", "pm")
+				.addOption("Kick", "kk")
+				.addOption("Temporary ban", "tb")
+				.addOption("Permanent ban", "pb")
+				.build();
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:add1")).queue();
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:add1"))
+				.setEphemeral(true)
+				.addActionRow(menu)
+				.queue();
+		waiter.waitForEvent(SelectionMenuEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
-				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-				e -> {int plannedpunish = Integer.parseInt(e.getMessage().getContentRaw());
-					  this.addpunishements2(event, plannedpunish);},
+				  	  return e.getUser().getIdLong() == user.getIdLong();},
+				e -> {String plannedpunish = e.getSelectedOptions().get(0).getValue();
+					  this.addpunishements2(plannedpunish);},
 				1, TimeUnit.MINUTES,
-				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.getHook().deleteOriginal().queue();
+					   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
-	private void addpunishements2(SlashCommandEvent event, int plannedpunish) {
+	private void addpunishements2(String plannedpunish) {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:add2")).queue();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:add2")).queue();
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {int warnings = Integer.parseInt(e.getMessage().getContentRaw());
-					  this.addpunishements3(event, plannedpunish, warnings);},
+					  this.addpunishements3(plannedpunish, warnings);},
 				1, TimeUnit.MINUTES,
-				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
-	private void addpunishements3(SlashCommandEvent event, int plannedpunish, int warnings) {
-		if (plannedpunish == 2 || plannedpunish == 5) {
-			EventWaiter waiter = Bot.INSTANCE.getWaiter();
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:add3time")).queue();
-			waiter.waitForEvent(GuildMessageReceivedEvent.class,
-					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
-					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-					e -> {if (plannedpunish == 2) {
-						  	String punishement = String.valueOf(warnings) + "_tempmute_" + e.getMessage().getContentRaw();
-						  	Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", punishement);
-						  	event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:successtempmute")).queue();
-						  	return;
-						  }
-						  if (plannedpunish == 5) {
-							  String punishement = String.valueOf(warnings) + "_tempban_" + e.getMessage().getContentRaw();
-							  Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", punishement);
-							  event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:successtempban")).queue();
-							  return;
-						  }},
-					1, TimeUnit.MINUTES,
-					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
-			return;
-		}
-		if (plannedpunish == 1) {
-			EventWaiter waiter = Bot.INSTANCE.getWaiter();
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:add3role")).queue();
+	private void addpunishements3(String plannedpunish, int warnings) {
+		EventWaiter waiter = Bot.INSTANCE.getWaiter();
+		switch (plannedpunish) {
+		case "rr":
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:add3role")).queue();
 			waiter.waitForEvent(GuildMessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {String punishement = String.valueOf(warnings) + "_removerole_" + e.getMessage().getContentRaw();
-						  Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", punishement);
-						  event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:successrole")).queue();
+						  Configloader.INSTANCE.addGuildConfig(guild, "autopunish", punishement);
+						  channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:successrole")).queue();
 						  },
 					1, TimeUnit.MINUTES,
-					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
-			return;
+					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+			break;
+		case "tm":
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:add3time")).queue();
+			waiter.waitForEvent(GuildMessageReceivedEvent.class,
+					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+					e -> {String punishement = String.valueOf(warnings) + "_tempmute_" + e.getMessage().getContentRaw();
+						  Configloader.INSTANCE.addGuildConfig(guild, "autopunish", punishement);
+						  channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:successtempmute")).queue();},
+					1, TimeUnit.MINUTES,
+					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+			break;
+		case "pm":
+			Configloader.INSTANCE.addGuildConfig(guild, "autopunish", String.valueOf(warnings) + "_mute");
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:successmute")).queue();
+			break;
+		case "kk":
+			Configloader.INSTANCE.addGuildConfig(guild, "autopunish", String.valueOf(warnings) + "_kick");
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:successkick")).queue();
+			break;
+		case "tb":
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:add3time")).queue();
+			waiter.waitForEvent(GuildMessageReceivedEvent.class,
+					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+					e -> {String punishement = String.valueOf(warnings) + "_tempban_" + e.getMessage().getContentRaw();
+						  Configloader.INSTANCE.addGuildConfig(guild, "autopunish", punishement);
+						  channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:successtempban")).queue();},
+					1, TimeUnit.MINUTES,
+					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+			break;
+		case "pb":
+			Configloader.INSTANCE.addGuildConfig(guild, "autopunish", String.valueOf(warnings) + "_ban");
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:successban")).queue();
+			break;
+		default:
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:fatal")).queue();
 		}
-		if (plannedpunish == 4) {
-			Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", String.valueOf(warnings) + "_kick");
-			event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:successkick")).queue();
-			return;
-		}
-		if (plannedpunish == 3) {
-			Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", String.valueOf(warnings) + "_mute");
-			event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:successmute")).queue();
-			return;
-		}
-		if (plannedpunish == 6) {
-			Configloader.INSTANCE.addGuildConfig(event.getGuild(), "autopunish", String.valueOf(warnings) + "_ban");
-			event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:successban")).queue();
-			return;
-		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Error!", ":x: | Something went horribly wrong!")).queue();
 	}
 	
 	private void listpunishements(SlashCommandEvent event) {
-		Guild guild = event.getGuild();
-		final StringBuilder sB = new StringBuilder();
-		final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autopunish");
+		StringBuilder sB = new StringBuilder();
+		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autopunish");
 		if (currentraw.equals("")) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autopunish:nopunishements")).queue();;
 			return;

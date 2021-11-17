@@ -26,9 +26,10 @@ public class Play implements Command{
 		final TextChannel channel = event.getTextChannel();
 		final String argument = event.getOption("title").toString();
 		final Member self = guild.getSelfMember();
+		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/play:wrongusage")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/play:wrongusage")).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
@@ -36,11 +37,11 @@ public class Play implements Command{
 			return;
 		}
 		if (self.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/play:alreadyinuse")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/play:alreadyinuse")).queue();
 			return;
 		}
 		if (!member.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/play:noVCdefined")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/play:noVCdefined")).queue();
 			return;
 		}
 		this.load(event, argument, musicManager, channel, member);
@@ -56,10 +57,10 @@ public class Play implements Command{
 		}
 		if (!isURL(argument)) {
 			String term = "ytsearch:" + argument;
-			musicManager.scheduler.player.setVolume(5);
+			musicManager.scheduler.player.setVolume(15);
 			PlayerManager.getInstance().loadAndPlay(event, term);
 		} else {
-			musicManager.scheduler.player.setVolume(20);
+			musicManager.scheduler.player.setVolume(15);
 			PlayerManager.getInstance().loadAndPlay(event, argument);
 		}
 	}

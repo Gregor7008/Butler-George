@@ -16,9 +16,9 @@ public class Forbiddenwords implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		Guild guild = event.getGuild();
-		User user = event.getUser();
-		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/forbiddenwords:nopermission")).queue();
 			return;
 		}
@@ -54,7 +54,7 @@ public class Forbiddenwords implements Command{
 			String finallist = rawlist.replaceAll(";", ", ");
 			String title = AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/forbiddenwords:list");
 			String description = AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/forbiddenwords:list");
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(title, description + finallist));
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(title, description + finallist)).queue();
 			break;
 		default:
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/forbiddenwords:error")).queue() ;
@@ -79,5 +79,4 @@ public class Forbiddenwords implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/forbiddenwords:help");
 	}
-
 }

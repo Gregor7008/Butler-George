@@ -16,13 +16,14 @@ public class Mute implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
+		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/command/moderation/mute:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/command/moderation/mute:nopermission")).queue();
 			return;
 		}
-		User user = event.getOption("member").getAsUser();
-		this.mute(event.getGuild().getMember(user));
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully muted permanently!"));
+		this.mute(guild.getMember(user));
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully muted permanently!")).queue();
 	}
 
 	@Override

@@ -21,7 +21,7 @@ public class Levelbackground implements Command{
 				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/levelbackground:wrongarg")).queue();
 			} else {
 				Configloader.INSTANCE.setUserConfig(event.getMember(), "levelbackground", event.getOption("number").getAsString());
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/levelbackground:success")).addFile(lv.renderLevelcard(event.getMember())).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/levelbackground:success")).addFile(lv.renderLevelcard(event.getUser())).queue();
 			}
 			return;
 		}

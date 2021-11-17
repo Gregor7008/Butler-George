@@ -12,27 +12,32 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class Ignorechannel implements Command{
+	
+	private Guild guild;
+	private User user;
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		guild = event.getGuild();
+		user = event.getUser();
 		if(!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/ignorechannel:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/ignorechannel:nopermission")).queue();
 			return;
 		}
 		switch (event.getSubcommandName()) {
 		case "add":
-			Configloader.INSTANCE.addGuildConfig(event.getGuild(), "ignored", event.getOption("channel").getAsGuildChannel().getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/ignorechannel:successadd")).queue();
+			Configloader.INSTANCE.addGuildConfig(guild, "ignored", event.getOption("channel").getAsGuildChannel().getId());
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/ignorechannel:successadd")).queue();
 			break;
 		case "list":
 			this.listignoredchannels(event);
 			break;
 		case "remove":
-			Configloader.INSTANCE.deleteGuildConfig(event.getGuild(), "ignored", event.getOption("channel").getAsGuildChannel().getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/ignorechannel:successremove")).queue();
+			Configloader.INSTANCE.deleteGuildConfig(guild, "ignored", event.getOption("channel").getAsGuildChannel().getId());
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/ignorechannel:successremove")).queue();
 			break;
 		default:
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/ignorechannel:error")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/ignorechannel:error")).queue();
 		}
 	}
 
@@ -53,22 +58,22 @@ public class Ignorechannel implements Command{
 	}
 	
 	private void listignoredchannels(SlashCommandEvent event) {
-		String channelids = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "ignored");
+		String channelids = Configloader.INSTANCE.getGuildConfig(guild, "ignored");
 		if (channelids.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/ignorechannel:nochannels")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/ignorechannel:nochannels")).queue();
 			return;
 		}
 		StringBuilder sb = new StringBuilder();
-		sb.append(AnswerEngine.getInstance().getDescription(event.getGuild(), event.getUser(), "/commands/moderation/ignorechannel:list"));
+		sb.append(AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/ignorechannel:list"));
 		String[] channelid = channelids.split(";");
 		for (int i = 0; i < channelid.length; i++) {
 			sb.append("#" + String.valueOf(i + 1) + " ");
-			sb.append(event.getGuild().getTextChannelById(channelid[i]).getAsMention());
+			sb.append(guild.getTextChannelById(channelid[i]).getAsMention());
 			if (i+1 != channelid.length) {
 				sb.append("\n");
 			}
 		}
-		String title = AnswerEngine.getInstance().getTitle(event.getGuild(), event.getUser(), "/commands/moderation/ignorechannel:list");
+		String title = AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/ignorechannel:list");
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(title, sb.toString())).queue();
 	}
 }

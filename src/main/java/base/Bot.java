@@ -39,7 +39,7 @@ public class Bot {
 	
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
-		System.out.println("Still not ready:\n-> CleanUp systems (Instead of messagecount, use a list)\n-> Autopunish (Drop-Down menu instead if numbers)");
+		System.out.println("Still not ready:\n-> CleanUp systems (Instead of messagecount, use a list)");
 		System.out.println("In developement:\n-> Ping to move\n-> Move Command for support");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
@@ -69,6 +69,9 @@ public class Bot {
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("")) {
     			guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create")).putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
     		}
+    		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
+    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
+    		}
     	}
 	}
 
@@ -86,6 +89,9 @@ public class Bot {
         				guild.getVoiceChannelById(temp1[0]).delete().queue();
         			}
     			}
+    		}
+    		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
+    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
     		}
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);

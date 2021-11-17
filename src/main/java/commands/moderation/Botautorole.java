@@ -1,12 +1,10 @@
 package commands.moderation;
 
 import commands.Command;
-import components.Developerlist;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -17,28 +15,31 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class Botautorole implements Command{
 
+	private Guild guild;
+	private User user;
+	
 	@Override
 	public void perform(SlashCommandEvent event) {
-		final Guild guild = event.getGuild();
-		final Member member = event.getMember();
-		if (!member.hasPermission(Permission.MANAGE_ROLES) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/botautorole:nopermission")).queue();
+		guild = event.getGuild();
+		user = event.getUser();
+		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/botautorole:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
-			final Role role = event.getOption("addrole").getAsRole();
+			Role role = event.getOption("addrole").getAsRole();
 			Configloader.INSTANCE.addGuildConfig(guild, "botautoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/botautorole:addsuccess")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/botautorole:addsuccess")).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
-			final Role role = event.getOption("removerole").getAsRole();
+			Role role = event.getOption("removerole").getAsRole();
 			Configloader.INSTANCE.deleteGuildConfig(guild, "botautoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/botautorole:removesuccess")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
-			this.listroles(event, guild);
+			this.listroles(event);
 		}
 	}
 
@@ -56,11 +57,11 @@ public class Botautorole implements Command{
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/botautorole:help");
 	}
 	
-	private void listroles(SlashCommandEvent event, Guild guild) {
-		final StringBuilder sB = new StringBuilder();
-		final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "botautoroles");
+	private void listroles(SlashCommandEvent event) {
+		StringBuilder sB = new StringBuilder();
+		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "botautoroles");
 		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/autorole:nobotautoroles")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autorole:nobotautoroles")).queue();;
 			return;
 		}
 		if (!currentraw.contains(";")) {
@@ -79,5 +80,4 @@ public class Botautorole implements Command{
 		}
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new bot joins:", sB.toString())).queue();
 	}
-
 }

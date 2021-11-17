@@ -19,7 +19,6 @@ public class Userinfo implements Command{
 	public void perform(SlashCommandEvent event) {
 		if (event.getMember().getRoles().contains(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole")))) {
 			this.listModInfo(event);
-			return;
 		} else {
 			this.listInfo(event);
 		}

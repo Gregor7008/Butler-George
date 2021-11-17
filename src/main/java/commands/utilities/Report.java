@@ -18,8 +18,8 @@ public class Report implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		Guild guild = event.getGuild();
-		User user = event.getUser();
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "reportchannel").equals("")) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/report:nochannel")).queue();
 			return;
@@ -36,7 +36,7 @@ public class Report implements Command{
 		}
 		eb.setDescription(event.getOption("reason").getAsString());
 		guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "reportchannel")).sendMessageEmbeds(eb.build()).queue();
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/report:success")).queue(response -> response.deleteOriginal().queueAfter(10, TimeUnit.SECONDS));
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/report:success")).queue(response -> response.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
 	}
 
 	@Override
@@ -52,5 +52,4 @@ public class Report implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/report:help");
 	}
-
 }

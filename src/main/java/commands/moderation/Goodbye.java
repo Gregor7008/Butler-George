@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import commands.Command;
-import components.Developerlist;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
@@ -20,37 +19,39 @@ public class Goodbye implements Command {
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		if (event.getMember().hasPermission(Permission.MANAGE_SERVER) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("No Permission!", ":warning: | You have no permission to use this command!\n You need to have the permission to manage the server to get access to this command!"));
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/goodbye:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("set")) {
-			final String message = event.getOption("message").toString();
-			final String channelid = event.getOption("channel").getAsGuildChannel().getId();
-			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "goodbyemsg", message + ";" + channelid);
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/goodbye:setsuccess"));
+			String message = event.getOption("message").toString();
+			String channelid = event.getOption("channel").getAsGuildChannel().getId();
+			Configloader.INSTANCE.setGuildConfig(guild, "goodbyemsg", message + ";" + channelid);
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/goodbye:setsuccess")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
-			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "goodbyemsg", "");
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/goodbye:offsuccess"));
+			Configloader.INSTANCE.setGuildConfig(guild, "goodbyemsg", "");
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/goodbye:offsuccess")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
-			String goodbyemsgraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "goodbyemsg");
+			String goodbyemsgraw = Configloader.INSTANCE.getGuildConfig(guild, "goodbyemsg");
 			LocalDateTime date = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 			String currentdate = date.format(formatter);
 			if (goodbyemsgraw != "") {
 				String[] goodbyemsg = goodbyemsgraw.split(";");
-				goodbyemsg[0].replace("{servername}", event.getGuild().getName());
+				goodbyemsg[0].replace("{servername}", guild.getName());
 				goodbyemsg[0].replace("{member}", event.getMember().getEffectiveName());
-				goodbyemsg[0].replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
+				goodbyemsg[0].replace("{membercount}", Integer.toString(guild.getMemberCount()));
 				goodbyemsg[0].replace("{date}", currentdate);
 				goodbyemsg[0].replace("{timejoined}", event.getMember().getTimeJoined().format(formatter));
-				event.getGuild().getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
+				guild.getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/goodbye:nonedefined"));
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/goodbye:nonedefined")).queue();
 			}
 		}
 	}
@@ -70,5 +71,4 @@ public class Goodbye implements Command {
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/goodbye:help");
 	}
-
 }

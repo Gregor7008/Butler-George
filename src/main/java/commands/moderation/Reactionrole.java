@@ -10,6 +10,7 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -41,6 +42,10 @@ public class Reactionrole implements Command{
 		channel = event.getTextChannel();
 		msgid = event.getOption("message").getAsString();
 		finalchannel = guild.getTextChannelById(event.getOption("channel").getAsGuildChannel().getId());
+		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/reactionrole:")).queue();
+			return;
+		}
 		if (finalchannel.equals(null)) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/reactionrole:nochannel")).queue();
 			return;

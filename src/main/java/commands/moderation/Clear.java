@@ -4,11 +4,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import commands.Command;
-import components.Developerlist;
 import components.base.AnswerEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -21,20 +19,21 @@ public class Clear implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		final Member member = event.getMember();
-		if (!member.hasPermission(Permission.MESSAGE_MANAGE) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/clear:nopermission")).queue();
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/clear:nopermission")).queue();
 			return;
 		}
-		final TextChannel channel = event.getTextChannel();
-		final int count = Integer.parseInt(event.getOption("count").getAsString());
+		TextChannel channel = event.getTextChannel();
+		int count = Integer.parseInt(event.getOption("count").getAsString());
 		List<Message> messages = channel.getHistory().retrievePast(count).complete();
 		try {channel.deleteMessages(messages).queue();} catch (Exception e) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/clear:error")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/clear:error")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			e.printStackTrace();
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/clear:done")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/clear:done")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 
 	@Override
@@ -47,5 +46,4 @@ public class Clear implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/clear:help");
 	}
-
 }

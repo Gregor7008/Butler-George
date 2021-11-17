@@ -1,5 +1,6 @@
 package commands.moderation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -7,7 +8,6 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
 import commands.Command;
-import components.Developerlist;
 import components.base.AnswerEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -26,18 +26,21 @@ public class Rolesorting implements Command{
 	private Role grouprole;
 	private List<Role> subroles;
 	private List<Member> members;
-	private Bot bot;
+	private EventWaiter waiter = Bot.INSTANCE.getWaiter();
 	private Guild guild;
 	private Member member;
+	private User user;
 	private TextChannel channel;
+	private List<Message> messages = new ArrayList<>();
 	
 	@Override
 	public void perform(SlashCommandEvent event) {
 		oevent = event;
 		guild = event.getGuild();
+		user = event.getUser();
 		member = event.getMember();
-		if (!member.hasPermission(Permission.MANAGE_ROLES) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/rolesorting:nopermission")).queue();
+		if (!member.hasPermission(Permission.MANAGE_ROLES)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:nopermission")).queue();
 			return;
 		}
 		channel = event.getTextChannel();
@@ -56,50 +59,50 @@ public class Rolesorting implements Command{
 	}
 
 	private void definegroup() {
-		EventWaiter waiter = bot.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/rolesorting:definegroup")).queue();
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/rolesorting:definegroup")).complete());
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
-							e -> {grouprole = e.getMessage().getMentionedRoles().get(0);
+							e -> {messages.add(e.getMessage());
+								  grouprole = e.getMessage().getMentionedRoles().get(0);
 								  this.definesub();},
 							1, TimeUnit.MINUTES,
-							() -> {this.cleanup(2);
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/moderation/rolesorting:timeout")).queue();});
+							() -> {this.cleanup();
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definesub() {
-		EventWaiter waiter = bot.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/moderation/rolesorting:definesub")).queue();
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:definesub")).complete());
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
-							e -> {subroles = e.getMessage().getMentionedRoles();
+							e -> {messages.add(e.getMessage());
+								  subroles = e.getMessage().getMentionedRoles();
 								  this.definemember();},
 							1, TimeUnit.MINUTES,
-							() -> {this.cleanup(4);
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/moderation/rolesorting:timeout")).queue();});
+							() -> {this.cleanup();
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void definemember() {
-		EventWaiter waiter = bot.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/moderation/rolesorting:definemember")).queue();
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:definemember")).complete());
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
-							e -> {members = e.getMessage().getMentionedMembers();
+							e -> {messages.add(e.getMessage());
+								  members = e.getMessage().getMentionedMembers();
 								  this.rolesorter();},
 							1, TimeUnit.MINUTES,
-							() -> {this.cleanup(6);
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/moderation/rolesorting:timeout")).queue();});
+							() -> {this.cleanup();
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void rolesorter() {
 		for (int e = 0; e<members.size(); e++) {
 			this.sorter(guild, members.get(e), subroles, grouprole);
 		}
-		this.cleanup(7);
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(oevent.getGuild(), oevent.getUser(),"/commands/moderation/rolesorting:success")).queue();
+		this.cleanup();
+		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:success")).queue(response -> response.delete().queueAfter(10, TimeUnit.SECONDS));
 	}
 	
 	public void sorter(Guild iguild, Member mb, List<Role> sr, Role gr) {
@@ -119,8 +122,8 @@ public class Rolesorting implements Command{
 			}
 	}
 	
-	private void cleanup(int i) {
-		List<Message> messages = channel.getHistory().retrievePast(i).complete();
+	private void cleanup() {
+		oevent.getHook().deleteOriginal().queue();
 		channel.deleteMessages(messages).queue();
 	}
 }

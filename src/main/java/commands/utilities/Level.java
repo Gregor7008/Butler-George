@@ -21,7 +21,6 @@ import components.base.AnswerEngine;
 import components.base.Configloader;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -29,22 +28,23 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class Level implements Command {
+	
+	private Guild guild;
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		Member member;
+		guild = event.getGuild();
+		User user = event.getUser();
 		event.deferReply(true);
 		try {
-			User user = event.getOption("member").getAsUser();
-			member = event.getGuild().getMember(user);
-		} catch (IllegalStateException | NullPointerException e) {member = event.getMember();}
-		if (member.getEffectiveName().equals(event.getGuild().getSelfMember().getEffectiveName())) {
+			user = event.getOption("member").getAsUser();
+		} catch (IllegalStateException | NullPointerException e) {}
+		if (guild.getMember(user).getEffectiveName().equals(guild.getSelfMember().getEffectiveName())) {
 			event.reply("You think you're funny or what?").queue();
 			return;
 		}
-		File finalimage = this.renderLevelcard(member);
+		File finalimage = this.renderLevelcard(user);
         event.reply("").addFile(finalimage).queue();
-		//event.reply(LevelEngine.getInstance().devtest(member)).queue();
 	}
 
 	@Override
@@ -77,11 +77,11 @@ public class Level implements Command {
 		return progress;
 	}
 	
-	public File renderLevelcard(Member member) {
-		String levelbackground = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "levelbackground");
-		int level = Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level"));
-		String curxp = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "expe");
-		int nedxp = LevelEngine.getInstance().xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "level")));
+	public File renderLevelcard(User iuser) {
+		String levelbackground = Configloader.INSTANCE.getUserConfig(guild, iuser, "levelbackground");
+		int level = Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, iuser, "level"));
+		String curxp = Configloader.INSTANCE.getUserConfig(guild, iuser, "expe");
+		int nedxp = LevelEngine.getInstance().xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, iuser, "level")));
 		int progress = this.calculateProgress(level, nedxp, curxp);
 		BufferedImage image = null;
 		try {image = ImageIO.read(new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/" + levelbackground + ".png"));
@@ -90,7 +90,7 @@ public class Level implements Command {
 			return null;}		
 		BufferedImage avatar = null;
 		try {
-			URL url = new URL(member.getUser().getAvatarUrl());
+			URL url = new URL(iuser.getAvatarUrl());
 			File avfile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/cache/avatar.png");
 			FileUtils.copyURLToFile(url, avfile);
 			avatar = ImageIO.read(avfile);
@@ -111,10 +111,10 @@ public class Level implements Command {
         g2d.setColor(Color.WHITE);
         String temp1 = curxp + "\s/\s" + String.valueOf(nedxp);
         g2d.drawString(temp1, 820 - g2d.getFontMetrics().stringWidth(temp1), 170);
-		//write Username
+		//write iusername
         g2d.setFont(new Font("Calibri", Font.PLAIN, 50));
         g2d.setColor(Color.WHITE);
-        g2d.drawString(member.getEffectiveName(), 293, 170);
+        g2d.drawString(guild.getMember(iuser).getEffectiveName(), 293, 170);
 		//draw Icon
 		g2d.drawImage(this.makeRoundedCorner(avatar, avatar.getWidth()), 70, 50, 200, 200, null);
 		//draw Progressbar

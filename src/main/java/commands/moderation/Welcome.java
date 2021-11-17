@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import commands.Command;
-import components.Developerlist;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
@@ -20,36 +19,38 @@ public class Welcome implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		if (event.getMember().hasPermission(Permission.MANAGE_SERVER) && !Developerlist.getInstance().developers.contains(event.getMember().getId())) {
+		Guild guild = event.getGuild();
+		User user = event.getUser();
+		if (event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("No Permission!", ":warning: | You have no permission to use this command!\n You need to have the permission to manage the server to get access to this command!"));
 			return;
 		}
 		if (event.getSubcommandName().equals("set")) {
-			final String message = event.getOption("message").getAsString();
-			final String channelid = event.getOption("channel").getAsGuildChannel().getId();
-			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "welcomemsg", message + ";" + channelid);
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/welcome:setsuccess"));
+			String message = event.getOption("message").getAsString();
+			String channelid = event.getOption("channel").getAsGuildChannel().getId();
+			Configloader.INSTANCE.setGuildConfig(guild, "welcomemsg", message + ";" + channelid);
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/welcome:setsuccess"));
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
-			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "welcomemsg", "");
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/welcome:offsuccess"));
+			Configloader.INSTANCE.setGuildConfig(guild, "welcomemsg", "");
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/welcome:offsuccess"));
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
-			String welcomemsgraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "welcomemsg");
+			String welcomemsgraw = Configloader.INSTANCE.getGuildConfig(guild, "welcomemsg");
 			LocalDateTime date = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 			String currentdate = date.format(formatter);
 			if (welcomemsgraw != "") {
 				String[] welcomemsg = welcomemsgraw.split(";");
-				welcomemsg[0].replace("{servername}", event.getGuild().getName());
+				welcomemsg[0].replace("{servername}", guild.getName());
 				welcomemsg[0].replace("{membername}", event.getMember().getAsMention());
-				welcomemsg[0].replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
+				welcomemsg[0].replace("{membercount}", Integer.toString(guild.getMemberCount()));
 				welcomemsg[0].replace("{date}", currentdate);
-				event.getGuild().getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
+				guild.getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/welcome:nonedefined"));
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/welcome:nonedefined"));
 			}
 		}
 	}
@@ -69,5 +70,4 @@ public class Welcome implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/welcome:help");
 	}
-
 }

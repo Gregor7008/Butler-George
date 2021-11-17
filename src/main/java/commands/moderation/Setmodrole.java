@@ -14,17 +14,19 @@ public class Setmodrole implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/setmodrole:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/setmodrole:nopermission")).queue();
 			return;
 		}
-		Configloader.INSTANCE.setGuildConfig(event.getGuild(), "modrole", event.getOption("role").getAsRole().getId());
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/commands/moderation/setmodrole:success")).queue();
+		Configloader.INSTANCE.setGuildConfig(guild, "modrole", event.getOption("role").getAsRole().getId());
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/setmodrole:success")).queue();
 	}
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("setmodrole", "Define the moderation role").addOption(OptionType.ROLE, "role", "Mention the role");
+		CommandData command = new CommandData("setmodrole", "Define the moderation role").addOption(OptionType.ROLE, "role", "Mention the role", true);
 		return command;
 	}
 
@@ -32,5 +34,4 @@ public class Setmodrole implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/setmodrole:help");
 	}
-
 }

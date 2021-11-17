@@ -1,6 +1,4 @@
 es
 fr
-it
-jp
 nl
 ru

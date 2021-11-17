@@ -13,31 +13,36 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class Levelreward implements Command{
 
+	private Guild guild;
+	private User user;
+	
 	@Override
 	public void perform(SlashCommandEvent event) {
+		guild = event.getGuild();
+		user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/levelreward:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/levelreward:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
-			Configloader.INSTANCE.addGuildConfig(event.getGuild(), "levelrewards", event.getOption("role").getAsRole().getId() + "_" + event.getOption("level").getAsString());
+			Configloader.INSTANCE.addGuildConfig(guild, "levelrewards", event.getOption("role").getAsRole().getId() + "_" + event.getOption("level").getAsString());
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The role\s"
 							+ event.getOption("role").getAsRole().getAsMention() + "\swill now be assigned to every member reaching level\s" + event.getOption("level").getAsString() + "!")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
-			String rawinput = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "levelrewards");
+			String rawinput = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards");
 			if (rawinput.equals("")) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/levelreward:norewards")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/levelreward:norewards")).queue();
 				return;
 			}
 			String[] rewards = rawinput.split(";");
 			for (int i = 0; i < rewards.length; i++) {
 				if (rewards[i].contains(event.getOption("role").getAsRole().getId())) {
-					Configloader.INSTANCE.deleteGuildConfig(event.getGuild(), "levelrewards", rewards[i]);
+					Configloader.INSTANCE.deleteGuildConfig(guild, "levelrewards", rewards[i]);
 					String[] reward = rewards[i].split("_");
 					event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The role\s"
-								+ event.getGuild().getRoleById(reward[0]).getAsMention() + "\swill no longer be given to every member reaching level\s" + reward[1] + "!")).queue();
+								+ guild.getRoleById(reward[0]).getAsMention() + "\swill no longer be given to every member reaching level\s" + reward[1] + "!")).queue();
 					return;
 				}
 			}
@@ -63,11 +68,10 @@ public class Levelreward implements Command{
 	}
 	
 	private void listrewards(SlashCommandEvent event) {
-		final Guild guild = event.getGuild();
-		final StringBuilder sB = new StringBuilder();
-		final String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards");
+		StringBuilder sB = new StringBuilder();
+		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards");
 		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/levelreward:norewards")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/levelreward:norewards")).queue();;
 			return;
 		}
 		if (!currentraw.contains(";")) {
