@@ -19,11 +19,13 @@ public class Mute implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/command/moderation/mute:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/commands/moderation/mute:nopermission")).queue();
 			return;
 		}
 		this.mute(guild.getMember(user));
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully muted permanently!")).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(
+				AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/mute:success"),
+				AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/mute:success").replace("{user}", user.getName()))).queue();
 	}
 
 	@Override

@@ -39,8 +39,9 @@ public class Bot {
 	
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
-		System.out.println("Still not ready:\n");
-		System.out.println("In developement:\n-> Ping to move");
+		System.out.println("Still not ready:\n-> Multilanguage system for info commands");
+		System.out.println("In developement:\n");
+		System.out.println("In planning:\n-> Ping to move");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());

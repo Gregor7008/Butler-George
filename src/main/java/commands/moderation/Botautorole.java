@@ -61,11 +61,11 @@ public class Botautorole implements Command{
 		StringBuilder sB = new StringBuilder();
 		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "botautoroles");
 		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autorole:nobotautoroles")).queue();;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/botautorole:nobotautoroles")).queue();;
 			return;
 		}
 		if (!currentraw.contains(";")) {
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new bot joins:", "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/botautorole:list"), "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
 			return;
 		}
 		String[] current = currentraw.split(";");
@@ -78,6 +78,6 @@ public class Botautorole implements Command{
 				sB.append(guild.getRoleById(current[i-1]).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new bot joins:", sB.toString())).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/botautorole:list"), sB.toString())).queue();
 	}
 }

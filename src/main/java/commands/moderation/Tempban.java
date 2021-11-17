@@ -25,14 +25,16 @@ public class Tempban implements Command{
 			return;
 		}
 		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), guild.getMember(user));
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully banned for\s" + event.getOption("days").getAsString() + "\sdays!")).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(
+				AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/tempban:success"),
+				AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/tempban:success").replace("{user}", user.getName()).replace("{time}", event.getOption("days").getAsString()))).queue();
 	}
 
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("tempban", "Ban a user temporary")
-												.addOptions(new OptionData(OptionType.USER, "member", "The member you want to ban").setRequired(true))
-												.addOptions(new OptionData(OptionType.INTEGER, "days", "The number of days you want the member to be banned").setRequired(true));
+												.addOptions(new OptionData(OptionType.USER, "member", "The member you want to ban", true))
+												.addOptions(new OptionData(OptionType.INTEGER, "days", "The number of days you want the member to be banned", true));
 		return command;
 	}
 

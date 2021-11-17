@@ -21,11 +21,13 @@ public class Tempmute implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/command/moderation/tempmute:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/commands/moderation/tempmute:nopermission")).queue();
 			return;
 		}
 		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), guild.retrieveMember(user).complete());
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The member\s" + user.getName() + "\swas successfully muted for\s" + event.getOption("days").getAsString() + "\sdays!")).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(
+					AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/tempmute:success"),
+					AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/tempmute:success").replace("{user}", user.getName()).replace("{time}", event.getOption("days").getAsString()))).queue();
 	}
 
 	@Override

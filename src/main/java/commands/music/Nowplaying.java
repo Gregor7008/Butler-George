@@ -28,7 +28,7 @@ public class Nowplaying implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/nowplaying:nopermission")).queue();
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current track:", ":arrow_right: | `" + info.title + "` by `" + info.author + "`!")).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/music/nowplaying:success"), ":arrow_right: | `" + info.title + "` by `" + info.author + "`!")).queue();
 	}
 
 	@Override

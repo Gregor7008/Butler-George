@@ -47,7 +47,9 @@ public class Warning implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/warning:success")).queue();
 			try {
 				iuser.openPrivateChannel().queue(channel -> {
-					channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + guild.getName() + "\nReason:\n=> " + reason)).queue();
+					channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(
+							AnswerEngine.getInstance().getTitle(guild, iuser, "/commands/moderation/warning:pm"),
+							AnswerEngine.getInstance().getDescription(guild, iuser, "/commands/moderation/warning:pm").replace("{guild}", guild.getName()).replace("{reason}", reason))).queue();
 				});
 			} catch (Exception e) {}
 			AutoPunishEngine.getInstance().processWarnings(guild);
@@ -58,7 +60,7 @@ public class Warning implements Command{
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			if (this.listwarnings(event)) {
-				event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Choose a warning!", ":envelope_with_arrow: | Please reply with the number of the warning you want to remove!")).queue();
+				event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/warning:remsel")).queue();
 				EventWaiter waiter = Bot.INSTANCE.getWaiter();
 				TextChannel channel = event.getTextChannel();
 				Member member = event.getOption("member").getAsMember();
@@ -69,7 +71,9 @@ public class Warning implements Command{
 							  String[] warnings = allwarnings.split(";");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
 							  Configloader.INSTANCE.deleteUserConfig(member, "warnings", warnings[w-1]);
-							  channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The warning for \"" + warnings[w-1] + "\" was successfully removed of " + member.getEffectiveName())).queue();},
+							  channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(
+									  AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/warning:remsuccess"),
+									  AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/warning:remsuccess").replace("{warning}", warnings[w-1]).replace("{user}", member.getEffectiveName()))).queue();},
 						1, TimeUnit.MINUTES,
 						() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/warning:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			}

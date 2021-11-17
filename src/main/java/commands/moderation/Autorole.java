@@ -65,7 +65,7 @@ public class Autorole implements Command {
 			return;
 		}
 		if (!currentraw.contains(";")) {
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/autorole:list"), "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
 			return;
 		}
 		String[] current = currentraw.split(";");
@@ -78,6 +78,6 @@ public class Autorole implements Command {
 				sB.append(guild.getRoleById(current[i-1]).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current roles which will be assigned when a new member joins:", sB.toString())).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/autorole:list"), sB.toString())).queue();
 	}
 }

@@ -203,7 +203,7 @@ public class Autopunish implements Command{
 		}
 		if (!currentraw.contains(";")) {
 			String[] temp1 = currentraw.split("_");
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current punishements:", "#" + temp1[1] + "\s\s" + temp1[0])).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/autopunish:nopunishements"), "#" + temp1[1] + "\s\s" + temp1[0])).queue();
 			return;
 		}
 		String[] current = currentraw.split(";");
@@ -216,6 +216,6 @@ public class Autopunish implements Command{
 				sB.append(temp2[0] + "\swarnings,\n");
 			}
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current punishements:", sB.toString())).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/autopunish:nopunishements"), sB.toString())).queue();
 	}
 }

@@ -36,7 +36,7 @@ public class Help implements Command{
 		if ((cmd = commandList.musiccmds.get(event.getOption("command").getAsString())) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
 		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/help:error")).queue();

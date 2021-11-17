@@ -15,6 +15,10 @@ public class Close implements Command {
 	public void perform(SlashCommandEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
+		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")))) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/close:nopermission"));
+			return;
+		}
 		if (event.getTextChannel().getName().contains("-support")) {
 			event.getTextChannel().delete().queue();
 			return;

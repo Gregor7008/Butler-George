@@ -27,7 +27,7 @@ public class Levelreward implements Command{
 		if (event.getSubcommandName().equals("add")) {
 			Configloader.INSTANCE.addGuildConfig(guild, "levelrewards", event.getOption("role").getAsRole().getId() + "_" + event.getOption("level").getAsString());
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The role\s"
-							+ event.getOption("role").getAsRole().getAsMention() + "\swill now be assigned to every member reaching level\s" + event.getOption("level").getAsString() + "!")).queue();
+							+ event.getOption("role").getAsRole().getAsMention() + "\s" + AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/levelreward:addsuccess") + "\s" + event.getOption("level").getAsString() + "!")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
@@ -42,7 +42,7 @@ public class Levelreward implements Command{
 					Configloader.INSTANCE.deleteGuildConfig(guild, "levelrewards", rewards[i]);
 					String[] reward = rewards[i].split("_");
 					event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!", ":white_check_mark: | The role\s"
-								+ guild.getRoleById(reward[0]).getAsMention() + "\swill no longer be given to every member reaching level\s" + reward[1] + "!")).queue();
+								+ guild.getRoleById(reward[0]).getAsMention() + "\s" + AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/levelreward:remsuccess") + "\s" + reward[1] + "!")).queue();
 					return;
 				}
 			}
@@ -76,7 +76,7 @@ public class Levelreward implements Command{
 		}
 		if (!currentraw.contains(";")) {
 			String[] reward = currentraw.split("_");
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current levelrewards:", "#1\s\s" + guild.getRoleById(reward[0]).getAsMention() + "\s->\s" + reward[1])).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/levelreward:list"), "#1\s\s" + guild.getRoleById(reward[0]).getAsMention() + "\s->\s" + reward[1])).queue();
 			return;
 		}
 		String[] current = currentraw.split(";");
@@ -90,6 +90,6 @@ public class Levelreward implements Command{
 				sB.append(guild.getRoleById(reward[0]).getAsMention() + "\s->\s" + reward[1] + "\n");
 			}
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Current levelrewards:", sB.toString())).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/levelreward:list"), sB.toString())).queue();
 	}
 }
