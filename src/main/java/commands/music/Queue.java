@@ -25,18 +25,19 @@ public class Queue implements Command{
 		final Member member = event.getMember();
 		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
+		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 		if (!self.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/nowplaying:notconnected")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/nowplaying:notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/nowplaying:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/nowplaying:nopermission")).queue();
 			return;
 		}
 		if (queue.isEmpty()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/music/nowplaying:noqueue")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/nowplaying:noqueue")).queue();
 			return;
 		}
 		
@@ -87,5 +88,4 @@ public class Queue implements Command{
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/music/queue:help");
 	}
-
 }
