@@ -31,7 +31,7 @@ public class AutoPunishEngine {
 			String[] temp1 = pm[a].split("_", 2);
 			punishements.put(Integer.valueOf(temp1[0]), temp1[1]);
 		}
-		List<Member> members = guild.loadMembers().get();
+		List<Member> members = guild.getMembers();
 		//go through members
 		for (int e = 0; e < members.size(); e++) {
 			Member member = members.get(e);

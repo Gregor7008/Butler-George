@@ -7,6 +7,7 @@ import commands.moderation.Autorole;
 import commands.moderation.Botautorole;
 import commands.moderation.Clear;
 import commands.moderation.Close;
+import commands.moderation.Forbiddenwords;
 import commands.moderation.Goodbye;
 import commands.moderation.Ignorechannel;
 import commands.moderation.Join2Create;
@@ -85,6 +86,7 @@ public class CommandList {
 		this.moderationcmds.put("setsupportrole", new Setsupportrole());
 		this.moderationcmds.put("setsupportchat", new Setsupportchat());
 		this.moderationcmds.put("setsupporttalk", new Setsupporttalk());
+		this.moderationcmds.put("forbiddenwords", new Forbiddenwords());
 		this.moderationcmds.put("move", new Move());
 		//Developement
 		this.moderationcmds.put("test", new Test());
