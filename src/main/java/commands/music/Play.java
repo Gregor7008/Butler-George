@@ -24,7 +24,7 @@ public class Play implements Command{
 		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
 		final TextChannel channel = event.getTextChannel();
-		final String argument = event.getOption("title").toString();
+		final String argument = event.getOption("title").getAsString();
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
@@ -76,7 +76,7 @@ public class Play implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!"));
+		CommandData command = new CommandData("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!", true));
 		return command;
 	}
 

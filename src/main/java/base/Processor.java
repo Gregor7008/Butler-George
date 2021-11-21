@@ -40,7 +40,6 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 public class Processor extends ListenerAdapter {
@@ -239,14 +238,14 @@ public class Processor extends ListenerAdapter {
 		//check for Join2create-channel & create User-channel if true
 		String j2cid = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
 		if (channeljoined.getId().equals(j2cid)) {
-			ChannelAction<VoiceChannel> newchannel = guild.createVoiceChannel(member.getEffectiveName() + "'s channel", channeljoined.getParent());
 			Collection<Permission> perms = new LinkedList<Permission>();
 			perms.add(Permission.MANAGE_CHANNEL);
 			perms.add(Permission.MANAGE_PERMISSIONS);
 			perms.add(Permission.CREATE_INSTANT_INVITE);
 			perms.add(Permission.VOICE_MUTE_OTHERS);
 			perms.add(Permission.VOICE_SPEAK);
-			VoiceChannel nc = newchannel.addMemberPermissionOverride(member.getIdLong(), perms, null).complete();
+			VoiceChannel nc = guild.createVoiceChannel(member.getEffectiveName() + "'s channel", channeljoined.getParent()).complete();
+			nc.putPermissionOverride(member).setAllow(perms).complete();
 			guild.moveVoiceMember(member, nc).queue();
 			Configloader.INSTANCE.addGuildConfig(guild, "j2cs", nc.getId() + "-" + member.getUser().getId());
 		}
