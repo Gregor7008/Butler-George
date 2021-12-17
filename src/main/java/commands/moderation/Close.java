@@ -15,23 +15,23 @@ public class Close implements Command {
 	public void perform(SlashCommandEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")))) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/close:nopermission"));
+		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))) && !event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/close:nopermission")).queue();
 			return;
 		}
 		if (event.getTextChannel().getName().contains("-support")) {
 			event.getTextChannel().delete().queue();
 			return;
 		}
-		if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getName()).equals(null)) {
+		if (Configloader.INSTANCE.getMailConfig1(event.getTextChannel().getId()) != null) {
+			String cid = event.getTextChannel().getId();
+			event.getTextChannel().delete().queue();
+			Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cid)).openPrivateChannel().complete().sendMessageEmbeds(
+					AnswerEngine.getInstance().fetchMessage(guild, Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cid)), "/commands/moderation/close:closed")).queue();
+			Configloader.INSTANCE.removeMailConfig(cid);
+		} else {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/close:nochannel")).queue();
-			return;
 		}
-		String cname = event.getChannel().getName();
-		event.getTextChannel().delete().queue();
-		Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cname)).openPrivateChannel().complete().sendMessageEmbeds(
-				AnswerEngine.getInstance().fetchMessage(guild, Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cname)), "/commands/moderation/close:closed")).queue();
-		Configloader.INSTANCE.removeMailConfig(cname);
 	}
 
 	@Override

@@ -8,6 +8,8 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
+import commands.music.Stop;
+
 public class TrackScheduler extends AudioEventAdapter {
 
 	public final AudioPlayer player;
@@ -25,13 +27,17 @@ public class TrackScheduler extends AudioEventAdapter {
 	}
 	
 	public void nextTrack() {
-		this.player.startTrack(this.queue.poll(), false);
+		if (this.queue.poll() != null) {
+			this.player.startTrack(this.queue.poll(), false);
+		} else {
+			new Stop().stopandleave(PlayerCache.getInstance().getGuild(player));
+		}
 	}
 	
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 		if (endReason.mayStartNext) {
-			nextTrack();
+			this.nextTrack();
 		}
 	}
 }

@@ -57,21 +57,17 @@ public class ModMail {
 	
 	private void processMessage(PrivateMessageReceivedEvent event) {
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID"));
-		TextChannel nc = guild.createTextChannel(event.getAuthor().getName().toLowerCase(), guild.getCategoryById("896011407303270402")).complete();
+		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById("896011407303270402")).complete();
 		nc.sendMessage(event.getMessage().getContentRaw()).queue();
-		Configloader.INSTANCE.setMailConfig(String.valueOf(event.getAuthor().getName().toLowerCase()), event.getAuthor().getId());
+		Configloader.INSTANCE.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 	
 	private void processAnonymousMessage(PrivateMessageReceivedEvent event) {
-		Random rng = new Random();
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID"));
-		int rn = rng.nextInt(100);
-		while (Configloader.INSTANCE.getMailConfig1(String.valueOf(rn)) != null) {
-			rn = rng.nextInt(100);
-		}
+		int rn = new Random().nextInt(100);
 		TextChannel nc = guild.createTextChannel(String.valueOf(rn), guild.getCategoryById("896011407303270402")).complete();
 		String message = event.getMessage().getContentDisplay().replaceAll("#anonymous", "");
 		nc.sendMessage(message).queue();
-		Configloader.INSTANCE.setMailConfig(String.valueOf(rn), event.getAuthor().getId());
+		Configloader.INSTANCE.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 }

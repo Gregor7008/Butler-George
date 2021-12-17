@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import commands.Command;
 import commands.CommandList;
+import commands.music.Stop;
 import commands.utilities.Suggest;
 import components.base.AnswerEngine;
 import components.base.Configloader;
@@ -57,12 +58,12 @@ public class Processor extends ListenerAdapter {
 		LevelEngine.getInstance().messagereceived(event);
 		//automoderation
 		AutoModerator.getInstance().messagereceived(event);
-		//Anonymous ModMail
-		if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getName()) != null) {
+		//ModMail
+		if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getId()) != null) {
 			if (event.getAuthor().isBot()) {
 				return;
 			}
-			PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(Configloader.INSTANCE.getMailConfig1(event.getChannel().getName())).complete();
+			PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(Configloader.INSTANCE.getMailConfig1(event.getChannel().getId())).complete();
 			pc.sendMessage(event.getMessage().getContentDisplay()).queue();
 			return;
 		}
@@ -252,16 +253,17 @@ public class Processor extends ListenerAdapter {
 	}
 	
 	private void managej2cleave(Guild guild, Member member, VoiceChannel channelleft) {
-		//check if VoiceChannelLeft was a Userchannel
 		VoiceChannel vc = channelleft;
 		int conmemb = vc.getMembers().size();
-		if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId())) {
-			if (conmemb == 1) {
-				if (vc.getMembers().get(0).equals(guild.getSelfMember())) {
-					guild.getAudioManager().closeAudioConnection();
-					conmemb--;
-				}
+		//check if bot is the only one left in the channel (Then leave)
+		if (conmemb == 1) {
+			if (vc.getMembers().get(0).equals(guild.getSelfMember())) {
+				new Stop().stopandleave(guild);
+				conmemb--;
 			}
+		}
+		//check if VoiceChannelLeft was a Userchannel
+		if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId())) {
 			if (conmemb == 0) {
 				Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", vc.getId() + "-" + member.getUser().getId());
 				vc.delete().queue();

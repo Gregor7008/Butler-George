@@ -41,22 +41,23 @@ public class ModController {
 					}
 				}
 				String muteroleID = Configloader.INSTANCE.getGuildConfig(guild, "muterole");
-				Role muterole = guild.getRoleByBot(muteroleID);
+				Role muterole = guild.getRoleById(muteroleID);
 				//Check the user
 				if (guilddir.exists()) {
 					File pFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
 					if (pFile.exists() && !user.isBot()) {
+						//Check for tempmute properties
 						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempmuted"))) {
 							OffsetDateTime tmuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tmuntil"));
 							OffsetDateTime now = OffsetDateTime.now();
 							int difference = Duration.between(now, tmuntil).toSecondsPart();
 							if (difference <= 0) {
-								guild.removeRoleFromMember(member, muterole).queue();
 								Configloader.INSTANCE.setUserConfig(guild.retrieveMember(user).complete(), "muted", "false");
 								Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tempmuted", "false");
 								Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tmuntil", "");
 							}
 						}
+						//Enforce mute properties
 						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
 							if (!member.getRoles().contains(muterole)) {
 								guild.addRoleToMember(member, muterole).queue();

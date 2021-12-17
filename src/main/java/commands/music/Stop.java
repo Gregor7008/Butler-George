@@ -19,7 +19,6 @@ public class Stop implements Command{
 		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
-		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (!self.getVoiceState().inVoiceChannel()) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/stop:notconnected")).queue();
 			return;
@@ -33,13 +32,7 @@ public class Stop implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/stop:nopermission")).queue();
 			return;
 		}
-		musicManager.scheduler.player.stopTrack();
-		musicManager.scheduler.queue.clear();
-		VoiceChannel vc = guild.getSelfMember().getVoiceState().getChannel();
-		guild.getAudioManager().closeAudioConnection();
-		if (vc.getUserLimit() != 0) {
-			vc.getManager().setUserLimit(vc.getUserLimit() - 1).queue();
-		}
+		this.stopandleave(guild);
 		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/stop:stopped")).queue();
 	}
 
@@ -52,5 +45,16 @@ public class Stop implements Command{
 	@Override
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/music/stop:help");
+	}
+	
+	public void stopandleave(Guild guild) {
+		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+		musicManager.scheduler.player.stopTrack();
+		musicManager.scheduler.queue.clear();
+		VoiceChannel vc = guild.getSelfMember().getVoiceState().getChannel();
+		guild.getAudioManager().closeAudioConnection();
+		if (vc.getUserLimit() != 0) {
+			vc.getManager().setUserLimit(vc.getUserLimit() - 1).queue();
+		}
 	}
 }
