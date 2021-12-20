@@ -24,7 +24,7 @@ public class ModMail {
 			return;
 		}
 		if (Configloader.INSTANCE.getMailConfig2(event.getAuthor().getId()) != null) {
-			TextChannel channel = guild.getTextChannelsByName(Configloader.INSTANCE.getMailConfig2(event.getAuthor().getId()), true).get(0);
+			TextChannel channel = guild.getTextChannelById(Configloader.INSTANCE.getMailConfig2(event.getAuthor().getId()));
 			channel.sendMessage(event.getMessage().getContentRaw()).queue();
 			return;
 		}

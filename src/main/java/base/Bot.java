@@ -41,7 +41,7 @@ public class Bot {
 		INSTANCE = this;
 		System.out.println("Still not ready:\n-> Multilanguage system for info commands");
 		System.out.println("In developement:\n");
-		System.out.println("In planning:\n-> Ping to move");
+		System.out.println("In planning:\n-> Ping to move\n-> Warn option for abuse of anonymous modmail");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
