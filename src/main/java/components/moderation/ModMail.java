@@ -58,7 +58,7 @@ public class ModMail {
 	private void processMessage(PrivateMessageReceivedEvent event) {
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID"));
 		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById("896011407303270402")).complete();
-		nc.sendMessage(event.getMessage().getContentRaw()).queue();
+		nc.sendMessage(event.getMessage().getContentRaw() + "\n" + guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")).getAsMention()).queue();
 		Configloader.INSTANCE.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 	
@@ -67,7 +67,7 @@ public class ModMail {
 		int rn = new Random().nextInt(100);
 		TextChannel nc = guild.createTextChannel(String.valueOf(rn), guild.getCategoryById("896011407303270402")).complete();
 		String message = event.getMessage().getContentDisplay().replaceAll("#anonymous", "");
-		nc.sendMessage(message).queue();
+		nc.sendMessage(message + "\n" + guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")).getAsMention()).queue();
 		Configloader.INSTANCE.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 }

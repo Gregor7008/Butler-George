@@ -39,9 +39,11 @@ public class Bot {
 	
 	private Bot() throws LoginException, InterruptedException {
 		INSTANCE = this;
-		System.out.println("Still not ready:\n-> Multilanguage system for info commands");
-		System.out.println("In developement:\n");
-		System.out.println("In planning:\n-> Ping to move\n-> Warn option for abuse of anonymous modmail");
+		System.out.println("Still not ready:\n-> Multilanguage system for info commands\n--------------------");
+		System.out.println("In developement:\n-> \n--------------------");
+		System.out.println("In planning:\n-> Ping to move\n-> Warn option for abuse of anonymous modmail\n--------------------");
+		System.out.println("If token is null:\n1. Check if the local variable \"resourcepath\" in \"Bot.getBotConfig()\" is starting with \"../\""
+				+ "\n2. Check if the file \"botconfig.properties\" in \"resources\" if \"token=(token here)\"\n--------------------");
 		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
@@ -126,7 +128,11 @@ public class Bot {
 	}
 	
 	public String getBotConfig(String key) {
-		File propertiesFile = new File("./resources/botconfig.properties");
+		String resourcepath = "../resources";
+		if (key.equals("resourcepath")) {
+			return resourcepath;
+		}
+		File propertiesFile = new File(resourcepath + "/botconfig.properties");
 		Properties properties = new Properties();	 
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
 		  properties.load(bis);
