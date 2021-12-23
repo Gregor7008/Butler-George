@@ -1,14 +1,18 @@
 package base;
 
-import java.io.BufferedInputStream;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Properties;
 
 import javax.security.auth.login.LoginException;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -28,23 +32,74 @@ public class Bot {
 	
 	public JDA jda;
 	private EventWaiter eventWaiter = new EventWaiter();
+	private static String token, environment;
 	
 	public static void main(String[] arguments) {
-		try {
-			new Bot();
-		} catch (LoginException | InterruptedException e) {
-			e.printStackTrace();
-		}
+		   JFrame scframe = new JFrame("NoLimits Bot - Startup Configuration");
+	       JPanel scpanel = new JPanel();
+	       JButton dbutton = new JButton("Finish");
+	       JTextField tfield = new JTextField("", 35);
+	       JCheckBox ebox = new JCheckBox("Eclipse");
+	       JCheckBox jbox = new JCheckBox("Java RE");
+	       
+	       scpanel.add(new JLabel("Token:"));
+	       scpanel.add(tfield);
+	       scpanel.add(new JLabel("Environment:"));
+	       scpanel.add(ebox);
+	       scpanel.add(jbox);
+	       scpanel.add(dbutton);
+	       
+	       scframe.add(scpanel);
+	       scframe.pack();
+	       scframe.setLocationRelativeTo(null);
+	       scframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	       scframe.setVisible(true);
+	       dbutton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				scframe.setVisible(false);
+				JFrame eframe = new JFrame("NoLimits Bot - Error");
+				JPanel epanel = new JPanel();
+				String error = "";
+				if (ebox.isSelected() && jbox.isSelected()) {
+					error = "Error! You may only select the correct environment, in which the program is running in!";
+				}
+				if (!ebox.isSelected() && !jbox.isSelected()) {
+					error = "Error! You have to select the correct environment, in which the program is running in!";
+				}
+				if (ebox.isSelected()) {
+					environment = "./resources";
+				} else {
+					environment = "../resources";
+				}
+				if (tfield.getText().equals("")) {
+					error = "Error! You have to input a valid bot token!";
+				} else {
+					token = tfield.getText();
+				}
+				if (error.equals("")) {
+					try {
+						new Bot();
+						return;
+					} catch (LoginException | InterruptedException | IOException ex) {
+						error = "Error! You have to input a valid bot token!";
+					}
+				}
+				epanel.add(new JLabel(error));
+				eframe.add(epanel);
+				eframe.pack();
+				eframe.setLocationRelativeTo(null);
+				eframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				eframe.setVisible(true);
+			}});
 	}
 	
-	private Bot() throws LoginException, InterruptedException {
+	private Bot() throws LoginException, InterruptedException, IOException {
 		INSTANCE = this;
 		System.out.println("Still not ready:\n-> Multilanguage system for info commands\n--------------------");
 		System.out.println("In developement:\n-> \n--------------------");
 		System.out.println("In planning:\n-> Ping to move\n-> Warn option for abuse of anonymous modmail\n--------------------");
-		System.out.println("If token is null:\n1. Check if the local variable \"resourcepath\" in \"Bot.getBotConfig()\" is starting with \"../\""
-				+ "\n2. Check if the file \"botconfig.properties\" in \"resources\" if \"token=(token here)\"\n--------------------");
-		JDABuilder builder = JDABuilder.createDefault(this.getBotConfig("token"));
+		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
 		builder.setRawEventsEnabled(true);
@@ -54,19 +109,21 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    new Thread (() -> {
 	    	while (jda.getPresence().getStatus().equals(OnlineStatus.ONLINE)) {
-	    		jda.getPresence().setActivity(Activity.playing("Discord"));
-	    		this.wait(15000);
-	    		jda.getPresence().setActivity(Activity.watching("private messages"));
-	    		this.wait(15000);
-	    		jda.getPresence().setActivity(Activity.watching("NoLimits"));
-	    		this.wait(15000);
-	    		jda.getPresence().setActivity(Activity.playing("discord.gg/qHA2vUs"));
-	    		this.wait(15000);
+	    		try {
+	    			jda.getPresence().setActivity(Activity.playing("Discord"));
+	    			this.wait(15000);
+	    			jda.getPresence().setActivity(Activity.watching("private messages"));
+	    			this.wait(15000);
+	    			jda.getPresence().setActivity(Activity.watching("NoLimits"));
+	    			this.wait(15000);
+	    			jda.getPresence().setActivity(Activity.playing("discord.gg/qHA2vUs"));
+	    			this.wait(15000);
+	    		} catch (InterruptedException e) {}
 	    	}
 	    }).start();
     	new Configloader();
     	//new NoLimitsOnly().staticTalksOff();
-    	this.readConsole();
+    	this.waitForStop();
     	for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
     		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("")) {
@@ -100,7 +157,7 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
 		System.out.println("Bot offline");
-		this.wait(1000);
+		try {this.wait(1000);} catch (InterruptedException e) {}
 		System.exit(0);
 	}
 	
@@ -108,12 +165,11 @@ public class Bot {
 		return eventWaiter;
 	}
 	
-	private void wait(int time) {
-		try { Thread.sleep(time);
-        } catch (InterruptedException e){}
+	private void wait(int time) throws InterruptedException {
+		Thread.sleep(time);
 	}
 	
-	private void readConsole() {
+	private void waitForStop() {
 		new Thread (() -> {
 			String line = "";
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -128,15 +184,12 @@ public class Bot {
 	}
 	
 	public String getBotConfig(String key) {
-		String resourcepath = "../resources";
 		if (key.equals("resourcepath")) {
-			return resourcepath;
+			return environment;
 		}
-		File propertiesFile = new File(resourcepath + "/botconfig.properties");
-		Properties properties = new Properties();	 
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
-		  properties.load(bis);
-		} catch (Exception ex) {}
-		return properties.getProperty(key);
+		if (key.equals("NoLiID")) {
+			return "708381749826289666";
+		}
+		return null;
 	}
 }
