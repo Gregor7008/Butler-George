@@ -1,0 +1,4 @@
+es
+fr => Samurai
+nl
+ru
