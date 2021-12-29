@@ -69,7 +69,7 @@ public class Bot {
 	    }).start();
     	new Configloader();
     	//new NoLimitsOnly().staticTalksOff();
-    	this.waitForStop();
+    	this.readConsole();
     	for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
     		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("")) {
@@ -81,7 +81,7 @@ public class Bot {
     	}
 	}
 
-	public void shutdown() {
+	private void shutdown() {
 		//new NoLimitsOnly().staticTalksOn();
 		for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
     		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
@@ -107,25 +107,83 @@ public class Bot {
 		System.exit(0);
 	}
 	
+	private void readConsole() {
+		new Thread (() -> {
+			String line = "";
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			try {
+				while((line = reader.readLine()) != null) {
+					String[] insplit = line.split(" ");
+					String command = insplit[0];
+					switch (command) {
+					case "stop": 
+						this.shutdown();
+						break;
+					case "exit":
+						System.exit(0);
+						break;
+					case "giverole":
+						try {
+							jda.getGuildById(insplit[1]).addRoleToMember(insplit[2], jda.getGuildById(insplit[1]).getRoleById(insplit[3])).queue();
+						} catch (Exception e) {
+							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID | 3. Role ID");
+							break;
+						}
+						System.out.println("Role " + jda.getGuildById(insplit[1]).getRoleById(insplit[3]).getName() + " was successfully given to " + jda.retrieveUserById(insplit[2]).complete().getName());
+						break;
+					case "removerole":
+						try {	
+							jda.getGuildById(insplit[1]).removeRoleFromMember(insplit[2], jda.getGuildById(insplit[1]).getRoleById(insplit[3])).queue();
+						} catch (Exception e) {
+							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID | 3. Role ID");
+							break;
+						}
+						System.out.println("Role " + jda.getGuildById(insplit[1]).getRoleById(insplit[3]).getName() + " was successfully removed from " + jda.retrieveUserById(insplit[2]).complete().getName());
+						break;
+					case "kick":
+						try {
+							jda.getGuildById(insplit[1]).kick(insplit[2]).queue();
+						} catch (Exception e) {
+							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID");
+							break;
+						}
+						System.out.println("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully kicked from " + jda.getGuildById(insplit[1]).getName());
+						break;
+					case "ban":
+						try {
+							jda.getGuildById(insplit[1]).ban(insplit[2], 0).queue();
+						} catch (Exception e) {
+							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID");
+							break;
+						}
+						System.out.println("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully banned from " + jda.getGuildById(insplit[1]).getName());
+						break;
+					case "unban":
+						try {
+							jda.getGuildById(insplit[1]).unban(insplit[2]).queue();
+						} catch (Exception e) {
+							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID");
+							break;
+						}
+						System.out.println("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully unbanned from " + jda.getGuildById(insplit[1]).getName());
+						break;
+					case "warn":
+						Configloader.INSTANCE.addUserConfig(jda.getGuildById(insplit[1]).getMemberById(insplit[2]), "warnings", "Administrative actions");
+						System.out.println("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
+						break;
+					default:
+						System.out.println("Unknown command!");
+					}
+				}
+			} catch (IOException e){}
+		}).start();
+	}
+	
 	public EventWaiter getWaiter() {
 		return eventWaiter;
 	}
 	
 	private void wait(int time) throws InterruptedException {
 		Thread.sleep(time);
-	}
-	
-	private void waitForStop() {
-		new Thread (() -> {
-			String line = "";
-			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-			try {
-				while((line = reader.readLine()) != null) {
-					if(line.equalsIgnoreCase("stop")) {
-						this.shutdown();
-					}
-				}
-			} catch (IOException e){}
-		}).start();
 	}
 }
