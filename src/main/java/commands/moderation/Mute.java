@@ -44,7 +44,7 @@ public class Mute implements Command{
 	public void mute(Member member) {
 		Configloader.INSTANCE.setUserConfig(member, "tempmuted", "false");
 		Configloader.INSTANCE.setUserConfig(member, "muted", "true");
-		if (member.getGuild().equals(Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID")))) {
+		if (member.getGuild().equals(Bot.INSTANCE.jda.getGuildById(Bot.noliID))) {
 			member.getGuild().removeRoleFromMember(member, member.getGuild().getRoleById("709478250253910103")).queue();
 		}
 	}

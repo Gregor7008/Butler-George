@@ -226,7 +226,7 @@ public class Poll implements Command{
 				}
 			}
 		}
-		String path = Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId() + "/";
+		String path = Bot.environment + "/configs/polls/" + guild.getId() + "/";
 		File renamed = new File(path + msg.getId() + ".properties");
 		File pollfile = Configloader.INSTANCE.findPollConfig(guild, tempname);
 		while (!pollfile.exists()) {
@@ -249,7 +249,7 @@ public class Poll implements Command{
 	}
 	
 	private void listPoll(SlashCommandEvent event) {
-		File fl = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId());
+		File fl = new File(Bot.environment + "/configs/polls/" + guild.getId());
 		StringBuilder sb = new StringBuilder();
 		EmbedBuilder eb = new EmbedBuilder();
 		List<String> pollfiles = Arrays.asList(fl.list(new FilenameFilter() {

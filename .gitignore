@@ -3,4 +3,3 @@ target/
 .classpath
 bin/
 src/test/
-resources/configs/

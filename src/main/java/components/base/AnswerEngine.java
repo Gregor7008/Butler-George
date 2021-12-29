@@ -51,7 +51,7 @@ public class AnswerEngine {
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];
-		File propertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/languages/" + lang + "/" + path + ".properties");
+		File propertiesFile = new File(Bot.environment + "/languages/" + lang + "/" + path + ".properties");
 		Properties properties = new Properties();
 		
 		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {

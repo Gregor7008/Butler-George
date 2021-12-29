@@ -9,13 +9,13 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 
-import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
@@ -84,14 +84,20 @@ public class Level implements Command {
 		int nedxp = LevelEngine.getInstance().xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, iuser, "level")));
 		int progress = this.calculateProgress(level, nedxp, curxp);
 		BufferedImage image = null;
-		try {image = ImageIO.read(new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/" + levelbackground + ".png"));
-		} catch (IOException e) {
+		try {image = ImageIO.read(new File(this.getClass().getClassLoader().getResource("levelcards/" + levelbackground + ".png").toURI()));
+		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 			return null;}		
 		BufferedImage avatar = null;
+		File avfile;
+		try {
+		avfile = new File(this.getClass().getClassLoader().getResource("levelcards/cache/avatar.png").toURI());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return null;
+		}
 		try {
 			URL url = new URL(iuser.getAvatarUrl());
-			File avfile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/cache/avatar.png");
 			FileUtils.copyURLToFile(url, avfile);
 			avatar = ImageIO.read(avfile);
 		} catch (Exception e) {
@@ -126,7 +132,13 @@ public class Level implements Command {
         g2d.drawImage(this.makeRoundedCorner(progressbar, 30), 290, 185, null);
 		//export the image and respond to the event
 		g2d.dispose();
-		File finalimage = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/levelcards/cache/temp.png");
+		File finalimage;
+		try {
+			finalimage = new File(this.getClass().getClassLoader().getResource("levelcards/cache/temp.png").toURI());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return null;
+		}
 		try {
 		ImageIO.write(image, "png", finalimage);
 		}catch (IOException e) {

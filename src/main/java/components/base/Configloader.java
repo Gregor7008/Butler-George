@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.User;
 public class Configloader {
 	
 	public static Configloader INSTANCE;
+	private String respath = Bot.environment;
 	
 	public Configloader() {
 		INSTANCE = this;
@@ -111,7 +112,7 @@ public class Configloader {
 	
 	//Find or create files
 	public File findorCreateMailConfig1() {
-		File mailpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/modmail/708381749826289666/cache1.properties");
+		File mailpropertiesFile = new File(respath + "/configs/modmail/708381749826289666/cache1.properties");
 		if (!mailpropertiesFile.exists()) {
 			try {
 				mailpropertiesFile.createNewFile();
@@ -121,7 +122,7 @@ public class Configloader {
 	}
 	
 	public File findorCreateMailConfig2() {
-		File mailpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/modmail/708381749826289666/cache2.properties");
+		File mailpropertiesFile = new File(respath + "/configs/modmail/708381749826289666/cache2.properties");
 		if (!mailpropertiesFile.exists()) {
 			try {
 				mailpropertiesFile.createNewFile();
@@ -131,11 +132,11 @@ public class Configloader {
 	}
 	
 	public File findorCreateRRConfig(Guild guild, TextChannel channel) {
-		File guilddir = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/reactionroles/" + guild.getId());
+		File guilddir = new File(respath + "/configs/reactionroles/" + guild.getId());
 		if (!guilddir.exists()) {
 			guilddir.mkdirs();
 		}
-		File rrpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/reactionroles/" + guild.getId() + "/" + channel.getId() + ".properties");
+		File rrpropertiesFile = new File(respath + "/configs/reactionroles/" + guild.getId() + "/" + channel.getId() + ".properties");
 		if (!rrpropertiesFile.exists()) {
 			try {
 				rrpropertiesFile.createNewFile();
@@ -146,7 +147,7 @@ public class Configloader {
 
 	public File findorCreateGuildConfig(Guild guild) {
 		Properties pps = new Properties();
-		File pFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/guild/" + guild.getId() + ".properties");
+		File pFile = new File(respath + "/configs/guild/" + guild.getId() + ".properties");
 		if (!pFile.exists()) {
 			try {
 				FileOutputStream fop = new FileOutputStream(pFile);
@@ -179,12 +180,11 @@ public class Configloader {
 	
 	public File findorCreateUserConfig(Guild guild, User user) {
 		Properties pps = new Properties();
-		File guilddir = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guild.getId());
+		File guilddir = new File(respath + "/configs/user/" + guild.getId());
 		if (!guilddir.exists()) {
 			guilddir.mkdirs();
 		}
-		
-		File pFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
+		File pFile = new File( respath + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
 		if (!pFile.exists()) {
 			try {
 				FileOutputStream fop = new FileOutputStream(pFile);
@@ -211,7 +211,7 @@ public class Configloader {
 	}
 	
 	public File findPollConfig(Guild guild, String msgid) {
-		File pollpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId() + "/" + msgid + ".properties");
+		File pollpropertiesFile = new File(respath + "/configs/polls/" + guild.getId() + "/" + msgid + ".properties");
 		if (pollpropertiesFile.exists()) {
 			return pollpropertiesFile;
 		} else {
@@ -221,11 +221,11 @@ public class Configloader {
 	
 	public File createPollConfig(Guild guild, String title) {
 		Properties pps = new Properties();
-		File guilddir = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId());
+		File guilddir = new File(respath + "/configs/polls/" + guild.getId());
 		if (!guilddir.exists()) {
 			guilddir.mkdirs();
 		}
-		File pollpropertiesFile = new File(Bot.INSTANCE.getBotConfig("resourcepath") + "/configs/polls/" + guild.getId() + "/" + title + ".properties");
+		File pollpropertiesFile = new File(respath + "/configs/polls/" + guild.getId() + "/" + title + ".properties");
 		try {
 			FileOutputStream fop = new FileOutputStream(pollpropertiesFile);
 			pollpropertiesFile.createNewFile();

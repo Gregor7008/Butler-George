@@ -15,7 +15,7 @@ public class NoLimitsOnly {
 	private final List<Member> members;
 	
 	public NoLimitsOnly() {
-		guild = Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID"));
+		guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
 		members = guild.loadMembers().get();
 	}
 	

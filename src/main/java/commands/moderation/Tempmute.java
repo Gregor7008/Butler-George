@@ -49,7 +49,7 @@ public class Tempmute implements Command{
 		Configloader.INSTANCE.setUserConfig(member, "tmuntil", until.toString());
 		Configloader.INSTANCE.setUserConfig(member, "tempmuted", "true");
 		Configloader.INSTANCE.setUserConfig(member, "muted", "true");
-		if (member.getGuild().equals(Bot.INSTANCE.jda.getGuildById(Bot.INSTANCE.getBotConfig("NoLiID")))) {
+		if (member.getGuild().equals(Bot.INSTANCE.jda.getGuildById(Bot.noliID))) {
 			member.getGuild().removeRoleFromMember(member, member.getGuild().getRoleById("709478250253910103")).queue();
 		}
 	}

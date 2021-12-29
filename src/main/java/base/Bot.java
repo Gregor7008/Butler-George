@@ -1,18 +1,10 @@
 package base;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 import javax.security.auth.login.LoginException;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -32,69 +24,23 @@ public class Bot {
 	
 	public JDA jda;
 	private EventWaiter eventWaiter = new EventWaiter();
-	private static String token, environment;
+	public static String token, environment, noliID;
 	
 	public static void main(String[] arguments) {
-		   JFrame scframe = new JFrame("NoLimits Bot - Startup Configuration");
-	       JPanel scpanel = new JPanel();
-	       JButton dbutton = new JButton("Finish");
-	       JTextField tfield = new JTextField("", 35);
-	       JCheckBox ebox = new JCheckBox("Eclipse");
-	       JCheckBox jbox = new JCheckBox("Java RE");
-	       
-	       scpanel.add(new JLabel("Token:"));
-	       scpanel.add(tfield);
-	       scpanel.add(new JLabel("Environment:"));
-	       scpanel.add(ebox);
-	       scpanel.add(jbox);
-	       scpanel.add(dbutton);
-	       
-	       scframe.add(scpanel);
-	       scframe.pack();
-	       scframe.setLocationRelativeTo(null);
-	       scframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	       scframe.setVisible(true);
-	       dbutton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				scframe.setVisible(false);
-				JFrame eframe = new JFrame("NoLimits Bot - Error");
-				JPanel epanel = new JPanel();
-				String error = "";
-				if (ebox.isSelected() && jbox.isSelected()) {
-					error = "Error! You may only select the correct environment, in which the program is running in!";
-				}
-				if (!ebox.isSelected() && !jbox.isSelected()) {
-					error = "Error! You have to select the correct environment, in which the program is running in!";
-				}
-				if (ebox.isSelected()) {
-					environment = "./resources";
-				} else {
-					environment = "../resources";
-				}
-				if (tfield.getText().equals("")) {
-					error = "Error! You have to input a valid bot token!";
-				} else {
-					token = tfield.getText();
-				}
-				if (error.equals("")) {
-					try {
-						new Bot();
-						return;
-					} catch (LoginException | InterruptedException | IOException ex) {
-						error = "Error! You have to input a valid bot token!";
-					}
-				}
-				epanel.add(new JLabel(error));
-				eframe.add(epanel);
-				eframe.pack();
-				eframe.setLocationRelativeTo(null);
-				eframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				eframe.setVisible(true);
-			}});
+		if (arguments[0].equals("") || arguments[1].equals("")) {
+			System.out.println("You have to provide 1. a bot token, 2. the path to my resource folder!");
+		}
+		token = arguments[0];
+		environment = arguments[1];
+		noliID = "708381749826289666";
+		try {
+			new Bot(token);
+		} catch (LoginException | InterruptedException | IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 	
-	private Bot() throws LoginException, InterruptedException, IOException {
+	private Bot(String token) throws LoginException, InterruptedException, IOException {
 		INSTANCE = this;
 		System.out.println("Still not ready:\n-> Multilanguage system for info commands\n--------------------");
 		System.out.println("In developement:\n-> \n--------------------");
@@ -181,15 +127,5 @@ public class Bot {
 				}
 			} catch (IOException e){}
 		}).start();
-	}
-	
-	public String getBotConfig(String key) {
-		if (key.equals("resourcepath")) {
-			return environment;
-		}
-		if (key.equals("NoLiID")) {
-			return "708381749826289666";
-		}
-		return null;
 	}
 }
