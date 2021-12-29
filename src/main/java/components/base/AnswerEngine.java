@@ -48,6 +48,7 @@ public class AnswerEngine {
 	
 	public String getRaw(Guild guild, User user, String input) {
 		String lang = Configloader.INSTANCE.getUserConfig(guild, user, "language");
+		lang = "en";
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];
