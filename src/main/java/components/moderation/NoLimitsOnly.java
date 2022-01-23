@@ -4,7 +4,6 @@ import java.util.List;
 
 import base.Bot;
 import commands.moderation.Rolesorting;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -42,17 +41,5 @@ public class NoLimitsOnly {
 				rs.sorter(guild, member, sr4, gr4);
 			}
 		}
-	}
-	
-	public void staticTalksOff() {
-		guild.getVoiceChannelById("906315376231600188").putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-		guild.getVoiceChannelById("906315389091324014").putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-		guild.getVoiceChannelById("906315400462094346").putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-	}
-	
-	public void staticTalksOn() {
-		guild.getVoiceChannelById("906315376231600188").putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
-		guild.getVoiceChannelById("906315389091324014").putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
-		guild.getVoiceChannelById("906315400462094346").putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
 	}
 }

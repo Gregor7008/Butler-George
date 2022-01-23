@@ -19,6 +19,8 @@ public class Setlanguage implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		Guild guild = event.getGuild();
+		User user = event.getUser();
 		SelectionMenu menu = SelectionMenu.create("menu:class")
 				.setPlaceholder("Select your language")
 				.setRequiredRange(1, 1)
@@ -29,44 +31,44 @@ public class Setlanguage implements Command{
 				.addOption("Nederlands", "nl")
 				.addOption("Pусский", "ru")
 				.build();
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:chooselang"))
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:chooselang"))
 				.setEphemeral(true)
 				.addActionRow(menu)
 				.queue();
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		waiter.waitForEvent(SelectionMenuEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
-				  	  return e.getUser().getIdLong() == event.getUser().getIdLong();},
+				  	  return e.getUser().getIdLong() == user.getIdLong();},
 				e -> {switch (e.getSelectedOptions().get(0).getValue()) {
 				      case "en":
 				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "en");
-				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:successen")).queue();
+				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:successen")).queue();
 				    	  break;
 				      case "de":
 				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "de");
-				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:successde")).queue();
+				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:successde")).queue();
 				    	  break;
 				      case "es":
 				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "es");
-				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:successes")).queue();
+				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:successes")).queue();
 				    	  break;
 				      case "fr":
 				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "fr");
-				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:successfr")).queue();
+				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:successfr")).queue();
 				    	  break;
 				      case "nl":
 				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "nl");
-				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:successnl")).queue();
+				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:successnl")).queue();
 				    	  break;
 				      case "ru":
 				    	  Configloader.INSTANCE.setUserConfig(event.getMember(), "language", "ru");
-				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:successru")).queue();
+				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:successru")).queue();
 				    	  break;
 				      default:
-						  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:error")).queue();
+						  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:error")).queue();
 				      }},
 				1, TimeUnit.MINUTES,
-				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/setlanguage:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override

@@ -15,12 +15,13 @@ import commands.moderation.Levelreward;
 import commands.moderation.Move;
 import commands.moderation.Mute;
 import commands.moderation.Reactionrole;
+import commands.moderation.Reset;
 import commands.moderation.Rolesorting;
 import commands.moderation.Setlevelchannel;
 import commands.moderation.Setmodrole;
 import commands.moderation.Setreportchannel;
 import commands.moderation.Setsuggestionchannel;
-import commands.moderation.Setsupportchat;
+import commands.moderation.Setsupportchannel;
 import commands.moderation.Setsupportrole;
 import commands.moderation.Setsupporttalk;
 import commands.moderation.Tempban;
@@ -85,9 +86,10 @@ public class CommandList {
 		this.moderationcmds.put("setreportchannel", new Setreportchannel());
 		this.moderationcmds.put("reactionrole", new Reactionrole());
 		this.moderationcmds.put("setsupportrole", new Setsupportrole());
-		this.moderationcmds.put("setsupportchat", new Setsupportchat());
+		this.moderationcmds.put("setsupportchannel", new Setsupportchannel());
 		this.moderationcmds.put("setsupporttalk", new Setsupporttalk());
 		this.moderationcmds.put("forbiddenwords", new Forbiddenwords());
+		this.moderationcmds.put("reset", new Reset());
 		this.moderationcmds.put("move", new Move());
 		//Developement
 		this.moderationcmds.put("test", new Test());

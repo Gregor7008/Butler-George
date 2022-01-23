@@ -28,6 +28,9 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.channel.category.CategoryDeleteEvent;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
@@ -40,6 +43,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
@@ -91,6 +95,7 @@ public class Processor extends ListenerAdapter {
 			ntc.putPermissionOverride(event.getMember()).setAllow(Permission.VIEW_CHANNEL).queue();
 			ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" + event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportrole")).getAsMention()).queue();
 			event.getMessage().delete().queue();
+			event.getChannel().getManager().setSlowmode(120).queue();
 		}
 	}
 	@Override
@@ -377,5 +382,97 @@ public class Processor extends ListenerAdapter {
 		new Thread (() -> {
 			new NoLimitsOnly().noliRolecheck();
 		}).start();
+	}
+	@Override
+	public void onTextChannelDelete(TextChannelDeleteEvent event) {
+		String id = event.getChannel().getId();
+		Guild guild = event.getGuild();
+		if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(id)) {
+			Configloader.INSTANCE.deleteGuildConfig(guild, "ignored", id);
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "supportchannel").contains(id)) {
+			Configloader.INSTANCE.setGuildConfig(guild, "supportchannel", "");
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "suggest").contains(id)) {
+			Configloader.INSTANCE.setGuildConfig(guild, "suggest", "");
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "reportchannel").contains(id)) {
+			Configloader.INSTANCE.setGuildConfig(guild, "reportchannel", "");
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").contains(id)) {
+			Configloader.INSTANCE.setGuildConfig(guild, "levelmsgch", "");
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "welcomemsg").contains(id)) {
+			Configloader.INSTANCE.setGuildConfig(guild, "welcomemsg", "");
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "goodbyemsg").contains(id)) {
+			Configloader.INSTANCE.setGuildConfig(guild, "goodbyemsg", "");
+		}
+	}
+	@Override
+	public void onVoiceChannelDelete(VoiceChannelDeleteEvent event) {
+		String id = event.getChannel().getId();
+		Guild guild = event.getGuild();
+		if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(id)) {
+			String[] entries = Configloader.INSTANCE.getGuildConfig(guild, "j2cs").split(";");
+			for (int i = 0; i < entries.length; i++) {
+				if (entries[i].contains(id)) {
+					Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", entries[i]);
+				}
+			}
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "supporttalk").contains(id)) {
+			Configloader.INSTANCE.setGuildConfig(guild, "supporttalk", "");
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
+			Configloader.INSTANCE.setGuildConfig(guild, "join2create", "");
+		}
+	}
+	@Override
+	public void onRoleDelete(RoleDeleteEvent event) {
+		String id = event.getRole().getId();
+		Guild guild = event.getGuild();
+		if (Configloader.INSTANCE.getGuildConfig(guild, "autoroles").contains(id)) {
+			Configloader.INSTANCE.deleteGuildConfig(guild, "autoroles", id);
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "botaurotoles").contains(id)) {
+			Configloader.INSTANCE.deleteGuildConfig(guild, "botautoroles", id);
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "supportrole").contains(id)) {
+			Configloader.INSTANCE.deleteGuildConfig(guild, "supportrole", id);
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").contains(id)) {
+			Configloader.INSTANCE.deleteGuildConfig(guild, "modrole", id);
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "muterole").contains(id)) {
+			Configloader.INSTANCE.deleteGuildConfig(guild, "muterole", id);
+			return;
+		}
+		if (Configloader.INSTANCE.getGuildConfig(guild, "levelrewards").contains(id)) {
+			String[] entries = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards").split(";");
+			for (int i = 0; i < entries.length; i++) {
+				if (entries[i].contains(id)) {
+					Configloader.INSTANCE.deleteGuildConfig(guild, "levelrewards", entries[i]);
+				}
+			}
+		}
+	}
+	@Override
+	public void onCategoryDelete(CategoryDeleteEvent event) {
+		if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportcategory").equals(event.getCategory().getId())) {
+			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "supportcategory", "");
+		}
 	}
 }

@@ -10,28 +10,28 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class Setsupportchat implements Command{
+public class Setsupportchannel implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/setsupportchat:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/setsupportchannel:nopermission")).queue();
 			return;
 		}
-		Configloader.INSTANCE.setGuildConfig(guild, "supportchat", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/setsupportchat:success")).queue();
+		Configloader.INSTANCE.setGuildConfig(guild, "supportchannel", event.getOption("channel").getAsGuildChannel().getId());
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/setsupportchannel:success")).queue();
 	}
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("setsupportchat", "Define the support channel").addOption(OptionType.CHANNEL, "channel", "Mention a text channel", true);
+		CommandData command = new CommandData("setsupportchannel", "Define the support channel").addOption(OptionType.CHANNEL, "channel", "Mention a text channel", true);
 		return command;
 	}
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/setsupportchat:help");
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/setsupportchannel:help");
 	}
 }
