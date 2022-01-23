@@ -53,20 +53,7 @@ public class Bot {
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
-	    new Thread (() -> {
-	    	while (jda.getPresence().getStatus().equals(OnlineStatus.ONLINE)) {
-	    		try {
-	    			jda.getPresence().setActivity(Activity.playing("Discord"));
-	    			this.wait(15000);
-	    			jda.getPresence().setActivity(Activity.watching("private messages"));
-	    			this.wait(15000);
-	    			jda.getPresence().setActivity(Activity.watching("NoLimits"));
-	    			this.wait(15000);
-	    			jda.getPresence().setActivity(Activity.playing("discord.gg/qHA2vUs"));
-	    			this.wait(15000);
-	    		} catch (InterruptedException e) {}
-	    	}
-	    }).start();
+	    jda.getPresence().setActivity(Activity.playing("V1.1-beta"));
     	new Configloader();
     	this.readConsole();
     	for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
@@ -101,7 +88,6 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
 		System.out.println("Bot offline");
-		try {this.wait(1000);} catch (InterruptedException e) {}
 		System.exit(0);
 	}
 	
@@ -179,9 +165,5 @@ public class Bot {
 	
 	public EventWaiter getWaiter() {
 		return eventWaiter;
-	}
-	
-	private void wait(int time) throws InterruptedException {
-		Thread.sleep(time);
 	}
 }

@@ -444,7 +444,7 @@ public class Processor extends ListenerAdapter {
 			Configloader.INSTANCE.deleteGuildConfig(guild, "autoroles", id);
 			return;
 		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "botaurotoles").contains(id)) {
+		if (Configloader.INSTANCE.getGuildConfig(guild, "botautoroles").contains(id)) {
 			Configloader.INSTANCE.deleteGuildConfig(guild, "botautoroles", id);
 			return;
 		}
