@@ -61,7 +61,7 @@ public class Poll implements Command{
 			this.infoPoll(event);
 			break;
 		default:
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:error")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:fatal")).queue();
 		}
 	}
 
@@ -100,7 +100,7 @@ public class Poll implements Command{
 								  this.definedescr();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definedescr() {
@@ -116,7 +116,7 @@ public class Poll implements Command{
 								  this.defineAnswers();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineAnswers() {
@@ -132,7 +132,7 @@ public class Poll implements Command{
 								  this.defineThumbnail();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineThumbnail() {
@@ -152,7 +152,7 @@ public class Poll implements Command{
 								  this.defineDays();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineDays() {
@@ -167,7 +167,7 @@ public class Poll implements Command{
 								  this.defineAnonymous();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineAnonymous() {
@@ -184,7 +184,7 @@ public class Poll implements Command{
 								  this.sendPoll();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/poll:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void sendPoll() {
@@ -321,7 +321,7 @@ public class Poll implements Command{
 		eb.setTitle("Information about the poll titled\s\"" + Configloader.INSTANCE.getPollConfig(guild, name, "title") + "\":");
 		eb.setDescription(sb.toString());
 		eb.setAuthor(user.getName(), null, user.getAvatarUrl());
-		eb.setFooter("Official-NoLimits Bot! - discord.gg/qHA2vUs");
+		eb.setFooter("Made with ❤️ by Gregor7008");
 		eb.setColor(56575);
 		event.replyEmbeds(eb.build()).queue(response -> response.deleteOriginal().queueAfter(30, TimeUnit.SECONDS));
 	}

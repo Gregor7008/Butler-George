@@ -17,7 +17,7 @@ public class Join2Create implements Command{
 	public void perform(SlashCommandEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if(!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
+		if(!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/join2create:nopermission")).queue();
 			return;
 		}

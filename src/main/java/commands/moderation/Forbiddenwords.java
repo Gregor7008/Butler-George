@@ -57,7 +57,7 @@ public class Forbiddenwords implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(title, description + finallist)).queue();
 			break;
 		default:
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/forbiddenwords:error")).queue() ;
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:fatal")).queue() ;
 		}
 	}
 

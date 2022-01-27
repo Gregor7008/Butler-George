@@ -89,7 +89,7 @@ public class Autopunish implements Command{
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {this.removefinal(e, current);},
 				1, TimeUnit.MINUTES,
-				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void removefinal(GuildMessageReceivedEvent e, String[] current) {
@@ -125,7 +125,7 @@ public class Autopunish implements Command{
 					  this.addpunishements2(plannedpunish);},
 				1, TimeUnit.MINUTES,
 				() -> {event.getHook().deleteOriginal().queue();
-					   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addpunishements2(String plannedpunish) {
@@ -137,7 +137,7 @@ public class Autopunish implements Command{
 				e -> {int warnings = Integer.parseInt(e.getMessage().getContentRaw());
 					  this.addpunishements3(plannedpunish, warnings);},
 				1, TimeUnit.MINUTES,
-				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addpunishements3(String plannedpunish, int warnings) {
@@ -153,7 +153,7 @@ public class Autopunish implements Command{
 						  channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:successrole")).queue();
 						  },
 					1, TimeUnit.MINUTES,
-					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "tm":
 			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:add3time")).queue();
@@ -164,7 +164,7 @@ public class Autopunish implements Command{
 						  Configloader.INSTANCE.addGuildConfig(guild, "autopunish", punishement);
 						  channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:successtempmute")).queue();},
 					1, TimeUnit.MINUTES,
-					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pm":
 			Configloader.INSTANCE.addGuildConfig(guild, "autopunish", String.valueOf(warnings) + "_mute");
@@ -183,14 +183,14 @@ public class Autopunish implements Command{
 						  Configloader.INSTANCE.addGuildConfig(guild, "autopunish", punishement);
 						  channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:successtempban")).queue();},
 					1, TimeUnit.MINUTES,
-					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pb":
 			Configloader.INSTANCE.addGuildConfig(guild, "autopunish", String.valueOf(warnings) + "_ban");
 			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autopunish:successban")).queue();
 			break;
 		default:
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/autopunish:fatal")).queue();
+			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:fatal")).queue();
 		}
 	}
 	

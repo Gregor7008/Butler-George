@@ -8,6 +8,7 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
@@ -21,6 +22,10 @@ public class Reset implements Command{
 	public void perform(SlashCommandEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
+		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/reset:nopermission")).queue();
+			return;
+		}
 		SelectionMenu menu = SelectionMenu.create("menu:class")
 				.setPlaceholder("Select the value to reset")
 				.setRequiredRange(1, 1)
@@ -77,10 +82,10 @@ public class Reset implements Command{
 				    			  AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "support role"))).queue();
 				    	  break;
 				      default:
-						  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/reset:error")).queue();
+						  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:fatal")).queue();
 				      }},
 				1, TimeUnit.MINUTES,
-				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/reset:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override

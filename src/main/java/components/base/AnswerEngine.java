@@ -31,7 +31,7 @@ public class AnswerEngine {
 		eb.setTitle(title);
 		eb.setColor(56575);
 		eb.setDescription(description);
-		eb.setFooter("Official NoLimits-Bot! - discord.gg/qHA2vUs");
+		eb.setFooter("Made with ❤️ by Gregor7008");
 		MessageEmbed embed = eb.build();
 		return embed;
 	}

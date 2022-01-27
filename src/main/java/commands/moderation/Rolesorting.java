@@ -68,7 +68,7 @@ public class Rolesorting implements Command{
 								  this.definesub();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definesub() {
@@ -81,7 +81,7 @@ public class Rolesorting implements Command{
 								  this.definemember();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void definemember() {
@@ -94,7 +94,7 @@ public class Rolesorting implements Command{
 								  this.rolesorter();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/rolesorting:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void rolesorter() {

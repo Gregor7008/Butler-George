@@ -1,5 +1,5 @@
-de => incomplete
-es => not started
-fr => not started
-nl => not started
-ru => not started
+de => not started OD
+es => not started OD
+fr => not started OD
+nl => not started OD
+ru => not started OD

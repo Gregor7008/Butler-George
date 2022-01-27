@@ -37,7 +37,7 @@ public class Ignorechannel implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/ignorechannel:successremove")).queue();
 			break;
 		default:
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/ignorechannel:error")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:fatal")).queue();
 		}
 	}
 

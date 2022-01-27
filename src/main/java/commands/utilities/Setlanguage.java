@@ -68,7 +68,7 @@ public class Setlanguage implements Command{
 						  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:error")).queue();
 				      }},
 				1, TimeUnit.MINUTES,
-				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override

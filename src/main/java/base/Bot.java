@@ -43,7 +43,7 @@ public class Bot {
 	private Bot(String token) throws LoginException, InterruptedException, IOException {
 		INSTANCE = this;
 		System.out.println("Still not ready:\n-> Multilanguage system for info commands\n--------------------");
-		System.out.println("In developement:\n->\n--------------------");
+		System.out.println("In developement:\n-> General properties file for timeout and error messages\n--------------------");
 		System.out.println("In planning:\n-> Ping to move\n-> Warn option for abuse of anonymous modmail\n-> Custom user categories including channels of all kind\n--------------------");
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(eventWaiter);

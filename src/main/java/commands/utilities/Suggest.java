@@ -25,22 +25,18 @@ public class Suggest implements Command{
 	public void perform(SlashCommandEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		if (!event.getOption("suggestion").getAsString().equals("")) {
-			String channelid = Configloader.INSTANCE.getGuildConfig(guild, "suggest");
-			if (channelid.equals(null)) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset")).queue();
-				return;
-			}
-			OffsetDateTime lastsuggestion = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "lastsuggestion"));
-			if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/suggest:nospam")).queue();
-				return;
-			}
-			this.sendsuggestion(guild, event.getMember(), event.getOption("suggestion").getAsString());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/suggest:success")).queue();
-		} else {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/suggest:noargs")).queue();
+		String channelid = Configloader.INSTANCE.getGuildConfig(guild, "suggest");
+		if (channelid.equals(null)) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset")).queue();
+			return;
 		}
+		OffsetDateTime lastsuggestion = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "lastsuggestion"));
+		if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/suggest:nospam")).queue();
+			return;
+		}
+		this.sendsuggestion(guild, event.getMember(), event.getOption("suggestion").getAsString());
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/suggest:success")).queue();
 	}
 
 	@Override

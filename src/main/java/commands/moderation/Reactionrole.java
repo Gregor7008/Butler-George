@@ -43,7 +43,7 @@ public class Reactionrole implements Command{
 		msgid = event.getOption("message").getAsString();
 		finalchannel = guild.getTextChannelById(event.getOption("channel").getAsGuildChannel().getId());
 		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/reactionrole:")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/reactionrole:nopermission")).queue();
 			return;
 		}
 		if (finalchannel.equals(null)) {
@@ -83,7 +83,7 @@ public class Reactionrole implements Command{
 						  finalchannel.retrieveMessageById(msgid).complete().removeReaction(e.getReactionEmote().getEmote()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {event.getHook().deleteOriginal().queue();
-						   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/reactionrole:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+						   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			return;
 		}
 	}
@@ -118,7 +118,7 @@ public class Reactionrole implements Command{
 								  this.defineAddEmojis(roles);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/reactionrole:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineAddEmojis(List<Role> roles) {
@@ -144,7 +144,7 @@ public class Reactionrole implements Command{
 					  }},
 				1, TimeUnit.MINUTES,
 				() -> {this.cleanup();
-					   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/reactionrole:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});		
+					   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});		
 	}
 	
 	private void addReactions() {

@@ -39,7 +39,7 @@ public class Help implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/help:error")).queue();
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:fatal")).queue();
 	}
 
 	@Override
