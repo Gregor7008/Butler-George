@@ -7,6 +7,7 @@ import java.util.Random;
 import base.Bot;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -57,7 +58,11 @@ public class ModMail {
 	
 	private void processMessage(PrivateMessageReceivedEvent event) {
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
-		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById("896011407303270402")).complete();
+		if (Configloader.INSTANCE.getGuildConfig(guild, "supportcategory").equals("")) {
+			Category ctg = guild.createCategory("---------- 📝 Tickets ---------").complete();
+			Configloader.INSTANCE.setGuildConfig(guild, "supportcategory", ctg.getId());
+		}
+		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById(Configloader.INSTANCE.getGuildConfig(guild, "supportcategory"))).complete();
 		nc.sendMessage(event.getMessage().getContentRaw() + "\n" + guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")).getAsMention()).queue();
 		Configloader.INSTANCE.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
@@ -65,7 +70,11 @@ public class ModMail {
 	private void processAnonymousMessage(PrivateMessageReceivedEvent event) {
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
 		int rn = new Random().nextInt(100);
-		TextChannel nc = guild.createTextChannel(String.valueOf(rn), guild.getCategoryById("896011407303270402")).complete();
+		if (Configloader.INSTANCE.getGuildConfig(guild, "supportcategory").equals("")) {
+			Category ctg = guild.createCategory("---------- 📝 Tickets ---------").complete();
+			Configloader.INSTANCE.setGuildConfig(guild, "supportcategory", ctg.getId());
+		}
+		TextChannel nc = guild.createTextChannel(String.valueOf(rn), guild.getCategoryById(Configloader.INSTANCE.getGuildConfig(guild, "supportcategory"))).complete();
 		String message = event.getMessage().getContentDisplay().replaceAll("#anonymous", "");
 		nc.sendMessage(message + "\n" + guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")).getAsMention()).queue();
 		Configloader.INSTANCE.setMailConfig(nc.getId(), event.getAuthor().getId());

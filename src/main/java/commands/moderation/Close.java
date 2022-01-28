@@ -7,6 +7,7 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class Close implements Command {
@@ -26,9 +27,17 @@ public class Close implements Command {
 		if (Configloader.INSTANCE.getMailConfig1(event.getTextChannel().getId()) != null) {
 			String cid = event.getTextChannel().getId();
 			event.getTextChannel().delete().queue();
+			User cuser = Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cid));
 			Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cid)).openPrivateChannel().complete().sendMessageEmbeds(
-					AnswerEngine.getInstance().fetchMessage(guild, Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cid)), "/commands/moderation/close:closed")).queue();
+					AnswerEngine.getInstance().buildMessage(
+							AnswerEngine.getInstance().getTitle(guild, cuser, "/commands/moderation/close:closed"),
+							AnswerEngine.getInstance().getDescription(guild, cuser, "/commands/moderation/close:closed").replace("{reason}", event.getOption("reason").getAsString()))).queue();
 			Configloader.INSTANCE.removeMailConfig(cid);
+			try {
+				if (event.getOption("warning").getAsBoolean()) {
+					Configloader.INSTANCE.addUserConfig(guild.getMember(cuser), "warnings", "Modmail abuse");
+				}
+			} catch (NullPointerException e) {}
 		} else {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/close:nochannel")).queue();
 		}
@@ -36,7 +45,7 @@ public class Close implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("close", "Closes the modmail/support channel");
+		CommandData command = new CommandData("close", "Closes the modmail/support channel").addOption(OptionType.STRING, "reason", "The reason why the ticket was closed", true).addOption(OptionType.BOOLEAN, "warning", "Whether the member should be warned");
 		return command;
 	}
 

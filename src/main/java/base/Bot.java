@@ -43,8 +43,8 @@ public class Bot {
 	private Bot(String token) throws LoginException, InterruptedException, IOException {
 		INSTANCE = this;
 		System.out.println("Still not ready:\n-> Multilanguage system for info commands\n--------------------");
-		System.out.println("In developement:\n-> General properties file for timeout and error messages\n--------------------");
-		System.out.println("In planning:\n-> Ping to move\n-> Warn option for abuse of anonymous modmail\n-> Custom user categories including channels of all kind\n--------------------");
+		System.out.println("In developement:\n-> General properties file for timeout and error messages\n-> Warn option for abuse of anonymous modmail\n--------------------");
+		System.out.println("In planning:\n-> Ping to move\n-> Custom user categories including channels of all kind\n--------------------");
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
@@ -53,7 +53,7 @@ public class Bot {
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
-	    jda.getPresence().setActivity(Activity.playing("V1.1-beta"));
+	    jda.getPresence().setActivity(Activity.playing("V1.2-beta"));
     	new Configloader();
     	this.readConsole();
     	for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
@@ -67,10 +67,10 @@ public class Bot {
     	}
 	}
 
-	private void shutdown() {
+	private void shutdown(Boolean delete) {
 		for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
     		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
-    		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("")) {
+    		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("") && delete) {
     			guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
     			String j2csraw = Configloader.INSTANCE.getGuildConfig(guild, "j2cs");
     			if (!j2csraw.equals("")) {
@@ -100,8 +100,12 @@ public class Bot {
 					String[] insplit = line.split(" ");
 					String command = insplit[0];
 					switch (command) {
-					case "stop": 
-						this.shutdown();
+					case "stop":
+						boolean delete = true;
+						try {
+							delete = Boolean.parseBoolean(insplit[1]);
+						} catch (IndexOutOfBoundsException e) {}
+						this.shutdown(delete);
 						break;
 					case "exit":
 						System.exit(0);
