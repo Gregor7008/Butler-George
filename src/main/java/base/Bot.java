@@ -62,7 +62,7 @@ public class Bot {
     			if (vc == null) {
     				Configloader.INSTANCE.setGuildConfig(guild, "join2create", "");
     			} else {
-    				vc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
+    				vc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
     			}
     		}
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
@@ -72,6 +72,18 @@ public class Bot {
     			} else {
     				tc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
     			}
+    		}
+    		if (guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")) == null ) {
+    			String id = Configloader.INSTANCE.getGuildConfig(guild, "supportrole");
+    			Configloader.INSTANCE.deleteGuildConfig(guild, "supportrole", id);
+    		}
+    		if (guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")) == null ) {
+    			String id = Configloader.INSTANCE.getGuildConfig(guild, "modrole");
+    			Configloader.INSTANCE.deleteGuildConfig(guild, "modrole", id);
+    		}
+    		if (guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")) == null ) {
+    			String id = Configloader.INSTANCE.getGuildConfig(guild, "muterole");
+    			Configloader.INSTANCE.deleteGuildConfig(guild, "muterole", id);
     		}
     	}
 	}

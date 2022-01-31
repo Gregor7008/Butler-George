@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -163,7 +164,12 @@ public class Processor extends ListenerAdapter {
 			if (!botautorolesraw.equals("")) {
 				String[] botautoroles = botautorolesraw.split(";");
 				for (int i = 0; i < botautoroles.length; i++) {
-					event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(botautoroles[i])).queue();
+					Role role = event.getGuild().getRoleById(botautoroles[i]);
+					if (role == null) {
+						Configloader.INSTANCE.deleteGuildConfig(event.getGuild(), "botautoroles", botautoroles[i]);
+					} else {
+						event.getGuild().addRoleToMember(event.getMember(), role).queue();
+					}
 				}
 			}
 		} else {
@@ -171,7 +177,12 @@ public class Processor extends ListenerAdapter {
 			if (!autorolesraw.equals("")) {
 				String[] autoroles = autorolesraw.split(";");
 				for (int i = 0; i < autoroles.length; i++) {
-					event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(autoroles[i])).queue();
+					Role role = event.getGuild().getRoleById(autoroles[i]);
+					if (role == null) {
+						Configloader.INSTANCE.deleteGuildConfig(event.getGuild(), "autoroles", autoroles[i]);
+					} else {
+						event.getGuild().addRoleToMember(event.getMember(), role).queue();
+					}
 				}
 			}
 			//send Welcomemessage

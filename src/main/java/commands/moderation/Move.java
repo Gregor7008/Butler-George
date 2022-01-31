@@ -32,7 +32,13 @@ public class Move implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/move:memnotconn")).queue();
 			return;
 		}
-		VoiceChannel st = guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supporttalk"));
+		String vcid = Configloader.INSTANCE.getGuildConfig(guild, "supporttalk");
+		VoiceChannel st = guild.getVoiceChannelById(vcid);
+		if (st == null) {
+			Configloader.INSTANCE.deleteGuildConfig(guild, "supporttalk", vcid);
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/move:nochannel")).queue();
+			return;
+		}
 		if (st.getMembers().contains(event.getMember())) {
 			guild.moveVoiceMember(guild.getMember(event.getOption("member").getAsUser()), st).queue();
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/move:success")).queue();
