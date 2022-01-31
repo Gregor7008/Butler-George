@@ -1,4 +1,4 @@
-package components.base;
+package components.utilities;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.Color;

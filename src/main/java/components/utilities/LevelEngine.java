@@ -82,6 +82,8 @@ public class LevelEngine {
 			TextChannel channel = member.getGuild().getTextChannelById(Configloader.INSTANCE.getGuildConfig(member.getGuild(), "levelmsgch"));
 			if (channel != null) {
 				channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":confetti_ball: Congrats\s" + member.getEffectiveName() + "\s! :confetti_ball:", "You just reached level\s" + String.valueOf(currentlevel+1) + "!")).queue();
+			} else {
+				Configloader.INSTANCE.setGuildConfig(member.getGuild(), "levelmsgch", "");
 			}
 		}
 	}

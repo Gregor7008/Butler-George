@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
@@ -56,10 +58,20 @@ public class Bot {
     	for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
     		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("")) {
-    			guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create")).putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
+    			VoiceChannel vc = guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create"));
+    			if (vc == null) {
+    				Configloader.INSTANCE.setGuildConfig(guild, "join2create", "");
+    			} else {
+    				vc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
+    			}
     		}
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
-    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
+    			TextChannel tc = guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat"));
+    			if (tc == null) {
+    				Configloader.INSTANCE.setGuildConfig(guild, "supportchat", "");
+    			} else {
+    				tc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
+    			}
     		}
     	}
 	}

@@ -3,6 +3,8 @@ package components.moderation;
 import java.io.File;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import base.Bot;
@@ -34,10 +36,13 @@ public class ModController {
 					List<TextChannel> channels = guild.getTextChannels();
 					for (int o = 0; o < channels.size(); o++) {
 						TextChannel channel = channels.get(o);
-						channel.createPermissionOverride(newrole)
-							   .setDeny(Permission.MESSAGE_WRITE)
-							   .setDeny(Permission.USE_SLASH_COMMANDS)
-							   .queue();
+						Collection<Permission> perms = new ArrayList<Permission>();
+						perms.add(Permission.USE_PRIVATE_THREADS);
+						perms.add(Permission.USE_PUBLIC_THREADS);
+						perms.add(Permission.USE_SLASH_COMMANDS);
+						perms.add(Permission.MESSAGE_WRITE);
+						perms.add(Permission.MESSAGE_ADD_REACTION);
+						channel.putPermissionOverride(newrole).setDeny(perms).queue();
 					}
 				}
 				String muteroleID = Configloader.INSTANCE.getGuildConfig(guild, "muterole");

@@ -2,6 +2,10 @@ In Developement:
 -> Custom user categories including channels of all kind
     => Neuer Command mit Auswahlmöglichkeit verschiedener Channel, wenn keine Kategorie für User vorhanden,
        neue erstellen und dann Kanäle dort hinzufügen
+-> When saved role gets deleted while offline, remove role-id from config-files
+	=> Beim Start einmal durch alle Server durchgehen und checken,
+	   ob man mit der ID aus dem Configloader noch etwas finden kann. Wenn == null, dann Eintrag löschen
+	=> Bot.java Zeile 58
 -------------------
 In Planning:
 -> Ping to move

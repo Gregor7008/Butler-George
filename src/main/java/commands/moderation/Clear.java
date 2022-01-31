@@ -30,7 +30,6 @@ public class Clear implements Command{
 		List<Message> messages = channel.getHistory().retrievePast(count).complete();
 		try {channel.deleteMessages(messages).queue();} catch (Exception e) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:fatal")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-			e.printStackTrace();
 			return;
 		}
 		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/clear:done")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
