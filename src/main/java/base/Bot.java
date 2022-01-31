@@ -85,6 +85,7 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
 		System.out.println("Bot offline");
+		this.wait(2000);
 		System.exit(0);
 	}
 	
@@ -162,6 +163,12 @@ public class Bot {
 				}
 			} catch (IOException e){}
 		}).start();
+	}
+	
+	private void wait(int time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {}
 	}
 	
 	public EventWaiter getWaiter() {

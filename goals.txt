@@ -1,17 +1,13 @@
 In Developement:
--> Multilanguage system for info commands
-    => Per AnswerEngine und String.replace("{Variable}") Informationen auflisten
--> Send custom webhooks
-    => Neuen Command hinzufügen, Werte "Link" und "Text"; Verwendung des WebhookEngines
+-> Custom user categories including channels of all kind
+    => Neuer Command mit Auswahlmöglichkeit verschiedener Channel, wenn keine Kategorie für User vorhanden,
+       neue erstellen und dann Kanäle dort hinzufügen
 -------------------
 In Planning:
 -> Ping to move
     => Neue Aktion beim EventListener "GuildMessageReceived",
        Bedingungen "Wenn Erwähnung enthält" und "Erwähnter in VoiceChannel",
        moved den Autor der Nachricht in den VoiceChannel des Erwähnten nach Zustimmung
--> Custom user categories including channels of all kind
-    => Neuer Command mit Auswahlmöglichkeit verschiedener Channel, wenn keine Kategorie für User vorhanden,
-       neue erstellen und dann Kanäle dort hinzufügen
 -------------------
 For Version 2:
 -> Spotify link integration
@@ -21,3 +17,12 @@ For Version 2:
        Nach Auswahl dann ModMail aufrufen und Nachricht verarbeiten
     => Möglicherweise Bot "Elemental" als Inspiration nutzen (new, list und close Commands sowie ID-System für jeden User)
 -> Modmail processing whilst offline (process in delay)
+-> Warning List bei Usern, die nicht mehr auf dem Server sind, per User ID (selbständig erkennen & verarbeiten)
+	=> Warning.java Zeile 104
+-------------------
+For Version 3:
+-> YouTube integration
+	=> Wenn ein neues YouTube Video gepostet wird, soll der Bot eine Nachricht an einen Webhook versenden.
+	   Welche YouTuber auf welchem Server usw. soll per Command konfigurierbar sein!
+-> Twitch integration
+	=> (siehe YouTube integration nur mit Twitch Streams)

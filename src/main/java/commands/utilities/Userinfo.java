@@ -40,6 +40,7 @@ public class Userinfo implements Command{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
+		String[] titles = AnswerEngine.getInstance().getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
 		if (event.getOption("member") == null) {
 			member = event.getMember();
 		} else {
@@ -52,27 +53,28 @@ public class Userinfo implements Command{
 		if (member.getTimeBoosted() == null) {
 			booster = "false";
 		} else {
-			booster = "Since\s" + member.getTimeBoosted().format(formatter) + "\s:heart:";
+			booster = titles[0] + "\s" + member.getTimeBoosted().format(formatter) + "\s:heart:";
 		}
-		eb.setTitle("Information about\s" + member.getEffectiveName());
+		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter("Official NoLimits-Bot! - discord.gg/qHA2vUs");
+		eb.setFooter("Made with ❤️ by Gregor7008");
+		eb.setColor(56575);
 		
-		eb.addField(":diamond_shape_with_a_dot_inside:  Name", "`" + member.getUser().getName() + "`", true);
-		eb.addField(":name_badge:  Nickname", "`" + member.getEffectiveName() + "`", true);
-		eb.addField(":registered:  Discriminator", "`" + member.getUser().getDiscriminator() + "`", true);
-		eb.addField(":id:  ID", "`" + member.getUser().getId() + "`", true);
-		eb.addField(":robot:  Bot", "`" + String.valueOf(member.getUser().isBot()) + "`", true);
-		eb.addField(":rocket:  Booster", "`" + booster + "`", true);
-		eb.addField(":calendar:  Joined", "`" + member.getTimeJoined().format(formatter) + "`", true);
-		eb.addField(":calendar:  Account created", "`" + member.getUser().getTimeCreated().format(formatter) + "`", true);
-		eb.addField(":warning:  Warnings", "`" + String.valueOf(Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "warnings").split(";").length - 1) + "`", true);
-		eb.addField(":card_index:  Experience", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
-		eb.addField(":pager:  Level", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
-		//eb.addField(":alarm_clock:  Status", "`" + member.getOnlineStatus().toString() + "`", true);
-		eb.addField(":abacus:  Role-Count", "`" + String.valueOf(member.getRoles().size()) + "`", true);
-		eb.addField(":arrow_up:  Highest role", "`" + member.getRoles().get(0).getName() + "`", true);
+		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getUser().getName() + "`", true);
+		eb.addField(":name_badge:" + titles[3], "`" + member.getEffectiveName() + "`", true);
+		eb.addField(":registered:" + titles[4], "`" + member.getUser().getDiscriminator() + "`", true);
+		eb.addField(":id:" + titles[5], "`" + member.getUser().getId() + "`", true);
+		eb.addField(":robot:" + titles[6], "`" + String.valueOf(member.getUser().isBot()) + "`", true);
+		eb.addField(":rocket:" + titles[7], "`" + booster + "`", true);
+		eb.addField(":calendar:" + titles[8], "`" + member.getTimeJoined().format(formatter) + "`", true);
+		eb.addField(":calendar:" + titles[9], "`" + member.getUser().getTimeCreated().format(formatter) + "`", true);
+		eb.addField(":warning:" + titles[10], "`" + String.valueOf(Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "warnings").split(";").length - 1) + "`", true);
+		eb.addField(":card_index:" + titles[11], "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
+		eb.addField(":pager:" + titles[12], "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
+		//eb.addField(":alarm_clock:" + titles[13], "`" + member.getOnlineStatus().toString() + "`", true);
+		eb.addField(":abacus:" + titles[14], "`" + String.valueOf(member.getRoles().size()) + "`", true);
+		eb.addField(":arrow_up:" + titles[15], "`" + member.getRoles().get(0).getName() + "`", true);
 		
 		event.replyEmbeds(eb.build()).queue();
 	}
@@ -82,6 +84,7 @@ public class Userinfo implements Command{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
+		String[] titles = AnswerEngine.getInstance().getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
 		if (event.getOption("member") == null) {
 			member = event.getMember();
 		} else {
@@ -94,24 +97,24 @@ public class Userinfo implements Command{
 		if (member.getTimeBoosted() == null) {
 			booster = "false";
 		} else {
-			booster = "Since\s" + member.getTimeBoosted().format(formatter) + "\s:heart:";
+			booster = titles[0] + "\s" + member.getTimeBoosted().format(formatter) + "\s:heart:";
 		}
-		eb.setTitle("Information about\s" + member.getEffectiveName());
+		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter("Official NoLimits-Bot! - discord.gg/qHA2vUs");
+		eb.setFooter("Made with ❤️ by Gregor7008");
 		eb.setColor(56575);
 		
-		eb.addField(":diamond_shape_with_a_dot_inside: Name", "`" + member.getEffectiveName() + "`", true);
-		eb.addField(":registered: Discriminator", "`" + member.getUser().getDiscriminator() + "`", true);
-		eb.addField(":robot: Bot", "`" + String.valueOf(member.getUser().isBot()) + "`", true);
-		eb.addField(":rocket: Booster", "`" + booster + "`", true);
-		eb.addField(":calendar: Joined", "`" + member.getTimeJoined().format(formatter) + "`", true);
-		eb.addField(":card_index: Experience", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
-		eb.addField(":pager: Level", "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
-		//eb.addField(":alarm_clock: Status", "`" + member.getOnlineStatus().toString() + "`", true);
-		eb.addField(":abacus: Role-Count", "`" + String.valueOf(member.getRoles().size()) + "`", true);
-		eb.addField(":arrow_up: Hoisted role", "`" + member.getRoles().get(0).getName() + "`", true);
+		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getEffectiveName() + "`", true);
+		eb.addField(":registered:" + titles[4], "`" + member.getUser().getDiscriminator() + "`", true);
+		eb.addField(":robot:" + titles[6], "`" + String.valueOf(member.getUser().isBot()) + "`", true);
+		eb.addField(":rocket:" + titles[7], "`" + booster + "`", true);
+		eb.addField(":calendar:" + titles[8], "`" + member.getTimeJoined().format(formatter) + "`", true);
+		eb.addField(":card_index:" + titles[11], "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
+		eb.addField(":pager:" + titles[12], "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
+		//eb.addField(":alarm_clock:" + titles[13], "`" + member.getOnlineStatus().toString() + "`", true);
+		eb.addField(":abacus:" + titles[14], "`" + String.valueOf(member.getRoles().size()) + "`", true);
+		eb.addField(":arrow_up:" + titles[15], "`" + member.getRoles().get(0).getName() + "`", true);
 		
 		event.replyEmbeds(eb.build()).queue();
 	}

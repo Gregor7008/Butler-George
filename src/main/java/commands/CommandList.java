@@ -43,6 +43,7 @@ import commands.utilities.Serverinfo;
 import commands.utilities.Setlanguage;
 import commands.utilities.Suggest;
 import commands.utilities.Userinfo;
+import commands.utilities.Webhook;
 import components.utilities.Test;
 
 public class CommandList {
@@ -63,6 +64,7 @@ public class CommandList {
 		this.utilitycmds.put("report", new Report());
 		this.utilitycmds.put("serverinfo", new Serverinfo());
 		this.utilitycmds.put("setlanguage", new Setlanguage());
+		this.utilitycmds.put("webhook", new Webhook());
 		
 		//Moderation
 		this.moderationcmds.put("autopunish", new Autopunish());
