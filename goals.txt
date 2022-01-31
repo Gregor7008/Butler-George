@@ -1,0 +1,22 @@
+In Developement:
+-> Multilanguage system for info commands
+    => Per AnswerEngine und String.replace("{Variable}") Informationen auflisten
+-> Send custom webhooks
+    => Neuen Command hinzufügen, Werte "Link" und "Text"; Verwendung des WebhookEngines
+-------------------
+In Planning:
+-> Ping to move
+    => Neue Aktion beim EventListener "GuildMessageReceived",
+       Bedingungen "Wenn Erwähnung enthält" und "Erwähnter in VoiceChannel",
+       moved den Autor der Nachricht in den VoiceChannel des Erwähnten nach Zustimmung
+-> Custom user categories including channels of all kind
+    => Neuer Command mit Auswahlmöglichkeit verschiedener Channel, wenn keine Kategorie für User vorhanden,
+       neue erstellen und dann Kanäle dort hinzufügen
+-------------------
+For Version 2:
+-> Spotify link integration
+    => Separate Bibliothek in Verwendung
+-> Modmail for multiple servers
+    => Alle Server des Bots durchlaufen und die auflisten, auf denen der User ist;
+       Nach Auswahl dann ModMail aufrufen und Nachricht verarbeiten
+    => Möglicherweise Bot "Elemental" als Inspiration nutzen (new, list und close Commands sowie ID-System für jeden User)
