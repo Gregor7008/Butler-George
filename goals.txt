@@ -20,3 +20,4 @@ For Version 2:
     => Alle Server des Bots durchlaufen und die auflisten, auf denen der User ist;
        Nach Auswahl dann ModMail aufrufen und Nachricht verarbeiten
     => Möglicherweise Bot "Elemental" als Inspiration nutzen (new, list und close Commands sowie ID-System für jeden User)
+-> Modmail processing whilst offline (process in delay)
