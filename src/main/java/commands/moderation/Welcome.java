@@ -19,9 +19,9 @@ public class Welcome implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		Guild guild = event.getGuild();
-		User user = event.getUser();
-		if (event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/welcome:nopermission")).queue();
 			return;
 		}
@@ -44,11 +44,10 @@ public class Welcome implements Command{
 			String currentdate = date.format(formatter);
 			if (welcomemsgraw != "") {
 				String[] welcomemsg = welcomemsgraw.split(";");
-				welcomemsg[0].replace("{servername}", guild.getName());
-				welcomemsg[0].replace("{membername}", event.getMember().getAsMention());
-				welcomemsg[0].replace("{membercount}", Integer.toString(guild.getMemberCount()));
-				welcomemsg[0].replace("{date}", currentdate);
-				guild.getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
+				String msg = welcomemsg[0].replace("{server}", guild.getName()).replace("{member}", event.getMember().getAsMention())
+							.replace("{membercount}", Integer.toString(guild.getMemberCount())).replace("{date}", currentdate);
+				guild.getTextChannelById(welcomemsg[1]).sendMessage(msg).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/welcome:testsuccess")).queue();
 			} else {
 				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/welcome:nonedefined")).queue();
 			}
@@ -59,7 +58,7 @@ public class Welcome implements Command{
 	public CommandData initialize() {
 		CommandData command = new CommandData("welcome", "Configure the welcome message, that will be send whenever a new member joins your server!")
 									.addSubcommands(new SubcommandData("set", "Set the welcome message")
-											  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {servername} {date}!").setRequired(true))
+											  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {server} {date}!").setRequired(true))
 											  .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Provide the channel where the message should be send in").setRequired(true)))
 									.addSubcommands(new SubcommandData("off", "Turn welcome messages off again!"))
 									.addSubcommands(new SubcommandData("test", "Test the welcome message"));

@@ -53,64 +53,9 @@ public class Bot {
 		jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing("V1.2-beta"));
+	    this.readConsole();
     	new Configloader();
-    	this.readConsole();
-    	for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
-    		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
-    		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("")) {
-    			VoiceChannel vc = guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create"));
-    			if (vc == null) {
-    				Configloader.INSTANCE.setGuildConfig(guild, "join2create", "");
-    			} else {
-    				vc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
-    			}
-    		}
-    		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
-    			TextChannel tc = guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat"));
-    			if (tc == null) {
-    				Configloader.INSTANCE.setGuildConfig(guild, "supportchat", "");
-    			} else {
-    				tc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
-    			}
-    		}
-    		if (guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")) == null ) {
-    			String id = Configloader.INSTANCE.getGuildConfig(guild, "supportrole");
-    			Configloader.INSTANCE.deleteGuildConfig(guild, "supportrole", id);
-    		}
-    		if (guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")) == null ) {
-    			String id = Configloader.INSTANCE.getGuildConfig(guild, "modrole");
-    			Configloader.INSTANCE.deleteGuildConfig(guild, "modrole", id);
-    		}
-    		if (guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")) == null ) {
-    			String id = Configloader.INSTANCE.getGuildConfig(guild, "muterole");
-    			Configloader.INSTANCE.deleteGuildConfig(guild, "muterole", id);
-    		}
-    	}
-	}
-
-	private void shutdown(Boolean delete) {
-		for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
-    		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
-    		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("") && delete) {
-    			guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
-    			String j2csraw = Configloader.INSTANCE.getGuildConfig(guild, "j2cs");
-    			if (!j2csraw.equals("")) {
-    				String[] j2cs = j2csraw.split(";");
-    				for (int e = 0; e < j2cs.length; e++) {
-        				String[] temp1 = j2cs[e].split("-");
-        				guild.getVoiceChannelById(temp1[0]).delete().queue();
-        			}
-    			}
-    		}
-    		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
-    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-    		}
-    	}
-		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
-		jda.shutdown();
-		System.out.println("Bot offline");
-		this.wait(2000);
-		System.exit(0);
+    	this.checkConfigs();
 	}
 	
 	private void readConsole() {
@@ -130,6 +75,7 @@ public class Bot {
 						this.shutdown(delete);
 						break;
 					case "exit":
+						jda.shutdown();
 						System.exit(0);
 						break;
 					case "giverole":
@@ -187,6 +133,109 @@ public class Bot {
 				}
 			} catch (IOException e){}
 		}).start();
+	}
+	
+	private void shutdown(Boolean delete) {
+		for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
+    		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
+    		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("") && delete) {
+    			guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
+    			String j2csraw = Configloader.INSTANCE.getGuildConfig(guild, "j2cs");
+    			if (!j2csraw.equals("")) {
+    				String[] j2cs = j2csraw.split(";");
+    				for (int e = 0; e < j2cs.length; e++) {
+        				String[] temp1 = j2cs[e].split("-");
+        				guild.getVoiceChannelById(temp1[0]).delete().queue();
+        			}
+    			}
+    		}
+    		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
+    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+    		}
+    	}
+		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
+		jda.shutdown();
+		System.out.println("Bot offline");
+		this.wait(2000);
+		System.exit(0);
+	}
+	
+	private void checkConfigs() {
+		for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
+    		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
+    		String id = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
+    		if (!id.equals("")) {
+    			VoiceChannel vc = guild.getVoiceChannelById(id);
+    			if (vc == null) {
+    				Configloader.INSTANCE.deleteGuildConfig(guild, "join2create", id);
+    			} else {
+    				vc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
+    			}
+    		}
+    		id = Configloader.INSTANCE.getGuildConfig(guild, "supportchat");
+    		if (!id.equals("")) {
+    			TextChannel tc = guild.getTextChannelById(id);
+    			if (tc == null) {
+    				Configloader.INSTANCE.deleteGuildConfig(guild, "supportchat", id);
+    			} else {
+    				tc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
+    			}
+    		}
+    		id = Configloader.INSTANCE.getGuildConfig(guild, "supportrole");
+    		if (!id.equals("")) {
+    			if (guild.getRoleById(id) == null ) {
+    				Configloader.INSTANCE.deleteGuildConfig(guild, "supportrole", id);
+    			}
+    		}
+    		id = Configloader.INSTANCE.getGuildConfig(guild, "modrole");
+    		if (!id.equals("")) {
+    			if (guild.getRoleById(id) == null ) {
+    				Configloader.INSTANCE.deleteGuildConfig(guild, "modrole", id);
+    			}
+    		}
+    		id = Configloader.INSTANCE.getGuildConfig(guild, "muterole");
+    		if (!id.equals("")) {
+    			if (guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")) == null ) {
+    				Configloader.INSTANCE.deleteGuildConfig(guild, "muterole", id);
+    			}
+    		}
+    		id = Configloader.INSTANCE.getGuildConfig(guild, "reportchannel");
+    		if (!id.equals("")) {
+    			if (guild.getTextChannelById(id) == null) {
+    				Configloader.INSTANCE.deleteGuildConfig(guild, "reportchannel", id);
+    			}
+    		}
+    		id = Configloader.INSTANCE.getGuildConfig(guild, "supportcategory");
+    		if (!id.equals("")) {
+    			if (guild.getCategoryById(id) == null) {
+    				Configloader.INSTANCE.deleteGuildConfig(guild, "supportcategory", id);
+    			}
+    		}
+    		id = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards");
+    		if (!id.equals("")) {
+    			String[] entries = id.split(";");
+				for (int a = 0; a < entries.length; a++) {
+					String[] details = entries[i].split("_");
+					if (guild.getRoleById(details[0]) == null) {
+						Configloader.INSTANCE.deleteGuildConfig(guild, "levelrewards", entries[i]);
+					}
+				}
+			}
+    		id = Configloader.INSTANCE.getGuildConfig(guild, "welcomemsg");
+    		if (!id.equals("")) {
+    			String[] details = id.split(";");
+    			if (guild.getTextChannelById(details[1]) == null) {
+    				Configloader.INSTANCE.setGuildConfig(guild, "welcomemsg", "");
+    			}
+    		}
+    		id = Configloader.INSTANCE.getGuildConfig(guild, "goodbyemsg");
+    		if (!id.equals("")) {
+    			String[] details = id.split(";");
+    			if (guild.getTextChannelById(details[1]) == null) {
+    				Configloader.INSTANCE.setGuildConfig(guild, "goodbyemsg", "");
+    			}
+    		}
+    	}
 	}
 	
 	private void wait(int time) {

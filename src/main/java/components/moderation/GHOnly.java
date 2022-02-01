@@ -8,17 +8,17 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
-public class NoLimitsOnly {
+public class GHOnly {
 	
 	private final Guild guild;
 	private final List<Member> members;
 	
-	public NoLimitsOnly() {
+	public GHOnly() {
 		guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
 		members = guild.loadMembers().get();
 	}
 	
-	public void noliRolecheck() {
+	public void rolecheck() {
 		Role gr1 = guild.getRoleById("837742608604332052");
 		int gr1p = gr1.getPosition();
 		Role gr2 = guild.getRoleById("837744376712265728");
@@ -30,7 +30,7 @@ public class NoLimitsOnly {
 		List<Role> sr1 = guild.getRoles().stream().filter(e -> e.getPosition() < gr1p).toList().stream().filter(e -> e.getPosition() > gr2p).toList();
 		List<Role> sr2 = guild.getRoles().stream().filter(e -> e.getPosition() < gr2p).toList().stream().filter(e -> e.getPosition() > gr3p).toList();
 		List<Role> sr3 = guild.getRoles().stream().filter(e -> e.getPosition() < gr3p).toList().stream().filter(e -> e.getPosition() > gr4p).toList();
-		List<Role> sr4 = guild.getRoles().stream().filter(e -> e.getPosition() < gr4p).toList().stream().filter(e -> e.getPosition() >= guild.getRoleById("901836045803462696").getPosition()).toList();
+		List<Role> sr4 = guild.getRoles().stream().filter(e -> e.getPosition() < gr4p).toList().stream().filter(e -> e.getPosition() >= guild.getRoleById("864136501653798932").getPosition()).toList();
 		Rolesorting rs = new Rolesorting();
 		for (int i = 0; i < members.size(); i++) {
 			Member member = members.get(i);

@@ -2,8 +2,6 @@ In Developement:
 -> Custom user categories including channels of all kind
     => Neuer Command mit Auswahlmöglichkeit verschiedener Channel, wenn keine Kategorie für User vorhanden,
        neue erstellen und dann Kanäle dort hinzufügen
--> When saved role gets deleted while offline, remove role-id from config-files
-	=> reportchannel, goodbyemsg, supportcategory, welcomemsg, levelrewards (müssen noch gemacht werden)
 -------------------
 In Planning:
 -> Ping to move

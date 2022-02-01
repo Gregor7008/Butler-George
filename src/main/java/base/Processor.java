@@ -17,7 +17,7 @@ import components.base.Configloader;
 import components.moderation.AutoModerator;
 import components.moderation.ModController;
 import components.moderation.ModMail;
-import components.moderation.NoLimitsOnly;
+import components.moderation.GHOnly;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -192,8 +192,8 @@ public class Processor extends ListenerAdapter {
 			String currentdate = date.format(formatter);
 			if (!welcomemsgraw.equals("")) {
 				String[] welcomemsg = welcomemsgraw.split(";");
-				welcomemsg[0].replace("{servername}", event.getGuild().getName());
-				welcomemsg[0].replace("{membername}", event.getMember().getAsMention());
+				welcomemsg[0].replace("{server}", event.getGuild().getName());
+				welcomemsg[0].replace("{member}", event.getMember().getAsMention());
 				welcomemsg[0].replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
 				welcomemsg[0].replace("{date}", currentdate);
 				event.getGuild().getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
@@ -212,7 +212,7 @@ public class Processor extends ListenerAdapter {
 		String currentdate = date.format(formatter);
 		if (!goodbyemsgraw.equals("")) {
 			String[] goodbyemsg = goodbyemsgraw.split(";");
-			goodbyemsg[0].replace("{servername}", event.getGuild().getName());
+			goodbyemsg[0].replace("{server}", event.getGuild().getName());
 			goodbyemsg[0].replace("{member}", event.getMember().getEffectiveName());
 			goodbyemsg[0].replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
 			goodbyemsg[0].replace("{date}", currentdate);
@@ -384,15 +384,11 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
-		new Thread (() -> {
-			new NoLimitsOnly().noliRolecheck();
-		}).start();
+		new GHOnly().rolecheck();
 	}
 	@Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
-		new Thread (() -> {
-			new NoLimitsOnly().noliRolecheck();
-		}).start();
+		new GHOnly().rolecheck();
 	}
 	@Override
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {

@@ -44,12 +44,11 @@ public class Goodbye implements Command {
 			String currentdate = date.format(formatter);
 			if (goodbyemsgraw != "") {
 				String[] goodbyemsg = goodbyemsgraw.split(";");
-				goodbyemsg[0].replace("{servername}", guild.getName());
-				goodbyemsg[0].replace("{member}", event.getMember().getEffectiveName());
-				goodbyemsg[0].replace("{membercount}", Integer.toString(guild.getMemberCount()));
-				goodbyemsg[0].replace("{date}", currentdate);
-				goodbyemsg[0].replace("{timejoined}", event.getMember().getTimeJoined().format(formatter));
-				guild.getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
+				String msg = goodbyemsg[0].replace("{server}", guild.getName()).replace("{member}", event.getMember().getEffectiveName())
+							.replace("{membercount}", Integer.toString(guild.getMemberCount()))
+							.replace("{timejoined}", event.getMember().getTimeJoined().format(formatter)).replace("{date}", currentdate);
+				guild.getTextChannelById(goodbyemsg[1]).sendMessage(msg).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/goodbye:testsuccess")).queue();
 			} else {
 				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/goodbye:nonedefined")).queue();
 			}
@@ -60,7 +59,7 @@ public class Goodbye implements Command {
 	public CommandData initialize() {
 		CommandData command = new CommandData("goodbye", "Configure the goodbye message, that will be send whenever a new member joins your server!")
 				.addSubcommands(new SubcommandData("set", "Set the welcome message")
-						  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {servername} {date} {timejoined}!").setRequired(true))
+						  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {server} {date} {timejoined}!").setRequired(true))
 						  .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Provide the channel where the message should be send in").setRequired(true)))
 				.addSubcommands(new SubcommandData("off", "Turn goodbye messages off again!"))
 				.addSubcommands(new SubcommandData("test", "Test the goodbye message"));
