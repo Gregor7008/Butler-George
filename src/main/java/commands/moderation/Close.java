@@ -35,7 +35,7 @@ public class Close implements Command {
 			Configloader.INSTANCE.removeMailConfig(cid);
 			try {
 				if (event.getOption("warning").getAsBoolean()) {
-					Configloader.INSTANCE.addUserConfig(guild.getMember(cuser), "warnings", "Modmail abuse");
+					Configloader.INSTANCE.addUserConfig(guild, cuser, "warnings", "Modmail abuse");
 				}
 			} catch (NullPointerException e) {}
 		} else {

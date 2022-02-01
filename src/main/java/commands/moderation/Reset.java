@@ -26,7 +26,7 @@ public class Reset implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/reset:nopermission")).queue();
 			return;
 		}
-		SelectionMenu menu = SelectionMenu.create("menu:class")
+		SelectionMenu menu = SelectionMenu.create("selvalre")
 				.setPlaceholder("Select the value to reset")
 				.setRequiredRange(1, 1)
 				.addOption("Level channel", "lc")
@@ -36,6 +36,7 @@ public class Reset implements Command{
 				.addOption("Support talk", "st")
 				.addOption("Moderator role", "mr")
 				.addOption("Support role", "sr")
+				.addOption("User channel role", "ucr")
 				.build();
 		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/reset:choosevalue"))
 				.setEphemeral(true)
@@ -80,6 +81,11 @@ public class Reset implements Command{
 				    	  Configloader.INSTANCE.setGuildConfig(guild, "supportrole", "");
 				    	  e.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user,"/commands/moderation/reset:success"),
 				    			  AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "support role"))).queue();
+				    	  break;
+				      case "ucr":
+				    	  Configloader.INSTANCE.setGuildConfig(guild, "ccrole", "");
+				    	  e.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user,"/commands/moderation/reset:success"),
+				    			  AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "user channel role"))).queue();
 				    	  break;
 				      default:
 						  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:fatal")).queue();

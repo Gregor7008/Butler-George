@@ -15,13 +15,15 @@ public class Levelbackground implements Command{
 
 	@Override
 	public void perform(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
 		if (event.getSubcommandName().equals("set")) {
 			Level lv = new Level();
 			if (Integer.parseInt(event.getOption("number").getAsString()) > 4 || Integer.parseInt(event.getOption("number").getAsString()) < 0) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/levelbackground:wrongarg")).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/levelbackground:wrongarg")).queue();
 			} else {
-				Configloader.INSTANCE.setUserConfig(event.getMember(), "levelbackground", event.getOption("number").getAsString());
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(),"/commands/utilities/levelbackground:success")).addFile(lv.renderLevelcard(event.getUser())).queue();
+				Configloader.INSTANCE.setUserConfig(guild, user, "levelbackground", event.getOption("number").getAsString());
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/levelbackground:success")).addFile(lv.renderLevelcard(user)).queue();
 			}
 			return;
 		}

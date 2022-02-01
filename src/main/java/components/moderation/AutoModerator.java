@@ -20,7 +20,7 @@ public class AutoModerator {
 		String[] singleword = forbiddenwords.split(";");
 		for (int i = 0; i < singleword.length; i++) {
 			if (event.getMessage().getContentRaw().toLowerCase().contains(singleword[i].toLowerCase())) {
-				Configloader.INSTANCE.addUserConfig(event.getMember(), "warnings", "Rude behavior");
+				Configloader.INSTANCE.addUserConfig(event.getGuild(), event.getAuthor(), "warnings", "Rude behavior");
 				try {
 					event.getMember().getUser().openPrivateChannel().queue(channel -> {
 						 channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + event.getGuild().getName() + "\nReason:\n=> Rude behavior")).queue();});

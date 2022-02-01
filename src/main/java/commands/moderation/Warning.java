@@ -9,6 +9,7 @@ import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import components.moderation.AutoPunishEngine;
+import components.moderation.ModController;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -26,6 +27,7 @@ public class Warning implements Command{
 	public void perform(SlashCommandEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
+		new ModController().modcheck();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").equals("")) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/warning:nomodrole")).queue();
 			return;
@@ -36,14 +38,13 @@ public class Warning implements Command{
 		}
 		if (event.getSubcommandName().equals("add")) {
 			final User iuser = event.getOption("member").getAsUser();
-			Member member = guild.retrieveMemberById(iuser.getId()).complete();
 			String reason;
 			if (event.getOption("reason") == null) {
 				reason = "~Unknown reason~";
 			} else {
 				reason = event.getOption("reason").getAsString();
 			}
-			Configloader.INSTANCE.addUserConfig(member, "warnings", reason);
+			Configloader.INSTANCE.addUserConfig(guild, user, "warnings", reason);
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/warning:success")).queue();
 			try {
 				iuser.openPrivateChannel().queue(channel -> {
@@ -70,7 +71,7 @@ public class Warning implements Command{
 						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(guild, event.getOption("member").getAsUser(), "warnings");
 							  String[] warnings = allwarnings.split(";");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
-							  Configloader.INSTANCE.deleteUserConfig(member, "warnings", warnings[w-1]);
+							  Configloader.INSTANCE.deleteUserConfig(guild, user, "warnings", warnings[w-1]);
 							  channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(
 									  AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/warning:remsuccess"),
 									  AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/warning:remsuccess").replace("{warning}", warnings[w-1]).replace("{user}", member.getEffectiveName()))).queue();},

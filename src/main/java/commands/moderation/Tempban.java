@@ -7,7 +7,6 @@ import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -24,7 +23,7 @@ public class Tempban implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/commands/moderation/tempban:nopermission")).queue();
 			return;
 		}
-		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), guild.getMember(user));
+		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), guild, user);
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(
 				AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/tempban:success"),
 				AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/tempban:success").replace("{user}", user.getName()).replace("{time}", event.getOption("days").getAsString()))).queue();
@@ -43,10 +42,10 @@ public class Tempban implements Command{
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/tempban:help");
 	}
 	
-	public void tempban(int days, Member member) {
+	public void tempban(int days, Guild guild, User user) {
 		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
-		Configloader.INSTANCE.setUserConfig(member, "tbuntil", until.toString());
-		Configloader.INSTANCE.setUserConfig(member, "tempbanned", "true");
-		member.ban(0).queue();
+		Configloader.INSTANCE.setUserConfig(guild, user, "tbuntil", until.toString());
+		Configloader.INSTANCE.setUserConfig(guild, user, "tempbanned", "true");
+		guild.getMember(user).ban(0).queue();
 	}	
 }

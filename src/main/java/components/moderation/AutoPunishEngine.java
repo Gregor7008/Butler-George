@@ -8,6 +8,7 @@ import commands.moderation.Tempmute;
 import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 
 public class AutoPunishEngine {
 	
@@ -35,7 +36,8 @@ public class AutoPunishEngine {
 		//go through members
 		for (int e = 0; e < members.size(); e++) {
 			Member member = members.get(e);
-			int warningcount = Configloader.INSTANCE.getUserConfig(member.getGuild(), member.getUser(), "warnings").split(";").length;
+			User user = members.get(e).getUser();
+			int warningcount = Configloader.INSTANCE.getUserConfig(guild, user, "warnings").split(";").length;
 			if (punishements.get(warningcount) != null) {
 				String punishement = punishements.get(warningcount);
 				//go through punishements
@@ -50,20 +52,20 @@ public class AutoPunishEngine {
 						if (punishement.contains("removerole")) {
 							String[] temp1 = punishement.split("_");
 							guild.removeRoleFromMember(member, guild.getRoleById(temp1[1]));
-							Configloader.INSTANCE.setUserConfig(member, "expe", "0");
-							Configloader.INSTANCE.setUserConfig(member, "level", "0");
+							Configloader.INSTANCE.setUserConfig(guild, user, "expe", "0");
+							Configloader.INSTANCE.setUserConfig(guild, user, "level", "0");
 							return;
 						}
 						if (punishement.contains("tempmute")) {
 							String[] temp1 = punishement.split("_");
 							Tempmute tm = new Tempmute();
-							tm.tempmute(Integer.valueOf(temp1[1]), member);
+							tm.tempmute(Integer.valueOf(temp1[1]), guild, user);
 							return;
 						}
 						if (punishement.contains("tempban")) {
 							String[] temp1 = punishement.split("_");
 							Tempban tb = new Tempban();
-							tb.tempban(Integer.valueOf(temp1[1]), member);
+							tb.tempban(Integer.valueOf(temp1[1]), guild, user);
 							return;
 						}
 				}

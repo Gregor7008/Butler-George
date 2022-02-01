@@ -8,7 +8,6 @@ import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -25,7 +24,7 @@ public class Tempmute implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/commands/moderation/tempmute:nopermission")).queue();
 			return;
 		}
-		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), guild.retrieveMember(user).complete());
+		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), guild, user);
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(
 					AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/tempmute:success"),
 					AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/tempmute:success").replace("{user}", user.getName()).replace("{time}", event.getOption("days").getAsString()))).queue();
@@ -44,13 +43,13 @@ public class Tempmute implements Command{
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/tempmute:help");
 	}
 	
-	public void tempmute(int days, Member member) {
+	public void tempmute(int days, Guild guild, User user) {
 		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
-		Configloader.INSTANCE.setUserConfig(member, "tmuntil", until.toString());
-		Configloader.INSTANCE.setUserConfig(member, "tempmuted", "true");
-		Configloader.INSTANCE.setUserConfig(member, "muted", "true");
-		if (member.getGuild().equals(Bot.INSTANCE.jda.getGuildById(Bot.noliID))) {
-			member.getGuild().removeRoleFromMember(member, member.getGuild().getRoleById("709478250253910103")).queue();
+		Configloader.INSTANCE.setUserConfig(guild, user, "tmuntil", until.toString());
+		Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "true");
+		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
+		if (guild.equals(Bot.INSTANCE.jda.getGuildById(Bot.noliID))) {
+			guild.removeRoleFromMember(guild.getMember(user), guild.getRoleById("709478250253910103")).queue();
 		}
 	}
 }

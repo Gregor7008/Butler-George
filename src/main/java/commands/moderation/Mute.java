@@ -6,7 +6,6 @@ import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -23,7 +22,7 @@ public class Mute implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/commands/moderation/mute:nopermission")).queue();
 			return;
 		}
-		this.mute(guild.getMember(user));
+		this.mute(guild, user);
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(
 				AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/mute:success"),
 				AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/mute:success").replace("{user}", user.getName()))).queue();
@@ -41,11 +40,11 @@ public class Mute implements Command{
 		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/mute:help");
 	}
 	
-	public void mute(Member member) {
-		Configloader.INSTANCE.setUserConfig(member, "tempmuted", "false");
-		Configloader.INSTANCE.setUserConfig(member, "muted", "true");
-		if (member.getGuild().equals(Bot.INSTANCE.jda.getGuildById(Bot.noliID))) {
-			member.getGuild().removeRoleFromMember(member, member.getGuild().getRoleById("709478250253910103")).queue();
+	public void mute(Guild guild, User user) {
+		Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "false");
+		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
+		if (guild.equals(Bot.INSTANCE.jda.getGuildById(Bot.noliID))) {
+			guild.removeRoleFromMember(guild.getMember(user), guild.getRoleById("709478250253910103")).queue();
 		}
 	}
 }

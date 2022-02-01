@@ -17,6 +17,8 @@ import commands.moderation.Mute;
 import commands.moderation.Reactionrole;
 import commands.moderation.Reset;
 import commands.moderation.Rolesorting;
+import commands.moderation.Setcustomchannelrole;
+import commands.moderation.Setdefaultaccess;
 import commands.moderation.Setlevelchannel;
 import commands.moderation.Setmodrole;
 import commands.moderation.Setreportchannel;
@@ -33,6 +35,7 @@ import commands.music.Play;
 import commands.music.Queue;
 import commands.music.Skip;
 import commands.music.Stop;
+import commands.utilities.Createchannel;
 import commands.utilities.Embed;
 import commands.utilities.Help;
 import commands.utilities.Level;
@@ -65,6 +68,7 @@ public class CommandList {
 		this.utilitycmds.put("serverinfo", new Serverinfo());
 		this.utilitycmds.put("setlanguage", new Setlanguage());
 		this.utilitycmds.put("webhook", new Webhook());
+		this.utilitycmds.put("createchannel", new Createchannel());
 		
 		//Moderation
 		this.moderationcmds.put("autopunish", new Autopunish());
@@ -93,6 +97,8 @@ public class CommandList {
 		this.moderationcmds.put("forbiddenwords", new Forbiddenwords());
 		this.moderationcmds.put("reset", new Reset());
 		this.moderationcmds.put("move", new Move());
+		this.moderationcmds.put("setdefaultaccess", new Setdefaultaccess());
+		this.moderationcmds.put("setcustomchannelrole", new Setcustomchannelrole());
 		//Developement
 		this.moderationcmds.put("test", new Test());
 		

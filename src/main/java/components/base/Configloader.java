@@ -10,7 +10,6 @@ import java.util.Properties;
 
 import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
@@ -48,8 +47,8 @@ public class Configloader {
 		return this.getProperty(this.findPollConfig(guild, title), key);
 	}
 	
-	public void setUserConfig(Member member, String key, String value) {
-		this.setProperty(this.findorCreateUserConfig(member.getGuild(), member.getUser()), key, value);
+	public void setUserConfig(Guild guild, User user, String key, String value) {
+		this.setProperty(this.findorCreateUserConfig(guild, user), key, value);
 	}
 	
 	public void setGuildConfig(Guild guild, String key, String value) {
@@ -69,8 +68,8 @@ public class Configloader {
 		this.setProperty(this.findPollConfig(guild, msgid), key, value);
 	}
 	
-	public void addUserConfig(Member member, String key, String value) {
-		this.addProperty(this.findorCreateUserConfig(member.getGuild(), member.getUser()), key, value, this.getUserConfig(member.getGuild(), member.getUser(), key));
+	public void addUserConfig(Guild guild, User user, String key, String value) {
+		this.addProperty(this.findorCreateUserConfig(guild, user), key, value, this.getUserConfig(guild, user, key));
 	}
 	
 	public void addGuildConfig(Guild guild, String key, String value) {
@@ -85,8 +84,8 @@ public class Configloader {
 		this.deleteProperty(this.findorCreateGuildConfig(guild), key, value, this.getGuildConfig(guild, key));
 	}
 	
-	public void deleteUserConfig(Member member, String key, String value) {
-		this.deleteProperty(this.findorCreateUserConfig(member.getGuild(), member.getUser()), key, value, this.getUserConfig(member.getGuild(), member.getUser(), key));
+	public void deleteUserConfig(Guild guild, User user, String key, String value) {
+		this.deleteProperty(this.findorCreateUserConfig(guild, user), key, value, this.getUserConfig(guild, user, key));
 	}
 	
 	public void removeReactionRoleConfig(Guild guild, TextChannel channel, String msgid) {
@@ -171,6 +170,8 @@ public class Configloader {
 				pps.setProperty("supportchat", "");
 				pps.setProperty("supporttalk", "");
 				pps.setProperty("supportcategory", "");
+				pps.setProperty("ccrole", "");
+				pps.setProperty("ccdefaccess", "");
 				pps.store(fop, null);
 				fop.close();
 			} catch (IOException e) {e.printStackTrace();}
@@ -203,6 +204,7 @@ public class Configloader {
 				pps.setProperty("lastsuggestion", OffsetDateTime.now().toString());
 				pps.setProperty("language", "en");
 				pps.setProperty("levelspamcount", "0");
+				pps.setProperty("cccategory", "");
 				pps.store(fop, null);
 				fop.close();
 			} catch (IOException e) {e.printStackTrace();}

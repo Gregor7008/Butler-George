@@ -48,18 +48,18 @@ public class ModController {
 				String muteroleID = Configloader.INSTANCE.getGuildConfig(guild, "muterole");
 				Role muterole = guild.getRoleById(muteroleID);
 				//Check the user
-				if (guilddir.exists()) {
+				if (guilddir.exists() && !user.isBot()){
 					File pFile = new File(Bot.environment + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
-					if (pFile.exists() && !user.isBot()) {
+					if (pFile.exists()) {
 						//Check for tempmute properties
 						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempmuted"))) {
 							OffsetDateTime tmuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tmuntil"));
 							OffsetDateTime now = OffsetDateTime.now();
 							int difference = Duration.between(now, tmuntil).toSecondsPart();
 							if (difference <= 0) {
-								Configloader.INSTANCE.setUserConfig(guild.retrieveMember(user).complete(), "muted", "false");
-								Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tempmuted", "false");
-								Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tmuntil", "");
+								Configloader.INSTANCE.setUserConfig(guild, user, "muted", "false");
+								Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "false");
+								Configloader.INSTANCE.setUserConfig(guild, user, "tmuntil", "");
 							}
 						}
 						//Enforce mute properties
@@ -73,7 +73,7 @@ public class ModController {
 						} else {
 							if (member.getRoles().contains(muterole)) {
 								guild.removeRoleFromMember(member, muterole).queue();
-								Configloader.INSTANCE.setUserConfig(guild.getMember(user), "muted", "false");
+								Configloader.INSTANCE.setUserConfig(guild, user, "muted", "false");
 								if (guild.getId().equals(Bot.noliID)) {
 									guild.addRoleToMember(member, guild.getRoleById("709478250253910103")).queue();
 								}
@@ -92,8 +92,8 @@ public class ModController {
 					long difference = Duration.between(now, tbuntil).toSeconds();
 					if (difference <= 0) {
 						guild.unban(user).queue();
-						Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tempbanned", "false");
-						Configloader.INSTANCE.setUserConfig(guild.getMember(user), "tbuntil", "");
+						Configloader.INSTANCE.setUserConfig(guild, user, "tempbanned", "false");
+						Configloader.INSTANCE.setUserConfig(guild, user, "tbuntil", "");
 					}
 				}
 			}

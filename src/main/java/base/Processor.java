@@ -13,11 +13,11 @@ import commands.CommandList;
 import commands.music.Stop;
 import commands.utilities.Suggest;
 import components.base.AnswerEngine;
+import components.base.Configcheck;
 import components.base.Configloader;
 import components.moderation.AutoModerator;
-import components.moderation.ModController;
-import components.moderation.ModMail;
 import components.moderation.GHOnly;
+import components.moderation.ModMail;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -55,10 +55,6 @@ public class Processor extends ListenerAdapter {
 		if (event.getAuthor().isBot()) {
 			return;
 		}
-		//ModController
-		new Thread (() -> {
-			new ModController().modcheck();
-		}).start();
 		//levelsystem
 		LevelEngine.getInstance().messagereceived(event);
 		//automoderation
@@ -384,43 +380,21 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
-		new GHOnly().rolecheck();
+		new Thread(() -> {
+			new GHOnly().rolecheck();
+		}).start();
 	}
 	@Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
-		new GHOnly().rolecheck();
+		new Thread(() -> {
+			new GHOnly().rolecheck();
+		}).start();
 	}
 	@Override
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {
-		String id = event.getChannel().getId();
-		Guild guild = event.getGuild();
-		if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(id)) {
-			Configloader.INSTANCE.deleteGuildConfig(guild, "ignored", id);
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "supportchannel").contains(id)) {
-			Configloader.INSTANCE.setGuildConfig(guild, "supportchannel", "");
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "suggest").contains(id)) {
-			Configloader.INSTANCE.setGuildConfig(guild, "suggest", "");
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "reportchannel").contains(id)) {
-			Configloader.INSTANCE.setGuildConfig(guild, "reportchannel", "");
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").contains(id)) {
-			Configloader.INSTANCE.setGuildConfig(guild, "levelmsgch", "");
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "welcomemsg").contains(id)) {
-			Configloader.INSTANCE.setGuildConfig(guild, "welcomemsg", "");
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "goodbyemsg").contains(id)) {
-			Configloader.INSTANCE.setGuildConfig(guild, "goodbyemsg", "");
-		}
+		new Thread(() -> {
+			Configcheck.INSTANCE.checkGuildConfigs(event.getGuild());
+		}).start();
 	}
 	@Override
 	public void onVoiceChannelDelete(VoiceChannelDeleteEvent event) {
@@ -435,51 +409,21 @@ public class Processor extends ListenerAdapter {
 			}
 			return;
 		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "supporttalk").contains(id)) {
-			Configloader.INSTANCE.setGuildConfig(guild, "supporttalk", "");
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
-			Configloader.INSTANCE.setGuildConfig(guild, "join2create", "");
-		}
+		new Thread(() -> {
+			Configcheck.INSTANCE.checkGuildConfigs(event.getGuild());
+		}).start();
 	}
 	@Override
 	public void onRoleDelete(RoleDeleteEvent event) {
-		String id = event.getRole().getId();
-		Guild guild = event.getGuild();
-		if (Configloader.INSTANCE.getGuildConfig(guild, "autoroles").contains(id)) {
-			Configloader.INSTANCE.deleteGuildConfig(guild, "autoroles", id);
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "botautoroles").contains(id)) {
-			Configloader.INSTANCE.deleteGuildConfig(guild, "botautoroles", id);
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "supportrole").contains(id)) {
-			Configloader.INSTANCE.deleteGuildConfig(guild, "supportrole", id);
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").contains(id)) {
-			Configloader.INSTANCE.deleteGuildConfig(guild, "modrole", id);
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "muterole").contains(id)) {
-			Configloader.INSTANCE.deleteGuildConfig(guild, "muterole", id);
-			return;
-		}
-		if (Configloader.INSTANCE.getGuildConfig(guild, "levelrewards").contains(id)) {
-			String[] entries = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards").split(";");
-			for (int i = 0; i < entries.length; i++) {
-				if (entries[i].contains(id)) {
-					Configloader.INSTANCE.deleteGuildConfig(guild, "levelrewards", entries[i]);
-				}
-			}
-		}
+		new Thread(() -> {
+			Configcheck.INSTANCE.checkGuildConfigs(event.getGuild());
+		}).start();
 	}
 	@Override
 	public void onCategoryDelete(CategoryDeleteEvent event) {
-		if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportcategory").equals(event.getCategory().getId())) {
-			Configloader.INSTANCE.setGuildConfig(event.getGuild(), "supportcategory", "");
-		}
+		new Thread(() -> {
+			Configcheck.INSTANCE.checkGuildConfigs(event.getGuild());
+			Configcheck.INSTANCE.checkUserConfigs(event.getGuild());
+		}).start();
 	}
 }
