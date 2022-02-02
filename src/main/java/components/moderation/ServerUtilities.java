@@ -4,21 +4,16 @@ import java.util.List;
 
 import base.Bot;
 import commands.moderation.Rolesorting;
+import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
-public class GHOnly {
-	
-	private final Guild guild;
-	private final List<Member> members;
-	
-	public GHOnly() {
-		guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
-		members = guild.loadMembers().get();
-	}
+public class ServerUtilities {
 	
 	public void rolecheck() {
+		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
+		final List<Member> members = guild.getMembers();
 		Role gr1 = guild.getRoleById("837742608604332052");
 		int gr1p = gr1.getPosition();
 		Role gr2 = guild.getRoleById("837744376712265728");
@@ -39,6 +34,13 @@ public class GHOnly {
 				rs.sorter(guild, member, sr2, gr2);
 				rs.sorter(guild, member, sr3, gr3);
 				rs.sorter(guild, member, sr4, gr4);
+				if (member.getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
+					guild.removeRoleFromMember(member, guild.getRoleById("709478250253910103")).queue();
+				} else {
+					if (!member.getRoles().contains(guild.getRoleById("709478250253910103"))) {
+						guild.addRoleToMember(member, guild.getRoleById("709478250253910103")).queue();
+					}
+				}
 			}
 		}
 	}

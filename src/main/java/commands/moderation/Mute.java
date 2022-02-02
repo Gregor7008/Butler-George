@@ -1,6 +1,5 @@
 package commands.moderation;
 
-import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
@@ -43,8 +42,5 @@ public class Mute implements Command{
 	public void mute(Guild guild, User user) {
 		Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "false");
 		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
-		if (guild.equals(Bot.INSTANCE.jda.getGuildById(Bot.noliID))) {
-			guild.removeRoleFromMember(guild.getMember(user), guild.getRoleById("709478250253910103")).queue();
-		}
 	}
 }

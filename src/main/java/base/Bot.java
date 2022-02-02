@@ -168,7 +168,6 @@ public class Bot {
 		}
 	}
 	
-	
 	private void wait(int time) {
 		try {
 			Thread.sleep(time);

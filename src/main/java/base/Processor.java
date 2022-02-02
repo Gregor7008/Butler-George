@@ -16,7 +16,7 @@ import components.base.AnswerEngine;
 import components.base.Configcheck;
 import components.base.Configloader;
 import components.moderation.AutoModerator;
-import components.moderation.GHOnly;
+import components.moderation.ServerUtilities;
 import components.moderation.ModMail;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
@@ -380,15 +380,11 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
-		new Thread(() -> {
-			new GHOnly().rolecheck();
-		}).start();
+		new ServerUtilities().rolecheck();
 	}
 	@Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
-		new Thread(() -> {
-			new GHOnly().rolecheck();
-		}).start();
+		new ServerUtilities().rolecheck();
 	}
 	@Override
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {

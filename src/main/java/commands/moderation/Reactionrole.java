@@ -61,7 +61,7 @@ public class Reactionrole implements Command{
 		}
 		if (event.getSubcommandName().equals("delete")) {
 			Configloader.INSTANCE.removeReactionRoleConfig(guild, finalchannel, msgid);
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/reactionrole:delsuccess")).queue();
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/reactionrole:delsuccess")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			finalchannel.retrieveMessageById(msgid).complete().clearReactions().queue();
 			return;
 		}
@@ -72,7 +72,8 @@ public class Reactionrole implements Command{
 					  	  return e.getUser().getIdLong() == user.getIdLong();},
 					e -> {event.getHook().editOriginalEmbeds(AnswerEngine.getInstance().buildMessage(
 							AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/reactionrole:remsuccess"),
-							AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/reactionrole:remsuccess").replace("{emoji}", e.getReactionEmote().getEmoji()))).queue();
+							AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/reactionrole:remsuccess").replace("{emoji}", e.getReactionEmote().getEmoji()))).queue(
+									r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
 						  String[] actions = Configloader.INSTANCE.getReactionroleConfig(guild, finalchannel, msgid).split(";");
 						  Configloader.INSTANCE.setReactionroleConfig(guild, finalchannel, msgid, "");
 						  for (int i = 0; i < actions.length; i++) {
@@ -80,7 +81,7 @@ public class Reactionrole implements Command{
 								Configloader.INSTANCE.addReactionroleConfig(guild, finalchannel, msgid, actions[i]);
 							}
 						  }
-						  finalchannel.retrieveMessageById(msgid).complete().removeReaction(e.getReactionEmote().getEmote()).queue();},
+						  finalchannel.retrieveMessageById(msgid).complete().removeReaction(e.getReactionEmote().getAsCodepoints()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {event.getHook().deleteOriginal().queue();
 						   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});

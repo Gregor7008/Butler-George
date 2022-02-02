@@ -2,7 +2,6 @@ package commands.moderation;
 
 import java.time.OffsetDateTime;
 
-import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
@@ -48,8 +47,5 @@ public class Tempmute implements Command{
 		Configloader.INSTANCE.setUserConfig(guild, user, "tmuntil", until.toString());
 		Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "true");
 		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
-		if (guild.equals(Bot.INSTANCE.jda.getGuildById(Bot.noliID))) {
-			guild.removeRoleFromMember(guild.getMember(user), guild.getRoleById("709478250253910103")).queue();
-		}
 	}
 }

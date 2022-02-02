@@ -114,11 +114,9 @@ public class Rolesorting implements Command{
 			}
 			if (match > 0 && !mb.getRoles().contains(gr)) {
 				iguild.addRoleToMember(mb, gr).queue();
-				System.out.println("Role " + gr.getName() + " added to " + mb.getEffectiveName());
 			}
 			if (match == 0 && mb.getRoles().contains(gr)) {
 				iguild.removeRoleFromMember(mb, gr).queue();
-				System.out.println("Role " + gr.getName() + " removed from " + mb.getEffectiveName());
 			}
 	}
 	

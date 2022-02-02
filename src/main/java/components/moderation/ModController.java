@@ -66,17 +66,10 @@ public class ModController {
 						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
 							if (!member.getRoles().contains(muterole)) {
 								guild.addRoleToMember(member, muterole).queue();
-								if (guild.getId().equals(Bot.noliID)) {
-									guild.removeRoleFromMember(member, guild.getRoleById("709478250253910103")).queue();
-								}
 							}
 						} else {
 							if (member.getRoles().contains(muterole)) {
 								guild.removeRoleFromMember(member, muterole).queue();
-								Configloader.INSTANCE.setUserConfig(guild, user, "muted", "false");
-								if (guild.getId().equals(Bot.noliID)) {
-									guild.addRoleToMember(member, guild.getRoleById("709478250253910103")).queue();
-								}
 							}
 						}
 					}
