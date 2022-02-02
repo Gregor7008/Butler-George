@@ -10,14 +10,15 @@ import java.util.concurrent.TimeUnit;
 
 import commands.Command;
 import commands.CommandList;
+import commands.TextCommandList;
 import commands.music.Stop;
 import commands.utilities.Suggest;
 import components.base.AnswerEngine;
 import components.base.Configcheck;
 import components.base.Configloader;
 import components.moderation.AutoModerator;
-import components.moderation.ServerUtilities;
 import components.moderation.ModMail;
+import components.moderation.ServerUtilities;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -52,8 +53,25 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		if (event.getAuthor().isBot()) {
+		final Guild guild = event.getGuild();
+		final User user = event.getAuthor();
+		if (user.isBot()) {
 			return;
+		}
+		//Text-Commands
+		if (event.getMessage().getContentRaw().startsWith("!")) {
+			String[] commandraw = event.getMessage().getContentRaw().split(" ", 2);
+			String[] command = commandraw[0].split("!", 2);
+			String arguments = "";
+			try {
+				arguments = commandraw[1];
+			} catch (IndexOutOfBoundsException e) {}
+			TextCommandList tcl = new TextCommandList();
+			List<String> tclnames = new ArrayList<>();
+			tclnames.addAll(tcl.textcmds.keySet());
+			if (tclnames.contains(command[1])) {
+				tcl.textcmds.get(command[1]).perform(event, arguments);
+			}
 		}
 		//levelsystem
 		LevelEngine.getInstance().messagereceived(event);
@@ -61,7 +79,7 @@ public class Processor extends ListenerAdapter {
 		AutoModerator.getInstance().messagereceived(event);
 		//ModMail
 		if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getId()) != null) {
-			if (event.getAuthor().isBot()) {
+			if (user.isBot()) {
 				return;
 			}
 			PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(Configloader.INSTANCE.getMailConfig1(event.getChannel().getId())).complete();
@@ -69,28 +87,31 @@ public class Processor extends ListenerAdapter {
 			return;
 		}
 		//Suggestions
-		String suggestid = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "suggest");
-		if (suggestid != null && event.getChannel().getId().equals(suggestid) && !event.getAuthor().isBot()) {
-			new Suggest().sendsuggestion(event.getGuild(), event.getMember(), event.getMessage().getContentRaw());
+		String suggestid = Configloader.INSTANCE.getGuildConfig(guild, "suggest");
+		if (!suggestid.equals("") && event.getChannel().getId().equals(suggestid) && !user.isBot()) {
+			new Suggest().sendsuggestion(guild, event.getMember(), event.getMessage().getContentRaw());
 			event.getMessage().delete().queue();
 			return;
 		}
 		//Support channel
-		String supportid = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportchat");
-		if (supportid != null && event.getChannel().getId().equals(supportid) && !event.getAuthor().isBot() && !Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportrole").equals("")) {
-			if (event.getGuild().getCategoryById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportcategory")) == null) {
-				Category cat = event.getGuild().createCategory("Supportchat").complete();
-				cat.createPermissionOverride(event.getGuild().getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-				cat.createPermissionOverride(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportrole"))).setAllow(Permission.VIEW_CHANNEL).queue();
-				Configloader.INSTANCE.setGuildConfig(event.getGuild(), "supportcategory", cat.getId());
+		String supportid = Configloader.INSTANCE.getGuildConfig(guild, "supportchat");
+		if (!supportid.equals("") && event.getChannel().getId().equals(supportid) && !user.isBot() && !Configloader.INSTANCE.getGuildConfig(guild, "supportrole").equals("")) {
+			if (guild.getCategoryById(Configloader.INSTANCE.getGuildConfig(guild, "supportcategory")) == null) {
+				Category cat = guild.createCategory("Supportchat").complete();
+				cat.createPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+				cat.createPermissionOverride(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))).setAllow(Permission.VIEW_CHANNEL).queue();
+				Configloader.INSTANCE.setGuildConfig(guild, "supportcategory", cat.getId());
 			}
-			TextChannel ntc = event.getGuild().createTextChannel(
-					event.getAuthor().getName().toLowerCase() + "-support",
-					event.getGuild().getCategoryById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportcategory"))).complete();
-			ntc.putPermissionOverride(event.getGuild().getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-			ntc.putPermissionOverride(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportrole"))).setAllow(Permission.VIEW_CHANNEL).queue();
+			String curcount = Configloader.INSTANCE.getGuildConfig(guild, "ticketcount");
+			int newcount = Integer.parseInt(curcount) + 1;
+			TextChannel ntc = guild.createTextChannel(
+					"Ticket #" + curcount,
+					guild.getCategoryById(Configloader.INSTANCE.getGuildConfig(guild, "supportcategory"))).complete();
+			ntc.putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+			ntc.putPermissionOverride(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))).setAllow(Permission.VIEW_CHANNEL).queue();
 			ntc.putPermissionOverride(event.getMember()).setAllow(Permission.VIEW_CHANNEL).queue();
-			ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" + event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "supportrole")).getAsMention()).queue();
+			ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" + guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")).getAsMention()).queue();
+			Configloader.INSTANCE.setGuildConfig(guild, "ticketcount", String.format("%05d", newcount));
 			event.getMessage().delete().queue();
 			event.getChannel().getManager().setSlowmode(120).queue();
 		}
@@ -127,12 +148,14 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onSlashCommand(SlashCommandEvent event) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
 		//perform Slash-Command
 		CommandList commandList = new CommandList();
 		Command utilitycmd;
 		if ((utilitycmd = commandList.utilitycmds.get(event.getName())) != null) {
-			if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "ignored").contains(event.getChannel().getId()) && !event.getName().equals("embed") && !event.getName().equals("poll")) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(event.getChannel().getId()) && !event.getName().equals("embed") && !event.getName().equals("poll")) {
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 				return;
 			}
 			utilitycmd.perform(event);
@@ -143,8 +166,8 @@ public class Processor extends ListenerAdapter {
 		}
 		Command musiccmd;
 		if ((musiccmd = commandList.musiccmds.get(event.getName())) != null) {
-			if (Configloader.INSTANCE.getGuildConfig(event.getGuild(), "ignored").contains(event.getChannel().getId())) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(event.getGuild(), event.getUser(), "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(event.getChannel().getId())) {
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 				return;
 			}
 			musiccmd.perform(event);
@@ -154,45 +177,46 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+		final Guild guild = event.getGuild();
 		//assign Autoroles
 		if (event.getMember().getUser().isBot()) {
-			String botautorolesraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "botautoroles");
+			String botautorolesraw = Configloader.INSTANCE.getGuildConfig(guild, "botautoroles");
 			if (!botautorolesraw.equals("")) {
 				String[] botautoroles = botautorolesraw.split(";");
 				for (int i = 0; i < botautoroles.length; i++) {
-					Role role = event.getGuild().getRoleById(botautoroles[i]);
+					Role role = guild.getRoleById(botautoroles[i]);
 					if (role == null) {
-						Configloader.INSTANCE.deleteGuildConfig(event.getGuild(), "botautoroles", botautoroles[i]);
+						Configloader.INSTANCE.deleteGuildConfig(guild, "botautoroles", botautoroles[i]);
 					} else {
-						event.getGuild().addRoleToMember(event.getMember(), role).queue();
+						guild.addRoleToMember(event.getMember(), role).queue();
 					}
 				}
 			}
 		} else {
-			String autorolesraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "autoroles");
+			String autorolesraw = Configloader.INSTANCE.getGuildConfig(guild, "autoroles");
 			if (!autorolesraw.equals("")) {
 				String[] autoroles = autorolesraw.split(";");
 				for (int i = 0; i < autoroles.length; i++) {
-					Role role = event.getGuild().getRoleById(autoroles[i]);
+					Role role = guild.getRoleById(autoroles[i]);
 					if (role == null) {
-						Configloader.INSTANCE.deleteGuildConfig(event.getGuild(), "autoroles", autoroles[i]);
+						Configloader.INSTANCE.deleteGuildConfig(guild, "autoroles", autoroles[i]);
 					} else {
-						event.getGuild().addRoleToMember(event.getMember(), role).queue();
+						guild.addRoleToMember(event.getMember(), role).queue();
 					}
 				}
 			}
 			//send Welcomemessage
-			String welcomemsgraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "welcomemsg");
+			String welcomemsgraw = Configloader.INSTANCE.getGuildConfig(guild, "welcomemsg");
 			LocalDateTime date = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 			String currentdate = date.format(formatter);
 			if (!welcomemsgraw.equals("")) {
 				String[] welcomemsg = welcomemsgraw.split(";");
-				welcomemsg[0].replace("{server}", event.getGuild().getName());
+				welcomemsg[0].replace("{server}", guild.getName());
 				welcomemsg[0].replace("{member}", event.getMember().getAsMention());
-				welcomemsg[0].replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
+				welcomemsg[0].replace("{membercount}", Integer.toString(guild.getMemberCount()));
 				welcomemsg[0].replace("{date}", currentdate);
-				event.getGuild().getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
+				guild.getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
 			}
 		}
 	}
@@ -224,7 +248,7 @@ public class Processor extends ListenerAdapter {
 		//check for Join2create-channel & create User-channel if true
 		this.managej2cjoin(event.getGuild(), event.getMember(), event.getChannelJoined());
 		//check if VoiceChannelLeft was a Userchannel
-		this.managej2cleave(event.getGuild(), event.getMember(), event.getChannelLeft());
+		this.managej2cleave(event.getGuild(), event.getMember().getUser(), event.getChannelLeft());
 		//levelsystem
 		LevelEngine.getInstance().voicemove(event);
 	}
@@ -244,7 +268,7 @@ public class Processor extends ListenerAdapter {
 			return;
 		}
 		//check if VoiceChannelLeft was a Userchannel
-		this.managej2cleave(event.getGuild(), event.getMember(), event.getChannelLeft());
+		this.managej2cleave(event.getGuild(), event.getMember().getUser(), event.getChannelLeft());
 	}
 	
 	private void managej2cjoin(Guild guild, Member member, VoiceChannel channeljoined) {
@@ -264,7 +288,7 @@ public class Processor extends ListenerAdapter {
 		}
 	}
 	
-	private void managej2cleave(Guild guild, Member member, VoiceChannel channelleft) {
+	private void managej2cleave(Guild guild, User user, VoiceChannel channelleft) {
 		VoiceChannel vc = channelleft;
 		int conmemb = vc.getMembers().size();
 		//check if bot is the only one left in the channel (Then leave)
@@ -277,20 +301,20 @@ public class Processor extends ListenerAdapter {
 		//check if VoiceChannelLeft was a Userchannel
 		if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId())) {
 			if (conmemb == 0) {
-				Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", vc.getId() + "-" + member.getUser().getId());
+				Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", vc.getId() + "-" + user.getId());
 				vc.delete().queue();
 			} else {
-				if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId() + "-" + member.getUser().getId())) {
+				if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId() + "-" + user.getId())) {
 					Collection<Permission> perms = new LinkedList<Permission>();
 					perms.add(Permission.MANAGE_CHANNEL);
 					perms.add(Permission.MANAGE_PERMISSIONS);
 					perms.add(Permission.CREATE_INSTANT_INVITE);
 					perms.add(Permission.VOICE_MUTE_OTHERS);
 					perms.add(Permission.VOICE_SPEAK);
-					Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", vc.getId() + "-" + member.getUser().getId());
+					Configloader.INSTANCE.deleteGuildConfig(guild, "j2cs", vc.getId() + "-" + user.getId());
 					Member newowner =  vc.getMembers().get(0);
 					Configloader.INSTANCE.addGuildConfig(guild, "j2cs", vc.getId() + "-" + newowner.getUser().getId());
-					vc.getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(member).setName(newowner.getEffectiveName() + "'s channel").queue();
+					vc.getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(guild.getMember(user)).setName(newowner.getEffectiveName() + "'s channel").queue();
 				}
 			}
 		}
@@ -305,24 +329,26 @@ public class Processor extends ListenerAdapter {
 	}
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-		if (event.getUser().isBot()) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		if (user.isBot()) {
 			return;
 		}
 		//if reaction on poll, process reaction
-		if (Configloader.INSTANCE.findPollConfig(event.getGuild(), event.getMessageId()) != null) {
+		if (Configloader.INSTANCE.findPollConfig(guild, event.getMessageId()) != null) {
 			if (!event.getReactionEmote().getAsCodepoints().contains("U+20e3")) {
-				event.getChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getUser()).queue();
+				event.getChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), user).queue();
 			} else {
-				this.addPollAnswer(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getGuild(), event.getUser());
-				if (Boolean.parseBoolean(Configloader.INSTANCE.getPollConfig(event.getGuild(), event.getMessageId(), "anonymous"))) {
-					event.getChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), event.getUser()).queue();
+				this.addPollAnswer(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), guild, user);
+				if (Boolean.parseBoolean(Configloader.INSTANCE.getPollConfig(guild, event.getMessageId(), "anonymous"))) {
+					event.getChannel().removeReactionById(event.getMessageId(), event.getReactionEmote().getAsCodepoints(), user).queue();
 				}
 			}
 			return;
 		}
 		//if reaction on reactionrole message, process reaction
-		if (Configloader.INSTANCE.getReactionroleConfig(event.getGuild(), event.getChannel(), event.getMessageId()) != null) {
-			Guild guild = event.getGuild();
+		if (Configloader.INSTANCE.getReactionroleConfig(guild, event.getChannel(), event.getMessageId()) != null) {
+			
 			TextChannel channel = event.getChannel();
 			String msgid = event.getMessageId();
 			String[] actions = Configloader.INSTANCE.getReactionroleConfig(guild, channel, msgid).split(";");
