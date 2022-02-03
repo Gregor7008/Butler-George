@@ -139,6 +139,7 @@ public class Configcheck {
     	    		if (!id.equals("")) {
     	    			if (guild.getCategoryById(id) == null) {
     	    				Configloader.INSTANCE.deleteUserConfig(guild, user, "cccategory", id);
+    	    				Configloader.INSTANCE.deleteGuildConfig(guild, "ccctgies", id);
     	    			}
     	    		}
     			}

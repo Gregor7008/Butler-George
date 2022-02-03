@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
@@ -31,15 +32,15 @@ public class Setlanguage implements Command{
 				.addOption("Nederlands", "nl")
 				.addOption("Pусский", "ru")
 				.build();
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:chooselang"))
-				.setEphemeral(true)
+		InteractionHook reply = event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:chooselang"))
 				.addActionRow(menu)
-				.queue();
+				.complete();
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		waiter.waitForEvent(SelectionMenuEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 				  	  return e.getUser().getIdLong() == user.getIdLong();},
-				e -> {switch (e.getSelectedOptions().get(0).getValue()) {
+				e -> {reply.deleteOriginal().queue();
+					  switch (e.getSelectedOptions().get(0).getValue()) {
 				      case "en":
 				    	  Configloader.INSTANCE.setUserConfig(guild, user, "language", "en");
 				    	  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:successen")).queue();
@@ -68,7 +69,7 @@ public class Setlanguage implements Command{
 						  e.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:fatal")).queue();
 				      }},
 				1, TimeUnit.MINUTES,
-				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override

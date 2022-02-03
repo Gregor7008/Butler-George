@@ -173,6 +173,7 @@ public class Configloader {
 				pps.setProperty("ccrole", "");
 				pps.setProperty("ccdefaccess", "");
 				pps.setProperty("ticketcount", "00001");
+				pps.setProperty("ccctgies", "");
 				pps.store(fop, null);
 				fop.close();
 			} catch (IOException e) {e.printStackTrace();}
