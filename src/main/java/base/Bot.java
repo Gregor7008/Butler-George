@@ -3,6 +3,7 @@ package base;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
@@ -136,10 +137,15 @@ public class Bot {
 	}
 	
 	private void shutdown(Boolean delete) {
-		for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
-    		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);    		
-    		if (!Configloader.INSTANCE.getGuildConfig(guild, "join2create").equals("") && delete) {
-    			guild.getVoiceChannelById(Configloader.INSTANCE.getGuildConfig(guild, "join2create")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
+		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
+		for (int i = 0; i < guilds.size(); i++) {
+    		Guild guild = guilds.get(i);    	
+    		String ids = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
+    		if (!ids.equals("") && delete) {
+    			String[] entries = ids.split(";");
+    			for (int a = 0; a < entries.length; a++) {
+    				guild.getVoiceChannelById(entries[a]).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
+    			}
     			String j2csraw = Configloader.INSTANCE.getGuildConfig(guild, "j2cs");
     			if (!j2csraw.equals("")) {
     				String[] j2cs = j2csraw.split(";");

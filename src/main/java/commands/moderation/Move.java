@@ -45,7 +45,6 @@ public class Move implements Command{
 		} else {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/move:notconnected")).queue();
 		}
-		
 	}
 
 	@Override

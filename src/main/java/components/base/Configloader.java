@@ -158,7 +158,7 @@ public class Configloader {
 				pps.setProperty("autoroles", "");
 				pps.setProperty("botautoroles", "");
 				pps.setProperty("modrole", "");
-				pps.setProperty("autopunish", "");
+				pps.setProperty("penalties", "");
 				pps.setProperty("levelrewards", "");
 				pps.setProperty("muterole", "");
 				pps.setProperty("j2cs", "");
@@ -207,6 +207,7 @@ public class Configloader {
 				pps.setProperty("language", "en");
 				pps.setProperty("levelspamcount", "0");
 				pps.setProperty("cccategory", "");
+				pps.setProperty("penaltycount", "");
 				pps.store(fop, null);
 				fop.close();
 			} catch (IOException e) {e.printStackTrace();}

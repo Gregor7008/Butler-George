@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 import commands.Command;
 import commands.CommandList;
-import commands.TextCommandList;
 import commands.music.Stop;
 import commands.utilities.Suggest;
 import components.base.AnswerEngine;
@@ -58,21 +57,6 @@ public class Processor extends ListenerAdapter {
 		if (user.isBot()) {
 			return;
 		}
-		//Text-Commands
-		if (event.getMessage().getContentRaw().startsWith("!")) {
-			String[] commandraw = event.getMessage().getContentRaw().split(" ", 2);
-			String[] command = commandraw[0].split("!", 2);
-			String arguments = "";
-			try {
-				arguments = commandraw[1];
-			} catch (IndexOutOfBoundsException e) {}
-			TextCommandList tcl = new TextCommandList();
-			List<String> tclnames = new ArrayList<>();
-			tclnames.addAll(tcl.textcmds.keySet());
-			if (tclnames.contains(command[1])) {
-				tcl.textcmds.get(command[1]).perform(event, arguments);
-			}
-		}
 		//levelsystem
 		LevelEngine.getInstance().messagereceived(event);
 		//automoderation
@@ -114,8 +98,10 @@ public class Processor extends ListenerAdapter {
 			Configloader.INSTANCE.setGuildConfig(guild, "ticketcount", String.format("%05d", newcount));
 			event.getMessage().delete().queue();
 			event.getChannel().getManager().setSlowmode(120).queue();
-		}
+			return;
+		}		
 	}
+	
 	@Override
 	public void onReady(ReadyEvent event) {
 		//initialize Slash-Commands
@@ -146,6 +132,7 @@ public class Processor extends ListenerAdapter {
 			clua.queue();
 		}
 	}
+	
 	@Override
 	public void onSlashCommand(SlashCommandEvent event) {
 		final Guild guild = event.getGuild();
@@ -175,6 +162,7 @@ public class Processor extends ListenerAdapter {
 		//levelsystem
 		LevelEngine.getInstance().slashcommand(event);
 	}
+	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 		final Guild guild = event.getGuild();
@@ -220,6 +208,7 @@ public class Processor extends ListenerAdapter {
 			}
 		}
 	}
+	
 	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
 		if (event.getUser().isBot()) {
@@ -240,6 +229,7 @@ public class Processor extends ListenerAdapter {
 			event.getGuild().getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
 		}
 	}
+	
 	@Override
 	public void onGuildVoiceMove(GuildVoiceMoveEvent event) {
 		if (event.getMember().getUser().isBot()) {
@@ -252,6 +242,7 @@ public class Processor extends ListenerAdapter {
 		//levelsystem
 		LevelEngine.getInstance().voicemove(event);
 	}
+	
 	@Override
 	public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
 		if (event.getMember().getUser().isBot()) {
@@ -262,6 +253,7 @@ public class Processor extends ListenerAdapter {
 		//levelsystem
 		LevelEngine.getInstance().voicejoin(event);
 	}
+	
 	@Override
 	public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
 		if (event.getMember().getUser().isBot()) {
@@ -273,8 +265,8 @@ public class Processor extends ListenerAdapter {
 	
 	private void managej2cjoin(Guild guild, Member member, VoiceChannel channeljoined) {
 		//check for Join2create-channel & create User-channel if true
-		String j2cid = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
-		if (channeljoined.getId().equals(j2cid)) {
+		String j2cids = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
+		if (j2cids.contains(channeljoined.getId())) {
 			Collection<Permission> perms = new LinkedList<Permission>();
 			perms.add(Permission.MANAGE_CHANNEL);
 			perms.add(Permission.MANAGE_PERMISSIONS);
@@ -319,6 +311,7 @@ public class Processor extends ListenerAdapter {
 			}
 		}
 	}
+	
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
 		if (event.getAuthor().isBot()) {
@@ -327,6 +320,7 @@ public class Processor extends ListenerAdapter {
 		//process modmail
 		new ModMail(event);
 	}
+	
 	@Override
 	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
 		final Guild guild = event.getGuild();
@@ -360,6 +354,7 @@ public class Processor extends ListenerAdapter {
 			}
 		}
 	}
+	
 	@Override
 	public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
 		//if reaction on reactionrole message, process reaction
@@ -404,20 +399,24 @@ public class Processor extends ListenerAdapter {
 			Configloader.INSTANCE.setPollConfig(guild, msgid, "users", currentusers + ";" + user.getId() + "_" + String.valueOf(choice));
 		}
 	}
+	
 	@Override
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
 		new ServerUtilities().rolecheck();
 	}
+	
 	@Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
 		new ServerUtilities().rolecheck();
 	}
+	
 	@Override
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {
 		new Thread(() -> {
 			Configcheck.INSTANCE.checkGuildConfigs(event.getGuild());
 		}).start();
 	}
+	
 	@Override
 	public void onVoiceChannelDelete(VoiceChannelDeleteEvent event) {
 		String id = event.getChannel().getId();
@@ -435,12 +434,14 @@ public class Processor extends ListenerAdapter {
 			Configcheck.INSTANCE.checkGuildConfigs(event.getGuild());
 		}).start();
 	}
+	
 	@Override
 	public void onRoleDelete(RoleDeleteEvent event) {
 		new Thread(() -> {
 			Configcheck.INSTANCE.checkGuildConfigs(event.getGuild());
 		}).start();
 	}
+	
 	@Override
 	public void onCategoryDelete(CategoryDeleteEvent event) {
 		new Thread(() -> {

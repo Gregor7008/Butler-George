@@ -1,5 +1,7 @@
 package commands.utilities;
 
+import java.util.concurrent.TimeUnit;
+
 import commands.Command;
 import commands.CommandList;
 import components.base.AnswerEngine;
@@ -17,29 +19,34 @@ public class Help implements Command{
 	public void perform(SlashCommandEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
+		final String input = event.getOption("command").getAsString();
 		CommandList commandList = new CommandList();
 		Command cmd;
 		String help = null;
-		if ((cmd = commandList.utilitycmds.get(event.getOption("command").getAsString())) != null) {
-			help = cmd.getHelp(guild, user);
-			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], helpsplit[1])).queue();
+		if (input.equals("help")) {
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Help for the \"/help\"-command!", ":face_with_symbols_over_mouth: | WHY WOULD YOU DO THIS?!")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		if ((cmd = commandList.moderationcmds.get(event.getOption("command").getAsString())) != null 
-				&& event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
-			help = cmd.getHelp(guild, user);
-			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], helpsplit[1])).queue();
-			return;
-		}
-		if ((cmd = commandList.musiccmds.get(event.getOption("command").getAsString())) != null) {
+		if ((cmd = commandList.utilitycmds.get(input)) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:fatal")).queue();
+		if ((cmd = commandList.moderationcmds.get(input)) != null 
+				&& event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
+			help = cmd.getHelp(guild, user);
+			String[] helpsplit = help.split(";\\s+");
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], ":bulb: | " + helpsplit[1])).queue();
+			return;
+		}
+		if ((cmd = commandList.musiccmds.get(input)) != null) {
+			help = cmd.getHelp(guild, user);
+			String[] helpsplit = help.split(";\\s+");
+			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0], ":bulb: | " + helpsplit[1])).queue();
+			return;
+		}
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/help:unknown")).queue();
 	}
 
 	@Override
@@ -50,6 +57,6 @@ public class Help implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/help:help");
+		return null;
 	}
 }

@@ -22,11 +22,14 @@ public class Configcheck {
 	public void checkGuildConfigs(Guild guild) {
 		String id = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
 		if (!id.equals("")) {
-			VoiceChannel vc = guild.getVoiceChannelById(id);
-			if (vc == null) {
-				Configloader.INSTANCE.deleteGuildConfig(guild, "join2create", id);
-			} else {
-				vc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
+			String[] entries = id.split(";");
+			for (int i = 0; i < entries.length; i++) {
+				VoiceChannel vc = guild.getVoiceChannelById(entries[i]);
+				if (vc == null) {
+					Configloader.INSTANCE.deleteGuildConfig(guild, "join2create", entries[i]);
+				} else {
+					vc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
+				}
 			}
 		}
 		id = Configloader.INSTANCE.getGuildConfig(guild, "supporttalk");

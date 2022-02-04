@@ -1,19 +1,14 @@
 In Developement:
--> Custom user categories including channels of all kind
-	=> Text-Commands vervollständigen, mit Selection Menu die Permission auswählen und dann hinzufügen (Argument soll betroffenen User beinhalten)
--> Cleanup command to delete all files of users, that left the server
--> ModEngine as users are getting muted again as soon as their tempmute by the AutopunishEngine runs out, as warnings do not get removed
-	=> Als User-Attribut speicher, welche Autopunish Strafen man schon bekommen hat und dementsprechend auf die nächste Stufe warten,
-	   wenn Autopunish Strafen neu gesetzt werden: resetten
--> Mehrere Join2Create Channel ermöglichen (Add und Remove Command, Join2Create-Value aus Reset Command entfernen)
+-> [none]
 -------------------
 In Planning:
--> Ping to move
-    => Neue Aktion beim EventListener "GuildMessageReceived",
-       Bedingungen "Wenn Erwähnung enthält" und "Erwähnter in VoiceChannel",
-       moved den Autor der Nachricht in den VoiceChannel des Erwähnten nach Zustimmung
+-> [none]
 -------------------
 For Version 2:
+-> Simplyfication of replacements in AnswerEngine
+-> Disable action row components on interaction/timeout
+-> Multi-Language implemented in SelectionMenus
+-> File implementation for embed command
 -> Spotify link integration
     => Separate Bibliothek in Verwendung
 -> Modmail for multiple servers

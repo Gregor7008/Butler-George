@@ -25,7 +25,7 @@ public class AutoModerator {
 					event.getMember().getUser().openPrivateChannel().queue(channel -> {
 						 channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + event.getGuild().getName() + "\nReason:\n=> Rude behavior")).queue();});
 				} catch (Exception e) {e.printStackTrace();}
-				AutoPunishEngine.getInstance().processWarnings(event.getGuild());
+				PenaltyEngine.getInstance().processWarnings(event.getGuild());
 				event.getMessage().delete().queue();
 			}
 		}

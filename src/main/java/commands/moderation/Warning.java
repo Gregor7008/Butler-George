@@ -8,7 +8,7 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import components.moderation.AutoPunishEngine;
+import components.moderation.PenaltyEngine;
 import components.moderation.ModController;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -53,7 +53,7 @@ public class Warning implements Command{
 							AnswerEngine.getInstance().getDescription(guild, iuser, "/commands/moderation/warning:pm").replace("{guild}", guild.getName()).replace("{reason}", reason))).queue();
 				});
 			} catch (Exception e) {}
-			AutoPunishEngine.getInstance().processWarnings(guild);
+			PenaltyEngine.getInstance().processWarnings(guild);
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
