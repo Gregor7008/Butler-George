@@ -76,7 +76,11 @@ public class LevelEngine {
 		int currentlevel = Integer.valueOf(Configloader.INSTANCE.getUserConfig(guild, user, "level"));
 		if (this.xpleftfornextlevel(guild, user) < 1) {
 			Configloader.INSTANCE.setUserConfig(guild, user, "level", String.valueOf(currentlevel + 1));
-			TextChannel channel = guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch"));
+			String id = Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch");
+			if (id.equals("")) {
+				return;
+			}
+			TextChannel channel = guild.getTextChannelById(id);
 			if (channel != null) {
 				channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":confetti_ball: Congrats\s" + guild.getMember(user).getEffectiveName()
 						+ "\s! :confetti_ball:", "You just reached level\s" + String.valueOf(currentlevel+1) + "!")).queue();

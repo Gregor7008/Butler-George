@@ -37,7 +37,8 @@ public class Clear implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("clear", "Clears a specific number of messages from this channel!").addOptions(new OptionData(OptionType.INTEGER, "count", "Hand over the number of messages you want to delete!"));
+		CommandData command = new CommandData("clear", "Deletes a specific number of messages from this channel!")
+				.addOptions(new OptionData(OptionType.INTEGER, "count", "Hand over the number of messages you want to delete!", true));
 		return command;
 	}
 

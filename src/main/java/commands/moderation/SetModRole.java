@@ -26,7 +26,7 @@ public class SetModRole implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("setmodrole", "Define the moderation role").addOption(OptionType.ROLE, "role", "Mention the role", true);
+		CommandData command = new CommandData("setmodrole", "Defines the role of moderators on this server").addOption(OptionType.ROLE, "role", "Mention the role", true);
 		return command;
 	}
 

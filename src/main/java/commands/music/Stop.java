@@ -38,7 +38,7 @@ public class Stop implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("stop", "Stop the currently playing music!");
+		CommandData command = new CommandData("stop", "Stops the currently playing music!");
 		return command;
 	}
 

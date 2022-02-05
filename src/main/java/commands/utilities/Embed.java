@@ -50,7 +50,7 @@ public class Embed implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("embed", "Create an cutom embedded message!");
+		CommandData command = new CommandData("embed", "Creates a custom embedded message!");
 		return command;
 	}
 	

@@ -2,7 +2,6 @@ package commands.utilities;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
-public class Userpermission implements Command{
+public class Channelpermission implements Command{
 	
 	List<Message> msgs = new ArrayList<>();
 
@@ -33,16 +32,17 @@ public class Userpermission implements Command{
 	public void perform(SlashCommandEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		if (!event.getTextChannel().getParent().equals(guild.getCategoryById(Configloader.INSTANCE.getUserConfig(guild, user, "cccategory")))) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/userpermission:nopermission")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		String ctgid = Configloader.INSTANCE.getUserConfig(guild, user, "cccategory");
+		if (ctgid.equals("") || !event.getTextChannel().getParent().equals(guild.getCategoryById(ctgid))) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:nopermission")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (event.getOption("user") == null && event.getOption("role") == null) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/userpermission:noargs")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:noargs")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		if (event.getSubcommandName().equals("reset")) {
-			this.defineEdit(null, event, null, false);
+		if (event.getOption("user") != null && event.getOption("role") != null) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:invalidargs")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		SelectionMenu menu = SelectionMenu.create("permselection")
@@ -63,7 +63,7 @@ public class Userpermission implements Command{
 				.addOption("Use Slash-Commands", "usc")
 				.addOption("All Permissions", "apm")
 				.build();
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/userpermission:selperm"))
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:selperm"))
 				.addActionRow(menu)
 				.queue();
 		Bot.INSTANCE.getWaiter().waitForEvent(SelectionMenuEvent.class,
@@ -80,16 +80,12 @@ public class Userpermission implements Command{
 	
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("userpermission", "Edits permission in user channels")
+		CommandData command = new CommandData("channelpermission", "Edits permission in user channels")
 				.addSubcommands(new SubcommandData("grant", "Grants permission in a user channel")
 						.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
 						.addOption(OptionType.USER, "user", "The wanted user")
 						.addOption(OptionType.ROLE, "role", "The wanted role"))
 				.addSubcommands(new SubcommandData("remove", "Removes a permission in a user channel")
-						.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
-						.addOption(OptionType.USER, "user", "The wanted user")
-						.addOption(OptionType.ROLE, "role", "The wanted role"))
-				.addSubcommands(new SubcommandData("reset", "Resets the permissions in a user channel")
 						.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
 						.addOption(OptionType.USER, "user", "The wanted user")
 						.addOption(OptionType.ROLE, "role", "The wanted role"));
@@ -98,7 +94,7 @@ public class Userpermission implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/userpermission:help");
+		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/channelpermission:help");
 	}
 	
 	private void defineEdit(String selected, SlashCommandEvent event, SelectionMenuEvent sme, boolean action) {
@@ -116,52 +112,101 @@ public class Userpermission implements Command{
 			sme.replyEmbeds(AnswerEngine.getInstance().buildMessage("MUHAHAHAHA", ":rofl: | You really thought that would work?!\nI got administrator permissions, remember?")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		if (selected == null) {
-			this.updatePerms(pholder, channel, selected, action);
-			return;
-		}
 		if (pholder.equals(guild.getPublicRole()) && selected.equals("vc")) {
-			sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/userpermission:invalid")).queue();
-			return;
-		}
-		if (channel != null) {
-			this.updatePerms(pholder, channel, selected, action);
-			sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/userpermission:remsuccess")).queue();
+			sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:invalid")).queue();
 			return;
 		}
 		if (category != null) {
 			List<GuildChannel> channels = category.getChannels();
 			for (int i = 0; i < channels.size(); i++) {
-				this.updatePerms(pholder, channels.get(i), selected, action);
+				this.updateChannelPerms(pholder, channels.get(i), selected, action);
 			}
-			sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/userpermission:remsuccess")).queue();
+			this.updateCategoryPerms(pholder, category, selected, action);
+			if (action) {
+				sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:addsuccess")).queue();
+			} else {
+				sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:remsuccess")).queue();
+			}
+			return;
+		}
+		if (channel != null) {
+			this.updateChannelPerms(pholder, channel, selected, action);
+			if (action) {
+				sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:addsuccess")).queue();
+			} else {
+				sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:remsuccess")).queue();
+			}
 			return;
 		}
 		sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:fatal")).queue();
 	}
 	
-	private void updatePerms(IPermissionHolder pholder, GuildChannel channel, String selected, boolean action) {
-		if (selected == null) {
-			channel.putPermissionOverride(pholder).reset().queue();
-			return;
-		}
+	private void updateChannelPerms(IPermissionHolder pholder, GuildChannel channel, String selected, boolean action) {
 		PermissionOverride current = channel.getPermissionOverride(pholder);
 		if (current != null) {
-			Collection<Permission> update = this.convertToPerm(selected);
+			ArrayList<Permission> update = this.convertToPerm(selected);
 			Collection<Permission> curdeny = current.getDenied();
 			Collection<Permission> curallow = current.getAllowed();
 			if (action) {
+				for (int i = 0; i < update.size(); i++) {
+					if (curdeny.contains(update.get(i))) {
+						curdeny.remove(update.get(i));
+					}
+				}
 				curallow.forEach(p -> update.add(p));
-				channel.putPermissionOverride(pholder).setDeny(curdeny).setAllow(update).queue();
+				channel.upsertPermissionOverride(pholder).setPermissions(update, curdeny).queue();
 			} else {
+				for (int i = 0; i < update.size(); i++) {
+					if (curallow.contains(update.get(i))) {
+						curallow.remove(update.get(i));
+					}
+				}
 				curdeny.forEach(p -> update.add(p));
-				channel.putPermissionOverride(pholder).setAllow(curallow).setDeny(update).queue();
+				channel.upsertPermissionOverride(pholder).setPermissions(curallow, update).queue();
+			}
+		} else {
+			if (action) {
+				channel.putPermissionOverride(pholder).setAllow(this.convertToPerm(selected)).queue();
+			} else {
+				channel.putPermissionOverride(pholder).setDeny(this.convertToPerm(selected)).queue();
 			}
 		}
 	}
 	
-	private Collection<Permission> convertToPerm(String string) {
-		Collection<Permission> perms = new LinkedList<>();
+	private void updateCategoryPerms(IPermissionHolder pholder, Category category, String selected, boolean action) {
+		PermissionOverride current = category.getPermissionOverride(pholder);
+		if (current != null) {
+			ArrayList<Permission> update = this.convertToPerm(selected);
+			Collection<Permission> curdeny = current.getDenied();
+			Collection<Permission> curallow = current.getAllowed();
+			if (action) {
+				for (int i = 0; i < update.size(); i++) {
+					if (curdeny.contains(update.get(i))) {
+						curdeny.remove(update.get(i));
+					}
+				}
+				curallow.forEach(p -> update.add(p));
+				category.upsertPermissionOverride(pholder).setPermissions(update, curdeny).queue();
+			} else {
+				for (int i = 0; i < update.size(); i++) {
+					if (curallow.contains(update.get(i))) {
+						curallow.remove(update.get(i));
+					}
+				}
+				curdeny.forEach(p -> update.add(p));
+				category.upsertPermissionOverride(pholder).setPermissions(curallow, update).queue();
+			}
+		} else {
+			if (action) {
+				category.putPermissionOverride(pholder).setAllow(this.convertToPerm(selected)).queue();
+			} else {
+				category.putPermissionOverride(pholder).setDeny(this.convertToPerm(selected)).queue();
+			}
+		}
+	}
+	
+	private ArrayList<Permission> convertToPerm(String string) {
+		ArrayList<Permission> perms = new ArrayList<>();
 		switch (string) {
 		case "vc":
 			perms.add(Permission.VIEW_CHANNEL);

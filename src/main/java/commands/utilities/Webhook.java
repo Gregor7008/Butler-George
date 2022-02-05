@@ -35,7 +35,7 @@ public class Webhook implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("webhook", "Send a webhook")
+		CommandData command = new CommandData("webhook", "Sends a message to a webhook")
 										.addOption(OptionType.STRING, "link", "The link of the webhook", true)
 										.addOption(OptionType.STRING, "message", "The message that should be sent", true);
 		return command;

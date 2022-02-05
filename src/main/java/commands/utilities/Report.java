@@ -41,7 +41,7 @@ public class Report implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("report", "report a member")
+		CommandData command = new CommandData("report", "Report a member for a specific reason")
 										.addOption(OptionType.USER, "user", "The user to be reported", true)
 										.addOption(OptionType.STRING, "reason", "The reason for your report", true)
 										.addOption(OptionType.STRING, "link", "The link to a message for evidence", false);

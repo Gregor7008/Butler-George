@@ -2,7 +2,6 @@ package commands;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import commands.moderation.Penalty;
 import commands.moderation.AutoRole;
 import commands.moderation.BotAutoRole;
 import commands.moderation.Cleanup;
@@ -15,6 +14,7 @@ import commands.moderation.Join2Create;
 import commands.moderation.Levelreward;
 import commands.moderation.Move;
 import commands.moderation.Mute;
+import commands.moderation.Penalty;
 import commands.moderation.ReactionRole;
 import commands.moderation.Reset;
 import commands.moderation.Rolesorting;
@@ -36,6 +36,7 @@ import commands.music.Play;
 import commands.music.Queue;
 import commands.music.Skip;
 import commands.music.Stop;
+import commands.utilities.Channelpermission;
 import commands.utilities.CreateChannel;
 import commands.utilities.Embed;
 import commands.utilities.Help;
@@ -48,9 +49,7 @@ import commands.utilities.Serverinfo;
 import commands.utilities.SetLanguage;
 import commands.utilities.Suggest;
 import commands.utilities.Userinfo;
-import commands.utilities.Userpermission;
 import commands.utilities.Webhook;
-import components.utilities.Test;
 
 public class CommandList {
 	
@@ -72,7 +71,7 @@ public class CommandList {
 		this.utilitycmds.put("setlanguage", new SetLanguage());
 		this.utilitycmds.put("webhook", new Webhook());
 		this.utilitycmds.put("createchannel", new CreateChannel());
-		this.utilitycmds.put("userpermission", new Userpermission());
+		this.utilitycmds.put("channelpermission", new Channelpermission());
 		this.utilitycmds.put("pingandmove", new PingAndMove());
 		
 		//Moderation
@@ -105,7 +104,6 @@ public class CommandList {
 		this.moderationcmds.put("setdefaultaccess", new SetDefaultAccess());
 		this.moderationcmds.put("setcustomchannelrole", new SetCustomChannelRole());
 		//Developement
-		this.moderationcmds.put("test", new Test());
 		this.moderationcmds.put("cleanup", new Cleanup());
 		
 		//Music

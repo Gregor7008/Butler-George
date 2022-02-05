@@ -56,8 +56,10 @@ public class Levelreward implements Command{
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("levelreward", "Configure the levelreward roles!")
-									.addSubcommands(new SubcommandData("add", "Add a new role").addOption(OptionType.ROLE, "role", "The new role", true).addOption(OptionType.INTEGER, "level", "The level on which the role should be given to a user", true))
-									.addSubcommands(new SubcommandData("remove", "Remove a existing levelreward").addOption(OptionType.ROLE, "role", "The rewardrole that should be removed", true))
+									.addSubcommands(new SubcommandData("add", "Adds a new levelreward in form of a role")
+											.addOption(OptionType.ROLE, "role", "The roles that should be given", true)
+											.addOption(OptionType.INTEGER, "level", "The level on which the role should be given to a user", true))
+									.addSubcommands(new SubcommandData("remove", "Removes an existing levelreward").addOption(OptionType.ROLE, "role", "The rewarded role that should be removed", true))
 									.addSubcommands(new SubcommandData("list", "Lists all existing levelrewards"));
 		return command;
 	}

@@ -56,11 +56,11 @@ public class Welcome implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("welcome", "Configure the welcome message, that will be send whenever a new member joins your server!")
-									.addSubcommands(new SubcommandData("set", "Set the welcome message")
+		CommandData command = new CommandData("welcome", "Configure the welcome message, that will be send whenever a new member joins")
+									.addSubcommands(new SubcommandData("set", "Set the welcome message, that'll be send whenever a new member joins")
 											  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {server} {date}!").setRequired(true))
 											  .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Provide the channel where the message should be send in").setRequired(true)))
-									.addSubcommands(new SubcommandData("off", "Turn welcome messages off again!"))
+									.addSubcommands(new SubcommandData("off", "Turns welcome messages off"))
 									.addSubcommands(new SubcommandData("test", "Test the welcome message"));
 		return command;
 	}

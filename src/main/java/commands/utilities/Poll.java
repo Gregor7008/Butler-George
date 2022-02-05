@@ -68,8 +68,8 @@ public class Poll implements Command{
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("poll", "Manage polls")
-											 .addSubcommands(new SubcommandData("create", "Create a poll"))
-											 .addSubcommands(new SubcommandData("remove", "Delete a poll")
+											 .addSubcommands(new SubcommandData("create", "Creates a poll"))
+											 .addSubcommands(new SubcommandData("remove", "Deletes a poll")
 													 		 .addOption(OptionType.STRING, "msgid", "The message ID of the poll", true))
 											 .addSubcommands(new SubcommandData("list", "Lists all active polls"))
 											 .addSubcommands(new SubcommandData("info", "Show details about a specific poll")

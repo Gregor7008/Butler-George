@@ -26,7 +26,7 @@ public class Userinfo implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("userinfo", "Request the information about a member").addOption(OptionType.USER, "member", "The member the information should be about", false);
+		CommandData command = new CommandData("userinfo", "Requests information about a user").addOption(OptionType.USER, "user", "The member the information should be about", false);
 		return command;
 	}
 

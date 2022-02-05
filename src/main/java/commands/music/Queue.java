@@ -76,7 +76,7 @@ public class Queue implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("queue", "Displays the current queue!");
+		CommandData command = new CommandData("queue", "Displays the current music queue!");
 		return command;
 	}
 

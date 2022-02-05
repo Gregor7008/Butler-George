@@ -49,9 +49,9 @@ public class Penalty implements Command{
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("penalty", "The automatic penalties executed, when a specified number of warnings is reached")
-											  .addSubcommands(new SubcommandData("add", "Add an penalty"))
-											  .addSubcommands(new SubcommandData("remove", "Remove an penalty"))
-											  .addSubcommands(new SubcommandData("list", "List all penalties"));
+											  .addSubcommands(new SubcommandData("add", "Adds a penalty that's executed on reaching a certain amount of warnings"))
+											  .addSubcommands(new SubcommandData("remove", "Removes a penalty"))
+											  .addSubcommands(new SubcommandData("list", "List all currently defined penalties"));
 		return command;
 	}
 

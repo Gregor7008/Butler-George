@@ -45,7 +45,9 @@ public class Close implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("close", "Closes the modmail/support channel").addOption(OptionType.STRING, "reason", "The reason why the ticket was closed", true).addOption(OptionType.BOOLEAN, "warning", "Whether the member should be warned");
+		CommandData command = new CommandData("close", "Closes the modmail/support channel")
+				.addOption(OptionType.STRING, "reason", "The reason why the ticket was closed", true)
+				.addOption(OptionType.BOOLEAN, "warning", "Whether the member should be warned");
 		return command;
 	}
 

@@ -26,7 +26,7 @@ public class SetCustomChannelRole implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("setcustomchannelrole", "Set the role that should be able to create custom user channel").addOption(OptionType.ROLE, "role", "The wanted role", true);
+		CommandData command = new CommandData("setcustomchannelrole", "Sets the role that should be able to create custom user channels").addOption(OptionType.ROLE, "role", "The wanted role", true);
 		return command;
 	}
 

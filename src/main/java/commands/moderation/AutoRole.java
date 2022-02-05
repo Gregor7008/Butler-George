@@ -45,10 +45,12 @@ public class AutoRole implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("autorole", "Configurates the roles given to every new member joining in the future!")
-								  .addSubcommands(new SubcommandData("add", "Adds a role!").addOptions(new OptionData(OptionType.ROLE, "addrole", "Mention the role you want to add!").setRequired(true)))
-								  .addSubcommands(new SubcommandData("remove", "Removes a role!").addOptions(new OptionData(OptionType.ROLE, "removerole", "Mention the role you want to remove!").setRequired(true)))
-								  .addSubcommands(new SubcommandData("list", "Displays the roles currently given to every new member!"));
+		CommandData command = new CommandData("autorole", "Configurates the roles given to every new member joining!")
+								  .addSubcommands(new SubcommandData("add", "Adds a role, that'll be given to every new member joining!")
+										  .addOptions(new OptionData(OptionType.ROLE, "addrole", "Mention the role you want to add!", true)))
+								  .addSubcommands(new SubcommandData("remove", "Removes a role, that was previously given to every new member joining!")
+										  .addOptions(new OptionData(OptionType.ROLE, "removerole", "Mention the role you want to remove!", true)))
+								  .addSubcommands(new SubcommandData("list", "Displays the roles currently given to every new member joining!"));
 		return command;
 	}
 

@@ -57,12 +57,12 @@ public class Goodbye implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("goodbye", "Configure the goodbye message, that will be send whenever a new member joins your server!")
-				.addSubcommands(new SubcommandData("set", "Set the welcome message")
-						  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {server} {date} {timejoined}!").setRequired(true))
-						  .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Provide the channel where the message should be send in").setRequired(true)))
-				.addSubcommands(new SubcommandData("off", "Turn goodbye messages off again!"))
-				.addSubcommands(new SubcommandData("test", "Test the goodbye message"));
+		CommandData command = new CommandData("goodbye", "Configure the goodbye message, that will be send whenever a member leaves the server!")
+				.addSubcommands(new SubcommandData("set", "Sets the goodbye message, that'll be send whenever a member leaves the server!")
+						  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {server} {date} {timejoined}!", true))
+						  .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Provide the channel where the message should be send in", true)))
+				.addSubcommands(new SubcommandData("off", "Turns goodbye messages off"))
+				.addSubcommands(new SubcommandData("test", "Tests the goodbye message"));
 		return command;
 	}
 

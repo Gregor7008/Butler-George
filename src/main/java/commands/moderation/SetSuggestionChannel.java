@@ -27,7 +27,7 @@ public class SetSuggestionChannel implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("setsuggestionchannel", "Set a suggestion channel for your server!")
+		CommandData command = new CommandData("setsuggestionchannel", "Sets a suggestion channel for your server!")
 										.addOptions(new OptionData(OptionType.CHANNEL, "channel", "Mention the channel that should be used", true));	
 		return command;
 	}

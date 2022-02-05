@@ -92,13 +92,13 @@ public class ReactionRole implements Command{
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("reactionrole", "Manage reactionroles on your server")
-									.addSubcommands(new SubcommandData("add", "Add a new reactionrole")
+									.addSubcommands(new SubcommandData("add", "Adds a reaction to a message that acts as a button to get a specified role")
 											.addOption(OptionType.CHANNEL, "channel", "The channel of your message", true)
 											.addOption(OptionType.STRING, "message", "The message-id for your message", true))
-									.addSubcommands(new SubcommandData("delete", "Delete an existing reactionrole")
+									.addSubcommands(new SubcommandData("delete", "Deletes all reactions of a reactionrole message")
 											.addOption(OptionType.CHANNEL, "channel", "The channel of your message", true)
 											.addOption(OptionType.STRING, "message", "The message-id for your message", true))
-									.addSubcommands(new SubcommandData("remove", "Remove one emoji from an existing reactionrole message")
+									.addSubcommands(new SubcommandData("remove", "Removes one reaction of a reactionrole message")
 											.addOption(OptionType.CHANNEL, "channel", "The channel of your message", true)
 											.addOption(OptionType.STRING, "message", "The message-id for your message", true));
 		return command;

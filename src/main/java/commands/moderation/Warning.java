@@ -85,12 +85,12 @@ public class Warning implements Command{
 	public CommandData initialize() {
 		CommandData command = new CommandData("warning", "Warn a member")
 								  .addSubcommands(new SubcommandData("add", "Warns a user and adds a warning to their warnings-list")
-											  .addOptions(new OptionData(OptionType.USER, "member", "The member you want to warn", true))
+											  .addOptions(new OptionData(OptionType.USER, "user", "The user you want to warn", true))
 											  .addOptions(new OptionData(OptionType.STRING, "reason", "The reason why you warn the member", false)))
 								  .addSubcommands(new SubcommandData("list", "Shows you the number of warnings a member already has")
-										  	  .addOptions(new OptionData(OptionType.USER, "member", "The member you want to check", true)))
-								  .addSubcommands(new SubcommandData("remove", "Removes the warning of a user")
-										  	  .addOptions(new OptionData(OptionType.USER, "member", "The member you want to remove the warning from", true)));
+										  	  .addOptions(new OptionData(OptionType.USER, "user", "The user you want to check", true)))
+								  .addSubcommands(new SubcommandData("remove", "Removes a warning of a user")
+										  	  .addOptions(new OptionData(OptionType.USER, "user", "The user you want to remove the warning from", true)));
 		return command;
 	}
 

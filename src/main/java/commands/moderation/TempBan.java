@@ -31,7 +31,7 @@ public class TempBan implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("tempban", "Ban a user temporary")
+		CommandData command = new CommandData("tempban", "Bans a user temporarily")
 												.addOptions(new OptionData(OptionType.USER, "member", "The member you want to ban", true))
 												.addOptions(new OptionData(OptionType.INTEGER, "days", "The number of days you want the member to be banned", true));
 		return command;

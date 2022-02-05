@@ -49,7 +49,7 @@ public class Rolesorting implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("rolesort", "Use this command to sort groups by grouping roles!");
+		CommandData command = new CommandData("rolesort", "Adds and removes roles by other roles (If member has a role, give him another role)");
 		return command;
 	}
 

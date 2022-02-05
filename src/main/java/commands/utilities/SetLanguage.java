@@ -29,7 +29,7 @@ public class SetLanguage implements Command{
 				.addOption("Deutsch", "de")
 				.addOption("Español", "es")
 				.addOption("Français", "fr")
-				.addOption("Nederlands", "nl")
+				.addOption("Dutch", "nl")
 				.addOption("Pусский", "ru")
 				.build();
 		InteractionHook reply = event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/setlanguage:chooselang"))
@@ -74,7 +74,7 @@ public class SetLanguage implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("setlanguage", "Set your preferred language the bot should answer in!");
+		CommandData command = new CommandData("setlanguage", "Set your preferred language in which the bot should answer in!");
 		return command;
 	}
 

@@ -26,7 +26,7 @@ public class SetSupportRole implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("setsupportrole", "Define the support role").addOption(OptionType.ROLE, "role", "Mention the role", true);
+		CommandData command = new CommandData("setsupportrole", "Defines the role of supporters on this server").addOption(OptionType.ROLE, "role", "Mention the role", true);
 		return command;
 	}
 

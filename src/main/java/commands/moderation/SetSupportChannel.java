@@ -26,7 +26,7 @@ public class SetSupportChannel implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("setsupportchannel", "Define the support channel").addOption(OptionType.CHANNEL, "channel", "Mention a text channel", true);
+		CommandData command = new CommandData("setsupportchannel", "Defines the support channel of your server").addOption(OptionType.CHANNEL, "channel", "Mention a text channel", true);
 		return command;
 	}
 

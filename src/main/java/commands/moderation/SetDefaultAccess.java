@@ -40,7 +40,7 @@ public class SetDefaultAccess implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("setdefaultaccess", "Set the roles that shall have access to user channels by default");
+		CommandData command = new CommandData("setdefaultaccess", "Sets the roles that should have access to user channels by default");
 		return command;
 	}
 
