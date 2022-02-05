@@ -1,5 +1,6 @@
-# NoLimits-Bot
+# Butler-George
 Der Bot für Alles und Jeden!
+Ein Butler, der wirklich alles kann...
 
 # Wozu der Bot?
 Der Bot war anfangs nur als Gimik unseres Servers gedacht, entwickelt sich aber inzwischen zu einem riesigen Tool für Administration und Moderation. So verwenden wir den Bot für das Sortieren von Rollen, das Einbetten und damit Verschönern von Nachrichten und Vielem mehr.
