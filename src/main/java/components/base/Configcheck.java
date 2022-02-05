@@ -27,8 +27,6 @@ public class Configcheck {
 				VoiceChannel vc = guild.getVoiceChannelById(entries[i]);
 				if (vc == null) {
 					Configloader.INSTANCE.deleteGuildConfig(guild, "join2create", entries[i]);
-				} else {
-					vc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
 				}
 			}
 		}
@@ -54,8 +52,6 @@ public class Configcheck {
 				TextChannel tc = guild.getTextChannelById(entries[a]);
 				if (tc == null) {
 					Configloader.INSTANCE.deleteGuildConfig(guild, "ignored", entries[a]);
-				} else {
-					tc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
 				}
 			}
 		}

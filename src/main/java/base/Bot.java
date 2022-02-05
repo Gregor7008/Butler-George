@@ -139,13 +139,8 @@ public class Bot {
 	private void shutdown(Boolean delete) {
 		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
-    		Guild guild = guilds.get(i);    	
-    		String ids = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
-    		if (!ids.equals("") && delete) {
-    			String[] entries = ids.split(";");
-    			for (int a = 0; a < entries.length; a++) {
-    				guild.getVoiceChannelById(entries[a]).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL, Permission.VOICE_SPEAK).queue();
-    			}
+    		Guild guild = guilds.get(i);
+    		if (delete) {
     			String j2csraw = Configloader.INSTANCE.getGuildConfig(guild, "j2cs");
     			if (!j2csraw.equals("")) {
     				String[] j2cs = j2csraw.split(";");
