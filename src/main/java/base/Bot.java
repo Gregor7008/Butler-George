@@ -29,8 +29,9 @@ public class Bot {
 	public static String token, environment, noliID;
 	
 	public static void main(String[] arguments) {
-		if (arguments[0].equals("") || arguments[1].equals("")) {
+		if (arguments.length <= 0) {
 			System.out.println("You have to provide 1. a bot token, 2. the path to my resource folder!");
+			System.exit(0);
 		}
 		token = arguments[0];
 		environment = arguments[1];
