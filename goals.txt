@@ -5,6 +5,9 @@ In Planning:
 -> [none]
 -------------------
 For Version 2:
+-> Join2Create Channel with user limit & setting for visibility to users (to make j2c channels invisible when bot's offline)
+-> Reactionrole custom emoji integration (for server emojis)
+-> Full Wiki-Documentation on github
 -> Simplyfication of replacements in AnswerEngine
 -> Disable action row components on interaction/timeout
 -> Multi-Language implemented in SelectionMenus
