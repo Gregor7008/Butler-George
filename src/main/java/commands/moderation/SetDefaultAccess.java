@@ -33,7 +33,7 @@ public class SetDefaultAccess implements Command{
 					  for (int i = 0; i < roles.size(); i++) {
 						  Configloader.INSTANCE.addGuildConfig(guild, "ccdefaccess", roles.get(i).getId());
 					  }
-					  event.getTextChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/setdefaultacces:success")).queue();},
+					  event.getTextChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/setdefaultaccess:success")).queue();},
 				2, TimeUnit.MINUTES,
 				() -> {event.getTextChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
