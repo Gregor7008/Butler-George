@@ -23,7 +23,7 @@ public class Levelbackground implements Command{
 				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/levelbackground:wrongarg")).queue();
 			} else {
 				Configloader.INSTANCE.setUserConfig(guild, user, "levelbackground", event.getOption("number").getAsString());
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/levelbackground:success")).addFile(lv.renderLevelcard(user)).queue();
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/levelbackground:success")).addFile(lv.renderLevelcard(user, guild)).queue();
 			}
 			return;
 		}
@@ -35,7 +35,8 @@ public class Levelbackground implements Command{
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("levelbackground", "Configure your personal levelbackground")
-									.addSubcommands(new SubcommandData("set", "Set your new levelbackground").addOption(OptionType.INTEGER, "number", "The number of your new levelbackground", true))
+									.addSubcommands(new SubcommandData("set", "Set your new levelbackground")
+											.addOption(OptionType.INTEGER, "number", "The number of your new levelbackground", true))
 									.addSubcommands(new SubcommandData("list", "List all possible backgrounds"));
 		return command;
 	}

@@ -37,14 +37,6 @@ public class Channelpermission implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:nopermission")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		if (event.getOption("user") == null && event.getOption("role") == null) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:noargs")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-			return;
-		}
-		if (event.getOption("user") != null && event.getOption("role") != null) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:invalidargs")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-			return;
-		}
 		SelectionMenu menu = SelectionMenu.create("permselection")
 				.setPlaceholder("Select the wanted permission")
 				.setRequiredRange(1, 1)
@@ -83,12 +75,10 @@ public class Channelpermission implements Command{
 		CommandData command = new CommandData("channelpermission", "Edits permission in user channels")
 				.addSubcommands(new SubcommandData("grant", "Grants permission in a user channel")
 						.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
-						.addOption(OptionType.USER, "user", "The wanted user")
-						.addOption(OptionType.ROLE, "role", "The wanted role"))
+						.addOption(OptionType.USER, "user", "The wanted user", true))
 				.addSubcommands(new SubcommandData("remove", "Removes a permission in a user channel")
 						.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
-						.addOption(OptionType.USER, "user", "The wanted user")
-						.addOption(OptionType.ROLE, "role", "The wanted role"));
+						.addOption(OptionType.USER, "user", "The wanted user", true));
 		return command;
 	}
 
@@ -100,14 +90,9 @@ public class Channelpermission implements Command{
 	private void defineEdit(String selected, SlashCommandEvent event, SelectionMenuEvent sme, boolean action) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		IPermissionHolder pholder = null;
+		IPermissionHolder pholder = guild.getMember(event.getOption("user").getAsUser());
 		GuildChannel channel = guild.getGuildChannelById(event.getOption("channel_or_category").getAsLong());
 		Category category = guild.getCategoryById(event.getOption("channel_or_category").getAsLong());
-		try {
-			pholder = event.getOption("role").getAsRole();
-		} catch (NullPointerException e) {
-			pholder = guild.getMember(event.getOption("user").getAsUser());
-		}
 		if (pholder.equals(guild.getSelfMember())) {
 			sme.replyEmbeds(AnswerEngine.getInstance().buildMessage("MUHAHAHAHA", ":rofl: | You really thought that would work?!\nI got administrator permissions, remember?")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;

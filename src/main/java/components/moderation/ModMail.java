@@ -7,8 +7,10 @@ import java.util.Random;
 import base.Bot;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -60,25 +62,31 @@ public class ModMail {
 	
 	private void processMessage(PrivateMessageReceivedEvent event) {
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
+		Role support = guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"));
 		if (Configloader.INSTANCE.getGuildConfig(guild, "supportcategory").equals("")) {
-			Category ctg = guild.createCategory("---------- 📝 Tickets ---------").complete();
+			Category ctg = guild.createCategory("----------📝 Tickets ------------").complete();
 			Configloader.INSTANCE.setGuildConfig(guild, "supportcategory", ctg.getId());
 		}
 		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById(Configloader.INSTANCE.getGuildConfig(guild, "supportcategory"))).complete();
-		nc.sendMessage(event.getMessage().getContentRaw() + "\n" + guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")).getAsMention()).queue();
+		nc.sendMessage(event.getMessage().getContentRaw() + "\n" + support.getAsMention()).queue();
+		nc.putPermissionOverride(guild.getPublicRole()).setDeny(Permission.VIEW_CHANNEL).queue();
+		nc.putPermissionOverride(support).setAllow(Permission.VIEW_CHANNEL).queue();
 		Configloader.INSTANCE.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 	
 	private void processAnonymousMessage(PrivateMessageReceivedEvent event) {
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
+		Role support = guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"));
 		int rn = new Random().nextInt(100);
 		if (Configloader.INSTANCE.getGuildConfig(guild, "supportcategory").equals("")) {
-			Category ctg = guild.createCategory("---------- 📝 Tickets ---------").complete();
+			Category ctg = guild.createCategory("----------📝 Tickets ------------").complete();
 			Configloader.INSTANCE.setGuildConfig(guild, "supportcategory", ctg.getId());
 		}
 		TextChannel nc = guild.createTextChannel(String.valueOf(rn), guild.getCategoryById(Configloader.INSTANCE.getGuildConfig(guild, "supportcategory"))).complete();
 		String message = event.getMessage().getContentDisplay().replaceAll("#anonymous", "");
-		nc.sendMessage(message + "\n" + guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")).getAsMention()).queue();
+		nc.sendMessage(message + "\n" + support.getAsMention()).queue();
+		nc.putPermissionOverride(guild.getPublicRole()).setDeny(Permission.VIEW_CHANNEL).queue();
+		nc.putPermissionOverride(support).setAllow(Permission.VIEW_CHANNEL).queue();
 		Configloader.INSTANCE.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 }

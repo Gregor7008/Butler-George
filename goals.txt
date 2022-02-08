@@ -2,14 +2,13 @@ In Developement:
 -> [none]
 -------------------
 In Planning:
--> [none]
+-> Leave option for user channels (accessable by users to remove their own viewing permission to a user channel)
+-> Giveaway command to create giveaways (with option to ping a role)
 -------------------
 For Version 2:
 -> Join2Create Channel with user limit & setting for visibility to users (to make j2c channels invisible when bot's offline)
 -> Reactionrole custom emoji integration (for server emojis)
 -> Full Wiki-Documentation on github
--> Simplyfication of replacements in AnswerEngine
--> Disable action row components on interaction/timeout
 -> Multi-Language implemented in SelectionMenus
 -> File implementation for embed command
 -> Spotify link integration
@@ -23,6 +22,9 @@ For Version 2:
 	=> Warning.java Zeile 104
 -------------------
 For Version 3:
+-> Disable action row components on interaction/timeout
+-> Simplyfication of replacements in AnswerEngine
+-> Show mod commands only to the modrole!
 -> YouTube integration
 	=> Wenn ein neues YouTube Video gepostet wird, soll der Bot eine Nachricht an einen Webhook versenden.
 	   Welche YouTuber auf welchem Server usw. soll per Command konfigurierbar sein!

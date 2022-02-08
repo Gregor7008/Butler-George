@@ -29,12 +29,10 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class Level implements Command {
-	
-	private Guild guild;
 
 	@Override
 	public void perform(SlashCommandEvent event) {
-		guild = event.getGuild();
+		Guild guild = event.getGuild();
 		User user = event.getUser();
 		event.deferReply(true);
 		try {
@@ -44,7 +42,7 @@ public class Level implements Command {
 			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("...", ":face_exhaling: | You think you're funny or what?")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		File finalimage = this.renderLevelcard(user);
+		File finalimage = this.renderLevelcard(user, guild);
         event.reply("").addFile(finalimage).queue();
 	}
 
@@ -78,7 +76,7 @@ public class Level implements Command {
 		return progress;
 	}
 	
-	public File renderLevelcard(User iuser) {
+	public File renderLevelcard(User iuser, Guild guild) {
 		String levelbackground = Configloader.INSTANCE.getUserConfig(guild, iuser, "levelbackground");
 		int level = Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, iuser, "level"));
 		String curxp = Configloader.INSTANCE.getUserConfig(guild, iuser, "expe");

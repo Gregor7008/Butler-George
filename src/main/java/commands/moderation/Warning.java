@@ -27,7 +27,9 @@ public class Warning implements Command{
 	public void perform(SlashCommandEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		new ModController().modcheck();
+		new Thread(() -> {
+			new ModController().modcheck();
+		}).start();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").equals("")) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/warning:nomodrole")).queue();
 			return;
@@ -37,7 +39,7 @@ public class Warning implements Command{
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
-			final User iuser = event.getOption("member").getAsUser();
+			final User iuser = event.getOption("user").getAsUser();
 			String reason;
 			if (event.getOption("reason") == null) {
 				reason = "~Unknown reason~";
@@ -64,11 +66,11 @@ public class Warning implements Command{
 				event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/warning:remsel")).queue();
 				EventWaiter waiter = Bot.INSTANCE.getWaiter();
 				TextChannel channel = event.getTextChannel();
-				Member member = event.getOption("member").getAsMember();
+				Member member = event.getOption("user").getAsMember();
 				waiter.waitForEvent(GuildMessageReceivedEvent.class,
 						e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 						  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(guild, event.getOption("member").getAsUser(), "warnings");
+						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(guild, event.getOption("user").getAsUser(), "warnings");
 							  String[] warnings = allwarnings.split(";");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
 							  Configloader.INSTANCE.deleteUserConfig(guild, user, "warnings", warnings[w-1]);
@@ -102,7 +104,7 @@ public class Warning implements Command{
 	private boolean listwarnings(SlashCommandEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		final User iuser = event.getOption("member").getAsUser();
+		final User iuser = event.getOption("user").getAsUser();
 		String allwarnings = Configloader.INSTANCE.getUserConfig(guild, iuser, "warnings");
 		if (allwarnings.equals("")) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/warning:nowarnings")).queue();

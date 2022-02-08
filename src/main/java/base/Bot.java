@@ -9,6 +9,7 @@ import javax.security.auth.login.LoginException;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
+import components.base.AnswerEngine;
 import components.base.Configcheck;
 import components.base.Configloader;
 import net.dv8tion.jda.api.JDA;
@@ -153,6 +154,10 @@ public class Bot {
     		}
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
     			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+    		}
+    		if (!Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").equals("")) {
+    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch")).sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Bot offline", ":warning: | I am going offline for maintenance!"
+    					+ "\n:information_source: | You won't be able to execute commands until I go online again!")).queue();
     		}
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);

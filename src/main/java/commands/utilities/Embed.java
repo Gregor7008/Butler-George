@@ -1,5 +1,6 @@
 package commands.utilities;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +30,7 @@ public class Embed implements Command{
 	private User user;
 	private Guild guild;
 	private TextChannel channel;
-	private List<Message> messages;
+	private List<Message> messages = new ArrayList<>();
 	
 	@Override
 	public void perform(SlashCommandEvent event) {
