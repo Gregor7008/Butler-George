@@ -4,6 +4,7 @@ In Developement:
 In Planning:
 -> Leave option for user channels (accessable by users to remove their own viewing permission to a user channel)
 -> Giveaway command to create giveaways (with option to ping a role)
+-> Unmute command
 -------------------
 For Version 2:
 -> Join2Create Channel with user limit & setting for visibility to users (to make j2c channels invisible when bot's offline)
