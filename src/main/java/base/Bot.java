@@ -1,6 +1,7 @@
 package base;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -151,14 +152,16 @@ public class Bot {
         				guild.getVoiceChannelById(temp1[0]).delete().queue();
         			}
     			}
+    			if (!Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").equals("")) {
+        			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch")).sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Bot offline", ":warning: | I am going offline for maintenance!"
+        					+ "\n:information_source: | You won't be able to execute commands until I go online again!")).queue();
+        		}
     		}
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
     			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
     		}
-    		if (!Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").equals("")) {
-    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch")).sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Bot offline", ":warning: | I am going offline for maintenance!"
-    					+ "\n:information_source: | You won't be able to execute commands until I go online again!")).queue();
-    		}
+    		new File(Bot.environment + "/levelcards/cache/temp.png").delete();
+    		new File(Bot.environment + "/levelcards/cache/avatar.png").delete();
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
