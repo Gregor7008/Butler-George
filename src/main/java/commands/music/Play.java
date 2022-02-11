@@ -40,11 +40,7 @@ public class Play implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/play:alreadyinuse")).queue();
 			return;
 		}
-		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
-			this.load(event, argument, musicManager, channel, member);
-			return;
-		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:fatal")).queue();
+		this.load(event, argument, musicManager, channel, member);
 	}
 	
 	private void load(SlashCommandEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
