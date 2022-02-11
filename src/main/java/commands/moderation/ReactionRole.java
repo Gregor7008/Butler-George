@@ -91,7 +91,7 @@ public class ReactionRole implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("reactionrole", "Manage reactionroles on your server")
+		CommandData command = new CommandData("reactionrole", "0")
 									.addSubcommands(new SubcommandData("add", "Adds a reaction to a message that acts as a button to get a specified role")
 											.addOption(OptionType.CHANNEL, "channel", "The channel of your message", true)
 											.addOption(OptionType.STRING, "message", "The message-id for your message", true))

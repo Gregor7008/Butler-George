@@ -55,7 +55,7 @@ public class Levelreward implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("levelreward", "Configure the levelreward roles!")
+		CommandData command = new CommandData("levelreward", "0")
 									.addSubcommands(new SubcommandData("add", "Adds a new levelreward in form of a role")
 											.addOption(OptionType.ROLE, "role", "The roles that should be given", true)
 											.addOption(OptionType.INTEGER, "level", "The level on which the role should be given to a user", true))

@@ -56,8 +56,6 @@ public class Bot {
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing("V1.3-beta"));
-	    new Configloader();
-	    new Configcheck();
 	    this.readConsole();
     	this.checkConfigs();
 	}
@@ -140,7 +138,7 @@ public class Bot {
 	}
 	
 	private void shutdown(Boolean delete) {
-		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
+		List<Guild> guilds = jda.getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);
     		if (delete) {
@@ -153,8 +151,10 @@ public class Bot {
         			}
     			}
     			if (!Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").equals("")) {
-        			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch")).sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Bot offline", ":warning: | I am going offline for maintenance!"
-        					+ "\n:information_source: | You won't be able to execute commands until I go online again!")).queue();
+    				String cid = Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch");
+    				String msgid = guild.getTextChannelById(cid).sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Bot offline", ":warning: | I am going offline for maintenance!"
+        					+ "\n:information_source: | You won't be able to execute commands until I go online again!")).complete().getId();
+        			Configloader.INSTANCE.setGuildConfig(guild, "offlinemsg", cid + "_" + msgid);
         		}
     		}
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
@@ -171,8 +171,8 @@ public class Bot {
 	}
 	
 	private void checkConfigs() {
-		for (int i = 0; i < Bot.INSTANCE.jda.getGuilds().size(); i++) {
-    		Guild guild = Bot.INSTANCE.jda.getGuilds().get(i);
+		for (int i = 0; i < jda.getGuilds().size(); i++) {
+    		Guild guild = jda.getGuilds().get(i);
     		Configcheck.INSTANCE.checkGuildConfigs(guild);
     		Configcheck.INSTANCE.checkUserConfigs(guild);
 		}

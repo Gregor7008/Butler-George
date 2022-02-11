@@ -61,17 +61,12 @@ public class Level implements Command {
 	private int calculateProgress(int level, int nedxp, String curxp) {
 		int progress;
 		int xpforlast = LevelEngine.getInstance().xpneededforlevel(level - 1);
-		if (level != 0) {
-			double temp1 = Double.valueOf(curxp) - xpforlast;
-			double temp2 = (double) nedxp - xpforlast;
-			double temp3 = temp1 / temp2 * 100;
-			progress = (int) temp3;
-		} else {
-			if (Integer.valueOf(curxp) != 0) {
-				progress = Integer.parseInt(curxp);
-			} else {
-				progress = 1;
-			}
+		double temp1 = Double.valueOf(curxp) - xpforlast;
+		double temp2 = (double) nedxp - xpforlast;
+		double temp3 = temp1 / temp2 * 100;
+		progress = (int) temp3;
+		if (progress <= 0) {
+			progress = 1;
 		}
 		return progress;
 	}

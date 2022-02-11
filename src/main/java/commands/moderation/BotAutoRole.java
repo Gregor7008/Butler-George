@@ -45,7 +45,7 @@ public class BotAutoRole implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("botautorole", "Configurates the roles given to every new bot joining in the future!")
+		CommandData command = new CommandData("botautorole", "0")
 								  .addSubcommands(new SubcommandData("add", "Adds a role, that'll be given to every new member joining!")
 										  .addOptions(new OptionData(OptionType.ROLE, "addrole", "Mention the role you want to add!", true)))
 								  .addSubcommands(new SubcommandData("remove", "Removes a role, that was previously given to every new member joining!")

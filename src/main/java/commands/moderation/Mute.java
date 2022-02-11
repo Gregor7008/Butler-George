@@ -30,7 +30,7 @@ public class Mute implements Command{
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("mute", "Mute a user permanently")
-				.addOptions(new OptionData(OptionType.USER, "member", "The member you want to mute").setRequired(true));
+				.addOptions(new OptionData(OptionType.USER, "member", "The member you want to mute", true));
 		return command;
 	}
 

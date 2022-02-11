@@ -32,19 +32,19 @@ public class Play implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/play:wrongusage")).queue();
 			return;
 		}
-		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
-			this.load(event, argument, musicManager, channel, member);
+		if (!member.getVoiceState().inVoiceChannel()) {
+			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/play:noVCdefined")).queue();
 			return;
 		}
 		if (self.getVoiceState().inVoiceChannel()) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/play:alreadyinuse")).queue();
 			return;
 		}
-		if (!member.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/play:noVCdefined")).queue();
+		if (member.getVoiceState().getChannel() == self.getVoiceState().getChannel()) {
+			this.load(event, argument, musicManager, channel, member);
 			return;
 		}
-		this.load(event, argument, musicManager, channel, member);
+		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:fatal")).queue();
 	}
 	
 	private void load(SlashCommandEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {

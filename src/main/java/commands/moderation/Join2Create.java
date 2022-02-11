@@ -47,7 +47,7 @@ public class Join2Create implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("join2create", "Edit the join2create channels of the server!")
+		CommandData command = new CommandData("join2create", "0")
 										.addSubcommands(new SubcommandData("add", "Adds a new join2create channel")
 												.addOptions(new OptionData(OptionType.CHANNEL, "channel", "Enter the voicechannel that should be used as the join2create channel!", true)))
 										.addSubcommands(new SubcommandData("remove", "Removes a join2create channel")

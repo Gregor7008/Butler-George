@@ -57,7 +57,7 @@ public class Goodbye implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("goodbye", "Configure the goodbye message, that will be send whenever a member leaves the server!")
+		CommandData command = new CommandData("goodbye", "0")
 				.addSubcommands(new SubcommandData("set", "Sets the goodbye message, that'll be send whenever a member leaves the server!")
 						  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {server} {date} {timejoined}!", true))
 						  .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Provide the channel where the message should be send in", true)))

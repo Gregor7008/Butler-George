@@ -56,7 +56,7 @@ public class Welcome implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("welcome", "Configure the welcome message, that will be send whenever a new member joins")
+		CommandData command = new CommandData("welcome", "0")
 									.addSubcommands(new SubcommandData("set", "Set the welcome message, that'll be send whenever a new member joins")
 											  .addOptions(new OptionData(OptionType.STRING, "message", "Variables:{member} {membercount} {server} {date}!").setRequired(true))
 											  .addOptions(new OptionData(OptionType.CHANNEL, "channel", "Provide the channel where the message should be send in").setRequired(true)))

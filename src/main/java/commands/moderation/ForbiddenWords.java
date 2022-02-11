@@ -63,7 +63,7 @@ public class ForbiddenWords implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("forbiddenwords", "Configures the list of forbidden words for your guild")
+		CommandData command = new CommandData("forbiddenwords", "0")
 									.addSubcommands(new SubcommandData("add", "Adds words to the list of forbidden words")
 										.addOptions(new OptionData(OptionType.STRING, "words", "The words that should be added", true)))
 									.addSubcommands(new SubcommandData("remove", "Removes words from the list of forbidden words")

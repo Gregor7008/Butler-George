@@ -32,12 +32,18 @@ public class PenaltyEngine {
 			String[] temp1 = pn[a].split("_", 2);
 			penalties.put(Integer.valueOf(temp1[0]), temp1[1]);
 		}
-		List<Member> members = guild.getMembers();
+		List<Member> members = guild.loadMembers().get();
 		//go through members
 		for (int e = 0; e < members.size(); e++) {
 			Member member = members.get(e);
 			User user = members.get(e).getUser();
 			int warningcount = Configloader.INSTANCE.getUserConfig(guild, user, "warnings").split(";").length;
+			for (int a = warningcount; a > 0; a--) {
+				if (penalties.get(a) != null) {
+					warningcount = a;
+					a = 0;
+				}
+			}
 			if (penalties.get(warningcount) != null && !Configloader.INSTANCE.getUserConfig(guild, user, "penaltycount").equals(String.valueOf(warningcount))) {
 				String penalty = penalties.get(warningcount);
 				Configloader.INSTANCE.setUserConfig(guild, user, "penaltycount", String.valueOf(warningcount));
@@ -59,6 +65,7 @@ public class PenaltyEngine {
 							return;
 						}
 						if (penalty.contains("tempmute")) {
+							System.out.println("hey=");
 							String[] temp1 = penalty.split("_");
 							TempMute tm = new TempMute();
 							tm.tempmute(Integer.valueOf(temp1[1]), guild, user);

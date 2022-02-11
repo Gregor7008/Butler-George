@@ -174,6 +174,7 @@ public class Configloader {
 				pps.setProperty("ccdefaccess", "");
 				pps.setProperty("ticketcount", "00001");
 				pps.setProperty("ccctgies", "");
+				pps.setProperty("offlinemsg", "");
 				pps.store(fop, null);
 				fop.close();
 			} catch (IOException e) {e.printStackTrace();}
@@ -208,6 +209,7 @@ public class Configloader {
 				pps.setProperty("levelspamcount", "0");
 				pps.setProperty("cccategory", "");
 				pps.setProperty("penaltycount", "");
+				pps.setProperty("giveaways", "");
 				pps.store(fop, null);
 				fop.close();
 			} catch (IOException e) {e.printStackTrace();}

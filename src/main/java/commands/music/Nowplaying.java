@@ -19,7 +19,6 @@ public class Nowplaying implements Command{
 		final Member member = event.getMember();
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
-		final AudioTrackInfo info = PlayerManager.getInstance().getMusicManager(guild).audioPlayer.getPlayingTrack().getInfo();
 		if (!self.getVoiceState().inVoiceChannel()) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/nowplaying:notconnected")).queue();
 			return;
@@ -28,6 +27,7 @@ public class Nowplaying implements Command{
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/nowplaying:nopermission")).queue();
 			return;
 		}
+		final AudioTrackInfo info = PlayerManager.getInstance().getMusicManager(guild).audioPlayer.getPlayingTrack().getInfo();
 		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/music/nowplaying:success"), ":arrow_right: | `" + info.title + "` by `" + info.author + "`!")).queue();
 	}
 

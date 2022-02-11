@@ -43,7 +43,7 @@ public class IgnoreChannel implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("ignorechannel", "Tells the bot to ignore a channel")
+		CommandData command = new CommandData("ignorechannel", "0")
 										.addSubcommands(new SubcommandData("add", "Adds a channel to the \"ignored\"-list")
 												.addOption(OptionType.CHANNEL, "channel", "Mention the channel", true))
 										.addSubcommands(new SubcommandData("list", "Lists all currently ignored channels"))

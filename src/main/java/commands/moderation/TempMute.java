@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import components.moderation.ModController;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -47,5 +48,8 @@ public class TempMute implements Command{
 		Configloader.INSTANCE.setUserConfig(guild, user, "tmuntil", until.toString());
 		Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "true");
 		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
+		new Thread(() -> {
+			new ModController().modcheck();
+		}).start();
 	}
 }

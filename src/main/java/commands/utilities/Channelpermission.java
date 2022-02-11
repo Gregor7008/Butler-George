@@ -93,12 +93,8 @@ public class Channelpermission implements Command{
 		IPermissionHolder pholder = guild.getMember(event.getOption("user").getAsUser());
 		GuildChannel channel = guild.getGuildChannelById(event.getOption("channel_or_category").getAsLong());
 		Category category = guild.getCategoryById(event.getOption("channel_or_category").getAsLong());
-		if (pholder.equals(guild.getSelfMember())) {
+		if (pholder.equals(guild.getSelfMember()) && !action) {
 			sme.replyEmbeds(AnswerEngine.getInstance().buildMessage("MUHAHAHAHA", ":rofl: | You really thought that would work?!\nI got administrator permissions, remember?")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-			return;
-		}
-		if (pholder.equals(guild.getPublicRole()) && selected.equals("vc")) {
-			sme.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/channelpermission:invalid")).queue();
 			return;
 		}
 		if (category != null) {

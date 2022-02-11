@@ -29,6 +29,7 @@ public class Warning implements Command{
 		User user = event.getUser();
 		new Thread(() -> {
 			new ModController().modcheck();
+			PenaltyEngine.getInstance().processWarnings(guild);
 		}).start();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").equals("")) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/warning:nomodrole")).queue();
@@ -46,7 +47,7 @@ public class Warning implements Command{
 			} else {
 				reason = event.getOption("reason").getAsString();
 			}
-			Configloader.INSTANCE.addUserConfig(guild, user, "warnings", reason);
+			Configloader.INSTANCE.addUserConfig(guild, iuser, "warnings", reason);
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/warning:success")).queue();
 			try {
 				iuser.openPrivateChannel().queue(channel -> {
@@ -55,7 +56,6 @@ public class Warning implements Command{
 							AnswerEngine.getInstance().getDescription(guild, iuser, "/commands/moderation/warning:pm").replace("{guild}", guild.getName()).replace("{reason}", reason))).queue();
 				});
 			} catch (Exception e) {}
-			PenaltyEngine.getInstance().processWarnings(guild);
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
@@ -73,7 +73,7 @@ public class Warning implements Command{
 						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(guild, event.getOption("user").getAsUser(), "warnings");
 							  String[] warnings = allwarnings.split(";");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
-							  Configloader.INSTANCE.deleteUserConfig(guild, user, "warnings", warnings[w-1]);
+							  Configloader.INSTANCE.deleteUserConfig(guild, member.getUser(), "warnings", warnings[w-1]);
 							  channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(
 									  AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/warning:remsuccess"),
 									  AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/warning:remsuccess").replace("{warning}", warnings[w-1]).replace("{user}", member.getEffectiveName()))).queue();},
@@ -85,7 +85,7 @@ public class Warning implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("warning", "Warn a member")
+		CommandData command = new CommandData("warning", "0")
 								  .addSubcommands(new SubcommandData("add", "Warns a user and adds a warning to their warnings-list")
 											  .addOptions(new OptionData(OptionType.USER, "user", "The user you want to warn", true))
 											  .addOptions(new OptionData(OptionType.STRING, "reason", "The reason why you warn the member", false)))

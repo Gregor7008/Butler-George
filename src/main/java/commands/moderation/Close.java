@@ -4,6 +4,7 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
+import components.moderation.PenaltyEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -36,6 +37,9 @@ public class Close implements Command {
 			try {
 				if (event.getOption("warning").getAsBoolean()) {
 					Configloader.INSTANCE.addUserConfig(guild, cuser, "warnings", "Modmail abuse");
+					new Thread(() -> {
+						PenaltyEngine.getInstance().processWarnings(guild);
+					}).start();
 				}
 			} catch (NullPointerException e) {}
 		} else {
@@ -45,7 +49,7 @@ public class Close implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("close", "Closes the modmail/support channel")
+		CommandData command = new CommandData("close", "Closes the support channel")
 				.addOption(OptionType.STRING, "reason", "The reason why the ticket was closed", true)
 				.addOption(OptionType.BOOLEAN, "warning", "Whether the member should be warned");
 		return command;

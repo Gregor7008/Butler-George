@@ -1,5 +1,6 @@
 package base;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -104,9 +105,20 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onReady(ReadyEvent event) {
-		//initialize Slash-Commands
-		for (int i = 0; i < event.getJDA().getGuilds().size(); i++) {
-			Guild guild = event.getJDA().getGuilds().get(i);
+		//setup Bot
+		new Configloader();
+	    new Configcheck();
+	    List<Guild> guilds = event.getJDA().getGuilds();
+		for (int i = 0; i < guilds.size(); i++) {
+			Guild guild = guilds.get(i);
+			//delete Offline messages
+			String idpack = Configloader.INSTANCE.getGuildConfig(guild, "offlinemsg");
+			if (!idpack.equals("")) {
+				String[] ids = idpack.split("_");
+				guild.getTextChannelById(ids[0]).retrieveMessageById(ids[1]).complete().delete().queue();
+				Configloader.INSTANCE.setGuildConfig(guild, "offlinemsg", "");
+			}
+			//initialize Slashcommands
 			CommandListUpdateAction clua = guild.updateCommands();
 			CommandList utilitycmdList = new CommandList();
 			List<String> utilitycmdnames = new ArrayList<>();
@@ -149,7 +161,12 @@ public class Processor extends ListenerAdapter {
 		}
 		Command modcmd;
 		if ((modcmd = commandList.moderationcmds.get(event.getName())) != null) {
-			modcmd.perform(event);
+			if (!this.checkCategory(event.getGuildChannel().getParent(), guild)) {
+				modcmd.perform(event);
+			} else {
+				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/base/processor:userchannel")).queue();
+				return;
+			}
 		}
 		Command musiccmd;
 		if ((musiccmd = commandList.musiccmds.get(event.getName())) != null) {
@@ -161,6 +178,22 @@ public class Processor extends ListenerAdapter {
 		}
 		//levelsystem
 		LevelEngine.getInstance().slashcommand(event);
+	}
+	
+	private boolean checkCategory(Category category, Guild guild) {
+		File guilddir = new File(Bot.environment + "/configs/user/" + guild.getId());
+		File[] filelist = guilddir.listFiles();
+		for (int i = 0; i < filelist.length; i++) {
+			String[] temp1 = filelist[i].getName().split(".properties");
+			User cuser = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
+			String ccid = Configloader.INSTANCE.getUserConfig(guild, cuser, "cccategory");
+			if (!ccid.equals("")) {
+				if (category.equals(guild.getCategoryById(ccid))) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	@Override
