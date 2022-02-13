@@ -2,10 +2,10 @@ package commands.moderation;
 
 import java.time.OffsetDateTime;
 
+import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import components.moderation.ModController;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -48,8 +48,6 @@ public class TempBan implements Command{
 		Configloader.INSTANCE.setUserConfig(guild, user, "tbuntil", until.toString());
 		Configloader.INSTANCE.setUserConfig(guild, user, "tempbanned", "true");
 		guild.getMember(user).ban(0).queue();
-		new Thread(() -> {
-			new ModController().modcheck();
-		}).start();
+		Bot.INSTANCE.modCheck(guild);
 	}	
 }

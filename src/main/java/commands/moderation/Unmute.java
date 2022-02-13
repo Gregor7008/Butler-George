@@ -1,9 +1,9 @@
 package commands.moderation;
 
+import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import components.moderation.ModController;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -30,9 +30,7 @@ public class Unmute implements Command{
 		Configloader.INSTANCE.setUserConfig(guild, cuser, "tempmuted", "false");
 		Configloader.INSTANCE.setUserConfig(guild, cuser, "tmuntil", "");
 		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/unmute:success")).queue();
-		new Thread(() -> {
-			new ModController().modcheck();
-		}).start();
+		Bot.INSTANCE.modCheck(guild);
 	}
 
 	@Override

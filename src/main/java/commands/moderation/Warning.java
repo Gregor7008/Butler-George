@@ -8,8 +8,6 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import components.moderation.PenaltyEngine;
-import components.moderation.ModController;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -27,10 +25,7 @@ public class Warning implements Command{
 	public void perform(SlashCommandEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		new Thread(() -> {
-			new ModController().modcheck();
-			PenaltyEngine.getInstance().processWarnings(guild);
-		}).start();
+		Bot.INSTANCE.penaltyCheck(guild);
 		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").equals("")) {
 			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/warning:nomodrole")).queue();
 			return;

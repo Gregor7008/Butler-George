@@ -1,5 +1,6 @@
 package components.moderation;
 
+import base.Bot;
 import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -26,7 +27,7 @@ public class AutoModerator {
 						 channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + event.getGuild().getName() + "\nReason:\n=> Rude behavior")).queue();});
 				} catch (Exception e) {e.printStackTrace();}
 				event.getMessage().delete().queue();
-				PenaltyEngine.getInstance().processWarnings(event.getGuild());
+				Bot.INSTANCE.penaltyCheck(event.getGuild());
 			}
 		}
 	}

@@ -13,6 +13,8 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import components.base.AnswerEngine;
 import components.base.Configcheck;
 import components.base.Configloader;
+import components.moderation.ModEngine;
+import components.moderation.PenaltyEngine;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -28,6 +30,8 @@ public class Bot {
 	
 	public JDA jda;
 	private EventWaiter eventWaiter = new EventWaiter();
+	private PenaltyEngine penaltyEngine;
+	private ModEngine modEngine;
 	public static String token, environment, noliID;
 	
 	public static void main(String[] arguments) {
@@ -56,6 +60,8 @@ public class Bot {
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing("V1.3-beta"));
+	    penaltyEngine = new PenaltyEngine();
+	    modEngine = new ModEngine();
 	    this.readConsole();
     	this.checkConfigs();
 	}
@@ -186,5 +192,17 @@ public class Bot {
 	
 	public EventWaiter getWaiter() {
 		return eventWaiter;
+	}
+	
+	public void penaltyCheck(Guild guild) {
+		new Thread(() -> {
+			this.penaltyEngine.run(guild);
+		}).start();
+	}
+	
+	public void modCheck(Guild guild) {
+		new Thread(() -> {
+			this.modEngine.run(guild);
+		}).start();
 	}
 }

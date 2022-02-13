@@ -3,6 +3,7 @@ package components.moderation;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import base.Bot;
 import commands.moderation.TempBan;
 import commands.moderation.TempMute;
 import components.base.Configloader;
@@ -12,16 +13,16 @@ import net.dv8tion.jda.api.entities.User;
 
 public class PenaltyEngine {
 	
-	private static PenaltyEngine INSTANCE;
-	
-	public static PenaltyEngine getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new PenaltyEngine();
-		}
-		return INSTANCE;
+	public PenaltyEngine() {
+		new Thread(() -> {
+			List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
+			for (int i = 0; i < guilds.size(); i++) {
+				this.run(guilds.get(i));
+			}
+		}).start();
 	}
 	
-	public void processWarnings(Guild guild) {
+	public void run(Guild guild) {
 		ConcurrentHashMap<Integer, String> penalties = new ConcurrentHashMap<>();
 		String pis = Configloader.INSTANCE.getGuildConfig(guild, "penalties");
 		if (pis.equals("")) {
@@ -65,7 +66,6 @@ public class PenaltyEngine {
 							return;
 						}
 						if (penalty.contains("tempmute")) {
-							System.out.println("hey=");
 							String[] temp1 = penalty.split("_");
 							TempMute tm = new TempMute();
 							tm.tempmute(Integer.valueOf(temp1[1]), guild, user);
