@@ -22,20 +22,30 @@ public class Leave implements Command{
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
 		String ctgid = Configloader.INSTANCE.getUserConfig(guild, user, "cccategory");
-		if (!ctgid.equals("")) {
-			if (event.getTextChannel().getParent().equals(guild.getCategoryById(ctgid))) {
-				List<GuildChannel> channels = guild.getCategoryById(ctgid).getChannels();
-				for (int i = 0; i < channels.size(); i++) {
-					channels.get(i).delete().queue();
-				}
-				guild.getCategoryById(ctgid).delete().queue();
-				return;
-			}
-		}
 		GuildChannel channel;
 		if (event.getOption("channel") != null) {
 			channel = event.getOption("channel").getAsGuildChannel();
+			if (!ctgid.equals("")) {
+				Category ctg = event.getTextChannel().getParent();
+				if (ctg.equals(guild.getCategoryById(ctgid))) {
+					if (ctg.getChannels().size() <=1) {
+						ctg.delete().queue();
+					}
+					channel.delete().queue();
+					return;
+				}
+			}
 		} else {
+			if (!ctgid.equals("")) {
+				if (event.getTextChannel().getParent().equals(guild.getCategoryById(ctgid))) {
+					List<GuildChannel> channels = guild.getCategoryById(ctgid).getChannels();
+					for (int i = 0; i < channels.size(); i++) {
+						channels.get(i).delete().queue();
+					}
+					guild.getCategoryById(ctgid).delete().queue();
+					return;
+				}
+			}
 			channel = event.getGuildChannel();
 		}
 		if (guild.getCategoryById(channel.getId()) != null) {

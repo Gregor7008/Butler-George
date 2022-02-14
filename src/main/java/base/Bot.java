@@ -15,6 +15,7 @@ import components.base.Configcheck;
 import components.base.Configloader;
 import components.moderation.ModEngine;
 import components.moderation.PenaltyEngine;
+import components.moderation.ServerUtilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -60,6 +61,7 @@ public class Bot {
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing("V1.3-beta"));
+	    new ServerUtilities().controlChannels(true);
 	    penaltyEngine = new PenaltyEngine();
 	    modEngine = new ModEngine();
 	    this.readConsole();
@@ -144,6 +146,7 @@ public class Bot {
 	}
 	
 	private void shutdown(Boolean delete) {
+		new ServerUtilities().controlChannels(false);
 		List<Guild> guilds = jda.getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);

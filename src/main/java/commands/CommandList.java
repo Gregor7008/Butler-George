@@ -40,7 +40,6 @@ import commands.music.Stop;
 import commands.utilities.Channelpermission;
 import commands.utilities.CreateChannel;
 import commands.utilities.Embed;
-import commands.utilities.Giveaway;
 import commands.utilities.Help;
 import commands.utilities.Language;
 import commands.utilities.Leave;
@@ -77,7 +76,7 @@ public class CommandList {
 		this.utilitycmds.put("channelpermission", new Channelpermission());
 		this.utilitycmds.put("pingandmove", new PingAndMove());
 		this.utilitycmds.put("leave", new Leave());
-		this.utilitycmds.put("giveaway", new Giveaway());
+		//this.utilitycmds.put("giveaway", new Giveaway());
 		
 		//Moderation
 		this.moderationcmds.put("penalty", new Penalty());

@@ -5,6 +5,7 @@ import java.util.List;
 import base.Bot;
 import commands.moderation.Rolesorting;
 import components.base.Configloader;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -46,6 +47,15 @@ public class ServerUtilities {
 					}
 				}
 			}
+		}
+	}
+	
+	public void controlChannels(boolean action) {
+		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
+		if (action) {
+			guild.getTextChannelById("937825700243726387").upsertPermissionOverride(guild.getPublicRole()).grant(Permission.VIEW_CHANNEL).queue();
+		} else {
+			guild.getTextChannelById("937825700243726387").upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
 		}
 	}
 }
