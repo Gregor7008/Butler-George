@@ -1,20 +1,19 @@
 # Butler-George
-Der Bot für Alles und Jeden!
-Ein Butler, der wirklich alles kann...
+The interface to the overwhelming power of the Discord bot API!
 
-# Wozu der Bot?
-Der Bot war anfangs nur als Gimik unseres Servers gedacht, entwickelt sich aber inzwischen zu einem riesigen Tool für Administration und Moderation. So verwenden wir den Bot für das Sortieren von Rollen, das Einbetten und damit Verschönern von Nachrichten und Vielem mehr.
-Geplant sind auch noch andere Funktionen, die wir dann in den Release-Notes ansprechen werden. Ein eigenes Wiki soll mit der 2. Version des Bots kommen!
-Aufgrund der Reichweite an Commands die dieser Bot inzwischen abdeckt, haben wir uns entschieden den Bot zu veröffentlichen und somit theoretisch jedem anzubieten, der etwas davon versteht, wie man Java Programme startet und einen Bot auf dem Developer Portal von Discord selber anzumelden.
+# Why another bot?
+The bot was initially only intended as a gimmick for my server, but has now developed into a huge tool for administration and moderation. We use the bot for sorting roles, embedding and thus beautifying messages and much more.
+Other functions are also planned, which we will then address in the release notes. A separate wiki is planned to come with the second version of the bot!
+Due to the range of commands that this bot now covers, we decided to publish the bot and thus theoretically offer it to anyone who understands how to start Java programs and register a bot on the Discord Developer Portal themselves.
 
-# Was ist unser Ziel?
-Unser Ziel ist es langfristig alle Bots, die auf unserem Server ihr Unwesen treiben, entfernen zu können und alles über diesen machen zu können. Das soll uns Unabhängigkeit, Individualität und Sicherheit was Ausfälle usw. betrifft geben. Wir wissen aus Erfahrung, dass ein Bot, der nicht in unserer Hand ist und auf dessen Entwicklung wir keinen Einfluss haben, aufgrund eventueller Ausfälle und Probleme zu Unzuverlässig ist.
-Ansonsten soll er uns natürlich die weite Reichweite an Möglichkeiten die Discord Bots bereit stellt uns ebenfalls bereitstellen und somit quasi als Übersetzer von Userinput zu Botinput dienen.
+# What's our goal?
+Our long-term goal is to be able to remove all bots that are up to mischief on our server and to be able to do everything without them. This should give us independence, individuality and security when it comes to failures, etc. We know from experience that a bot that is not in our hands and on whose development we have no influence is too unreliable due to possible failures and problems.
+Otherwise, it should of course also provide us with the wide range of possibilities that Discord provides bots.
 
-# Wer kann mit machen?
-So ziemlich jeder, der etwas von Java versteht und sich damit abfinden kann, sich durch die JDA Documentation durchzulesen. Natürlich sollte er auch Mitglied auf dem Discord Server sein, und wir sollten ihn kennen.
-Wenn man dann aufgenommen ist, bekommt man außerdem eine violette "Developer" Rolle sowie Zugang zu jeglichen Developement Channeln auf dem Server. Bei Interesse meldet euch einfach auf dem Discord Server!
+# Who can participate?
+Pretty much anyone who understands Java and can put up with reading through the JDA Documentation. Of course he should also be a member of the Discord server (https://www.discord.gg/gNTFUVYm6B) and be reliable and trustworthy!
+Once accepted, you also get a purple "Developer" role and access to any development channels on the server. If you are interested, just get in touch on the Discord server!
 
-# Wie arbeiten wir?
-Das ganze Repository ist aufgebaut wie ein Maven-Projekt. Welchen Editor ihr dafür benutzt ist eigentlich komplett egal, allerdings arbeite ich mit Eclipse und wenn wir uns bei Problemen gegenseitig helfen können wollen, wäre es sinnvoller, dass wir alle mit einem Editor arbeiten. Wenn ihr darauf allerdings keinen Wert legt, werde ich euch nicht im Wege stehen, wenn ihr einen Anderen verwenden wollt.
-Ansonsten kommunizieren wir über einen seperaten Channel auf dem NoLimits Discord Server und organisieren uns auch sonst komplett darüber. Mit dem Channel #👽-github-logs können wir außerdem verfolgen, was mit dem Repository hier passiert!
+# How do we work?
+The whole repository is built like a Maven project. It doesn't really matter which editor you use for this, but I work with Eclipse and if we want to be able to help each other with problems, it would make more sense that we all work with one editor. However, if you don't care about that, I won't stand in your way if you want to use a different one.
+Otherwise we communicate via a separate channel on the NoLimits Discord Server and otherwise organize ourselves completely via it. Also, with the #👽-github-logs channel, we can follow what's happening with the repository here!
