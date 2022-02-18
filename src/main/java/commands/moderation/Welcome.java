@@ -22,19 +22,19 @@ public class Welcome implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/welcome:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/welcome:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("set")) {
 			String message = event.getOption("message").getAsString();
 			String channelid = event.getOption("channel").getAsGuildChannel().getId();
 			Configloader.INSTANCE.setGuildConfig(guild, "welcomemsg", message + ";" + channelid);
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/welcome:setsuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/welcome:setsuccess")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
 			Configloader.INSTANCE.setGuildConfig(guild, "welcomemsg", "");
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/welcome:offsuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/welcome:offsuccess")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
@@ -47,9 +47,9 @@ public class Welcome implements Command{
 				String msg = welcomemsg[0].replace("{server}", guild.getName()).replace("{member}", event.getMember().getAsMention())
 							.replace("{membercount}", Integer.toString(guild.getMemberCount())).replace("{date}", currentdate);
 				guild.getTextChannelById(welcomemsg[1]).sendMessage(msg).queue();
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/welcome:testsuccess")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/welcome:testsuccess")).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/welcome:nonedefined")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/welcome:nonedefined")).queue();
 			}
 		}
 	}
@@ -67,6 +67,6 @@ public class Welcome implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/welcome:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/welcome:help");
 	}
 }

@@ -17,7 +17,7 @@ public class Close implements Command {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))) && !event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/close:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/close:nopermission")).queue();
 			return;
 		}
 		if (event.getTextChannel().getName().contains("-support")) {
@@ -29,9 +29,9 @@ public class Close implements Command {
 			event.getTextChannel().delete().queue();
 			User cuser = Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cid));
 			Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cid)).openPrivateChannel().complete().sendMessageEmbeds(
-					AnswerEngine.getInstance().buildMessage(
-							AnswerEngine.getInstance().getTitle(guild, cuser, "/commands/moderation/close:closed"),
-							AnswerEngine.getInstance().getDescription(guild, cuser, "/commands/moderation/close:closed").replace("{reason}", event.getOption("reason").getAsString()))).queue();
+					AnswerEngine.ae.buildMessage(
+							AnswerEngine.ae.getTitle(guild, cuser, "/commands/moderation/close:closed"),
+							AnswerEngine.ae.getDescription(guild, cuser, "/commands/moderation/close:closed").replace("{reason}", event.getOption("reason").getAsString()))).queue();
 			Configloader.INSTANCE.removeMailConfig(cid);
 			try {
 				if (event.getOption("warning").getAsBoolean()) {
@@ -40,7 +40,7 @@ public class Close implements Command {
 				}
 			} catch (NullPointerException e) {}
 		} else {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/close:nochannel")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/close:nochannel")).queue();
 		}
 	}
 
@@ -54,6 +54,6 @@ public class Close implements Command {
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/close:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/close:help");
 	}
 }

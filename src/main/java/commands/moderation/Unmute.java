@@ -19,17 +19,17 @@ public class Unmute implements Command{
 		final User user =  event.getUser();
 		final User cuser = event.getOption("user").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/unmute:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:nopermission")).queue();
 			return;
 		}
 		if (!Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, cuser, "muted"))) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/unmute:nomute")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:nomute")).queue();
 			return;
 		}
 		Configloader.INSTANCE.setUserConfig(guild, cuser, "muted", "false");
 		Configloader.INSTANCE.setUserConfig(guild, cuser, "tempmuted", "false");
 		Configloader.INSTANCE.setUserConfig(guild, cuser, "tmuntil", "");
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/unmute:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:success")).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}
 
@@ -41,6 +41,6 @@ public class Unmute implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/unmute:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/unmute:help");
 	}
 }

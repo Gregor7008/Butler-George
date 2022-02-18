@@ -23,19 +23,19 @@ public class AutoRole implements Command {
 		guild = event.getGuild();
 		user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autorole:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:nopermission")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			Role role = event.getOption("addrole").getAsRole();
 			Configloader.INSTANCE.addGuildConfig(guild, "autoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autorole:addsuccess")).queue();;
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:addsuccess")).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
 			Configloader.INSTANCE.deleteGuildConfig(guild, "autoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autorole:removesuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:removesuccess")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
@@ -56,18 +56,18 @@ public class AutoRole implements Command {
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/autorole:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/autorole:help");
 	}
 	
 	private void listroles(SlashCommandEvent event) {
 		StringBuilder sB = new StringBuilder();
 		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autoroles");
 		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/autorole:noautoroles")).queue();;
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:noautoroles")).queue();;
 			return;
 		}
 		if (!currentraw.contains(";")) {
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/autorole:list"), "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
+			event.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/autorole:list"), "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
 			return;
 		}
 		String[] current = currentraw.split(";");
@@ -80,6 +80,6 @@ public class AutoRole implements Command {
 				sB.append(guild.getRoleById(current[i-1]).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/autorole:list"), sB.toString())).queue();
+		event.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/autorole:list"), sB.toString())).queue();
 	}
 }

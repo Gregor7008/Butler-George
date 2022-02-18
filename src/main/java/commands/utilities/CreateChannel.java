@@ -24,15 +24,15 @@ public class CreateChannel implements Command{
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "ccrole").equals("")) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/createchannel:norole")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:norole")).queue();
 			return;
 		}
 		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "ccrole")))) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission")).queue();
 			return;
 		}
 		this.createTextChannel(guild, user, name);
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/createchannel:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/createchannel:success")).queue();
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class CreateChannel implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/createchannel:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/createchannel:help");
 	}
 	
 	private void createTextChannel(Guild guild, User user, String name) {
@@ -53,6 +53,7 @@ public class CreateChannel implements Command{
 			cgy = guild.createCategory(user.getName() + "'s channels").complete();
 			cgy.putPermissionOverride(guild.getPublicRole()).setDeny(Permission.VIEW_CHANNEL).queue();
 			cgy.putPermissionOverride(guild.getMember(user)).setAllow(perms).queue();
+			cgy.upsertPermissionOverride(guild.getMember(user)).setDeny(Permission.MESSAGE_MENTION_EVERYONE).queue();
 			Configloader.INSTANCE.addGuildConfig(guild, "ccctgies", cgy.getId());
 			if (!Configloader.INSTANCE.getGuildConfig(guild, "ccdefaccess").equals("")) {
 				String[] defroles = Configloader.INSTANCE.getGuildConfig(guild, "ccdefaccess").split(";");

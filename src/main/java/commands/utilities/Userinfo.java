@@ -34,7 +34,7 @@ public class Userinfo implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/userinfo:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/userinfo:help");
 	}
 	
 	private void listModInfo (SlashCommandEvent event) {
@@ -42,15 +42,15 @@ public class Userinfo implements Command{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
-		String[] titles = AnswerEngine.getInstance().getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
+		String[] titles = AnswerEngine.ae.getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
 		if (event.getOption("member") == null) {
 			member = event.getMember();
 		} else {
 			member = event.getGuild().getMember(event.getOption("member").getAsUser());
 		}
-		if (member.getEffectiveName().equals(event.getGuild().getSelfMember().getEffectiveName())) {
+		if (member.equals(event.getGuild().getSelfMember())) {
 			event.reply("You think you're funny or what?").queue();
-			return;
+			return; 
 		}
 		if (member.getTimeBoosted() == null) {
 			booster = "false";
@@ -60,7 +60,7 @@ public class Userinfo implements Command{
 		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter("Made with ❤️ by Gregor7008");
+		eb.setFooter(AnswerEngine.ae.footer);
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getUser().getName() + "`", true);
@@ -86,13 +86,13 @@ public class Userinfo implements Command{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
-		String[] titles = AnswerEngine.getInstance().getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
+		String[] titles = AnswerEngine.ae.getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
 		if (event.getOption("member") == null) {
 			member = event.getMember();
 		} else {
 			member = event.getGuild().getMember(event.getOption("member").getAsUser());
 		}
-		if (member.getEffectiveName().equals(event.getGuild().getSelfMember().getEffectiveName())) {
+		if (member.equals(event.getGuild().getSelfMember())) {
 			event.reply("You think you're funny or what?").queue();
 			return;
 		}
@@ -104,7 +104,7 @@ public class Userinfo implements Command{
 		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter("Made with ❤️ by Gregor7008");
+		eb.setFooter(AnswerEngine.ae.footer);
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getEffectiveName() + "`", true);

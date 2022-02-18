@@ -20,15 +20,15 @@ public class Nowplaying implements Command{
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
 		if (!self.getVoiceState().inVoiceChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/nowplaying:notconnected")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/nowplaying:notconnected")).queue();
 			return;
 		}
 		if(member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/music/nowplaying:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/nowplaying:nopermission")).queue();
 			return;
 		}
 		final AudioTrackInfo info = PlayerManager.getInstance().getMusicManager(guild).audioPlayer.getPlayingTrack().getInfo();
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(AnswerEngine.getInstance().getTitle(guild, user, "/commands/music/nowplaying:success"), ":arrow_right: | `" + info.title + "` by `" + info.author + "`!")).queue();
+		event.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user, "/commands/music/nowplaying:success"), ":arrow_right: | `" + info.title + "` by `" + info.author + "`!")).queue();
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class Nowplaying implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/music/nowplaying:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/music/nowplaying:help");
 	}
 
 }

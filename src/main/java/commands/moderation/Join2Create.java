@@ -20,27 +20,27 @@ public class Join2Create implements Command{
 		final User user = event.getUser();
 		final String id = event.getOption("channel").getAsGuildChannel().getId();
 		if(!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/moderation/join2create:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/join2create:nopermission")).queue();
 			return;
 		}
 		if (guild.getVoiceChannelById(id) == null) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/join2create:invalid")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:invalid")).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/join2create:adderror")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:adderror")).queue();
 			} else {
 				Configloader.INSTANCE.addGuildConfig(guild, "join2create", id);
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess")).queue();
 			}
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
 				Configloader.INSTANCE.deleteGuildConfig(guild, "join2create", id);
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess")).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/join2create:remerror")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remerror")).queue();
 			}
 		}
 	}
@@ -57,6 +57,6 @@ public class Join2Create implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/join2create:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/join2create:help");
 	}
 }

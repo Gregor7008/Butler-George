@@ -18,13 +18,13 @@ public class Mute implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/commands/moderation/mute:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, event.getUser(),"/commands/moderation/mute:nopermission")).queue();
 			return;
 		}
 		this.mute(guild, user);
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(
-				AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/mute:success"),
-				AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/mute:success").replace("{user}", user.getName()))).queue();
+		event.replyEmbeds(AnswerEngine.ae.buildMessage(
+				AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/mute:success"),
+				AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/mute:success").replace("{user}", user.getName()))).queue();
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class Mute implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/mute:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/mute:help");
 	}
 	
 	public void mute(Guild guild, User user) {

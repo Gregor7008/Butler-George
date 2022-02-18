@@ -62,6 +62,7 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing("V1.3-beta"));
 	    new ServerUtilities().controlChannels(true);
+	    new AnswerEngine();
 	    penaltyEngine = new PenaltyEngine();
 	    modEngine = new ModEngine();
 	    this.readConsole();
@@ -161,7 +162,7 @@ public class Bot {
     			}
     			if (!Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").equals("")) {
     				String cid = Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch");
-    				String msgid = guild.getTextChannelById(cid).sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("Bot offline", ":warning: | I am going offline for maintenance!"
+    				String msgid = guild.getTextChannelById(cid).sendMessageEmbeds(AnswerEngine.ae.buildMessage("Bot offline", ":warning: | I am going offline for maintenance!"
         					+ "\n:information_source: | You won't be able to execute commands until I go online again!")).complete().getId();
         			Configloader.INSTANCE.setGuildConfig(guild, "offlinemsg", cid + "_" + msgid);
         		}

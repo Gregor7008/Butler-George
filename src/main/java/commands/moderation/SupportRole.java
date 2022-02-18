@@ -18,11 +18,11 @@ public class SupportRole implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/supportrole:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supportrole:nopermission")).queue();
 			return;
 		}
 		Configloader.INSTANCE.setGuildConfig(guild, "supportrole", event.getOption("role").getAsRole().getId());
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/supportrole:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supportrole:success")).queue();
 	}
 
 	@Override
@@ -35,6 +35,6 @@ public class SupportRole implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/supportrole:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/supportrole:help");
 	}
 }

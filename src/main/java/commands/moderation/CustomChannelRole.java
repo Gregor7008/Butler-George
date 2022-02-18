@@ -18,11 +18,11 @@ public class CustomChannelRole implements Command{
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/customchannelrole:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelrole:nopermission")).queue();
 			return;
 		}
 		Configloader.INSTANCE.setGuildConfig(guild, "ccrole", event.getOption("role").getAsRole().getId());
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/customchannelrole:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelrole:success")).queue();
 	}
 
 	@Override
@@ -34,6 +34,6 @@ public class CustomChannelRole implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/customchannelrole:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/customchannelrole:help");
 	}
 }

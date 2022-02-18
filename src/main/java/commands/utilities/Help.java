@@ -24,29 +24,29 @@ public class Help implements Command{
 		Command cmd;
 		String help = null;
 		if (input.equals("help")) {
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Help for the \"/help\"-command!", ":face_with_symbols_over_mouth: | WHY WOULD YOU DO THIS?!")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.ae.buildMessage("Help for the \"/help\"-command!", ":face_with_symbols_over_mouth: | WHY WOULD YOU DO THIS?!")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if ((cmd = commandList.utilitycmds.get(input)) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.ae.buildMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
 		if ((cmd = commandList.moderationcmds.get(input)) != null 
 				&& event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.ae.buildMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
 		if ((cmd = commandList.musiccmds.get(input)) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.ae.buildMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/help:unknown")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/help:unknown")).queue();
 	}
 
 	@Override

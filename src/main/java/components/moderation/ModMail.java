@@ -24,7 +24,7 @@ public class ModMail {
 			return;
 		}
 		if (guild.retrieveMember(user).complete() == null) {
-			event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().buildMessage("No support!", "As you are not a member of the NoLimits Server, we aren't able to provide you any support."
+			event.getChannel().sendMessageEmbeds(AnswerEngine.ae.buildMessage("No support!", "As you are not a member of the NoLimits Server, we aren't able to provide you any support."
 					+ "\nWe hope for your understanding.\nYou may also join us with the link at the end of this message!")).queue();
 			return;
 		}
@@ -36,26 +36,26 @@ public class ModMail {
 		if (!event.getMessage().getContentRaw().contains("anonym")) {
 			OffsetDateTime lastmail = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "lastmail"));
 			if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 300) {
-				event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/components/moderation/modmail:success")).queue();
+				event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/moderation/modmail:success")).queue();
 				Configloader.INSTANCE.setUserConfig(guild, user, "lastmail", OffsetDateTime.now().toString());
 				this.processMessage(event);
 			} else {
 				int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
-				event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(
-						AnswerEngine.getInstance().getTitle(guild, user, "/components/moderation/modmail:timelimit"),
-						AnswerEngine.getInstance().getDescription(guild, user,"/components/moderation/modmail:timelimit").replace("{timeleft}", String.valueOf(timeleft)))).queue();
+				event.getChannel().sendMessageEmbeds(AnswerEngine.ae.buildMessage(
+						AnswerEngine.ae.getTitle(guild, user, "/components/moderation/modmail:timelimit"),
+						AnswerEngine.ae.getDescription(guild, user,"/components/moderation/modmail:timelimit").replace("{timeleft}", String.valueOf(timeleft)))).queue();
 			}
 		} else {
 			OffsetDateTime lastmail = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "lastmail"));
 			if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 1) {
-				event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/components/moderation/modmail:successanonym")).queue();
+				event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/moderation/modmail:successanonym")).queue();
 				Configloader.INSTANCE.setUserConfig(guild, user, "lastmail", OffsetDateTime.now().toString());
 				this.processAnonymousMessage(event);
 			} else {
 				int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
-				event.getChannel().sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(
-						AnswerEngine.getInstance().getTitle(guild, user, "/components/moderation/modmail:timelimit"),
-						AnswerEngine.getInstance().getDescription(guild, user,"/components/moderation/modmail:timelimit").replace("{timeleft}", String.valueOf(timeleft)))).queue();
+				event.getChannel().sendMessageEmbeds(AnswerEngine.ae.buildMessage(
+						AnswerEngine.ae.getTitle(guild, user, "/components/moderation/modmail:timelimit"),
+						AnswerEngine.ae.getDescription(guild, user,"/components/moderation/modmail:timelimit").replace("{timeleft}", String.valueOf(timeleft)))).queue();
 			}
 		}
 	}

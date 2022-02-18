@@ -33,13 +33,15 @@ public class Level implements Command {
 	@Override
 	public void perform(SlashCommandEvent event) {
 		Guild guild = event.getGuild();
-		User user = event.getUser();
+		User user;
 		event.deferReply(true);
 		try {
-			user = event.getOption("member").getAsUser();
-		} catch (IllegalStateException | NullPointerException e) {}
+			user = event.getOption("user").getAsUser();
+		} catch (NullPointerException e) {
+			user = event.getUser();
+		}
 		if (guild.getMember(user).getEffectiveName().equals(guild.getSelfMember().getEffectiveName())) {
-			event.replyEmbeds(AnswerEngine.getInstance().buildMessage("...", ":face_exhaling: | You think you're funny or what?")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.ae.buildMessage("...", ":face_exhaling: | You think you're funny or what?")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		File finalimage = this.renderLevelcard(user, guild);
@@ -49,13 +51,13 @@ public class Level implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = new CommandData("level", "Check your current level or the one of another user!")
-											  .addOptions(new OptionData(OptionType.USER, "member", "Mention another user (optional)").setRequired(false));
+											  .addOptions(new OptionData(OptionType.USER, "user", "Mention another user (optional)").setRequired(false));
 		return command;
 	}
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/level:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/level:help");
 	}
 	
 	private int calculateProgress(int level, int nedxp, String curxp) {

@@ -13,27 +13,25 @@ import net.dv8tion.jda.api.entities.User;
 
 public class AnswerEngine {
 	
-	private static AnswerEngine INSTANCE;
+	public static AnswerEngine ae;
+	public String footer = "Made with ❤️ by Gregor7008";
 	
-	public static AnswerEngine getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new AnswerEngine();
-		}
-		return INSTANCE;
+	public AnswerEngine() {
+		ae = this;
 	}
 	
-	public MessageEmbed fetchMessage (Guild guild, User user, String input)  {
+	public MessageEmbed fetchMessage(Guild guild, User user, String input)  {
 		return this.buildMessage(this.getTitle(guild, user, input), this.getDescription(guild, user, input));
 	}
 	
-	public MessageEmbed buildMessage (String title, String description) {
+	public MessageEmbed buildMessage(String title, String description) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setTitle(title);
 		eb.setColor(56575);
 		eb.setDescription(description);
-		eb.setFooter("Made with ❤️ by Gregor7008");
+		eb.setFooter(footer);
 		MessageEmbed embed = eb.build();
-		return embed;
+		return new AnswerEditor(embed).convert();
 	}
 	
 	public String getTitle(Guild guild, User user, String input) {
@@ -48,7 +46,7 @@ public class AnswerEngine {
 	
 	public String getRaw(Guild guild, User user, String input) {
 		String lang = Configloader.INSTANCE.getUserConfig(guild, user, "language");
-		lang = "en";
+		lang = "en"; //<= Disables the multi-language function, as translations aren't dont yet!
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];

@@ -46,11 +46,11 @@ public class Giveaway implements Command{
 			String msgid = event.getOption("msgid").getAsString();
 			if (giveaways.contains(channelid + "_" + msgid)) {
 				guild.getTextChannelById(channelid).retrieveMessageById(msgid).complete().delete().queue();
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/giveaway:remsuccess")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:remsuccess")).queue();
 				Configloader.INSTANCE.deleteUserConfig(guild, user, "giveaways", channelid + "_" + msgid);
 				return;
 			} else {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/giveaway:remfail")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:remfail")).queue();
 				return;
 			}
 		}
@@ -62,7 +62,7 @@ public class Giveaway implements Command{
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyy");
 				eb.setFooter("Ends: " + until.format(formatter));
 			}
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/giveaway:title")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/giveaway:title")).queue();
 			waiter.waitForEvent(GuildMessageReceivedEvent.class,
 								e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 								  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -71,7 +71,7 @@ public class Giveaway implements Command{
 									  this.defineDescr();},
 								1, TimeUnit.MINUTES,
 								() -> {this.cleanup();
-									   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+									   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 		}
 	}
 
@@ -89,11 +89,11 @@ public class Giveaway implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/giveaway:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/giveaway:help");
 	}
 	
 	private void defineDescr() {
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/giveaway:description")).queue(r -> messages.add(r));
+		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:description")).queue(r -> messages.add(r));
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -102,11 +102,11 @@ public class Giveaway implements Command{
 					  this.defineThumbnail();},
 				1, TimeUnit.MINUTES,
 				() -> {this.cleanup();
-					   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+					   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineThumbnail() {
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/giveaway:thumbnail")).queue(r -> messages.add(r));
+		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:thumbnail")).queue(r -> messages.add(r));
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -116,11 +116,11 @@ public class Giveaway implements Command{
 					  this.defineFields();},
 				1, TimeUnit.MINUTES,
 				() -> {this.cleanup();
-					   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+					   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineFields() {
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/giveaway:notes")).queue(r -> messages.add(r));
+		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:notes")).queue(r -> messages.add(r));
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -130,11 +130,11 @@ public class Giveaway implements Command{
 					  this.defineMentiones();},
 				1, TimeUnit.MINUTES,
 				() -> {this.cleanup();
-					   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+					   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineMentiones() {
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/giveaway:mentiones")).queue(r -> messages.add(r));
+		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:mentiones")).queue(r -> messages.add(r));
 		waiter.waitForEvent(GuildMessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -142,12 +142,12 @@ public class Giveaway implements Command{
 					  this.sendGiveaway(e.getMessage());},
 				1, TimeUnit.MINUTES,
 				() -> {this.cleanup();
-					   channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+					   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void sendGiveaway(Message msg) {
 		this.cleanup();
-		channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/giveaway:success")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
+		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:success")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
 		TextChannel finalch = guild.getTextChannelById(oevent.getOption("channel").getAsGuildChannel().getId());
 		if (finalch != null) {
 			List<Role> roles = msg.getMentionedRoles();
@@ -158,7 +158,7 @@ public class Giveaway implements Command{
 			}
 			finalch.sendMessageEmbeds(eb.build()).queue(r -> Configloader.INSTANCE.addUserConfig(guild, user, "giveaways", finalch.getId() + "_" + r.getId()));
 		} else {
-			channel.sendMessageEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "general:fatal")).queue();
+			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:fatal")).queue();
 		}
 	}
 	

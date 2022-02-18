@@ -55,7 +55,7 @@ public class PlayerManager {
 			@Override
 			public void trackLoaded(AudioTrack track) {
 				musicManager.scheduler.queue(track);
-				event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!")).queue();
+				event.replyEmbeds(AnswerEngine.ae.buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!")).queue();
 			}
 			
 			@Override
@@ -65,24 +65,24 @@ public class PlayerManager {
 					for (final AudioTrack track : tracks) {
 						musicManager.scheduler.queue.add(track);
 					}
-					event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | The playlist `" + playlist.getName() + "` with `" + String.valueOf(tracks.size()) + "` tracks was added to the queue!")).queue();
+					event.replyEmbeds(AnswerEngine.ae.buildMessage("Success!",":white_check_mark: | The playlist `" + playlist.getName() + "` with `" + String.valueOf(tracks.size()) + "` tracks was added to the queue!")).queue();
 					return;
 				} else {
 					AudioTrack track = tracks.get(0);
 					musicManager.scheduler.queue(track);
-					event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!")).queue();
+					event.replyEmbeds(AnswerEngine.ae.buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!")).queue();
 				}
 			}
 			
 			@Override
 			public void noMatches() {
-				event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Error!",":x: | I'm sorry, but I couldn't find anything for your search term!")).queue();
+				event.replyEmbeds(AnswerEngine.ae.buildMessage("Error!",":x: | I'm sorry, but I couldn't find anything for your search term!")).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			}
 			
 			@Override
 			public void loadFailed(FriendlyException exception) {
-				event.replyEmbeds(AnswerEngine.getInstance().buildMessage("Error!",":x: | I'm sorry, but I couldn't load your song...")).queue();
+				event.replyEmbeds(AnswerEngine.ae.buildMessage("Error!",":x: | I'm sorry, but I couldn't load your song...")).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			}
 		});

@@ -21,13 +21,13 @@ public class TempMute implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, event.getUser(),"/commands/moderation/tempmute:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, event.getUser(),"/commands/moderation/tempmute:nopermission")).queue();
 			return;
 		}
 		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), guild, user);
-		event.replyEmbeds(AnswerEngine.getInstance().buildMessage(
-					AnswerEngine.getInstance().getTitle(guild, user, "/commands/moderation/tempmute:success"),
-					AnswerEngine.getInstance().getDescription(guild, user, "/commands/moderation/tempmute:success").replace("{user}", user.getName()).replace("{time}", event.getOption("days").getAsString()))).queue();
+		event.replyEmbeds(AnswerEngine.ae.buildMessage(
+					AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/tempmute:success"),
+					AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/tempmute:success").replace("{user}", user.getName()).replace("{time}", event.getOption("days").getAsString()))).queue();
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class TempMute implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/tempmute:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/tempmute:help");
 	}
 	
 	public void tempmute(int days, Guild guild, User user) {

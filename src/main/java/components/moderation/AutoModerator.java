@@ -24,7 +24,7 @@ public class AutoModerator {
 				Configloader.INSTANCE.addUserConfig(event.getGuild(), event.getAuthor(), "warnings", "Rude behavior");
 				try {
 					event.getMember().getUser().openPrivateChannel().queue(channel -> {
-						 channel.sendMessageEmbeds(AnswerEngine.getInstance().buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + event.getGuild().getName() + "\nReason:\n=> Rude behavior")).queue();});
+						 channel.sendMessageEmbeds(AnswerEngine.ae.buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + event.getGuild().getName() + "\nReason:\n=> Rude behavior")).queue();});
 				} catch (Exception e) {e.printStackTrace();}
 				event.getMessage().delete().queue();
 				Bot.INSTANCE.penaltyCheck(event.getGuild());

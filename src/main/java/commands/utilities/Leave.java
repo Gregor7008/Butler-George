@@ -2,6 +2,7 @@ package commands.utilities;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import base.Bot;
 import commands.Command;
@@ -61,10 +62,10 @@ public class Leave implements Command{
 		}
 		if (this.checkCategory(channel.getParent(), guild)) {
 			channel.getManager().removePermissionOverride(event.getMember()).queue();
-			event.reply("Done...").queue(r -> r.deleteOriginal().queue());
+			event.reply("Done...").queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/utilities/leave:invalid")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/leave:invalid")).queue();
 	}
 
 	@Override
@@ -76,7 +77,7 @@ public class Leave implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/leave:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/leave:help");
 	}
 	
 	private boolean checkCategory(Category category, Guild guild) {

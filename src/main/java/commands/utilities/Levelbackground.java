@@ -20,10 +20,10 @@ public class Levelbackground implements Command{
 		if (event.getSubcommandName().equals("set")) {
 			Level lv = new Level();
 			if (Integer.parseInt(event.getOption("number").getAsString()) > 4 || Integer.parseInt(event.getOption("number").getAsString()) < 0) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/levelbackground:wrongarg")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/levelbackground:wrongarg")).queue();
 			} else {
 				Configloader.INSTANCE.setUserConfig(guild, user, "levelbackground", event.getOption("number").getAsString());
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user,"/commands/utilities/levelbackground:success")).addFile(lv.renderLevelcard(user, guild)).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/levelbackground:success")).addFile(lv.renderLevelcard(user, guild)).queue();
 			}
 			return;
 		}
@@ -43,7 +43,7 @@ public class Levelbackground implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/utilities/levelbackground:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/levelbackground:help");
 	}
 	
 	private void listlevelcards(SlashCommandEvent event) {

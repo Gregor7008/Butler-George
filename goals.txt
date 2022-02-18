@@ -5,11 +5,13 @@ In Planning:
 -> [none]
 -------------------
 For Version 2:
+-> Fixing the giveaway command
 -> Join2Create Channel with user limit & setting for visibility to users (to make j2c channels invisible when bot's offline)
 -> Reactionrole custom emoji integration (for server emojis)
 -> Full Wiki-Documentation on github
 -> Multi-Language implemented in SelectionMenus
 -> File implementation for embed command
+-> Simplyfication of replacements in AnswerEngine
 -> Spotify link integration
     => Separate Bibliothek in Verwendung
 -> Modmail for multiple servers
@@ -22,7 +24,6 @@ For Version 2:
 -------------------
 For Version 3:
 -> Disable action row components on interaction/timeout
--> Simplyfication of replacements in AnswerEngine
 -> Show mod commands only to the modrole!
 -> YouTube integration
 	=> Wenn ein neues YouTube Video gepostet wird, soll der Bot eine Nachricht an einen Webhook versenden.

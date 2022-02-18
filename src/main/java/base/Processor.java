@@ -154,7 +154,7 @@ public class Processor extends ListenerAdapter {
 		Command utilitycmd;
 		if ((utilitycmd = commandList.utilitycmds.get(event.getName())) != null) {
 			if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(event.getChannel().getId()) && !event.getName().equals("embed") && !event.getName().equals("poll")) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 				return;
 			}
 			utilitycmd.perform(event);
@@ -164,14 +164,14 @@ public class Processor extends ListenerAdapter {
 			if (!this.checkCategory(event.getGuildChannel().getParent(), guild)) {
 				modcmd.perform(event);
 			} else {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/base/processor:userchannel")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:userchannel")).queue();
 				return;
 			}
 		}
 		Command musiccmd;
 		if ((musiccmd = commandList.musiccmds.get(event.getName())) != null) {
 			if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(event.getChannel().getId())) {
-				event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 				return;
 			}
 			musiccmd.perform(event);
@@ -300,6 +300,7 @@ public class Processor extends ListenerAdapter {
 		//check for Join2create-channel & create User-channel if true
 		String j2cids = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
 		if (j2cids.contains(channeljoined.getId())) {
+			channeljoined.putPermissionOverride(guild.getPublicRole()).setDeny(Permission.VOICE_SPEAK).queue();
 			Collection<Permission> perms = new LinkedList<Permission>();
 			perms.add(Permission.MANAGE_CHANNEL);
 			perms.add(Permission.MANAGE_PERMISSIONS);

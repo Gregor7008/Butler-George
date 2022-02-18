@@ -18,11 +18,11 @@ public class SupportTalk implements Command{
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/supporttalk:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supporttalk:nopermission")).queue();
 			return;
 		}
 		Configloader.INSTANCE.setGuildConfig(guild, "supporttalk", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.getInstance().fetchMessage(guild, user, "/commands/moderation/supporttalk:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supporttalk:success")).queue();
 	}
 
 	@Override
@@ -35,6 +35,6 @@ public class SupportTalk implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getInstance().getRaw(guild, user, "/commands/moderation/supporttalk:help");
+		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/supporttalk:help");
 	}
 }
