@@ -34,7 +34,6 @@ public class Level implements Command {
 	public void perform(SlashCommandEvent event) {
 		Guild guild = event.getGuild();
 		User user;
-		event.deferReply(true);
 		try {
 			user = event.getOption("user").getAsUser();
 		} catch (NullPointerException e) {
@@ -44,8 +43,9 @@ public class Level implements Command {
 			event.replyEmbeds(AnswerEngine.ae.buildMessage("...", ":face_exhaling: | You think you're funny or what?")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
+		event.reply("...   ...   ...   ...").queue();
 		File finalimage = this.renderLevelcard(user, guild);
-        event.reply("").addFile(finalimage).queue();
+        event.getHook().editOriginal("").addFile(finalimage).queue();
 	}
 
 	@Override
@@ -101,16 +101,16 @@ public class Level implements Command {
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		//write Level
-		g2d.setFont(new Font("Calibri", Font.PLAIN, 65));
+		g2d.setFont(new Font("Calibri", 0, 40));
 		g2d.setColor(Color.decode("#5773c9"));
         g2d.drawString(String.valueOf(level), 813, 95);
 		//write XP
-        g2d.setFont(new Font("Calibri", Font.PLAIN, 30));
+        g2d.setFont(new Font("Calibri", 0, 20));
         g2d.setColor(Color.WHITE);
         String temp1 = curxp + "\s/\s" + String.valueOf(nedxp);
         g2d.drawString(temp1, 820 - g2d.getFontMetrics().stringWidth(temp1), 170);
 		//write iusername
-        g2d.setFont(new Font("Calibri", Font.PLAIN, 50));
+        g2d.setFont(new Font("Calibri", 0, 17));
         g2d.setColor(Color.WHITE);
         g2d.drawString(guild.getMember(iuser).getEffectiveName(), 293, 170);
 		//draw Icon

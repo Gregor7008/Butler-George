@@ -1,9 +1,13 @@
 package base;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
@@ -137,6 +141,26 @@ public class Bot {
 					case "warn":
 						Configloader.INSTANCE.addUserConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2]), "warnings", "Administrative actions");
 						System.out.println("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
+						break;
+					case "listbugs":
+						try (BufferedReader br = new BufferedReader(new FileReader(new File(environment + "/configs/bugs.txt")))) {
+						    String fileline;
+						    while ((fileline = br.readLine()) != null) {
+						       System.out.println(fileline);
+						    }
+						}
+						break;
+					case "addbugs":
+						try {
+							Writer output = new BufferedWriter(new FileWriter(environment + "/configs/bugs.txt", true));
+							String[] bug = line.split(" ", 2);
+							output.append(bug[1]);
+							output.close();
+						} catch (ArrayIndexOutOfBoundsException e) {
+							System.out.println("Invalid arguments!\nAdd the new bug behind the command!");
+							break;
+						}
+						
 						break;
 					default:
 						System.out.println("Unknown command!");

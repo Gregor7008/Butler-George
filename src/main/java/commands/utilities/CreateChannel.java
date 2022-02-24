@@ -53,7 +53,7 @@ public class CreateChannel implements Command{
 			cgy = guild.createCategory(user.getName() + "'s channels").complete();
 			cgy.putPermissionOverride(guild.getPublicRole()).setDeny(Permission.VIEW_CHANNEL).queue();
 			cgy.putPermissionOverride(guild.getMember(user)).setAllow(perms).queue();
-			cgy.upsertPermissionOverride(guild.getMember(user)).setDeny(Permission.MESSAGE_MENTION_EVERYONE).queue();
+			cgy.upsertPermissionOverride(guild.getMember(user)).deny(Permission.MESSAGE_MENTION_EVERYONE).queue();
 			Configloader.INSTANCE.addGuildConfig(guild, "ccctgies", cgy.getId());
 			if (!Configloader.INSTANCE.getGuildConfig(guild, "ccdefaccess").equals("")) {
 				String[] defroles = Configloader.INSTANCE.getGuildConfig(guild, "ccdefaccess").split(";");

@@ -300,8 +300,9 @@ public class Processor extends ListenerAdapter {
 		//check for Join2create-channel & create User-channel if true
 		String j2cids = Configloader.INSTANCE.getGuildConfig(guild, "join2create");
 		if (j2cids.contains(channeljoined.getId())) {
-			channeljoined.putPermissionOverride(guild.getPublicRole()).setDeny(Permission.VOICE_SPEAK).queue();
+			channeljoined.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VOICE_SPEAK).queue();
 			Collection<Permission> perms = new LinkedList<Permission>();
+			perms.add(Permission.VIEW_CHANNEL);
 			perms.add(Permission.MANAGE_CHANNEL);
 			perms.add(Permission.MANAGE_PERMISSIONS);
 			perms.add(Permission.CREATE_INSTANT_INVITE);
@@ -332,6 +333,7 @@ public class Processor extends ListenerAdapter {
 			} else {
 				if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(vc.getId() + "-" + user.getId())) {
 					Collection<Permission> perms = new LinkedList<Permission>();
+					perms.add(Permission.VIEW_CHANNEL);
 					perms.add(Permission.MANAGE_CHANNEL);
 					perms.add(Permission.MANAGE_PERMISSIONS);
 					perms.add(Permission.CREATE_INSTANT_INVITE);
