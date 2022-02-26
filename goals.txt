@@ -14,6 +14,8 @@ For Version 2:
 -> Simplyfication of replacements in AnswerEngine
 -> Spotify link integration
     => Separate Bibliothek in Verwendung
+-> Translate Messages
+	=> https://stackoverflow.com/questions/8147284/how-to-use-google-translate-api-in-my-java-application
 -> Modmail for multiple servers
     => Alle Server des Bots durchlaufen und die auflisten, auf denen der User ist;
        Nach Auswahl dann ModMail aufrufen und Nachricht verarbeiten
@@ -28,5 +30,6 @@ For Version 3:
 -> YouTube integration
 	=> Wenn ein neues YouTube Video gepostet wird, soll der Bot eine Nachricht an einen Webhook versenden.
 	   Welche YouTuber auf welchem Server usw. soll per Command konfigurierbar sein!
+	=> https://youtu.be/dLzqtpd8YHU
 -> Twitch integration
 	=> (siehe YouTube integration nur mit Twitch Streams)
