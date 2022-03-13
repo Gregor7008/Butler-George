@@ -154,7 +154,7 @@ public class Bot {
 						try {
 							Writer output = new BufferedWriter(new FileWriter(environment + "/configs/bugs.txt", true));
 							String[] bug = line.split(" ", 2);
-							output.append(bug[1]);
+							output.append(bug[1] + "\n");
 							output.close();
 						} catch (ArrayIndexOutOfBoundsException e) {
 							System.out.println("Invalid arguments!\nAdd the new bug behind the command!");

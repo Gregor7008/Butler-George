@@ -25,14 +25,11 @@ public class Warning implements Command{
 	public void perform(SlashCommandEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		Bot.INSTANCE.penaltyCheck(guild);
 		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/warning:nomodrole")).queue();
-			return;
 		}
 		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/warning:nopermission")).queue();
-			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			final User iuser = event.getOption("user").getAsUser();
@@ -51,7 +48,6 @@ public class Warning implements Command{
 							AnswerEngine.ae.getDescription(guild, iuser, "/commands/moderation/warning:pm").replace("{guild}", guild.getName()).replace("{reason}", reason))).queue();
 				});
 			} catch (Exception e) {}
-			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
 			this.listwarnings(event);
@@ -76,6 +72,7 @@ public class Warning implements Command{
 						() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/warning:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			}
 		}
+		Bot.INSTANCE.penaltyCheck(guild);
 	}
 
 	@Override
