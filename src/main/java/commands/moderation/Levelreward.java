@@ -6,9 +6,10 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class Levelreward implements Command{
@@ -17,7 +18,7 @@ public class Levelreward implements Command{
 	private User user;
 	
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		guild = event.getGuild();
 		user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
@@ -55,7 +56,7 @@ public class Levelreward implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("levelreward", "0")
+		CommandData command = Commands.slash("levelreward", "0")
 									.addSubcommands(new SubcommandData("add", "Adds a new levelreward in form of a role")
 											.addOption(OptionType.ROLE, "role", "The roles that should be given", true)
 											.addOption(OptionType.INTEGER, "level", "The level on which the role should be given to a user", true))
@@ -69,7 +70,7 @@ public class Levelreward implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/levelreward:help");
 	}
 	
-	private void listrewards(SlashCommandEvent event) {
+	private void listrewards(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
 		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards");
 		if (currentraw.equals("")) {

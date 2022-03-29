@@ -6,14 +6,15 @@ import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Close implements Command {
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))) && !event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
@@ -46,7 +47,7 @@ public class Close implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("close", "Closes the support channel")
+		CommandData command = Commands.slash("close", "Closes the support channel")
 				.addOption(OptionType.STRING, "reason", "The reason why the ticket was closed", true)
 				.addOption(OptionType.BOOLEAN, "warning", "Whether the member should be warned");
 		return command;

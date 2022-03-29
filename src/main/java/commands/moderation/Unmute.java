@@ -7,14 +7,15 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Unmute implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user =  event.getUser();
 		final User cuser = event.getOption("user").getAsUser();
@@ -35,7 +36,7 @@ public class Unmute implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("unmute", "Unmute a user").addOption(OptionType.USER, "user", "The user that should be unmuted", true);
+		CommandData command = Commands.slash("unmute", "Unmute a user").addOption(OptionType.USER, "user", "The user that should be unmuted", true);
 		return command;
 	}
 

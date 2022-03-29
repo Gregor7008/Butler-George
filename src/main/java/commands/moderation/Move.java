@@ -6,14 +6,15 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Move implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "supportrole").equals("")) {
@@ -28,7 +29,7 @@ public class Move implements Command{
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel")).queue();
 			return;
 		}
-		if (!guild.getMember(event.getOption("member").getAsUser()).getVoiceState().inVoiceChannel()) {
+		if (!guild.getMember(event.getOption("member").getAsUser()).getVoiceState().inAudioChannel()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:memnotconn")).queue();
 			return;
 		}
@@ -49,7 +50,7 @@ public class Move implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("move", "Move a member into the support talk").addOption(OptionType.USER, "member", "The member you want to move", true);
+		CommandData command = Commands.slash("move", "Move a member into the support talk").addOption(OptionType.USER, "member", "The member you want to move", true);
 		return command;
 	}
 

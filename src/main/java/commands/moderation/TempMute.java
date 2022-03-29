@@ -9,15 +9,16 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class TempMute implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
@@ -32,7 +33,7 @@ public class TempMute implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("tempmute", "Mutes a user temporarily")
+		CommandData command = Commands.slash("tempmute", "Mutes a user temporarily")
 				.addOptions(new OptionData(OptionType.USER, "member", "The member you want to mute").setRequired(true))
 				.addOptions(new OptionData(OptionType.INTEGER, "days", "The number of days you want the member to be muted").setRequired(true));
 		return command;

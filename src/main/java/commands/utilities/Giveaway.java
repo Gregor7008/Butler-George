@@ -18,15 +18,16 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class Giveaway implements Command{
 
-	private SlashCommandEvent oevent;
+	private SlashCommandInteractionEvent oevent;
 	private Guild guild;
 	private User user;
 	private TextChannel channel;
@@ -35,7 +36,7 @@ public class Giveaway implements Command{
 	final EmbedBuilder eb = new EmbedBuilder();
 	
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		oevent = event;
 		guild = event.getGuild();
 		user = event.getUser();
@@ -63,7 +64,7 @@ public class Giveaway implements Command{
 				eb.setFooter("Ends: " + until.format(formatter));
 			}
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/giveaway:title")).queue();
-			waiter.waitForEvent(GuildMessageReceivedEvent.class,
+			waiter.waitForEvent(MessageReceivedEvent.class,
 								e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 								  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 								e -> {eb.setTitle(e.getMessage().getContentRaw());
@@ -77,7 +78,7 @@ public class Giveaway implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("giveaway", "0")
+		CommandData command = Commands.slash("giveaway", "0")
 				.addSubcommands(new SubcommandData("create", "Creates a new giveaway")
 						.addOption(OptionType.CHANNEL, "channel", "The channel the giveaway should be send in", true)
 						.addOption(OptionType.INTEGER, "days", "The amount of days the giveaway should be active"))
@@ -94,7 +95,7 @@ public class Giveaway implements Command{
 	
 	private void defineDescr() {
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:description")).queue(r -> messages.add(r));
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {eb.setDescription(e.getMessage().getContentDisplay());
@@ -107,7 +108,7 @@ public class Giveaway implements Command{
 	
 	private void defineThumbnail() {
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:thumbnail")).queue(r -> messages.add(r));
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {if (!e.getMessage().getContentRaw().contains("none")){
@@ -121,7 +122,7 @@ public class Giveaway implements Command{
 	
 	private void defineFields() {
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:notes")).queue(r -> messages.add(r));
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {if (!e.getMessage().getContentRaw().contains("none")) {
@@ -135,7 +136,7 @@ public class Giveaway implements Command{
 	
 	private void defineMentiones() {
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/giveaway:mentiones")).queue(r -> messages.add(r));
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {messages.add(e.getMessage());

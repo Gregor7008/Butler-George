@@ -10,14 +10,15 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Userinfo implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		if (event.getMember().getRoles().contains(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole"))) && 
 				!event.getGuild().getPublicRole().hasPermission(event.getGuildChannel(), Permission.VIEW_CHANNEL)) {
 			this.listModInfo(event);
@@ -28,7 +29,7 @@ public class Userinfo implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("userinfo", "Requests information about a user").addOption(OptionType.USER, "user", "The member the information should be about", false);
+		CommandData command = Commands.slash("userinfo", "Requests information about a user").addOption(OptionType.USER, "user", "The member the information should be about", false);
 		return command;
 	}
 
@@ -37,7 +38,7 @@ public class Userinfo implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/userinfo:help");
 	}
 	
-	private void listModInfo (SlashCommandEvent event) {
+	private void listModInfo (SlashCommandInteractionEvent event) {
 		EmbedBuilder eb = new EmbedBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
@@ -81,7 +82,7 @@ public class Userinfo implements Command{
 		event.replyEmbeds(eb.build()).queue();
 	}
 
-	private void listInfo(SlashCommandEvent event) {
+	private void listInfo(SlashCommandInteractionEvent event) {
 		EmbedBuilder eb = new EmbedBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;

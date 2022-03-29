@@ -10,16 +10,17 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class CreateChannel implements Command{
 
 	private Collection<Permission> perms = this.setupPerms();
 	
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
@@ -37,7 +38,7 @@ public class CreateChannel implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("createchannel", "Creates a custom channel for you and your friends!")
+		CommandData command = Commands.slash("createchannel", "Creates a custom channel for you and your friends!")
 				.addOption(OptionType.STRING, "name", "The name of the new channel", true);
 		return command;
 	}

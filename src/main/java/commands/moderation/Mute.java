@@ -6,15 +6,16 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class Mute implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
@@ -29,7 +30,7 @@ public class Mute implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("mute", "Mute a user permanently")
+		CommandData command = Commands.slash("mute", "Mute a user permanently")
 				.addOptions(new OptionData(OptionType.USER, "member", "The member you want to mute", true));
 		return command;
 	}

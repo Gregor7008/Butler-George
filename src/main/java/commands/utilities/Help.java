@@ -8,15 +8,16 @@ import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class Help implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final String input = event.getOption("command").getAsString().toLowerCase();
@@ -51,7 +52,7 @@ public class Help implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("help", "Get help for a specific command")
+		CommandData command = Commands.slash("help", "Get help for a specific command")
 				.addOptions(new OptionData(OptionType.STRING, "command", "Name the command you need help with", true));
 		return command;
 	}

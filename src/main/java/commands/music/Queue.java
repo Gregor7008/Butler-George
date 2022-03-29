@@ -15,20 +15,21 @@ import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Queue implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Member member = event.getMember();
 		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
-		if (!self.getVoiceState().inVoiceChannel()) {
+		if (!self.getVoiceState().inAudioChannel()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/queue:notconnected")).queue();
 			return;
 		}
@@ -76,7 +77,7 @@ public class Queue implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("queue", "Displays the current music queue!");
+		CommandData command = Commands.slash("queue", "Displays the current music queue!");
 		return command;
 	}
 

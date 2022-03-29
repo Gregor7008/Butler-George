@@ -8,22 +8,23 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Stop implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Member member = event.getMember();
 		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
-		if (!self.getVoiceState().inVoiceChannel()) {
+		if (!self.getVoiceState().inAudioChannel()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:notconnected")).queue();
 			return;
 		}
-		if (member.getVoiceState().inVoiceChannel()) {
+		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:nopermission")).queue();
 				return;
@@ -38,7 +39,7 @@ public class Stop implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("stop", "Stops the currently playing music!");
+		CommandData command = Commands.slash("stop", "Stops the currently playing music!");
 		return command;
 	}
 
@@ -51,7 +52,7 @@ public class Stop implements Command{
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		musicManager.scheduler.player.stopTrack();
 		musicManager.scheduler.queue.clear();
-		VoiceChannel vc = guild.getSelfMember().getVoiceState().getChannel();
+		VoiceChannel vc = (VoiceChannel) guild.getSelfMember().getVoiceState().getChannel();
 		guild.getAudioManager().closeAudioConnection();
 		if (vc.getUserLimit() != 0) {
 			vc.getManager().setUserLimit(vc.getUserLimit() - 1).queue();

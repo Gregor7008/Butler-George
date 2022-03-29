@@ -13,11 +13,11 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ModMail {
 
-	public ModMail(PrivateMessageReceivedEvent event) {
+	public ModMail(MessageReceivedEvent event) {
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
 		User user = event.getAuthor();
 		if (user.isBot()) {
@@ -60,7 +60,7 @@ public class ModMail {
 		}
 	}
 	
-	private void processMessage(PrivateMessageReceivedEvent event) {
+	private void processMessage(MessageReceivedEvent event) {
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
 		Role support = guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"));
 		if (Configloader.INSTANCE.getGuildConfig(guild, "supportcategory").equals("")) {
@@ -74,7 +74,7 @@ public class ModMail {
 		Configloader.INSTANCE.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 	
-	private void processAnonymousMessage(PrivateMessageReceivedEvent event) {
+	private void processAnonymousMessage(MessageReceivedEvent event) {
 		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
 		Role support = guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"));
 		int rn = new Random().nextInt(100);

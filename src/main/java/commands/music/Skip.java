@@ -9,24 +9,25 @@ import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Skip implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
 		final Member member = event.getMember();
 		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final AudioPlayer audioPlayer = musicManager.audioPlayer;
-		if (!self.getVoiceState().inVoiceChannel()) {
+		if (!self.getVoiceState().inAudioChannel()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:notconnected")).queue();
 			return;
 		}
-		if (member.getVoiceState().inVoiceChannel()) {
+		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:nopermission")).queue();
 				return;
@@ -45,7 +46,7 @@ public class Skip implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("skip", "Skips the currently playing track!");
+		CommandData command = Commands.slash("skip", "Skips the currently playing track!");
 		return command;
 	}
 

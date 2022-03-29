@@ -10,19 +10,20 @@ import components.base.AnswerEngine;
 import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class Language implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		SelectionMenu menu = SelectionMenu.create("sellang")
+		SelectMenu menu = SelectMenu.create("sellang")
 				.setPlaceholder("Select your language")
 				.setRequiredRange(1, 1)
 				.addOption("English", "en")
@@ -36,7 +37,7 @@ public class Language implements Command{
 				.addActionRow(menu)
 				.complete();
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		waiter.waitForEvent(SelectionMenuEvent.class,
+		waiter.waitForEvent(SelectMenuInteractionEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 				  	  return e.getUser().getIdLong() == user.getIdLong();},
 				e -> {reply.deleteOriginal().queue();
@@ -74,7 +75,7 @@ public class Language implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("language", "Sets your preferred language in which the bot should answer you in on this server");
+		CommandData command = Commands.slash("language", "Sets your preferred language in which the bot should answer you in on this server");
 		return command;
 	}
 

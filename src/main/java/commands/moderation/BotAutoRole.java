@@ -7,9 +7,10 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
@@ -19,7 +20,7 @@ public class BotAutoRole implements Command{
 	private User user;
 	
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		guild = event.getGuild();
 		user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
@@ -45,7 +46,7 @@ public class BotAutoRole implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("botautorole", "0")
+		CommandData command = Commands.slash("botautorole", "0")
 								  .addSubcommands(new SubcommandData("add", "Adds a role, that'll be given to every new member joining!")
 										  .addOptions(new OptionData(OptionType.ROLE, "addrole", "Mention the role you want to add!", true)))
 								  .addSubcommands(new SubcommandData("remove", "Removes a role, that was previously given to every new member joining!")
@@ -59,7 +60,7 @@ public class BotAutoRole implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/botautorole:help");
 	}
 	
-	private void listroles(SlashCommandEvent event) {
+	private void listroles(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
 		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "botautoroles");
 		if (currentraw.equals("")) {

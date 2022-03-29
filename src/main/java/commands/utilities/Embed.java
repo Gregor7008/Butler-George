@@ -17,13 +17,14 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Embed implements Command{
 
-	private SlashCommandEvent oevent;
+	private SlashCommandInteractionEvent oevent;
 	private EmbedBuilder eb;
 	private EventWaiter waiter = Bot.INSTANCE.getWaiter();
 	private Member member;
@@ -33,7 +34,7 @@ public class Embed implements Command{
 	private List<Message> messages = new ArrayList<>();
 	
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		oevent = event;
 		member = event.getMember();
 		user = event.getUser();
@@ -51,7 +52,7 @@ public class Embed implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("embed", "Creates a custom embedded message!");
+		CommandData command = Commands.slash("embed", "Creates a custom embedded message!");
 		return command;
 	}
 	
@@ -62,7 +63,7 @@ public class Embed implements Command{
 	
 	private void definetitle() {
 		oevent.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/embed:definetitle")).queue();
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {eb.setTitle(e.getMessage().getContentRaw());
@@ -75,7 +76,7 @@ public class Embed implements Command{
 
 	private void definedescr() {
 		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/embed:definedescr")).complete());
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {eb.setDescription(e.getMessage().getContentRaw());
@@ -88,7 +89,7 @@ public class Embed implements Command{
 	
 	private void definefooter() {
 		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/embed:definefooter")).complete());
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {if (e.getMessage().getContentRaw()=="none"){} else {eb.setFooter(e.getMessage().getContentRaw());}
@@ -101,7 +102,7 @@ public class Embed implements Command{
 
 	private void defineTNail() {
 		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/embed:defineTNail")).complete());
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {if (e.getMessage().getContentRaw().contains("none")){} else {eb.setThumbnail(e.getMessage().getContentRaw());}
@@ -114,7 +115,7 @@ public class Embed implements Command{
 	
 	private void defineImag() {
 		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/embed:defineImag")).complete());
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {if (e.getMessage().getContentRaw().contains("none")){} else {eb.setImage(e.getMessage().getContentRaw());}
@@ -127,7 +128,7 @@ public class Embed implements Command{
 	
 	private void wantnewfield() {
 		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/embed:wantnewfield")).complete());
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {messages.add(e.getMessage());
@@ -139,7 +140,7 @@ public class Embed implements Command{
 	
 	private void addnewfield() {
 		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/embed:addnewfield")).complete());
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {messages.add(e.getMessage());

@@ -6,9 +6,10 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class IgnoreChannel implements Command{
@@ -17,7 +18,7 @@ public class IgnoreChannel implements Command{
 	private User user;
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		guild = event.getGuild();
 		user = event.getUser();
 		if(!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
@@ -43,7 +44,7 @@ public class IgnoreChannel implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("ignorechannel", "0")
+		CommandData command = Commands.slash("ignorechannel", "0")
 										.addSubcommands(new SubcommandData("add", "Adds a channel to the \"ignored\"-list")
 												.addOption(OptionType.CHANNEL, "channel", "Mention the channel", true))
 										.addSubcommands(new SubcommandData("list", "Lists all currently ignored channels"))
@@ -57,7 +58,7 @@ public class IgnoreChannel implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/ignorechannel:help");
 	}
 	
-	private void listignoredchannels(SlashCommandEvent event) {
+	private void listignoredchannels(SlashCommandInteractionEvent event) {
 		String channelids = Configloader.INSTANCE.getGuildConfig(guild, "ignored");
 		if (channelids.equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/ignorechannel:nochannels")).queue();

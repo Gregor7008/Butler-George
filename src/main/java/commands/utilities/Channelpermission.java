@@ -17,27 +17,28 @@ import net.dv8tion.jda.api.entities.IPermissionHolder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class Channelpermission implements Command{
 	
 	List<Message> msgs = new ArrayList<>();
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
 		String ctgid = Configloader.INSTANCE.getUserConfig(guild, user, "cccategory");
-		if (ctgid.equals("") || !event.getTextChannel().getParent().equals(guild.getCategoryById(ctgid))) {
+		if (ctgid.equals("") || !event.getTextChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/channelpermission:nopermission")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		SelectionMenu menu = SelectionMenu.create("permselection")
+		SelectMenu menu = SelectMenu.create("permselection")
 				.setPlaceholder("Select the wanted permission")
 				.setRequiredRange(1, 1)
 				.addOption("View Channel", "vc")
@@ -58,7 +59,7 @@ public class Channelpermission implements Command{
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/channelpermission:selperm"))
 				.addActionRow(menu)
 				.queue();
-		Bot.INSTANCE.getWaiter().waitForEvent(SelectionMenuEvent.class,
+		Bot.INSTANCE.getWaiter().waitForEvent(SelectMenuInteractionEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getTextChannel().getId())) {return false;} 
 				  	  return e.getUser().getIdLong() == user.getIdLong();},
 				e -> {if (event.getSubcommandName().equals("grant")) {
@@ -72,7 +73,7 @@ public class Channelpermission implements Command{
 	
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("channelpermission", "Edits permission in user channels")
+		CommandData command = Commands.slash("channelpermission", "Edits permission in user channels")
 				.addSubcommands(new SubcommandData("grant", "Grants permission in a user channel")
 						.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
 						.addOption(OptionType.USER, "user", "The wanted user", true))
@@ -87,7 +88,7 @@ public class Channelpermission implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/channelpermission:help");
 	}
 	
-	private void defineEdit(String selected, SlashCommandEvent event, SelectionMenuEvent sme, boolean action) {
+	private void defineEdit(String selected, SlashCommandInteractionEvent event, SelectMenuInteractionEvent sme, boolean action) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		IPermissionHolder pholder = guild.getMember(event.getOption("user").getAsUser());
@@ -123,7 +124,7 @@ public class Channelpermission implements Command{
 	}
 	
 	private void updateChannelPerms(IPermissionHolder pholder, GuildChannel channel, String selected, boolean action) {
-		PermissionOverride current = channel.getPermissionOverride(pholder);
+		PermissionOverride current = channel.getPermissionContainer().getPermissionOverride(pholder);
 		if (current != null) {
 			ArrayList<Permission> update = this.convertToPerm(selected);
 			Collection<Permission> curdeny = current.getDenied();
@@ -135,7 +136,7 @@ public class Channelpermission implements Command{
 					}
 				}
 				curallow.forEach(p -> update.add(p));
-				channel.upsertPermissionOverride(pholder).setPermissions(update, curdeny).queue();
+				channel.getPermissionContainer().upsertPermissionOverride(pholder).setPermissions(update, curdeny).queue();
 			} else {
 				for (int i = 0; i < update.size(); i++) {
 					if (curallow.contains(update.get(i))) {
@@ -143,13 +144,13 @@ public class Channelpermission implements Command{
 					}
 				}
 				curdeny.forEach(p -> update.add(p));
-				channel.upsertPermissionOverride(pholder).setPermissions(curallow, update).queue();
+				channel.getPermissionContainer().upsertPermissionOverride(pholder).setPermissions(curallow, update).queue();
 			}
 		} else {
 			if (action) {
-				channel.putPermissionOverride(pholder).setAllow(this.convertToPerm(selected)).queue();
+				channel.getPermissionContainer().putPermissionOverride(pholder).setAllow(this.convertToPerm(selected)).queue();
 			} else {
-				channel.putPermissionOverride(pholder).setDeny(this.convertToPerm(selected)).queue();
+				channel.getPermissionContainer().putPermissionOverride(pholder).setDeny(this.convertToPerm(selected)).queue();
 			}
 		}
 	}
@@ -199,10 +200,10 @@ public class Channelpermission implements Command{
 			perms.add(Permission.MANAGE_WEBHOOKS);
 			break;
 		case "sm":
-			perms.add(Permission.MESSAGE_WRITE);
+			perms.add(Permission.MESSAGE_SEND);
 			break;
 		case "cpt":
-			perms.add(Permission.USE_PRIVATE_THREADS);
+			perms.add(Permission.CREATE_PRIVATE_THREADS);
 			break;
 		case "el":
 			perms.add(Permission.MESSAGE_EMBED_LINKS);
@@ -226,7 +227,7 @@ public class Channelpermission implements Command{
 			perms.add(Permission.MESSAGE_HISTORY);
 			break;
 		case "usc":
-			perms.add(Permission.USE_SLASH_COMMANDS);
+			perms.add(Permission.USE_APPLICATION_COMMANDS);
 			break;
 		case "apm":
 			Permission.getPermissions(Permission.ALL_VOICE_PERMISSIONS).forEach(e -> perms.add(e));

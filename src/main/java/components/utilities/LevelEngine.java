@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class LevelEngine {
 	
@@ -25,12 +25,12 @@ public class LevelEngine {
 		return INSTANCE;
 	}
 	
-	public void messagereceived(GuildMessageReceivedEvent event) {
+	public void messagereceived(MessageReceivedEvent event) {
 		OffsetDateTime time = event.getMessage().getTimeCreated();
 		this.givexp(event.getGuild(), event.getAuthor(), time, 10, 30);
 	}
 	
-	public void slashcommand(SlashCommandEvent event) {
+	public void slashcommand(SlashCommandInteractionEvent event) {
 		OffsetDateTime time = java.time.OffsetDateTime.now();
 		this.givexp(event.getGuild(), event.getUser(), time, 20, 30);
 	}

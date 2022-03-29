@@ -23,15 +23,16 @@ import components.base.Configloader;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class Level implements Command {
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user;
 		try {
@@ -50,7 +51,7 @@ public class Level implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("level", "Check your current level or the one of another user!")
+		CommandData command = Commands.slash("level", "Check your current level or the one of another user!")
 											  .addOptions(new OptionData(OptionType.USER, "user", "Mention another user (optional)").setRequired(false));
 		return command;
 	}
@@ -101,16 +102,16 @@ public class Level implements Command {
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		//write Level
-		g2d.setFont(new Font("Calibri", 0, 40));
+		g2d.setFont(new Font("Calibri", Font.PLAIN, 65));
 		g2d.setColor(Color.decode("#5773c9"));
         g2d.drawString(String.valueOf(level), 813, 95);
 		//write XP
-        g2d.setFont(new Font("Calibri", 0, 20));
+        g2d.setFont(new Font("Calibri", Font.PLAIN, 30));
         g2d.setColor(Color.WHITE);
         String temp1 = curxp + "\s/\s" + String.valueOf(nedxp);
         g2d.drawString(temp1, 820 - g2d.getFontMetrics().stringWidth(temp1), 170);
 		//write iusername
-        g2d.setFont(new Font("Calibri", 0, 17));
+        g2d.setFont(new Font("Calibri", Font.PLAIN, 50));
         g2d.setColor(Color.WHITE);
         g2d.drawString(guild.getMember(iuser).getEffectiveName(), 293, 170);
 		//draw Icon

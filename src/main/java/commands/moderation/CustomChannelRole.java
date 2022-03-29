@@ -6,15 +6,16 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class CustomChannelRole implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
@@ -27,7 +28,7 @@ public class CustomChannelRole implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("customchannelrole", "0")
+		CommandData command = Commands.slash("customchannelrole", "0")
 				.addSubcommands(new SubcommandData("set", "Sets the role that should be able to create custom user channels").addOption(OptionType.ROLE, "role", "The wanted role", true));
 		return command;
 	}

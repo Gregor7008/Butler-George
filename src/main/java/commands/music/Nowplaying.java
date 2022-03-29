@@ -8,18 +8,19 @@ import components.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Nowplaying implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
-		if (!self.getVoiceState().inVoiceChannel()) {
+		if (!self.getVoiceState().inAudioChannel()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/nowplaying:notconnected")).queue();
 			return;
 		}
@@ -33,7 +34,7 @@ public class Nowplaying implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("nowplaying", "Shows you information about the currently playing track!");
+		CommandData command = Commands.slash("nowplaying", "Shows you information about the currently playing track!");
 		return command;
 	}
 

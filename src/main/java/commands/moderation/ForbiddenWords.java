@@ -6,16 +6,17 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class ForbiddenWords implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
@@ -63,7 +64,7 @@ public class ForbiddenWords implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("forbiddenwords", "0")
+		CommandData command = Commands.slash("forbiddenwords", "0")
 									.addSubcommands(new SubcommandData("add", "Adds words to the list of forbidden words")
 										.addOptions(new OptionData(OptionType.STRING, "words", "The words that should be added", true)))
 									.addSubcommands(new SubcommandData("remove", "Removes words from the list of forbidden words")

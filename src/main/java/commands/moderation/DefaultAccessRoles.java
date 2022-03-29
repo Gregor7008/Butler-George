@@ -11,15 +11,16 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class DefaultAccessRoles implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
@@ -27,7 +28,7 @@ public class DefaultAccessRoles implements Command{
 			return;
 		}
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:sendroles")).queue();
-		Bot.INSTANCE.getWaiter().waitForEvent(GuildMessageReceivedEvent.class,
+		Bot.INSTANCE.getWaiter().waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getTextChannel().getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {List<Role> roles = e.getMessage().getMentionedRoles();
@@ -41,7 +42,7 @@ public class DefaultAccessRoles implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("defaultaccessroles", "0")
+		CommandData command = Commands.slash("defaultaccessroles", "0")
 				.addSubcommands(new SubcommandData("set", "Sets the roles that should have access to user channels by default on this server"));
 		return command;
 	}

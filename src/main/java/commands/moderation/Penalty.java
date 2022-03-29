@@ -12,12 +12,13 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class Penalty implements Command{
 	
@@ -26,7 +27,7 @@ public class Penalty implements Command{
 	private Guild guild;
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		if (!event.getMember().hasPermission(Permission.BAN_MEMBERS)) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/penalty:nopermission")).queue();
 			return;
@@ -48,7 +49,7 @@ public class Penalty implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("penalty", "0")
+		CommandData command = Commands.slash("penalty", "0")
 											  .addSubcommands(new SubcommandData("add", "Adds a penalty that's executed on reaching a certain amount of warnings"))
 											  .addSubcommands(new SubcommandData("remove", "Removes a penalty"))
 											  .addSubcommands(new SubcommandData("list", "List all currently defined penalties"));
@@ -60,7 +61,7 @@ public class Penalty implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/penalty:help");
 	}
 	
-	private void removepenalties(SlashCommandEvent event) {
+	private void removepenalties(SlashCommandInteractionEvent event) {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		StringBuilder sB = new StringBuilder();
 		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "penalties");
@@ -84,7 +85,7 @@ public class Penalty implements Command{
 			}
 			event.replyEmbeds(AnswerEngine.ae.buildMessage("Current penalties: (Reply with warning count to remove)", sB.toString())).queue();
 		}
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {this.removefinal(e, current);},
@@ -92,7 +93,7 @@ public class Penalty implements Command{
 				() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
-	private void removefinal(GuildMessageReceivedEvent e, String[] current) {
+	private void removefinal(MessageReceivedEvent e, String[] current) {
 		for (int i = 1; i <= current.length; i++) {
 		   	 String[] temp3 = current[i-1].split("_", 2);
 		   	if (temp3[0].contains(e.getMessage().getContentRaw())) {
@@ -104,8 +105,8 @@ public class Penalty implements Command{
 		}
 	}
 	
-	private void addpenalties1(SlashCommandEvent event) {
-		SelectionMenu menu = SelectionMenu.create("menu:class")
+	private void addpenalties1(SlashCommandInteractionEvent event) {
+		SelectMenu menu = SelectMenu.create("menu:class")
 				.addOption("Removal of role", "rr")
 				.addOption("Temporary mute", "tm")
 				.addOption("Permanent mute", "pm")
@@ -118,7 +119,7 @@ public class Penalty implements Command{
 				.setEphemeral(true)
 				.addActionRow(menu)
 				.queue();
-		waiter.waitForEvent(SelectionMenuEvent.class,
+		waiter.waitForEvent(SelectMenuInteractionEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getUser().getIdLong() == user.getIdLong();},
 				e -> {String plannedpunish = e.getSelectedOptions().get(0).getValue();
@@ -131,7 +132,7 @@ public class Penalty implements Command{
 	private void addpenalties2(String plannedpunish) {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:add2")).queue();
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {int warnings = Integer.parseInt(e.getMessage().getContentRaw());
@@ -149,7 +150,7 @@ public class Penalty implements Command{
 		switch (plannedpunish) {
 		case "rr":
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:add3role")).queue();
-			waiter.waitForEvent(GuildMessageReceivedEvent.class,
+			waiter.waitForEvent(MessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {String penalty = String.valueOf(warnings) + "_removerole_" + e.getMessage().getContentRaw();
@@ -160,7 +161,7 @@ public class Penalty implements Command{
 			break;
 		case "tm":
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:add3time")).queue();
-			waiter.waitForEvent(GuildMessageReceivedEvent.class,
+			waiter.waitForEvent(MessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {String penalty = String.valueOf(warnings) + "_tempmute_" + e.getMessage().getContentRaw();
@@ -179,7 +180,7 @@ public class Penalty implements Command{
 			break;
 		case "tb":
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:add3time")).queue();
-			waiter.waitForEvent(GuildMessageReceivedEvent.class,
+			waiter.waitForEvent(MessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {String penalty = String.valueOf(warnings) + "_tempban_" + e.getMessage().getContentRaw();
@@ -197,7 +198,7 @@ public class Penalty implements Command{
 		}
 	}
 	
-	private void listpenalties(SlashCommandEvent event) {
+	private void listpenalties(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
 		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "penalties");
 		if (currentraw.equals("")) {

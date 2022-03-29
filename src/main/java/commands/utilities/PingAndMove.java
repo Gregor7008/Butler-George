@@ -9,17 +9,18 @@ import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class PingAndMove implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final Member omember = guild.getMember(event.getOption("user").getAsUser());
@@ -32,11 +33,11 @@ public class PingAndMove implements Command{
 					":rofl: | You think my developers didn't think of that?!\nThey rather wasted their brain power on this than actually fix bugs...")).queue(r -> r.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
 			return;
 		}
-		if (!omember.getVoiceState().inVoiceChannel()) {
+		if (!omember.getVoiceState().inAudioChannel()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/pingandmove:memnoncon")).queue();
 			return;
 		}
-		if (!guild.getMember(user).getVoiceState().inVoiceChannel()) {
+		if (!guild.getMember(user).getVoiceState().inAudioChannel()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/pingandmove:notcon")).queue();
 			return;
 		}
@@ -44,7 +45,7 @@ public class PingAndMove implements Command{
 				AnswerEngine.ae.getDescription(guild, user, "/commands/utilities/pingandmove:request").replace("{user}", guild.getMember(user).getAsMention())))
 								.addActionRow(Button.primary("accept", Emoji.fromUnicode("U+2705")),
 											  Button.primary("deny", Emoji.fromUnicode("U+274C"))).complete();
-		Bot.INSTANCE.getWaiter().waitForEvent(ButtonClickEvent.class,
+		Bot.INSTANCE.getWaiter().waitForEvent(ButtonInteractionEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 			  	  	  return e.getUser().getIdLong() == omember.getIdLong();},
 				e -> {if (e.getButton().getId().equals("accept")) {
@@ -59,7 +60,7 @@ public class PingAndMove implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("pingandmove", "Join a user in a full voice channel!").addOption(OptionType.USER, "user", "The user whoms channel you want to join", true);
+		CommandData command = Commands.slash("pingandmove", "Join a user in a full voice channel!").addOption(OptionType.USER, "user", "The user whoms channel you want to join", true);
 		return command;
 	}
 

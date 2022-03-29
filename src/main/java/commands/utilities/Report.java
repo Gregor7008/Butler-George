@@ -10,14 +10,15 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Report implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "reportchannel").equals("")) {
@@ -41,7 +42,7 @@ public class Report implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("report", "Report a member for a specific reason")
+		CommandData command = Commands.slash("report", "Report a member for a specific reason")
 										.addOption(OptionType.USER, "user", "The user to be reported", true)
 										.addOption(OptionType.STRING, "reason", "The reason for your report", true)
 										.addOption(OptionType.STRING, "link", "The link to a message for evidence", false);

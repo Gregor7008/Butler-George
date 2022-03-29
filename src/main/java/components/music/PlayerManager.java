@@ -16,7 +16,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import components.base.AnswerEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class PlayerManager {
 	
@@ -47,7 +47,7 @@ public class PlayerManager {
 		return INSTANCE;
 	}
 	
-	public void loadAndPlay(SlashCommandEvent event, String trackURL ) {
+	public void loadAndPlay(SlashCommandInteractionEvent event, String trackURL ) {
 		TextChannel channel = event.getTextChannel();
 		final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
 		this.audioPlayerManager.loadItemOrdered(musicManager, trackURL, new AudioLoadResultHandler() {

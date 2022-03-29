@@ -14,15 +14,16 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class Suggest implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
 		String channelid = Configloader.INSTANCE.getGuildConfig(guild, "suggest");
@@ -41,7 +42,7 @@ public class Suggest implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("suggest", "Suggest an idea!")
+		CommandData command = Commands.slash("suggest", "Suggest an idea!")
 										.addOptions(new OptionData(OptionType.STRING, "suggestion", "Write down your suggestions!", true));	
 		return command;
 	}

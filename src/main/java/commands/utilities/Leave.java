@@ -11,15 +11,17 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
+import net.dv8tion.jda.api.entities.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Leave implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
 		String ctgid = Configloader.INSTANCE.getUserConfig(guild, user, "cccategory");
@@ -27,7 +29,7 @@ public class Leave implements Command{
 		if (event.getOption("channel") != null) {
 			channel = event.getOption("channel").getAsGuildChannel();
 			if (!ctgid.equals("")) {
-				Category ctg = event.getTextChannel().getParent();
+				Category ctg = event.getTextChannel().getParentCategory();
 				if (ctg.equals(guild.getCategoryById(ctgid))) {
 					if (ctg.getChannels().size() <=1) {
 						ctg.delete().queue();
@@ -38,7 +40,7 @@ public class Leave implements Command{
 			}
 		} else {
 			if (!ctgid.equals("")) {
-				if (event.getTextChannel().getParent().equals(guild.getCategoryById(ctgid))) {
+				if (event.getTextChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
 					List<GuildChannel> channels = guild.getCategoryById(ctgid).getChannels();
 					for (int i = 0; i < channels.size(); i++) {
 						channels.get(i).delete().queue();
@@ -54,14 +56,15 @@ public class Leave implements Command{
 			if (this.checkCategory(ctgy, guild)) {
 				List<GuildChannel> channels = ctgy.getChannels();
 				for (int i = 0; i < channels.size(); i++) {
-					channels.get(i).getManager().removePermissionOverride(event.getMember()).queue();
+					channels.get(i).getPermissionContainer().getManager().removePermissionOverride(event.getMember()).queue();
 				}
 				event.reply("Done...").queue(r -> r.deleteOriginal().queue());
 				return;
 			}
 		}
-		if (this.checkCategory(channel.getParent(), guild)) {
-			channel.getManager().removePermissionOverride(event.getMember()).queue();
+		ICategorizableChannel temp = (ICategorizableChannel) channel;
+		if (this.checkCategory(temp.getParentCategory(), guild)) {
+			channel.getPermissionContainer().getManager().removePermissionOverride(event.getMember()).queue();
 			event.reply("Done...").queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
@@ -70,7 +73,7 @@ public class Leave implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("leave", "Leave this (or another) channel")
+		CommandData command = Commands.slash("leave", "Leave this (or another) channel")
 				.addOption(OptionType.CHANNEL, "channel", "If it's a channel you can't run commands in");
 		return command;
 	}

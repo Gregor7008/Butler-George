@@ -16,17 +16,18 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class ReactionRole implements Command{
 	
 	private final EventWaiter waiter = Bot.INSTANCE.getWaiter();
-	private SlashCommandEvent oevent;
+	private SlashCommandInteractionEvent oevent;
 	private TextChannel finalchannel, channel;
 	private Guild guild;
 	private User user;
@@ -35,7 +36,7 @@ public class ReactionRole implements Command{
 	private List<Message> messages = new ArrayList<Message>();;
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		oevent = event;
 		guild = event.getGuild();
 		user = event.getUser();
@@ -67,7 +68,7 @@ public class ReactionRole implements Command{
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:defineRemoveEmoji")).queue();
-			waiter.waitForEvent(GuildMessageReactionAddEvent.class,
+			waiter.waitForEvent(MessageReactionAddEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getUser().getIdLong() == user.getIdLong();},
 					e -> {event.getHook().editOriginalEmbeds(AnswerEngine.ae.buildMessage(
@@ -91,7 +92,7 @@ public class ReactionRole implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("reactionrole", "0")
+		CommandData command = Commands.slash("reactionrole", "0")
 									.addSubcommands(new SubcommandData("add", "Adds a reaction to a message that acts as a button to get a specified role")
 											.addOption(OptionType.CHANNEL, "channel", "The channel of your message", true)
 											.addOption(OptionType.STRING, "message", "The message-id for your message", true))
@@ -111,7 +112,7 @@ public class ReactionRole implements Command{
 
 	private void defineAddRoles() {
 		Configloader.INSTANCE.setReactionroleConfig(guild, finalchannel, msgid, "");
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {messages.add(e.getMessage());
@@ -128,7 +129,7 @@ public class ReactionRole implements Command{
 				AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/reactionrole:defineAddEmojis"),
 				AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reactionrole:defineAddEmojis").replace("{role}", role.getAsMention()))).complete();
 		messages.add(msg);
-		waiter.waitForEvent(GuildMessageReactionAddEvent.class,
+		waiter.waitForEvent(MessageReactionAddEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  if(e.getUser().getIdLong() != user.getIdLong()) {return false;}
 				  	  return e.getMessageId().equals(msg.getId());},

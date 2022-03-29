@@ -43,10 +43,10 @@ public class ModEngine {
 				for (int o = 0; o < channels.size(); o++) {
 					TextChannel channel = channels.get(o);
 					Collection<Permission> perms = new ArrayList<Permission>();
-					perms.add(Permission.USE_PRIVATE_THREADS);
-					perms.add(Permission.USE_PUBLIC_THREADS);
-					perms.add(Permission.USE_SLASH_COMMANDS);
-					perms.add(Permission.MESSAGE_WRITE);
+					perms.add(Permission.CREATE_PRIVATE_THREADS);
+					perms.add(Permission.CREATE_PUBLIC_THREADS);
+					perms.add(Permission.USE_APPLICATION_COMMANDS);
+					perms.add(Permission.MESSAGE_SEND);
 					perms.add(Permission.MESSAGE_ADD_REACTION);
 					channel.putPermissionOverride(newrole).setDeny(perms).queue();
 				}
@@ -82,17 +82,19 @@ public class ModEngine {
 			}
 		}
 		File[] filelist = guilddir.listFiles();
-		for (int i = 0; i < filelist.length; i++) {
-			String[] temp1 = filelist[i].getName().split(".properties");
-			User user = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
-			if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempbanned"))) {
-				OffsetDateTime tbuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tbuntil"));
-				OffsetDateTime now = OffsetDateTime.now();
-				long difference = Duration.between(now, tbuntil).toSeconds();
-				if (difference <= 0) {
-					guild.unban(user).queue();
-					Configloader.INSTANCE.setUserConfig(guild, user, "tempbanned", "false");
-					Configloader.INSTANCE.setUserConfig(guild, user, "tbuntil", "");
+		if (filelist != null) {
+			for (int i = 0; i < filelist.length; i++) {
+				String[] temp1 = filelist[i].getName().split(".properties");
+				User user = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
+				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempbanned"))) {
+					OffsetDateTime tbuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tbuntil"));
+					OffsetDateTime now = OffsetDateTime.now();
+					long difference = Duration.between(now, tbuntil).toSeconds();
+					if (difference <= 0) {
+						guild.unban(user).queue();
+						Configloader.INSTANCE.setUserConfig(guild, user, "tempbanned", "false");
+						Configloader.INSTANCE.setUserConfig(guild, user, "tbuntil", "");
+					}
 				}
 			}
 		}

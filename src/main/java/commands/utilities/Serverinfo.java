@@ -8,13 +8,14 @@ import components.base.AnswerEngine;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Serverinfo implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		EmbedBuilder eb = new EmbedBuilder();
 		Guild guild = event.getGuild();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
@@ -40,7 +41,7 @@ public class Serverinfo implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("serverinfo", "Lists information about this server");
+		CommandData command = Commands.slash("serverinfo", "Lists information about this server");
 		return command;
 	}
 

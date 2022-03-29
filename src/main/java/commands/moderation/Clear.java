@@ -10,15 +10,16 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class Clear implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
@@ -37,7 +38,7 @@ public class Clear implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("clear", "Deletes a specific number of messages from this channel!")
+		CommandData command = Commands.slash("clear", "Deletes a specific number of messages from this channel!")
 				.addOptions(new OptionData(OptionType.INTEGER, "count", "Hand over the number of messages you want to delete!", true));
 		return command;
 	}

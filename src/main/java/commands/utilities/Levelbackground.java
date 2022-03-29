@@ -6,15 +6,16 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class Levelbackground implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (event.getSubcommandName().equals("set")) {
@@ -34,7 +35,7 @@ public class Levelbackground implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("levelbackground", "Configure your personal levelbackground")
+		CommandData command = Commands.slash("levelbackground", "Configure your personal levelbackground")
 									.addSubcommands(new SubcommandData("set", "Set your new levelbackground")
 											.addOption(OptionType.INTEGER, "number", "The number of your new levelbackground", true))
 									.addSubcommands(new SubcommandData("list", "List all possible backgrounds"));
@@ -46,7 +47,7 @@ public class Levelbackground implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/levelbackground:help");
 	}
 	
-	private void listlevelcards(SlashCommandEvent event) {
+	private void listlevelcards(SlashCommandInteractionEvent event) {
 		EmbedBuilder eb0 = new EmbedBuilder();
 		EmbedBuilder eb1 = new EmbedBuilder();
 		EmbedBuilder eb2 = new EmbedBuilder();

@@ -11,22 +11,23 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class Reset implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:nopermission")).queue();
 			return;
 		}
-		SelectionMenu menu = SelectionMenu.create("selvalre")
+		SelectMenu menu = SelectMenu.create("selvalre")
 				.setPlaceholder("Select the value to reset")
 				.setRequiredRange(1, 1)
 				.addOption("Level channel", "lc")
@@ -43,7 +44,7 @@ public class Reset implements Command{
 				.addActionRow(menu)
 				.queue();
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		waiter.waitForEvent(SelectionMenuEvent.class,
+		waiter.waitForEvent(SelectMenuInteractionEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 				  	  return e.getUser().getIdLong() == user.getIdLong();},
 				e -> {switch (e.getSelectedOptions().get(0).getValue()) {
@@ -96,7 +97,7 @@ public class Reset implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("reset", "Resets a specific channel or role definition of the server");
+		CommandData command = Commands.slash("reset", "Resets a specific channel or role definition of the server");
 		return command;
 	}
 

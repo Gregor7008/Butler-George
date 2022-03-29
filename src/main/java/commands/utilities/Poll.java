@@ -22,11 +22,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class Poll implements Command{
@@ -39,7 +40,7 @@ public class Poll implements Command{
 	private boolean anym;
 	
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		channel = event.getTextChannel();
 		user = event.getUser();
 		guild = event.getGuild();
@@ -67,7 +68,7 @@ public class Poll implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("poll", "Manage polls")
+		CommandData command = Commands.slash("poll", "Manage polls")
 											 .addSubcommands(new SubcommandData("create", "Creates a poll"))
 											 .addSubcommands(new SubcommandData("remove", "Deletes a poll")
 													 		 .addOption(OptionType.STRING, "msgid", "The message ID of the poll", true))
@@ -82,12 +83,12 @@ public class Poll implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/poll:help");
 	}
 	
-	private void createPoll(SlashCommandEvent event) {
+	private void createPoll(SlashCommandInteractionEvent event) {
 		tempname = String.valueOf(new Random().nextInt(100));
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:definetitle")).queue();
 		messagecount++;
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {title = e.getMessage().getContentRaw();
@@ -107,7 +108,7 @@ public class Poll implements Command{
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:definedescr")).queue();
 		messagecount++;
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {description = e.getMessage().getContentRaw();
@@ -123,7 +124,7 @@ public class Poll implements Command{
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:defineAnswers")).queue();
 		messagecount++;
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {answers = e.getMessage().getContentRaw();
@@ -139,7 +140,7 @@ public class Poll implements Command{
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:defineTNURL")).queue();
 		messagecount++;
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {if(e.getMessage().getContentRaw().equals("none")) {
@@ -159,7 +160,7 @@ public class Poll implements Command{
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:definedays")).queue();
 		messagecount++;
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {Configloader.INSTANCE.setPollConfig(guild, tempname, "days", e.getMessage().getContentRaw());
@@ -237,7 +238,7 @@ public class Poll implements Command{
 		pollfile.renameTo(renamed);
 	}
 
-	private void removePoll(SlashCommandEvent event) {
+	private void removePoll(SlashCommandInteractionEvent event) {
 		String msgID = event.getOption("msgid").getAsString();
 		TextChannel channel = guild.getTextChannelById(Configloader.INSTANCE.getPollConfig(guild, msgID, "channel"));
 		channel.retrieveMessageById(msgID).complete().delete().queue();
@@ -248,7 +249,7 @@ public class Poll implements Command{
 		}
 	}
 	
-	private void listPoll(SlashCommandEvent event) {
+	private void listPoll(SlashCommandInteractionEvent event) {
 		File fl = new File(Bot.environment + "/configs/polls/" + guild.getId());
 		StringBuilder sb = new StringBuilder();
 		EmbedBuilder eb = new EmbedBuilder();
@@ -278,7 +279,7 @@ public class Poll implements Command{
 		event.replyEmbeds(eb.build()).queue();
 	}
 	
-	private void infoPoll(SlashCommandEvent event) {
+	private void infoPoll(SlashCommandInteractionEvent event) {
 		if (Configloader.INSTANCE.findPollConfig(guild, event.getOption("msgid").getAsString()) == null) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:pollnf")).queue();
 			return;

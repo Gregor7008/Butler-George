@@ -12,15 +12,16 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class Play implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
 		final TextChannel channel = event.getTextChannel();
@@ -32,19 +33,19 @@ public class Play implements Command{
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/play:wrongusage")).queue();
 			return;
 		}
-		if (!member.getVoiceState().inVoiceChannel()) {
+		if (!member.getVoiceState().inAudioChannel()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/play:noVCdefined")).queue();
 			return;
 		}
-		if (self.getVoiceState().inVoiceChannel()) {
+		if (self.getVoiceState().inAudioChannel()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/play:alreadyinuse")).queue();
 			return;
 		}
 		this.load(event, argument, musicManager, channel, member);
 	}
 	
-	private void load(SlashCommandEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
-		VoiceChannel vc = member.getVoiceState().getChannel();
+	private void load(SlashCommandInteractionEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
+		VoiceChannel vc = (VoiceChannel) member.getVoiceState().getChannel();
 		channel.getGuild().getAudioManager().openAudioConnection(vc);
 		if (!event.getGuild().getAudioManager().isConnected()) {
 			if (vc.getUserLimit() != 0) {
@@ -72,7 +73,7 @@ public class Play implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!", true));
+		CommandData command = Commands.slash("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!", true));
 		return command;
 	}
 

@@ -12,17 +12,18 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class Warning implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").equals("")) {
@@ -58,7 +59,7 @@ public class Warning implements Command{
 				EventWaiter waiter = Bot.INSTANCE.getWaiter();
 				TextChannel channel = event.getTextChannel();
 				Member member = event.getOption("user").getAsMember();
-				waiter.waitForEvent(GuildMessageReceivedEvent.class,
+				waiter.waitForEvent(MessageReceivedEvent.class,
 						e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 						  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(guild, event.getOption("user").getAsUser(), "warnings");
@@ -77,7 +78,7 @@ public class Warning implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("warning", "0")
+		CommandData command = Commands.slash("warning", "0")
 								  .addSubcommands(new SubcommandData("add", "Warns a user and adds a warning to their warnings-list")
 											  .addOptions(new OptionData(OptionType.USER, "user", "The user you want to warn", true))
 											  .addOptions(new OptionData(OptionType.STRING, "reason", "The reason why you warn the member", false)))
@@ -93,7 +94,7 @@ public class Warning implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/warning:help");
 	}
 	
-	private boolean listwarnings(SlashCommandEvent event) {
+	private boolean listwarnings(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		final User iuser = event.getOption("user").getAsUser();

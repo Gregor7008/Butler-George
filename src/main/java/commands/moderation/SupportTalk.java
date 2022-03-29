@@ -6,15 +6,16 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class SupportTalk implements Command{
 
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
@@ -27,7 +28,7 @@ public class SupportTalk implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("supporttalk", "0")
+		CommandData command = Commands.slash("supporttalk", "0")
 				.addSubcommands(new SubcommandData("set", "Sets the support talk of this server")
 						.addOption(OptionType.CHANNEL, "channel", "Mention a voice channel", true));
 		return command;

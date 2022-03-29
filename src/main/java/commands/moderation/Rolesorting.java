@@ -16,13 +16,14 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Rolesorting implements Command{
 	
-	private SlashCommandEvent oevent;
+	private SlashCommandInteractionEvent oevent;
 	private Role grouprole;
 	private List<Role> subroles;
 	private List<Member> members;
@@ -34,7 +35,7 @@ public class Rolesorting implements Command{
 	private List<Message> messages = new ArrayList<>();
 	
 	@Override
-	public void perform(SlashCommandEvent event) {
+	public void perform(SlashCommandInteractionEvent event) {
 		oevent = event;
 		guild = event.getGuild();
 		user = event.getUser();
@@ -49,7 +50,7 @@ public class Rolesorting implements Command{
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = new CommandData("rolesort", "Adds and removes roles by other roles (If member has a role, give him another role)");
+		CommandData command = Commands.slash("rolesort", "Adds and removes roles by other roles (If member has a role, give him another role)");
 		return command;
 	}
 
@@ -60,7 +61,7 @@ public class Rolesorting implements Command{
 
 	private void definegroup() {
 		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/rolesorting:definegroup")).complete());
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
 							e -> {messages.add(e.getMessage());
@@ -73,7 +74,7 @@ public class Rolesorting implements Command{
 	
 	private void definesub() {
 		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/rolesorting:definesub")).complete());
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
 							e -> {messages.add(e.getMessage());
@@ -86,7 +87,7 @@ public class Rolesorting implements Command{
 
 	private void definemember() {
 		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/rolesorting:definemember")).complete());
-		waiter.waitForEvent(GuildMessageReceivedEvent.class,
+		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
 							e -> {messages.add(e.getMessage());
