@@ -44,36 +44,34 @@ public class ReactionRole implements Command{
 		msgid = event.getOption("message").getAsString();
 		finalchannel = guild.getTextChannelById(event.getOption("channel").getAsGuildChannel().getId());
 		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nopermission").convert()).queue();
 			return;
 		}
 		if (finalchannel.equals(null)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nochannel")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nochannel").convert()).queue();
 			return;
 		}
 		if (finalchannel.retrieveMessageById(msgid).complete().equals(null)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nomessage")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nomessage").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:defineAddRoles")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:defineAddRoles").convert()).queue();
 			this.defineAddRoles();
 			return;
 		}
 		if (event.getSubcommandName().equals("delete")) {
 			Configloader.INSTANCE.removeReactionRoleConfig(guild, finalchannel, msgid);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:delsuccess")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:delsuccess").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			finalchannel.retrieveMessageById(msgid).complete().clearReactions().queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:defineRemoveEmoji")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:defineRemoveEmoji").convert()).queue();
 			waiter.waitForEvent(MessageReactionAddEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getUser().getIdLong() == user.getIdLong();},
-					e -> {event.getHook().editOriginalEmbeds(AnswerEngine.ae.buildMessage(
-							AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/reactionrole:remsuccess"),
-							AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reactionrole:remsuccess").replace("{emoji}", e.getReactionEmote().getEmoji()))).queue(
+					e -> {event.getHook().editOriginalEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:remsuccess").replaceDescription("{emoji}", e.getReactionEmote().getEmoji()).convert()).queue(
 									r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
 						  String[] actions = Configloader.INSTANCE.getReactionroleConfig(guild, finalchannel, msgid).split(";");
 						  Configloader.INSTANCE.setReactionroleConfig(guild, finalchannel, msgid, "");
@@ -85,7 +83,7 @@ public class ReactionRole implements Command{
 						  finalchannel.retrieveMessageById(msgid).complete().removeReaction(e.getReactionEmote().getAsCodepoints()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {event.getHook().deleteOriginal().queue();
-						   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+						   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			return;
 		}
 	}
@@ -120,24 +118,20 @@ public class ReactionRole implements Command{
 								  this.defineAddEmojis(roles);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineAddEmojis(List<Role> roles) {
 		Role role = roles.get(progress);
-		Message msg = channel.sendMessageEmbeds(AnswerEngine.ae.buildMessage(
-				AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/reactionrole:defineAddEmojis"),
-				AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reactionrole:defineAddEmojis").replace("{role}", role.getAsMention()))).complete();
+		Message msg = channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:defineAddEmojis").replaceDescription("{role}", role.getAsMention()).convert()).complete();
 		messages.add(msg);
 		waiter.waitForEvent(MessageReactionAddEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  if(e.getUser().getIdLong() != user.getIdLong()) {return false;}
 				  	  return e.getMessageId().equals(msg.getId());},
 				e -> {Configloader.INSTANCE.addReactionroleConfig(guild, finalchannel, msgid, e.getReactionEmote().getAsCodepoints() + "_" + role.getId());
-					  msg.editMessageEmbeds(AnswerEngine.ae.buildMessage(
-								AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/reactionrole:defineAddEmojis"),
-								AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reactionrole:defineAddEmojis").replace("{role}", role.getAsMention())
-								+ "\n->" + e.getReactionEmote().getEmoji())).queue();
+					  msg.editMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:defineAddEmojis")
+							  .replaceDescription("{role}", role.getAsMention() + "\n->" + e.getReactionEmote().getEmoji()).convert()).queue();
 					  progress++;
 					  if (progress < roles.size()) {
 						  this.defineAddEmojis(roles);
@@ -146,11 +140,11 @@ public class ReactionRole implements Command{
 					  }},
 				1, TimeUnit.MINUTES,
 				() -> {this.cleanup();
-					   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});		
+					   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});		
 	}
 	
 	private void addReactions() {
-		Message msg  = channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:adding")).complete();
+		Message msg  = channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:adding").convert()).complete();
 		messages.add(msg);
 		String[] actions = Configloader.INSTANCE.getReactionroleConfig(guild, finalchannel, msgid).split(";");
 		for (int i = 0; i < actions.length; i++) {
@@ -158,7 +152,7 @@ public class ReactionRole implements Command{
 			finalchannel.retrieveMessageById(msgid).complete().addReaction(temp1[0]).queue();
 		}
 		try {Thread.sleep(2000);} catch (InterruptedException e) {}
-		msg.editMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:success")).queue();
+		msg.editMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:success").convert()).queue();
 		try {Thread.sleep(5000);} catch (InterruptedException e) {}
 		this.cleanup();
 	}

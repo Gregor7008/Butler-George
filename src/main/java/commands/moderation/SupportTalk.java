@@ -19,11 +19,11 @@ public class SupportTalk implements Command{
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supporttalk:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supporttalk:nopermission").convert()).queue();
 			return;
 		}
 		Configloader.INSTANCE.setGuildConfig(guild, "supporttalk", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supporttalk:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supporttalk:success").convert()).queue();
 	}
 
 	@Override

@@ -24,24 +24,24 @@ public class Skip implements Command{
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final AudioPlayer audioPlayer = musicManager.audioPlayer;
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:notconnected")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:notconnected").convert()).queue();
 			return;
 		}
 		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:nopermission")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:nopermission").convert()).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:nopermission").convert()).queue();
 			return;
 		}
 		if (audioPlayer.getPlayingTrack() == null) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:noneplaying")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:noneplaying").convert()).queue();
 			return;
 		}
 		musicManager.scheduler.nextTrack();
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:skipped")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/skip:skipped").convert()).queue();
 	}
 
 	@Override

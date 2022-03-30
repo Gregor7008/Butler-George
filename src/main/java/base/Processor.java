@@ -160,7 +160,7 @@ public class Processor extends ListenerAdapter {
 		Command utilitycmd;
 		if ((utilitycmd = commandList.utilitycmds.get(event.getName())) != null) {
 			if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(event.getChannel().getId()) && !event.getName().equals("embed") && !event.getName().equals("poll")) {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:ignoredchannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 				return;
 			}
 			utilitycmd.perform(event);
@@ -170,14 +170,14 @@ public class Processor extends ListenerAdapter {
 			if (!this.checkCategory(event.getTextChannel().getParentCategory(), guild)) {
 				modcmd.perform(event);
 			} else {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:userchannel")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:userchannel").convert()).queue();
 				return;
 			}
 		}
 		Command musiccmd;
 		if ((musiccmd = commandList.musiccmds.get(event.getName())) != null) {
 			if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(event.getChannel().getId())) {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:ignoredchannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:ignoredchannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 				return;
 			}
 			musiccmd.perform(event);

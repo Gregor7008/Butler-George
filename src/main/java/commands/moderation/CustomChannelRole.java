@@ -19,11 +19,11 @@ public class CustomChannelRole implements Command{
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelrole:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelrole:nopermission").convert()).queue();
 			return;
 		}
 		Configloader.INSTANCE.setGuildConfig(guild, "ccrole", event.getOption("role").getAsRole().getId());
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelrole:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelrole:success").convert()).queue();
 	}
 
 	@Override

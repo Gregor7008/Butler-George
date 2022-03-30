@@ -24,7 +24,7 @@ public class Reset implements Command{
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:nopermission").convert()).queue();
 			return;
 		}
 		SelectMenu menu = SelectMenu.create("selvalre")
@@ -39,7 +39,7 @@ public class Reset implements Command{
 				.addOption("Support role", "sr")
 				.addOption("User channel role", "ucr")
 				.build();
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:choosevalue"))
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:choosevalue").convert())
 				.setEphemeral(true)
 				.addActionRow(menu)
 				.queue();
@@ -50,49 +50,41 @@ public class Reset implements Command{
 				e -> {switch (e.getSelectedOptions().get(0).getValue()) {
 				      case "lc":
 				    	  Configloader.INSTANCE.setGuildConfig(guild, "levelmsgch", "");
-				    	  e.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user,"/commands/moderation/reset:success"),
-				    			  AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "level channel"))).queue();
+				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "level channel").convert()).queue();
 				    	  break;
 				      case "rc":
 				    	  Configloader.INSTANCE.setGuildConfig(guild, "reportchannel", "");
-				    	  e.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user,"/commands/moderation/reset:success"),
-				    			  AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "report channel"))).queue();
+				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "report channel").convert()).queue();
 				    	  break;
 				      case "sgc":
 				    	  Configloader.INSTANCE.setGuildConfig(guild, "suggest", "");
-				    	  e.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user,"/commands/moderation/reset:success"),
-				    			  AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "suggestion channel"))).queue();
+				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "suggestion channel").convert()).queue();
 				    	  break;
 				      case "spc":
 				    	  Configloader.INSTANCE.setGuildConfig(guild, "supportchannel", "");
-				    	  e.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user,"/commands/moderation/reset:success"),
-				    			  AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "support channel"))).queue();
+				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "support channel").convert()).queue();
 				    	  break;
 				      case "st":
 				    	  Configloader.INSTANCE.setGuildConfig(guild, "supporttalk", "");
-				    	  e.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user,"/commands/moderation/reset:success"),
-				    			  AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "support talk"))).queue();
+				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "support talk").convert()).queue();
 				    	  break;
 				      case "mr":
 				    	  Configloader.INSTANCE.setGuildConfig(guild, "modrole", "");
-				    	  e.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user,"/commands/moderation/reset:success"),
-				    			  AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "moderator role"))).queue();
+				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "moderator role").convert()).queue();
 				    	  break;
 				      case "sr":
 				    	  Configloader.INSTANCE.setGuildConfig(guild, "supportrole", "");
-				    	  e.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user,"/commands/moderation/reset:success"),
-				    			  AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "support role"))).queue();
+				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "support role").convert()).queue();
 				    	  break;
 				      case "ucr":
 				    	  Configloader.INSTANCE.setGuildConfig(guild, "ccrole", "");
-				    	  e.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user,"/commands/moderation/reset:success"),
-				    			  AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/reset:success").replace("{value}", "user channel role"))).queue();
+				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "user channel role").convert()).queue();
 				    	  break;
 				      default:
-						  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:fatal")).queue();
+						  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:fatal").convert()).queue();
 				      }},
 				1, TimeUnit.MINUTES,
-				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override

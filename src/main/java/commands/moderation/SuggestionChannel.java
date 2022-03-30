@@ -19,11 +19,11 @@ public class SuggestionChannel implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/suggestionchannel:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/suggestionchannel:nopermission").convert()).queue();
 			return;
 		}
 		Configloader.INSTANCE.setGuildConfig(guild, "suggest", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/suggestionchannel:successset")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/suggestionchannel:successset").convert()).queue();
 	}
 
 	@Override

@@ -16,13 +16,23 @@ public class CustomMessageEmbed {
 		eb.copyFrom(embed);
 	}
 	
-	public CustomMessageEmbed replaceTitle(char target, char replacement) {
+	public CustomMessageEmbed replaceTitle(String target, String replacement) {
 		eb.setTitle(em.getTitle().replace(target, replacement));
 		return new CustomMessageEmbed(eb.build());
 	}
 	
-	public CustomMessageEmbed replaceDescription(char target, char replacement) {
+	public CustomMessageEmbed replaceDescription(String target, String replacement) {
 		eb.setDescription(em.getDescription().replace(target, replacement));
+		return new CustomMessageEmbed(eb.build());
+	}
+	
+	public CustomMessageEmbed setTitle(String title) {
+		eb.setTitle(title);
+		return new CustomMessageEmbed(eb.build());
+	}
+	
+	public CustomMessageEmbed setDescription(String description) {
+		eb.setDescription(description);
 		return new CustomMessageEmbed(eb.build());
 	}
 	

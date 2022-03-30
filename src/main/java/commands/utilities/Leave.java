@@ -68,7 +68,7 @@ public class Leave implements Command{
 			event.reply("Done...").queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/leave:invalid")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/leave:invalid").convert()).queue();
 	}
 
 	@Override

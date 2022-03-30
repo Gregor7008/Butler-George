@@ -60,7 +60,8 @@ public class LevelEngine {
 			if (newcount > 20) {
 				Configloader.INSTANCE.addUserConfig(guild, user, "warnings", "Levelspamming");
 				user.openPrivateChannel().complete()
-						.sendMessageEmbeds(AnswerEngine.ae.buildMessage("Warning!", ":warning: | You have been warned on the " + guild.getName() + " server for spamming to level up faster!")).queue();
+						.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/utilities/levelengine:levelspam")
+								.replaceDescription("{guild}", guild.getName()).convert()).queue();
 			}
 		}
 	}
@@ -82,8 +83,9 @@ public class LevelEngine {
 			}
 			TextChannel channel = guild.getTextChannelById(id);
 			if (channel != null) {
-				channel.sendMessageEmbeds(AnswerEngine.ae.buildMessage(":confetti_ball: Congrats\s" + guild.getMember(user).getEffectiveName()
-						+ "\s! :confetti_ball:", "You just reached level\s" + String.valueOf(currentlevel+1) + "!")).queue();
+				channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/utilities/levelengine:levelup")
+						.replaceTitle("{user}", guild.getMember(user).getEffectiveName())
+						.replaceDescription("{level}", String.valueOf(currentlevel+1)).convert()).queue();
 			} else {
 				Configloader.INSTANCE.setGuildConfig(guild, "levelmsgch", "");
 			}

@@ -22,23 +22,23 @@ public class IgnoreChannel implements Command{
 		guild = event.getGuild();
 		user = event.getUser();
 		if(!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/ignorechannel:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/ignorechannel:nopermission").convert()).queue();
 			return;
 		}
 		switch (event.getSubcommandName()) {
 		case "add":
 			Configloader.INSTANCE.addGuildConfig(guild, "ignored", event.getOption("channel").getAsGuildChannel().getId());
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/ignorechannel:successadd")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/ignorechannel:successadd").convert()).queue();
 			break;
 		case "list":
 			this.listignoredchannels(event);
 			break;
 		case "remove":
 			Configloader.INSTANCE.deleteGuildConfig(guild, "ignored", event.getOption("channel").getAsGuildChannel().getId());
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/ignorechannel:successremove")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/ignorechannel:successremove").convert()).queue();
 			break;
 		default:
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:fatal")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:fatal").convert()).queue();
 		}
 	}
 
@@ -61,11 +61,10 @@ public class IgnoreChannel implements Command{
 	private void listignoredchannels(SlashCommandInteractionEvent event) {
 		String channelids = Configloader.INSTANCE.getGuildConfig(guild, "ignored");
 		if (channelids.equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/ignorechannel:nochannels")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/ignorechannel:nochannels").convert()).queue();
 			return;
 		}
 		StringBuilder sb = new StringBuilder();
-		sb.append(AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/ignorechannel:list"));
 		String[] channelid = channelids.split(";");
 		for (int i = 0; i < channelid.length; i++) {
 			sb.append("#" + String.valueOf(i + 1) + " ");
@@ -74,7 +73,6 @@ public class IgnoreChannel implements Command{
 				sb.append("\n");
 			}
 		}
-		String title = AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/ignorechannel:list");
-		event.replyEmbeds(AnswerEngine.ae.buildMessage(title, sb.toString())).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/ignorechannel:list").replaceDescription("{list}", sb.toString()).convert()).queue();
 	}
 }

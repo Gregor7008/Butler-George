@@ -21,27 +21,27 @@ public class Join2Create implements Command{
 		final User user = event.getUser();
 		final String id = event.getOption("channel").getAsGuildChannel().getId();
 		if(!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/join2create:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/join2create:nopermission").convert()).queue();
 			return;
 		}
 		if (guild.getVoiceChannelById(id) == null) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:invalid")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:invalid").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:adderror")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:adderror").convert()).queue();
 			} else {
 				Configloader.INSTANCE.addGuildConfig(guild, "join2create", id);
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess").convert()).queue();
 			}
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
 				Configloader.INSTANCE.deleteGuildConfig(guild, "join2create", id);
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess").convert()).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remerror")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remerror").convert()).queue();
 			}
 		}
 	}

@@ -39,13 +39,13 @@ public class Bot {
 	private ModEngine modEngine;
 	public static String token, environment, homeID;
 	
-	public static void main(String[] arguments) {
-		if (arguments.length <= 0) {
+	public static void main(String[] args) {
+		if (args.length <= 0) {
 			System.out.println("You have to provide 1. a bot token, 2. the path to my resource folder!");
 			System.exit(0);
 		}
-		token = arguments[0];
-		environment = arguments[1];
+		token = args[0];
+		environment = args[1];
 		homeID = "708381749826289666";
 		try {
 			new Bot(token);
@@ -186,8 +186,7 @@ public class Bot {
     			}
     			if (!Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").equals("")) {
     				String cid = Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch");
-    				String msgid = guild.getTextChannelById(cid).sendMessageEmbeds(AnswerEngine.ae.buildMessage("Bot offline", ":warning: | I am going offline for maintenance!"
-        					+ "\n:information_source: | You won't be able to execute commands until I go online again!")).complete().getId();
+    				String msgid = guild.getTextChannelById(cid).sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getId();
         			Configloader.INSTANCE.setGuildConfig(guild, "offlinemsg", cid + "_" + msgid);
         		}
     		}

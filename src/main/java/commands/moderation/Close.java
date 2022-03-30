@@ -18,7 +18,7 @@ public class Close implements Command {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))) && !event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/close:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/close:nopermission").convert()).queue();
 			return;
 		}
 		if (event.getTextChannel().getName().contains("-support")) {
@@ -30,9 +30,7 @@ public class Close implements Command {
 			event.getTextChannel().delete().queue();
 			User cuser = Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cid));
 			Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getMailConfig1(cid)).openPrivateChannel().complete().sendMessageEmbeds(
-					AnswerEngine.ae.buildMessage(
-							AnswerEngine.ae.getTitle(guild, cuser, "/commands/moderation/close:closed"),
-							AnswerEngine.ae.getDescription(guild, cuser, "/commands/moderation/close:closed").replace("{reason}", event.getOption("reason").getAsString()))).queue();
+					AnswerEngine.ae.fetchMessage(guild, cuser, "/commands/moderation/close:closed").replaceDescription("{reason}", event.getOption("reason").getAsString()).convert()).queue();
 			Configloader.INSTANCE.removeMailConfig(cid);
 			try {
 				if (event.getOption("warning").getAsBoolean()) {
@@ -41,7 +39,7 @@ public class Close implements Command {
 				}
 			} catch (NullPointerException e) {}
 		} else {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/close:nochannel")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/close:nochannel").convert()).queue();
 		}
 	}
 

@@ -23,19 +23,19 @@ public class Goodbye implements Command {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/goodbye:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/goodbye:nopermission").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("set")) {
 			String message = event.getOption("message").toString();
 			String channelid = event.getOption("channel").getAsGuildChannel().getId();
 			Configloader.INSTANCE.setGuildConfig(guild, "goodbyemsg", message + ";" + channelid);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:setsuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
 			Configloader.INSTANCE.setGuildConfig(guild, "goodbyemsg", "");
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:offsuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:offsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
@@ -49,9 +49,9 @@ public class Goodbye implements Command {
 							.replace("{membercount}", Integer.toString(guild.getMemberCount()))
 							.replace("{timejoined}", event.getMember().getTimeJoined().format(formatter)).replace("{date}", currentdate);
 				guild.getTextChannelById(goodbyemsg[1]).sendMessage(msg).queue();
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/goodbye:testsuccess")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/goodbye:testsuccess").convert()).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:nonedefined")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:nonedefined").convert()).queue();
 			}
 		}
 	}

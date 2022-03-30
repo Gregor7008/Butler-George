@@ -45,7 +45,7 @@ public class Poll implements Command{
 		user = event.getUser();
 		guild = event.getGuild();
 		if (!event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:nopermission").convert()).queue();
 			return;
 		}
 		switch (event.getSubcommandName()) {
@@ -62,7 +62,7 @@ public class Poll implements Command{
 			this.infoPoll(event);
 			break;
 		default:
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:fatal")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:fatal").convert()).queue();
 		}
 	}
 
@@ -86,7 +86,7 @@ public class Poll implements Command{
 	private void createPoll(SlashCommandInteractionEvent event) {
 		tempname = String.valueOf(new Random().nextInt(100));
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:definetitle")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:definetitle").convert()).queue();
 		messagecount++;
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -101,12 +101,12 @@ public class Poll implements Command{
 								  this.definedescr();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definedescr() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:definedescr")).queue();
+		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:definedescr").convert()).queue();
 		messagecount++;
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -117,12 +117,12 @@ public class Poll implements Command{
 								  this.defineAnswers();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineAnswers() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:defineAnswers")).queue();
+		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:defineAnswers").convert()).queue();
 		messagecount++;
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -133,12 +133,12 @@ public class Poll implements Command{
 								  this.defineThumbnail();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineThumbnail() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:defineTNURL")).queue();
+		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:defineTNURL").convert()).queue();
 		messagecount++;
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -153,12 +153,12 @@ public class Poll implements Command{
 								  this.defineDays();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineDays() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:definedays")).queue();
+		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:definedays").convert()).queue();
 		messagecount++;
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
@@ -168,12 +168,12 @@ public class Poll implements Command{
 								  this.defineAnonymous();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineAnonymous() {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		Message msg = channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:defineanonymous")).complete();
+		Message msg = channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:defineanonymous").convert()).complete();
 		msg.addReaction("U+2705").queue();
 		msg.addReaction("U+274C").queue();
 		messagecount++;
@@ -185,7 +185,7 @@ public class Poll implements Command{
 								  this.sendPoll();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void sendPoll() {
@@ -203,7 +203,7 @@ public class Poll implements Command{
 			}
 		}
 		
-		String footer = OffsetDateTime.now().format(formatter) + "\s--\s"+ AnswerEngine.ae.getDescription(guild, user, "/commands/utilities/poll:field") + "\s" + String.valueOf(anym);
+		String footer = OffsetDateTime.now().format(formatter) + "\s--\s"+ AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/poll:field1") + "\s" + String.valueOf(anym);
 		eb.setAuthor(user.getName(), null, user.getAvatarUrl());
 		if (!url.equals("")) {
 			eb.setThumbnail(url);
@@ -212,7 +212,7 @@ public class Poll implements Command{
 		eb.setDescription(description);
 		eb.setFooter(footer);
 		Configloader.INSTANCE.setPollConfig(guild, tempname, "footer", footer);
-		eb.addField(AnswerEngine.ae.getTitle(guild, user, "/commands/utilities/poll:field"), sb.toString(), false);
+		eb.addField(AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/poll:field"), sb.toString(), false);
 		eb.setColor(56575);
 		
 		Message msg = channel.sendMessageEmbeds(eb.build()).complete();
@@ -243,16 +243,15 @@ public class Poll implements Command{
 		TextChannel channel = guild.getTextChannelById(Configloader.INSTANCE.getPollConfig(guild, msgID, "channel"));
 		channel.retrieveMessageById(msgID).complete().delete().queue();
 		if (Configloader.INSTANCE.findPollConfig(guild, msgID).delete()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:removesuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:removesuccess").convert()).queue();
 		} else {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:removefailed")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:removefailed").convert()).queue();
 		}
 	}
 	
 	private void listPoll(SlashCommandInteractionEvent event) {
 		File fl = new File(Bot.environment + "/configs/polls/" + guild.getId());
 		StringBuilder sb = new StringBuilder();
-		EmbedBuilder eb = new EmbedBuilder();
 		List<String> pollfiles = Arrays.asList(fl.list(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
@@ -267,25 +266,20 @@ public class Poll implements Command{
 				sb.append(Bot.INSTANCE.jda.getUserById(Configloader.INSTANCE.getPollConfig(guild, temp[0], "user")).getName() + "\n");
 			}
 		}
-		eb.setTitle(AnswerEngine.ae.getTitle(guild, user, "/commands/utilities/poll:list"));
-		eb.setAuthor(user.getName(), null, user.getAvatarUrl());
-		eb.setFooter("Official-NoLimits Bot! - discord.gg/qHA2vUs");
-		eb.setColor(56575);
 		if (sb.toString().equals("")) {
-			eb.setDescription(AnswerEngine.ae.getDescription(guild, user, "/commands/utilities/poll:list"));
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/poll:list").setAuthor(event.getMember()).convert()).queue();
 		} else {
-			eb.setDescription(sb.toString());
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/poll:list").setAuthor(event.getMember()).setDescription(sb.toString()).convert()).queue();
 		}
-		event.replyEmbeds(eb.build()).queue();
 	}
 	
 	private void infoPoll(SlashCommandInteractionEvent event) {
 		if (Configloader.INSTANCE.findPollConfig(guild, event.getOption("msgid").getAsString()) == null) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:pollnf")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/poll:pollnf").convert()).queue();
 			return;
 		}
 		if (!Configloader.INSTANCE.getPollConfig(guild, event.getOption("msgid").getAsString(), "owner").equals(user.getId())) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/poll:noinfoperm")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/poll:noinfoperm").convert()).queue();
 			return;
 		}
 		EmbedBuilder eb = new EmbedBuilder();

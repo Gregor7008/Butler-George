@@ -23,8 +23,9 @@ public class AutoModerator {
 			if (event.getMessage().getContentRaw().toLowerCase().contains(singleword[i].toLowerCase())) {
 				Configloader.INSTANCE.addUserConfig(event.getGuild(), event.getAuthor(), "warnings", "Rude behavior");
 				try {
-					event.getMember().getUser().openPrivateChannel().queue(channel -> {
-						 channel.sendMessageEmbeds(AnswerEngine.ae.buildMessage(":warning: You have been warned :warning:", "Server:\n=> " + event.getGuild().getName() + "\nReason:\n=> Rude behavior")).queue();});
+					event.getMember().getUser().openPrivateChannel().complete()
+						 .sendMessageEmbeds(AnswerEngine.ae.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")
+								 .replaceDescription("{guild}", event.getGuild().getName()).convert()).queue();
 				} catch (Exception e) {e.printStackTrace();}
 				event.getMessage().delete().queue();
 				Bot.INSTANCE.penaltyCheck(event.getGuild());

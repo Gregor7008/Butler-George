@@ -19,7 +19,7 @@ public class Cleanup implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/cleanup:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/cleanup:nopermission").convert()).queue();
 			return;
 		}
 		File guilddir = new File(Bot.environment + "/configs/user/" + guild.getId());
@@ -30,7 +30,7 @@ public class Cleanup implements Command{
 				ufiles[i].delete();
 			}
 		}
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/cleanup:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/cleanup:success").convert()).queue();
 	}
 
 	@Override

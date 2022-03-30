@@ -20,7 +20,7 @@ public class ForbiddenWords implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:nopermission").convert()).queue();
 			return;
 		}
 		switch (event.getSubcommandName()) {
@@ -30,7 +30,7 @@ public class ForbiddenWords implements Command{
 			for (int i = 0; i < splitadd.length; i++) {
 				Configloader.INSTANCE.addGuildConfig(guild, "forbidden", splitadd[i]);
 			}
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:addsuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:addsuccess").convert()).queue();
 			break;
 		case "remove":
 			String rawremove = event.getOption("words").getAsString();
@@ -38,27 +38,25 @@ public class ForbiddenWords implements Command{
 			for (int i = 0; i < splitremove.length; i++) {
 				Configloader.INSTANCE.deleteGuildConfig(guild, "forbidden", splitremove[i]);
 			}
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:removesuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:removesuccess").convert()).queue();
 			break;
 		case "set":
 			String rawset = event.getOption("words").getAsString();
 			String finalset = rawset.replaceAll(";\\s", ";");
 			Configloader.INSTANCE.setGuildConfig(guild, "forbidden", finalset);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:setsuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:setsuccess").convert()).queue();
 			break;
 		case "clear":
 			Configloader.INSTANCE.setGuildConfig(guild, "forbidden", "");
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:clearsuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:clearsuccess").convert()).queue();
 			break;
 		case "list":
 			String rawlist = Configloader.INSTANCE.getGuildConfig(guild, "forbidden");
 			String finallist = rawlist.replaceAll(";", ", ");
-			String title = AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/forbiddenwords:list");
-			String description = AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/forbiddenwords:list");
-			event.replyEmbeds(AnswerEngine.ae.buildMessage(title, description + finallist)).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:list").replaceDescription("{list}", finallist).convert()).queue();
 			break;
 		default:
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:fatal")).queue() ;
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:fatal").convert()).queue() ;
 		}
 	}
 

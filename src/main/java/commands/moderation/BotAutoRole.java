@@ -24,19 +24,19 @@ public class BotAutoRole implements Command{
 		guild = event.getGuild();
 		user = event.getUser();
 		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:nopermission").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			Role role = event.getOption("addrole").getAsRole();
 			Configloader.INSTANCE.addGuildConfig(guild, "botautoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:addsuccess")).queue();;
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:addsuccess").convert()).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
 			Configloader.INSTANCE.deleteGuildConfig(guild, "botautoroles", role.getId());
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
@@ -64,11 +64,11 @@ public class BotAutoRole implements Command{
 		StringBuilder sB = new StringBuilder();
 		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "botautoroles");
 		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:nobotautoroles")).queue();;
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:nobotautoroles").convert()).queue();;
 			return;
 		}
 		if (!currentraw.contains(";")) {
-			event.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/botautorole:list"), "#1\s\s" + guild.getRoleById(currentraw).getAsMention())).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "commands/moderation/botautorole:list").replaceDescription("{list}",  "#1\s\s" + guild.getRoleById(currentraw).getAsMention()).convert()).queue();
 			return;
 		}
 		String[] current = currentraw.split(";");
@@ -81,6 +81,6 @@ public class BotAutoRole implements Command{
 				sB.append(guild.getRoleById(current[i-1]).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(AnswerEngine.ae.buildMessage(AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/botautorole:list"), sB.toString())).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/botautorole:list").replaceDescription("{list}", sB.toString()).convert()).queue();
 	}
 }

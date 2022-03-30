@@ -27,7 +27,8 @@ public class ModEngine {
 		File guilddir = new File(Bot.environment + "/configs/user/" + guild.getId());
 		List<Member> members = guild.loadMembers().get();
 		for (int i = 0; i < members.size(); i++) {
-			User user = members.get(i).getUser();
+			Member member = members.get(i);
+			User user = member.getUser();
 			//Check the user
 			if (guilddir.exists() && !user.isBot()){
 				File pFile = new File(Bot.environment + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
@@ -35,12 +36,12 @@ public class ModEngine {
 					//Check for tempmute properties
 					if (!Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempmuted"))) {
 						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
-							if (!guild.getMember(user).isTimedOut()) {
-								guild.getMember(user).timeoutFor(28, TimeUnit.DAYS).queue();
+							if (!member.isTimedOut()) {
+								member.timeoutFor(27, TimeUnit.DAYS).queue();
 							}
 						} else {
-							if (guild.getMember(user).isTimedOut()) {
-								guild.getMember(user).removeTimeout().queue();
+							if (member.isTimedOut()) {
+								member.removeTimeout().queue();
 							}
 						}
 					} else {

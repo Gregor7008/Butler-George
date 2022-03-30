@@ -21,20 +21,20 @@ public class Stop implements Command{
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:notconnected")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:notconnected").convert()).queue();
 			return;
 		}
 		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:nopermission")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:nopermission").convert()).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:nopermission").convert()).queue();
 			return;
 		}
 		this.stopandleave(guild);
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:stopped")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/stop:stopped").convert()).queue();
 	}
 
 	@Override

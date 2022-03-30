@@ -18,33 +18,33 @@ public class Move implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "supportrole").equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/command/moderation/move:norole")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/command/moderation/move:norole").convert()).queue();
 			return;
 		}
 		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")))) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nopermission").convert()).queue();
 			return;
 		}
 		if (Configloader.INSTANCE.getGuildConfig(guild, "supporttalk").equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
 		if (!guild.getMember(event.getOption("member").getAsUser()).getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:memnotconn")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:memnotconn").convert()).queue();
 			return;
 		}
 		String vcid = Configloader.INSTANCE.getGuildConfig(guild, "supporttalk");
 		VoiceChannel st = guild.getVoiceChannelById(vcid);
 		if (st == null) {
 			Configloader.INSTANCE.deleteGuildConfig(guild, "supporttalk", vcid);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
 		if (st.getMembers().contains(event.getMember())) {
 			guild.moveVoiceMember(guild.getMember(event.getOption("member").getAsUser()), st).queue();
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:success")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:success").convert()).queue();
 		} else {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:notconnected")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:notconnected").convert()).queue();
 		}
 	}
 

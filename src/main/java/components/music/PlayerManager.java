@@ -16,6 +16,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import components.base.AnswerEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class PlayerManager {
@@ -48,6 +49,8 @@ public class PlayerManager {
 	}
 	
 	public void loadAndPlay(SlashCommandInteractionEvent event, String trackURL ) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
 		TextChannel channel = event.getTextChannel();
 		final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
 		this.audioPlayerManager.loadItemOrdered(musicManager, trackURL, new AudioLoadResultHandler() {
@@ -55,7 +58,9 @@ public class PlayerManager {
 			@Override
 			public void trackLoaded(AudioTrack track) {
 				musicManager.scheduler.queue(track);
-				event.replyEmbeds(AnswerEngine.ae.buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/music/playermanager:track")
+						.replaceDescription("{track}", track.getInfo().title)
+						.replaceDescription("{author}", track.getInfo().author).convert()).queue();
 			}
 			
 			@Override
@@ -65,24 +70,28 @@ public class PlayerManager {
 					for (final AudioTrack track : tracks) {
 						musicManager.scheduler.queue.add(track);
 					}
-					event.replyEmbeds(AnswerEngine.ae.buildMessage("Success!",":white_check_mark: | The playlist `" + playlist.getName() + "` with `" + String.valueOf(tracks.size()) + "` tracks was added to the queue!")).queue();
+					event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/music/playermanager:list")
+							.replaceDescription("{name}", playlist.getName())
+							.replaceDescription("{author}", String.valueOf(playlist.getTracks().size())).convert()).queue();
 					return;
 				} else {
 					AudioTrack track = tracks.get(0);
 					musicManager.scheduler.queue(track);
-					event.replyEmbeds(AnswerEngine.ae.buildMessage("Success!",":white_check_mark: | `" + track.getInfo().title + "` by `" + track.getInfo().author + "` was added to the queue!")).queue();
+					event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/music/playermanager:track")
+							.replaceDescription("{track}", track.getInfo().title)
+							.replaceDescription("{author}", track.getInfo().author).convert()).queue();
 				}
 			}
 			
 			@Override
 			public void noMatches() {
-				event.replyEmbeds(AnswerEngine.ae.buildMessage("Error!",":x: | I'm sorry, but I couldn't find anything for your search term!")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/music/playermanager:nomatch").convert()).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			}
 			
 			@Override
 			public void loadFailed(FriendlyException exception) {
-				event.replyEmbeds(AnswerEngine.ae.buildMessage("Error!",":x: | I'm sorry, but I couldn't load your song...")).queue();
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/music/playermanager:fail").convert()).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			}
 		});

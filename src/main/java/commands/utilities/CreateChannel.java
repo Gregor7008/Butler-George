@@ -25,15 +25,15 @@ public class CreateChannel implements Command{
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
 		if (Configloader.INSTANCE.getGuildConfig(guild, "ccrole").equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:norole")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:norole").convert()).queue();
 			return;
 		}
 		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "ccrole")))) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission").convert()).queue();
 			return;
 		}
 		this.createTextChannel(guild, user, name);
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/createchannel:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/createchannel:success").convert()).queue();
 	}
 
 	@Override

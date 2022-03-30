@@ -41,7 +41,7 @@ public class Level implements Command {
 			user = event.getUser();
 		}
 		if (guild.getMember(user).getEffectiveName().equals(guild.getSelfMember().getEffectiveName())) {
-			event.replyEmbeds(AnswerEngine.ae.buildMessage("...", ":face_exhaling: | You think you're funny or what?")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "eastereggs:3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		event.reply("...   ...   ...   ...").queue();

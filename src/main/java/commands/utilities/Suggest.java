@@ -28,16 +28,16 @@ public class Suggest implements Command{
 		final Guild guild = event.getGuild();
 		String channelid = Configloader.INSTANCE.getGuildConfig(guild, "suggest");
 		if (channelid.equals(null)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
 			return;
 		}
 		OffsetDateTime lastsuggestion = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "lastsuggestion"));
 		if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:nospam")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
 			return;
 		}
 		this.sendsuggestion(guild, event.getMember(), event.getOption("suggestion").getAsString());
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:success")).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:success").convert()).queue();
 	}
 
 	@Override

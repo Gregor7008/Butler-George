@@ -20,13 +20,11 @@ public class Mute implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, event.getUser(),"/commands/moderation/mute:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, event.getUser(),"/commands/moderation/mute:nopermission").convert()).queue();
 			return;
 		}
 		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
-		event.replyEmbeds(AnswerEngine.ae.buildMessage(
-				AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/mute:success"),
-				AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/mute:success").replace("{user}", user.getName()))).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/mute:success").replaceDescription("{user}", user.getName()).convert()).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}
 

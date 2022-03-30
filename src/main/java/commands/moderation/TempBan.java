@@ -22,13 +22,13 @@ public class TempBan implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		if (!event.getMember().hasPermission(Permission.BAN_MEMBERS)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, event.getUser(),"/commands/moderation/tempban:nopermission")).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, event.getUser(),"/commands/moderation/tempban:nopermission").convert()).queue();
 			return;
 		}
 		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), guild, user);
-		event.replyEmbeds(AnswerEngine.ae.buildMessage(
-				AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/tempban:success"),
-				AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/tempban:success").replace("{user}", user.getName()).replace("{time}", event.getOption("days").getAsString()))).queue();
+		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/tempban:success")
+				.replaceDescription("{user}", user.getName())
+				.replaceDescription("{time}", event.getOption("days").getAsString()).convert()).queue();
 	}
 
 	@Override
