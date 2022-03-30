@@ -63,13 +63,15 @@ public class Processor extends ListenerAdapter {
 			//automoderation
 			AutoModerator.getInstance().messagereceived(event);
 			//ModMail
-			if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getId()) != null) {
-				if (user.isBot()) {
+			if (Bot.INSTANCE.jda.getGuildById(Bot.homeID) != null) {
+				if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getId()) != null) {
+					if (user.isBot()) {
+						return;
+					}
+					PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(Configloader.INSTANCE.getMailConfig1(event.getChannel().getId())).complete();
+					pc.sendMessage(event.getMessage().getContentDisplay()).queue();
 					return;
 				}
-				PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(Configloader.INSTANCE.getMailConfig1(event.getChannel().getId())).complete();
-				pc.sendMessage(event.getMessage().getContentDisplay()).queue();
-				return;
 			}
 			//Suggestions
 			String suggestid = Configloader.INSTANCE.getGuildConfig(guild, "suggest");
@@ -124,7 +126,7 @@ public class Processor extends ListenerAdapter {
 			}
 		}
 		//initialize Slashcommands
-		CommandListUpdateAction clua = Bot.INSTANCE.jda.updateCommands();
+		CommandListUpdateAction clua = event.getJDA().updateCommands();
 		CommandList utilitycmdList = new CommandList();
 		List<String> utilitycmdnames = new ArrayList<>();
 		utilitycmdnames.addAll(utilitycmdList.utilitycmds.keySet());

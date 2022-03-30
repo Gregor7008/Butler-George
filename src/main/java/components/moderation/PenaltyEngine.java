@@ -1,11 +1,11 @@
 package components.moderation;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import base.Bot;
-import commands.moderation.TempBan;
-import commands.moderation.TempMute;
 import components.base.Configloader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -67,18 +67,25 @@ public class PenaltyEngine {
 						}
 						if (penalty.contains("tempmute")) {
 							String[] temp1 = penalty.split("_");
-							TempMute tm = new TempMute();
-							tm.tempmute(Integer.valueOf(temp1[1]), guild, user);
+							Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "true");
+							guild.getMember(user).timeoutFor(Integer.valueOf(temp1[1]), TimeUnit.DAYS).queue();
 							return;
 						}
 						if (penalty.contains("tempban")) {
 							String[] temp1 = penalty.split("_");
-							TempBan tb = new TempBan();
-							tb.tempban(Integer.valueOf(temp1[1]), guild, user);
+							this.tempban(Integer.valueOf(temp1[1]), guild, user);
 							return;
 						}
 				}
 			}
 		}
 	}
+	
+	private void tempban(int days, Guild guild, User user) {
+		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
+		Configloader.INSTANCE.setUserConfig(guild, user, "tbuntil", until.toString());
+		Configloader.INSTANCE.setUserConfig(guild, user, "tempbanned", "true");
+		guild.getMember(user).ban(0).queue();
+		Bot.INSTANCE.modCheck(guild);
+	}	
 }

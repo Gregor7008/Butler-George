@@ -1,6 +1,6 @@
 package commands.moderation;
 
-import java.time.OffsetDateTime;
+import java.util.concurrent.TimeUnit;
 
 import base.Bot;
 import commands.Command;
@@ -44,11 +44,9 @@ public class TempMute implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/tempmute:help");
 	}
 	
-	public void tempmute(int days, Guild guild, User user) {
-		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
-		Configloader.INSTANCE.setUserConfig(guild, user, "tmuntil", until.toString());
+	private void tempmute(int days, Guild guild, User user) {
 		Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "true");
-		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
+		guild.getMember(user).timeoutFor(days, TimeUnit.DAYS).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}
 }

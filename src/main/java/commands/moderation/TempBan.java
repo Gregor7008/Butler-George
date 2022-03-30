@@ -44,7 +44,7 @@ public class TempBan implements Command{
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/tempban:help");
 	}
 	
-	public void tempban(int days, Guild guild, User user) {
+	private void tempban(int days, Guild guild, User user) {
 		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
 		Configloader.INSTANCE.setUserConfig(guild, user, "tbuntil", until.toString());
 		Configloader.INSTANCE.setUserConfig(guild, user, "tempbanned", "true");

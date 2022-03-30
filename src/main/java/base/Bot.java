@@ -37,7 +37,7 @@ public class Bot {
 	private EventWaiter eventWaiter = new EventWaiter();
 	private PenaltyEngine penaltyEngine;
 	private ModEngine modEngine;
-	public static String token, environment, noliID;
+	public static String token, environment, homeID;
 	
 	public static void main(String[] arguments) {
 		if (arguments.length <= 0) {
@@ -46,7 +46,7 @@ public class Bot {
 		}
 		token = arguments[0];
 		environment = arguments[1];
-		noliID = "708381749826289666";
+		homeID = "708381749826289666";
 		try {
 			new Bot(token);
 		} catch (LoginException | InterruptedException | IOException ex) {

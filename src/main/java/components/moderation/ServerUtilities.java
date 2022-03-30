@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.Role;
 public class ServerUtilities {
 	
 	public void rolecheck() {
-		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
+		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
 		final List<Member> members = guild.getMembers();
 		Role gr1 = guild.getRoleById("837742608604332052");
 		int gr1p = gr1.getPosition();
@@ -51,7 +51,11 @@ public class ServerUtilities {
 	}
 	
 	public void controlChannels(boolean action) {
-		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
+		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
+		if (guild == null) {
+			System.out.println("Couldn't find home guild!");
+			return;
+		}
 		if (action) {
 			guild.getTextChannelById("937825700243726387").upsertPermissionOverride(guild.getPublicRole()).grant(Permission.VIEW_CHANNEL).queue();
 		} else {

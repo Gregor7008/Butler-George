@@ -1,5 +1,6 @@
 package commands.moderation;
 
+import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
@@ -22,10 +23,11 @@ public class Mute implements Command{
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, event.getUser(),"/commands/moderation/mute:nopermission")).queue();
 			return;
 		}
-		this.mute(guild, user);
+		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
 		event.replyEmbeds(AnswerEngine.ae.buildMessage(
 				AnswerEngine.ae.getTitle(guild, user, "/commands/moderation/mute:success"),
 				AnswerEngine.ae.getDescription(guild, user, "/commands/moderation/mute:success").replace("{user}", user.getName()))).queue();
+		Bot.INSTANCE.modCheck(guild);
 	}
 
 	@Override
@@ -38,10 +40,5 @@ public class Mute implements Command{
 	@Override
 	public String getHelp(Guild guild, User user) {
 		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/mute:help");
-	}
-	
-	public void mute(Guild guild, User user) {
-		Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "false");
-		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
 	}
 }

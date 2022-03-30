@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class ModMail {
 
 	public ModMail(MessageReceivedEvent event) {
-		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
+		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
 		User user = event.getAuthor();
 		if (user.isBot()) {
 			return;
@@ -61,7 +61,7 @@ public class ModMail {
 	}
 	
 	private void processMessage(MessageReceivedEvent event) {
-		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
+		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
 		Role support = guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"));
 		if (Configloader.INSTANCE.getGuildConfig(guild, "supportcategory").equals("")) {
 			Category ctg = guild.createCategory("----------📝 Tickets ------------").complete();
@@ -75,7 +75,7 @@ public class ModMail {
 	}
 	
 	private void processAnonymousMessage(MessageReceivedEvent event) {
-		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.noliID);
+		Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
 		Role support = guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"));
 		int rn = new Random().nextInt(100);
 		if (Configloader.INSTANCE.getGuildConfig(guild, "supportcategory").equals("")) {

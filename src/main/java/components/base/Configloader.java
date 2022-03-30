@@ -149,8 +149,8 @@ public class Configloader {
 		File pFile = new File(respath + "/configs/guild/" + guild.getId() + ".properties");
 		if (!pFile.exists()) {
 			try {
-				FileOutputStream fop = new FileOutputStream(pFile);
 				pFile.createNewFile();
+				FileOutputStream fop = new FileOutputStream(pFile);
 				pps.setProperty("welcomemsg", "");
 				pps.setProperty("goodbyemsg", "");
 				pps.setProperty("join2create", "");
@@ -191,12 +191,11 @@ public class Configloader {
 		File pFile = new File( respath + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
 		if (!pFile.exists()) {
 			try {
-				FileOutputStream fop = new FileOutputStream(pFile);
 				pFile.createNewFile();
+				FileOutputStream fop = new FileOutputStream(pFile);
 				pps.setProperty("warnings", "");
 				pps.setProperty("muted", "false");
 				pps.setProperty("tempmuted", "false");
-				pps.setProperty("tmuntil", "");
 				pps.setProperty("tempbanned", "false");
 				pps.setProperty("tbuntil", "");
 				pps.setProperty("lastxpgotten", OffsetDateTime.now().toString());
@@ -234,8 +233,8 @@ public class Configloader {
 		}
 		File pollpropertiesFile = new File(respath + "/configs/polls/" + guild.getId() + "/" + title + ".properties");
 		try {
-			FileOutputStream fop = new FileOutputStream(pollpropertiesFile);
 			pollpropertiesFile.createNewFile();
+			FileOutputStream fop = new FileOutputStream(pollpropertiesFile);
 			pps.setProperty("description", "");
 			pps.setProperty("title", "");
 			pps.setProperty("answers", "");

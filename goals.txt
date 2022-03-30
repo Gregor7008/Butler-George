@@ -2,9 +2,6 @@ In Developement:
 -> [none]
 -------------------
 In Planning:
--> [none]
--------------------
-For Version 2:
 -> Fixing the giveaway command
 -> Join2Create Channel with user limit & setting for visibility to users (to make j2c channels invisible when bot's offline)
 -> Reactionrole custom emoji integration (for server emojis)
@@ -23,6 +20,7 @@ For Version 2:
 -> Modmail processing whilst offline (process in delay)
 -> Warning List bei Usern, die nicht mehr auf dem Server sind, per User ID (selbständig erkennen & verarbeiten)
 	=> Warning.java Zeile 104
+-> New Logo Design
 -------------------
 For Version 3:
 -> Disable action row components on interaction/timeout
