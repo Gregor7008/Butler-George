@@ -3,7 +3,7 @@ In Developement:
 -> Multi-Language implemented in SelectionMenus
 -------------------
 In Planning:
--> Fixing the giveaway command
+-> Reimplement giveaway command
 -> Join2Create Channel with user limit & setting for visibility to users (to make j2c channels invisible when bot's offline)
 -> Reactionrole custom emoji integration (for server emojis)
 -> Full Wiki-Documentation on github

@@ -76,7 +76,6 @@ public class CommandList {
 		this.utilitycmds.put("channelpermission", new Channelpermission());
 		this.utilitycmds.put("pingandmove", new PingAndMove());
 		this.utilitycmds.put("leave", new Leave());
-		//this.utilitycmds.put("giveaway", new Giveaway());
 		
 		//Moderation
 		this.moderationcmds.put("penalty", new Penalty());
