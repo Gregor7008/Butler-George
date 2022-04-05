@@ -44,7 +44,7 @@ public class Level implements Command {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "eastereggs:3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		event.reply("...   ...   ...   ...").queue();
+		event.reply("...").queue();
 		File finalimage = this.renderLevelcard(user, guild);
         event.getHook().editOriginal("").addFile(finalimage).queue();
 	}
@@ -82,13 +82,13 @@ public class Level implements Command {
 		int progress = this.calculateProgress(level, nedxp, curxp);
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(new File(Bot.environment + "/levelcards/" + levelbackground + ".png"));
-		} catch (IOException e) {
+			image = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("levelcards/" + levelbackground + ".png"));
+		} catch (IOException | NullPointerException e) {
 			e.printStackTrace();
 			return null;
 		}
 		BufferedImage avatar = null;
-		File avfile = new File(Bot.environment + "/levelcards/cache/avatar.png");
+		File avfile = new File(Bot.environment + "/cache/avatar.png");
 		try {
 			URL url = new URL(iuser.getAvatarUrl());
 			FileUtils.copyURLToFile(url, avfile);
@@ -125,7 +125,7 @@ public class Level implements Command {
         g2d.drawImage(this.makeRoundedCorner(progressbar, 30), 290, 185, null);
 		//export the image and respond to the event
 		g2d.dispose();
-		File finalimage = new File(Bot.environment + "/levelcards/cache/temp.png");
+		File finalimage = new File(Bot.environment + "/cache/temp.png");
 		try {
 			ImageIO.write(image, "png", finalimage);
 		}catch (IOException e) {

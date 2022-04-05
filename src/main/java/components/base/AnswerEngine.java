@@ -1,11 +1,8 @@
 package components.base;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
-import base.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -39,12 +36,12 @@ public class AnswerEngine {
 	}
 	
 	private String getTitle(Guild guild, User user, String input) {
-		String[] temp1 = this.getRaw(guild, user, input).split(";\\s+");
+		String[] temp1 = this.getRaw(guild, user, input).split("; ");
 		return temp1[0];
 	}
 
 	private String getDescription(Guild guild, User user, String input) {
-		String[] temp1 = this.getRaw(guild, user, input).split(";\\s+");
+		String[] temp1 = this.getRaw(guild, user, input).split("; ");
 		return temp1[1];
 	}
 	
@@ -56,12 +53,12 @@ public class AnswerEngine {
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];
-		File propertiesFile = new File(Bot.environment + "/languages/" + lang + "/" + path + ".properties");
 		Properties properties = new Properties();
-		
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(propertiesFile))) {
-			properties.load(bis);
-		} catch (Exception e) {}
+		try {
+			properties.load(this.getClass().getClassLoader().getResourceAsStream("languages/" + lang + path + ".properties"));
+		} catch (NullPointerException | IOException e) {
+			return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
+		}
 		String temp2 = properties.getProperty(key);
 		return temp2;
 	}

@@ -1,8 +1,9 @@
 In Developement:
--> Including language files in the compiled .jar file
+-> Creating Resource-Folder all by itself (if not already in existance)
 -> Multi-Language implemented in SelectionMenus
 -------------------
 In Planning:
+-> Removal of Config Files => Moving on to SQL Database
 -> Reimplement giveaway command
 -> Join2Create Channel with user limit & setting for visibility to users (to make j2c channels invisible when bot's offline)
 -> Reactionrole custom emoji integration (for server emojis)

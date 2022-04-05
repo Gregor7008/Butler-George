@@ -68,7 +68,7 @@ public class BotAutoRole implements Command{
 			return;
 		}
 		if (!currentraw.contains(";")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "commands/moderation/botautorole:list").replaceDescription("{list}",  "#1\s\s" + guild.getRoleById(currentraw).getAsMention()).convert()).queue();
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/botautorole:list").replaceDescription("{list}",  "#1\s\s" + guild.getRoleById(currentraw).getAsMention()).convert()).queue();
 			return;
 		}
 		String[] current = currentraw.split(";");
