@@ -1,6 +1,6 @@
 target/
 .settings/
 .classpath
+.project
 bin/
 src/test/
-NoLimits-Bot - Resources/configs/
