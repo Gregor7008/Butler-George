@@ -31,7 +31,7 @@ public class AnswerEngine {
 		eb.setDescription(description);
 		eb.setFooter(footer);
 		MessageEmbed embed = eb.build();
-		return new AnswerEditor(embed).convert();
+		return embed;
 	}
 	
 	public String getTitle(Guild guild, User user, String input) {
