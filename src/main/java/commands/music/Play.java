@@ -52,7 +52,7 @@ public class Play implements Command{
 				vc.getManager().setUserLimit(vc.getUserLimit() + 1).queue();
 			}
 		}
-		if (!isURL(argument)) {
+		if (!this.isURL(argument)) {
 			String term = "ytsearch:" + argument;
 			musicManager.scheduler.player.setVolume(15);
 			PlayerManager.getInstance().loadAndPlay(event, term);
