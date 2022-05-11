@@ -4,7 +4,6 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -19,10 +18,6 @@ public class Mute implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
-		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, event.getUser(),"/commands/moderation/mute:nopermission").convert()).queue();
-			return;
-		}
 		Configloader.INSTANCE.setUserConfig(guild, user, "muted", "true");
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/mute:success").replaceDescription("{user}", user.getName()).convert()).queue();
 		Bot.INSTANCE.modCheck(guild);

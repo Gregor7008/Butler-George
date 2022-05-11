@@ -148,9 +148,9 @@ public class Channelpermission implements Command{
 			}
 		} else {
 			if (action) {
-				channel.getPermissionContainer().putPermissionOverride(pholder).setAllow(this.convertToPerm(selected)).queue();
+				channel.getPermissionContainer().upsertPermissionOverride(pholder).setAllowed(this.convertToPerm(selected)).queue();
 			} else {
-				channel.getPermissionContainer().putPermissionOverride(pholder).setDeny(this.convertToPerm(selected)).queue();
+				channel.getPermissionContainer().upsertPermissionOverride(pholder).setDenied(this.convertToPerm(selected)).queue();
 			}
 		}
 	}
@@ -180,9 +180,9 @@ public class Channelpermission implements Command{
 			}
 		} else {
 			if (action) {
-				category.putPermissionOverride(pholder).setAllow(this.convertToPerm(selected)).queue();
+				category.upsertPermissionOverride(pholder).setAllowed(this.convertToPerm(selected)).queue();
 			} else {
-				category.putPermissionOverride(pholder).setDeny(this.convertToPerm(selected)).queue();
+				category.upsertPermissionOverride(pholder).setDenied(this.convertToPerm(selected)).queue();
 			}
 		}
 	}

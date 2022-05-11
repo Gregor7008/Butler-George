@@ -3,7 +3,6 @@ package commands.moderation;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -19,10 +18,6 @@ public class ForbiddenWords implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:nopermission").convert()).queue();
-			return;
-		}
 		switch (event.getSubcommandName()) {
 		case "add":
 			String rawadd = event.getOption("words").getAsString();

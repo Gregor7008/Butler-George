@@ -26,12 +26,6 @@ public class Warning implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		if (Configloader.INSTANCE.getGuildConfig(guild, "modrole").equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/warning:nomodrole").convert()).queue();
-		}
-		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/warning:nopermission").convert()).queue();
-		}
 		if (event.getSubcommandName().equals("add")) {
 			final User iuser = event.getOption("user").getAsUser();
 			String reason;

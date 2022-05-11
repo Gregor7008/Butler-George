@@ -1,14 +1,10 @@
 package base;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Writer;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.security.auth.login.LoginException;
 
@@ -17,6 +13,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import components.base.AnswerEngine;
 import components.base.Configcheck;
 import components.base.Configloader;
+import components.base.ConsoleEngine;
 import components.moderation.ModEngine;
 import components.moderation.PenaltyEngine;
 import components.moderation.ServerUtilities;
@@ -37,6 +34,8 @@ public class Bot {
 	private EventWaiter eventWaiter = new EventWaiter();
 	private PenaltyEngine penaltyEngine;
 	private ModEngine modEngine;
+	public ConsoleEngine consoleEngine;
+	private Timer timer = new Timer();
 	public static String token, environment, homeID;
 	
 	public static void main(String[] args) {
@@ -60,117 +59,21 @@ public class Bot {
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
 		builder.setRawEventsEnabled(true);
-		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES);
+		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_PRESENCES);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing("V1.3-beta"));
-	    new ServerUtilities().controlChannels(true);
-	    new AnswerEngine();
 	    penaltyEngine = new PenaltyEngine();
 	    modEngine = new ModEngine();
-	    this.readConsole();
+	    consoleEngine = new ConsoleEngine();
+	    new ServerUtilities().controlChannels(true);
+	    new AnswerEngine();
     	this.checkConfigs();
+    	this.startTimer();
 	}
 	
-	private void readConsole() {
-		new Thread (() -> {
-			String line = "";
-			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-			try {
-				while((line = reader.readLine()) != null) {
-					String[] insplit = line.split(" ");
-					String command = insplit[0];
-					switch (command) {
-					case "stop":
-						boolean delete = true;
-						try {
-							delete = Boolean.parseBoolean(insplit[1]);
-						} catch (IndexOutOfBoundsException e) {}
-						this.shutdown(delete);
-						break;
-					case "exit":
-						jda.shutdown();
-						System.exit(0);
-						break;
-					case "giverole":
-						try {
-							jda.getGuildById(insplit[1]).addRoleToMember(insplit[2], jda.getGuildById(insplit[1]).getRoleById(insplit[3])).queue();
-						} catch (Exception e) {
-							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID | 3. Role ID");
-							break;
-						}
-						System.out.println("Role " + jda.getGuildById(insplit[1]).getRoleById(insplit[3]).getName() + " was successfully given to " + jda.retrieveUserById(insplit[2]).complete().getName());
-						break;
-					case "removerole":
-						try {	
-							jda.getGuildById(insplit[1]).removeRoleFromMember(insplit[2], jda.getGuildById(insplit[1]).getRoleById(insplit[3])).queue();
-						} catch (Exception e) {
-							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID | 3. Role ID");
-							break;
-						}
-						System.out.println("Role " + jda.getGuildById(insplit[1]).getRoleById(insplit[3]).getName() + " was successfully removed from " + jda.retrieveUserById(insplit[2]).complete().getName());
-						break;
-					case "kick":
-						try {
-							jda.getGuildById(insplit[1]).kick(insplit[2]).queue();
-						} catch (Exception e) {
-							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID");
-							break;
-						}
-						System.out.println("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully kicked from " + jda.getGuildById(insplit[1]).getName());
-						break;
-					case "ban":
-						try {
-							jda.getGuildById(insplit[1]).ban(insplit[2], 0).queue();
-						} catch (Exception e) {
-							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID");
-							break;
-						}
-						System.out.println("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully banned from " + jda.getGuildById(insplit[1]).getName());
-						break;
-					case "unban":
-						try {
-							jda.getGuildById(insplit[1]).unban(insplit[2]).queue();
-						} catch (Exception e) {
-							System.out.println("Invalid arguments or no permission!\n1. Server ID | 2. User ID");
-							break;
-						}
-						System.out.println("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully unbanned from " + jda.getGuildById(insplit[1]).getName());
-						break;
-					case "warn":
-						Configloader.INSTANCE.addUserConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2]), "warnings", "Administrative actions");
-						System.out.println("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
-						break;
-					case "listbugs":
-						try (BufferedReader br = new BufferedReader(new FileReader(new File(environment + "/configs/bugs.txt")))) {
-						    String fileline;
-						    while ((fileline = br.readLine()) != null) {
-						       System.out.println(fileline);
-						    }
-						}
-						break;
-					case "addbugs":
-						try {
-							Writer output = new BufferedWriter(new FileWriter(environment + "/configs/bugs.txt", true));
-							String[] bug = line.split(" ", 2);
-							output.append(bug[1] + "\n");
-							output.close();
-						} catch (ArrayIndexOutOfBoundsException e) {
-							System.out.println("Invalid arguments!\nAdd the new bug behind the command!");
-							break;
-						}
-						
-						break;
-					default:
-						System.out.println("Unknown command!");
-					}
-				}
-			} catch (IOException e){}
-		}).start();
-	}
-	
-	private void shutdown(Boolean delete) {
+	public void shutdown(Boolean delete) {
 		new ServerUtilities().controlChannels(false);
 		List<Guild> guilds = jda.getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
@@ -191,14 +94,14 @@ public class Bot {
         		}
     		}
     		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
-    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
     		}
     		new File(Bot.environment + "/levelcards/cache/temp.png").delete();
     		new File(Bot.environment + "/levelcards/cache/avatar.png").delete();
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
-		System.out.println("Bot offline");
+		consoleEngine.info(this, "Bot offline");
 		this.wait(2000);
 		System.exit(0);
 	}
@@ -209,6 +112,20 @@ public class Bot {
     		Configcheck.INSTANCE.checkGuildConfigs(guild);
     		Configcheck.INSTANCE.checkUserConfigs(guild);
 		}
+	}
+	
+	private void startTimer() {
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				List<Guild> guilds = jda.getGuilds();
+				for (int i = 0; i < guilds.size(); i++) {
+					Guild guild = guilds.get(i);
+					Bot.INSTANCE.penaltyCheck(guild);
+					Bot.INSTANCE.modCheck(guild);
+				}
+			}
+		}, 0, 5*60*1000);
 	}
 	
 	private void wait(int time) {

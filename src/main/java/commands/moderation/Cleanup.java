@@ -5,7 +5,6 @@ import java.io.File;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,10 +17,6 @@ public class Cleanup implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/cleanup:nopermission").convert()).queue();
-			return;
-		}
 		File guilddir = new File(Bot.environment + "/configs/user/" + guild.getId());
 		File[] ufiles = guilddir.listFiles();
 		for (int i = 0; i < ufiles.length; i++) {

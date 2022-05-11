@@ -3,7 +3,6 @@ package commands.moderation;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,10 +20,6 @@ public class Levelreward implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		guild = event.getGuild();
 		user = event.getUser();
-		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/levelreward:nopermission").convert()).queue();
-			return;
-		}
 		if (event.getSubcommandName().equals("add")) {
 			Configloader.INSTANCE.addGuildConfig(guild, "levelrewards", event.getOption("role").getAsRole().getId() + "_" + event.getOption("level").getAsString());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/levelreward:addsuccess")

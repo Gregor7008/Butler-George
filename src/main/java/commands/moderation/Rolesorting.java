@@ -9,7 +9,6 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -40,10 +39,6 @@ public class Rolesorting implements Command{
 		guild = event.getGuild();
 		user = event.getUser();
 		member = event.getMember();
-		if (!member.hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/rolesorting:nopermission").convert()).queue();
-			return;
-		}
 		channel = event.getTextChannel();
 		this.definegroup();
 	}

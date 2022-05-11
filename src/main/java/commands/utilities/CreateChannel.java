@@ -9,6 +9,7 @@ import components.base.Configloader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -16,8 +17,6 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class CreateChannel implements Command{
-
-	private Collection<Permission> perms = this.setupPerms();
 	
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -28,7 +27,8 @@ public class CreateChannel implements Command{
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:norole").convert()).queue();
 			return;
 		}
-		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "ccrole")))) {
+		Role permrole = guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "ccrole"));
+		if (!event.getMember().getRoles().contains(permrole) && !permrole.isPublicRole()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission").convert()).queue();
 			return;
 		}
@@ -49,17 +49,17 @@ public class CreateChannel implements Command{
 	}
 	
 	private void createTextChannel(Guild guild, User user, String name) {
+		Collection<Permission> perms = this.setupPerms();
 		Category cgy;
 		if (Configloader.INSTANCE.getUserConfig(guild, user, "cccategory").equals("")) {
 			cgy = guild.createCategory(user.getName() + "'s channels").complete();
-			cgy.putPermissionOverride(guild.getPublicRole()).setDeny(Permission.VIEW_CHANNEL).queue();
-			cgy.putPermissionOverride(guild.getMember(user)).setAllow(perms).queue();
-			cgy.upsertPermissionOverride(guild.getMember(user)).deny(Permission.MESSAGE_MENTION_EVERYONE).queue();
+			cgy.upsertPermissionOverride(guild.getPublicRole()).setDenied(Permission.VIEW_CHANNEL).queue();
+			cgy.upsertPermissionOverride(guild.getMember(user)).setAllowed(perms).queue();
 			Configloader.INSTANCE.addGuildConfig(guild, "ccctgies", cgy.getId());
 			if (!Configloader.INSTANCE.getGuildConfig(guild, "ccdefaccess").equals("")) {
 				String[] defroles = Configloader.INSTANCE.getGuildConfig(guild, "ccdefaccess").split(";");
 				for (int i = 0; i < defroles.length; i++) {
-					cgy.putPermissionOverride(guild.getRoleById(defroles[i])).setAllow(Permission.ALL_PERMISSIONS).queue();
+					cgy.upsertPermissionOverride(guild.getRoleById(defroles[i])).setAllowed(Permission.ALL_PERMISSIONS).queue();
 				}
 			}
 			Configloader.INSTANCE.setUserConfig(guild, user, "cccategory", cgy.getId());

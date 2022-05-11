@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import commands.Command;
 import commands.CommandList;
@@ -23,10 +22,11 @@ import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -62,17 +62,6 @@ public class Processor extends ListenerAdapter {
 			LevelEngine.getInstance().messagereceived(event);
 			//automoderation
 			AutoModerator.getInstance().messagereceived(event);
-			//ModMail
-			if (Bot.INSTANCE.jda.getGuildById(Bot.homeID) != null) {
-				if (Configloader.INSTANCE.getMailConfig1(event.getChannel().getId()) != null) {
-					if (user.isBot()) {
-						return;
-					}
-					PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(Configloader.INSTANCE.getMailConfig1(event.getChannel().getId())).complete();
-					pc.sendMessage(event.getMessage().getContentDisplay()).queue();
-					return;
-				}
-			}
 			//Suggestions
 			String suggestid = Configloader.INSTANCE.getGuildConfig(guild, "suggest");
 			if (!suggestid.equals("") && event.getChannel().getId().equals(suggestid) && !user.isBot()) {
@@ -85,8 +74,8 @@ public class Processor extends ListenerAdapter {
 			if (!supportid.equals("") && event.getChannel().getId().equals(supportid) && !user.isBot() && !Configloader.INSTANCE.getGuildConfig(guild, "supportrole").equals("")) {
 				if (guild.getCategoryById(Configloader.INSTANCE.getGuildConfig(guild, "supportcategory")) == null) {
 					Category cat = guild.createCategory("Supportchat").complete();
-					cat.createPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-					cat.createPermissionOverride(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))).setAllow(Permission.VIEW_CHANNEL).queue();
+					cat.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+					cat.upsertPermissionOverride(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))).setAllowed(Permission.VIEW_CHANNEL).queue();
 					Configloader.INSTANCE.setGuildConfig(guild, "supportcategory", cat.getId());
 				}
 				String curcount = Configloader.INSTANCE.getGuildConfig(guild, "ticketcount");
@@ -94,19 +83,24 @@ public class Processor extends ListenerAdapter {
 				TextChannel ntc = guild.createTextChannel(
 						"Ticket #" + curcount,
 						guild.getCategoryById(Configloader.INSTANCE.getGuildConfig(guild, "supportcategory"))).complete();
-				ntc.putPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-				ntc.putPermissionOverride(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))).setAllow(Permission.VIEW_CHANNEL).queue();
-				ntc.putPermissionOverride(event.getMember()).setAllow(Permission.VIEW_CHANNEL).queue();
+				ntc.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+				ntc.upsertPermissionOverride(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole"))).grant(Permission.VIEW_CHANNEL).queue();
+				ntc.upsertPermissionOverride(event.getMember()).grant(Permission.VIEW_CHANNEL).queue();
 				ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" + guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")).getAsMention()).queue();
 				Configloader.INSTANCE.setGuildConfig(guild, "ticketcount", String.format("%05d", newcount));
 				event.getMessage().delete().queue();
 				event.getTextChannel().getManager().setSlowmode(120).queue();
 				return;
 			}
+			//ModMail
+			new Thread(() -> {
+				new ModMail(event, true);
+			}).start();
 		} else {
-			//process modmail
-			new ModMail(event);
-		}
+			new Thread(() -> {
+				new ModMail(event, false);
+			}).start();
+		}		
 	}
 	
 	@Override
@@ -139,7 +133,7 @@ public class Processor extends ListenerAdapter {
 		modcmdnames.addAll(modcmdList.moderationcmds.keySet());
 		for (int e = 0; e < modcmdnames.size(); e++) {
 			Command cmd = modcmdList.moderationcmds.get(modcmdnames.get(e));
-			clua.addCommands(cmd.initialize());
+			clua.addCommands(cmd.initialize().setDefaultEnabled(false));
 		}
 		CommandList musiccmdList = new CommandList();
 		List<String> musiccmdnames = new ArrayList<>();
@@ -159,50 +153,41 @@ public class Processor extends ListenerAdapter {
 		CommandList commandList = new CommandList();
 		Command utilitycmd;
 		if ((utilitycmd = commandList.utilitycmds.get(event.getName())) != null) {
-			if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(event.getChannel().getId()) && !event.getName().equals("embed") && !event.getName().equals("poll")) {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:ignoredchannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-				return;
-			}
 			utilitycmd.perform(event);
 		}
 		Command modcmd;
 		if ((modcmd = commandList.moderationcmds.get(event.getName())) != null) {
-			if (!this.checkCategory(event.getTextChannel().getParentCategory(), guild)) {
+			if (this.checkCategory(event.getTextChannel().getParentCategory(), guild) == null) {
 				modcmd.perform(event);
 			} else {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:userchannel").convert()).queue();
-				return;
 			}
 		}
 		Command musiccmd;
 		if ((musiccmd = commandList.musiccmds.get(event.getName())) != null) {
-			if (Configloader.INSTANCE.getGuildConfig(guild, "ignored").contains(event.getChannel().getId())) {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:ignoredchannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-				return;
-			}
 			musiccmd.perform(event);
 		}
 		//levelsystem
 		LevelEngine.getInstance().slashcommand(event);
 	}
 	
-	private boolean checkCategory(Category category, Guild guild) {
+	private User checkCategory(Category category, Guild guild) {
 		File guilddir = new File(Bot.environment + "/configs/user/" + guild.getId());
 		File[] filelist = guilddir.listFiles();
 		if (filelist == null) {
-			return false;
+			return null;
 		}
 		for (int i = 0; i < filelist.length; i++) {
 			String[] temp1 = filelist[i].getName().split(".properties");
 			User cuser = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
 			String ccid = Configloader.INSTANCE.getUserConfig(guild, cuser, "cccategory");
 			if (!ccid.equals("")) {
-				if (category.equals(guild.getCategoryById(ccid))) {
-					return true;
+				if (category.getId().equals(ccid)) {
+					return cuser;
 				}
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	@Override
@@ -253,22 +238,33 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
+		Guild guild = event.getGuild();
+		User user = event.getUser();
 		if (event.getUser().isBot()) {
 			return;
 		}
 		//send goodbyemessage
-		String goodbyemsgraw = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "welcomemsg");
+		String goodbyemsgraw = Configloader.INSTANCE.getGuildConfig(guild, "welcomemsg");
 		LocalDateTime date = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 		String currentdate = date.format(formatter);
 		if (!goodbyemsgraw.equals("")) {
 			String[] goodbyemsg = goodbyemsgraw.split(";");
-			goodbyemsg[0].replace("{server}", event.getGuild().getName());
-			goodbyemsg[0].replace("{member}", event.getMember().getEffectiveName());
-			goodbyemsg[0].replace("{membercount}", Integer.toString(event.getGuild().getMemberCount()));
+			goodbyemsg[0].replace("{server}", guild.getName());
+			goodbyemsg[0].replace("{member}", user.getName());
+			goodbyemsg[0].replace("{membercount}", Integer.toString(guild.getMemberCount()));
 			goodbyemsg[0].replace("{date}", currentdate);
 			goodbyemsg[0].replace("{timejoined}", event.getMember().getTimeJoined().format(formatter));
 			event.getGuild().getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
+		}
+		//check for users category
+		if (!Configloader.INSTANCE.getUserConfig(guild, user, "cccategory").equals("")) {
+			Category ctg = guild.getCategoryById(Configloader.INSTANCE.getUserConfig(guild, user, "cccategory"));
+			List<GuildChannel> channels = ctg.getChannels();
+			for (int i = 0; i < channels.size(); i++) {
+				channels.get(i).delete().queue();
+			}
+			ctg.delete().queue();
 		}
 	}
 	
@@ -319,7 +315,7 @@ public class Processor extends ListenerAdapter {
 			perms.add(Permission.VOICE_SPEAK);
 			ICategorizableChannel temp = (ICategorizableChannel) audioChannel;
 			VoiceChannel nc = guild.createVoiceChannel(member.getEffectiveName() + "'s channel", temp.getParentCategory()).complete();
-			nc.putPermissionOverride(member).setAllow(perms).complete();
+			nc.upsertPermissionOverride(member).setAllowed(perms).complete();
 			guild.moveVoiceMember(member, nc).queue();
 			Configloader.INSTANCE.addGuildConfig(guild, "j2cs", nc.getId() + "-" + member.getUser().getId());
 		}
@@ -453,12 +449,12 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onChannelDelete(ChannelDeleteEvent event) {
+		Guild guild = event.getGuild();
 		new Thread(() -> {
-			Configcheck.INSTANCE.checkGuildConfigs(event.getGuild());
+			Configcheck.INSTANCE.checkGuildConfigs(guild);
 		}).start();
 		if (event.getChannelType().isAudio()) {
 			String id = event.getChannel().getId();
-			Guild guild = event.getGuild();
 			if (Configloader.INSTANCE.getGuildConfig(guild, "j2cs").contains(id)) {
 				String[] entries = Configloader.INSTANCE.getGuildConfig(guild, "j2cs").split(";");
 				for (int i = 0; i < entries.length; i++) {
@@ -467,6 +463,25 @@ public class Processor extends ListenerAdapter {
 					}
 				}
 				return;
+			}
+		}
+		if (event.isFromType(ChannelType.CATEGORY)) {
+			Category ctg = (Category) event.getChannel();
+			if (this.checkCategory(ctg, guild) != null) {
+				Configloader.INSTANCE.setUserConfig(guild, this.checkCategory(ctg, guild), "cccategory", "");
+			}
+			return;
+		}
+		if (event.getChannelType().isGuild()) {
+			ICategorizableChannel channel = (ICategorizableChannel) event.getChannel();
+			Category ctg = channel.getParentCategory();
+			if (ctg != null) {
+				if (ctg.getChannels().size() == 0) {
+					if (this.checkCategory(ctg, guild) != null) {
+						Configloader.INSTANCE.setUserConfig(guild, this.checkCategory(ctg, guild), "cccategory", "");
+						ctg.delete().queue();
+					}
+				}
 			}
 		}
 	}

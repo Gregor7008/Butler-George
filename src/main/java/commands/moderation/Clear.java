@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -22,10 +21,6 @@ public class Clear implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (!event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/clear:nopermission").convert()).queue();
-			return;
-		}
 		TextChannel channel = event.getTextChannel();
 		int count = Integer.parseInt(event.getOption("count").getAsString());
 		List<Message> messages = channel.getHistory().retrievePast(count).complete();

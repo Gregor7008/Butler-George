@@ -42,35 +42,7 @@ public class Configcheck {
 			if (tc == null) {
 				Configloader.INSTANCE.deleteGuildConfig(guild, "supportchat", id);
 			} else {
-				tc.putPermissionOverride(guild.getPublicRole()).setAllow(Permission.VIEW_CHANNEL).queue();
-			}
-		}
-		id = Configloader.INSTANCE.getGuildConfig(guild, "ignored");
-		if (!id.equals("")) {
-			String[] entries = id.split(";");
-			for (int a = 0; a < entries.length; a++) {
-				TextChannel tc = guild.getTextChannelById(entries[a]);
-				if (tc == null) {
-					Configloader.INSTANCE.deleteGuildConfig(guild, "ignored", entries[a]);
-				}
-			}
-		}
-		id = Configloader.INSTANCE.getGuildConfig(guild, "supportrole");
-		if (!id.equals("")) {
-			if (guild.getRoleById(id) == null ) {
-				Configloader.INSTANCE.deleteGuildConfig(guild, "supportrole", id);
-			}
-		}
-		id = Configloader.INSTANCE.getGuildConfig(guild, "modrole");
-		if (!id.equals("")) {
-			if (guild.getRoleById(id) == null ) {
-				Configloader.INSTANCE.deleteGuildConfig(guild, "modrole", id);
-			}
-		}
-		id = Configloader.INSTANCE.getGuildConfig(guild, "muterole");
-		if (!id.equals("")) {
-			if (guild.getRoleById(id) == null ) {
-				Configloader.INSTANCE.deleteGuildConfig(guild, "muterole", id);
+				tc.upsertPermissionOverride(guild.getPublicRole()).setAllowed(Permission.VIEW_CHANNEL).queue();
 			}
 		}
 		id = Configloader.INSTANCE.getGuildConfig(guild, "ccrole");

@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.Properties;
 
 import base.Bot;
+import components.moderation.ModMail;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -111,7 +112,7 @@ public class Configloader {
 	
 	//Find or create files
 	public File findorCreateMailConfig1() {
-		File mailpropertiesFile = new File(respath + "/configs/modmail/708381749826289666/cache1.properties");
+		File mailpropertiesFile = new File(respath + "/configs/modmail/" + ModMail.guild.getId() + "/cache1.properties");
 		if (!mailpropertiesFile.exists()) {
 			try {
 				mailpropertiesFile.createNewFile();
@@ -121,7 +122,7 @@ public class Configloader {
 	}
 	
 	public File findorCreateMailConfig2() {
-		File mailpropertiesFile = new File(respath + "/configs/modmail/708381749826289666/cache2.properties");
+		File mailpropertiesFile = new File(respath + "/configs/modmail/" + ModMail.guild.getId() + "/cache2.properties");
 		if (!mailpropertiesFile.exists()) {
 			try {
 				mailpropertiesFile.createNewFile();
@@ -157,16 +158,12 @@ public class Configloader {
 				pps.setProperty("suggest", "");
 				pps.setProperty("autoroles", "");
 				pps.setProperty("botautoroles", "");
-				pps.setProperty("modrole", "");
 				pps.setProperty("penalties", "");
 				pps.setProperty("levelrewards", "");
-				pps.setProperty("muterole", "");
 				pps.setProperty("j2cs", "");
 				pps.setProperty("levelmsgch", "");
-				pps.setProperty("ignored", "");
 				pps.setProperty("forbidden", "\\//\\//\\//");
 				pps.setProperty("reportchannel", "");
-				pps.setProperty("supportrole", "");
 				pps.setProperty("supportchat", "");
 				pps.setProperty("supporttalk", "");
 				pps.setProperty("supportcategory", "");

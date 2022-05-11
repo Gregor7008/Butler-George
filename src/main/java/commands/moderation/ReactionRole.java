@@ -10,7 +10,6 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -43,15 +42,16 @@ public class ReactionRole implements Command{
 		channel = event.getTextChannel();
 		msgid = event.getOption("message").getAsString();
 		finalchannel = guild.getTextChannelById(event.getOption("channel").getAsGuildChannel().getId());
-		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nopermission").convert()).queue();
-			return;
-		}
-		if (finalchannel.equals(null)) {
+		if (finalchannel == null) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nochannel").convert()).queue();
 			return;
 		}
-		if (finalchannel.retrieveMessageById(msgid).complete().equals(null)) {
+		try {
+			if (finalchannel.retrieveMessageById(msgid).complete() == null) {
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nomessage").convert()).queue();
+				return;
+			}
+		} catch (IllegalArgumentException e) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:nomessage").convert()).queue();
 			return;
 		}
@@ -111,7 +111,8 @@ public class ReactionRole implements Command{
 	private void defineAddRoles() {
 		Configloader.INSTANCE.setReactionroleConfig(guild, finalchannel, msgid, "");
 		waiter.waitForEvent(MessageReceivedEvent.class,
-							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;}
+								  if(e.getMessage().getMentionedRoles().isEmpty()) {return false;}
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {messages.add(e.getMessage());
 								  List<Role> roles = e.getMessage().getMentionedRoles();

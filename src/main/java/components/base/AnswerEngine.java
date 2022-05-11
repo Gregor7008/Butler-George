@@ -3,6 +3,7 @@ package components.base;
 import java.io.IOException;
 import java.util.Properties;
 
+import base.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -57,6 +58,7 @@ public class AnswerEngine {
 		try {
 			properties.load(this.getClass().getClassLoader().getResourceAsStream("languages/" + lang + path + ".properties"));
 		} catch (NullPointerException | IOException e) {
+			Bot.INSTANCE.consoleEngine.error(this, "Couldn't find language files!");
 			return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
 		}
 		String temp2 = properties.getProperty(key);

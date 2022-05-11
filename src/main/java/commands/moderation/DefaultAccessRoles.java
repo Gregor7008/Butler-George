@@ -7,7 +7,6 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -23,10 +22,6 @@ public class DefaultAccessRoles implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:nopermission").convert()).queue();
-			return;
-		}
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:sendroles").convert()).queue();
 		Bot.INSTANCE.getWaiter().waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getTextChannel().getId())) {return false;} 

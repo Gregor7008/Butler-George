@@ -3,7 +3,6 @@ package commands.moderation;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -23,10 +22,6 @@ public class BotAutoRole implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		guild = event.getGuild();
 		user = event.getUser();
-		if (!event.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:nopermission").convert()).queue();
-			return;
-		}
 		if (event.getSubcommandName().equals("add")) {
 			Role role = event.getOption("addrole").getAsRole();
 			Configloader.INSTANCE.addGuildConfig(guild, "botautoroles", role.getId());

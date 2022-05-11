@@ -17,14 +17,6 @@ public class Move implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (Configloader.INSTANCE.getGuildConfig(guild, "supportrole").equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/command/moderation/move:norole").convert()).queue();
-			return;
-		}
-		if (!event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "supportrole")))) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nopermission").convert()).queue();
-			return;
-		}
 		if (Configloader.INSTANCE.getGuildConfig(guild, "supporttalk").equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;

@@ -3,7 +3,6 @@ package commands.moderation;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -20,10 +19,6 @@ public class Join2Create implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final String id = event.getOption("channel").getAsGuildChannel().getId();
-		if(!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/join2create:nopermission").convert()).queue();
-			return;
-		}
 		if (guild.getVoiceChannelById(id) == null) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:invalid").convert()).queue();
 			return;

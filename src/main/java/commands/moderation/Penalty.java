@@ -8,7 +8,6 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -28,10 +27,6 @@ public class Penalty implements Command{
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
-		if (!event.getMember().hasPermission(Permission.BAN_MEMBERS)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/penalty:nopermission").convert()).queue();
-			return;
-		}
 		channel = event.getTextChannel();
 		user = event.getUser();
 		guild = event.getGuild();
@@ -152,6 +147,7 @@ public class Penalty implements Command{
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:add3role").convert()).queue();
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+						  if(e.getMessage().getMentionedRoles().isEmpty()) {return false;}
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {String penalty = String.valueOf(warnings) + "_removerole_" + e.getMessage().getContentRaw();
 						  Configloader.INSTANCE.addGuildConfig(guild, "penalties", penalty);

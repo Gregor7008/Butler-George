@@ -3,7 +3,6 @@ package commands.moderation;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,10 +17,6 @@ public class SuggestionChannel implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/suggestionchannel:nopermission").convert()).queue();
-			return;
-		}
 		Configloader.INSTANCE.setGuildConfig(guild, "suggest", event.getOption("channel").getAsGuildChannel().getId());
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/suggestionchannel:successset").convert()).queue();
 	}

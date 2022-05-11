@@ -6,7 +6,6 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.Configloader;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,10 +20,6 @@ public class TempBan implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
-		if (!event.getMember().hasPermission(Permission.BAN_MEMBERS)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, event.getUser(),"/commands/moderation/tempban:nopermission").convert()).queue();
-			return;
-		}
 		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), guild, user);
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/tempban:success")
 				.replaceDescription("{user}", user.getName())

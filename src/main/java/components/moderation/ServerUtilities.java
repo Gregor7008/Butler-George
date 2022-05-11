@@ -53,7 +53,7 @@ public class ServerUtilities {
 	public void controlChannels(boolean action) {
 		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
 		if (guild == null) {
-			System.out.println("Couldn't find home guild!");
+			Bot.INSTANCE.consoleEngine.debug(this, "Couldn't find home guild!");
 			return;
 		}
 		if (action) {
