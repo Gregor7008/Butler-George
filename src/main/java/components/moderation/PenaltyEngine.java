@@ -55,7 +55,6 @@ public class PenaltyEngine {
 						break;
 					case ("ban"):
 						member.ban(0, "Too many warnings!").queue();
-						Configloader.INSTANCE.findorCreateUserConfig(guild, user).delete();
 						break;
 					default:
 						if (penalty.contains("removerole")) {

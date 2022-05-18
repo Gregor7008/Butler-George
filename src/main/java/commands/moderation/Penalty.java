@@ -92,7 +92,7 @@ public class Penalty implements Command{
 		for (int i = 1; i <= current.length; i++) {
 		   	 String[] temp3 = current[i-1].split("_", 2);
 		   	if (temp3[0].contains(e.getMessage().getContentRaw())) {
-		   	    Configloader.INSTANCE.deleteGuildConfig(e.getGuild(), "penalty", current[i-1]);
+		   	    Configloader.INSTANCE.removeGuildConfig(e.getGuild(), "penalty", current[i-1]);
 		   	    e.getMessage().addReaction("U+2705").queue();
 		    } else {
 		    	e.getMessage().addReaction("U+0078").queue();

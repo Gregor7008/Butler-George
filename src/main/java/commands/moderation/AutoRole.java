@@ -30,7 +30,7 @@ public class AutoRole implements Command {
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
-			Configloader.INSTANCE.deleteGuildConfig(guild, "autoroles", role.getId());
+			Configloader.INSTANCE.removeGuildConfig(guild, "autoroles", role.getId());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:removesuccess").convert()).queue();
 			return;
 		}

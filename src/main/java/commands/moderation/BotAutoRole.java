@@ -30,7 +30,7 @@ public class BotAutoRole implements Command{
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
-			Configloader.INSTANCE.deleteGuildConfig(guild, "botautoroles", role.getId());
+			Configloader.INSTANCE.removeGuildConfig(guild, "botautoroles", role.getId());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess").convert()).queue();
 			return;
 		}

@@ -36,7 +36,7 @@ public class Levelreward implements Command{
 			String[] rewards = rawinput.split(";");
 			for (int i = 0; i < rewards.length; i++) {
 				if (rewards[i].contains(event.getOption("role").getAsRole().getId())) {
-					Configloader.INSTANCE.deleteGuildConfig(guild, "levelrewards", rewards[i]);
+					Configloader.INSTANCE.removeGuildConfig(guild, "levelrewards", rewards[i]);
 					String[] reward = rewards[i].split("_");
 					event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/levelreward:addsuccess")
 							.replaceDescription("{role}", guild.getRoleById(reward[0]).getAsMention())

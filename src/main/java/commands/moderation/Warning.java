@@ -59,7 +59,7 @@ public class Warning implements Command{
 						e -> {String allwarnings = Configloader.INSTANCE.getUserConfig(guild, event.getOption("user").getAsUser(), "warnings");
 							  String[] warnings = allwarnings.split(";");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
-							  Configloader.INSTANCE.deleteUserConfig(guild, member.getUser(), "warnings", warnings[w-1]);
+							  Configloader.INSTANCE.removeUserConfig(guild, member.getUser(), "warnings", warnings[w-1]);
 							  channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/warning:remsuccess")
 									  .replaceDescription("{warning}", warnings[w-1])
 									  .replaceDescription("{user}", member.getEffectiveName()).convert()).queue();},

@@ -36,7 +36,7 @@ public class ForbiddenWords implements Command{
 			String rawremove = event.getOption("words").getAsString();
 			String[] splitremove = rawremove.split(";\\s");
 			for (int i = 0; i < splitremove.length; i++) {
-				Configloader.INSTANCE.deleteGuildConfig(guild, "forbidden", splitremove[i]);
+				Configloader.INSTANCE.removeGuildConfig(guild, "forbidden", splitremove[i]);
 			}
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:removesuccess").convert()).queue();
 			break;

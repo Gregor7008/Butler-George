@@ -1,339 +1,220 @@
 package components.base;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.util.Properties;
+import org.bson.Document;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
-import base.Bot;
-import components.moderation.ModMail;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
 public class Configloader {
 	
 	public static Configloader INSTANCE;
-	private String respath = Bot.environment;
+	private static MongoClient client = MongoClients.create("mongodb://192.168.178.104:17389");
+	private static MongoDatabase database = client.getDatabase("butler-george");
+	private static MongoCollection<Document> userconfigs = database.getCollection("user");
+	private static MongoCollection<Document> guildconfigs = database.getCollection("guild");
 	
 	public Configloader() {
 		INSTANCE = this;
 	}
-	
-	//Change file in any way
-	public String getGuildConfig(Guild guild, String key) {
-		return this.getProperty(this.findorCreateGuildConfig(guild), key);
-	}
-	
+//	Get values
 	public String getUserConfig(Guild guild, User user, String key) {
-		return this.getProperty(this.findorCreateUserConfig(guild, user), key);
+		return this.findorCreateUserConfig(user, guild).getString(key);
 	}
 	
-	public String getMailConfig1(String randomNumber) {
-		return this.getProperty(this.findorCreateMailConfig1(), randomNumber);
+//	public JSONArray getUserConfigArray(Guild guild, User user, String key) {
+//		return this.findorCreateUserConfig(user, guild).getJSONArray(key);
+//	}
+	
+//	public int getUserConfigInt(Guild guild, User user, String key) {
+//		return this.findorCreateUserConfig(user, guild).getInt(key);
+//	}
+	
+	public String getGuildConfig(Guild guild, String key) {
+		return this.findorCreateGuildConfig(guild).getString(key);
 	}
 	
-	public String getMailConfig2(String userID) {
-		return this.getProperty(this.findorCreateMailConfig2(), userID);
-	}
+//	public JSONArray getGuildConfigArray(Guild guild, String key) {
+//		return this.findorCreateGuildConfig(guild).getJSONArray(key);
+//	}
 	
-	public String getReactionroleConfig(Guild guild, TextChannel channel, String msgid) {
-		return this.getProperty(this.findorCreateRRConfig(guild, channel), msgid);
-	}
+//	public int getGuildConfigInt(Guild guild, String key) {
+//		return this.findorCreateGuildConfig(guild).getInt(key);
+//	}
 	
-	public String getPollConfig(Guild guild, String title, String key) {
-		return this.getProperty(this.findPollConfig(guild, title), key);
-	}
 	
+//	Change file in any way
 	public void setUserConfig(Guild guild, User user, String key, String value) {
-		this.setProperty(this.findorCreateUserConfig(guild, user), key, value);
-	}
-	
-	public void setGuildConfig(Guild guild, String key, String value) {
-		this.setProperty(this.findorCreateGuildConfig(guild), key, value);
-	}
-	
-	public void setMailConfig(String randomNumber, String userID) {
-		this.setProperty(this.findorCreateMailConfig1(), randomNumber, userID);
-		this.setProperty(this.findorCreateMailConfig2(), userID, randomNumber);
-	}
-	
-	public void setReactionroleConfig(Guild guild, TextChannel channel, String msgid, String value) {
-		this.setProperty(this.findorCreateRRConfig(guild, channel), msgid, value);
-	}
-	
-	public void setPollConfig(Guild guild, String msgid, String key, String value) {
-		this.setProperty(this.findPollConfig(guild, msgid), key, value);
+		this.findorCreateUserConfig(user, guild).put(key, value);
 	}
 	
 	public void addUserConfig(Guild guild, User user, String key, String value) {
-		this.addProperty(this.findorCreateUserConfig(guild, user), key, value, this.getUserConfig(guild, user, key));
+//		this.findorCreateUserConfig(user, guild).getJSONArray(key).put(value);
+		if (this.getUserConfig(guild, user, key).equals("")) {
+			this.setUserConfig(guild, user, key, value);
+		} else {
+			this.setUserConfig(guild, user, key, this.getUserConfig(guild, user, key) + ";" + value);
+		}
+	}
+	
+	public void removeUserConfig(Guild guild, User user, String key, String value) {
+//		this.removeValueFromArray(this.findorCreateUserConfig(user, guild).getJSONArray(key), value);
+		if (this.getUserConfig(guild, user, key).equals(value)) {
+			this.setUserConfig(guild, user, key, "");
+		} else {
+			this.setUserConfig(guild, user, key, this.getUserConfig(guild, user, key).replace(";" + value, ""));
+		}
+	}
+	
+	public void setGuildConfig(Guild guild, String key, String value) {
+		this.findorCreateGuildConfig(guild).put(key, value);
 	}
 	
 	public void addGuildConfig(Guild guild, String key, String value) {
-		this.addProperty(this.findorCreateGuildConfig(guild), key, value, this.getGuildConfig(guild, key));
+//		this.findorCreateGuildConfig(guild).getJSONArray(key).put(value);
 	}
 	
-	public void addReactionroleConfig(Guild guild, TextChannel channel, String msgid, String value) {
-		this.addProperty(this.findorCreateRRConfig(guild, channel), msgid, value, this.getReactionroleConfig(guild, channel, msgid));
+	public void removeGuildConfig(Guild guild, String key, String value) {
+//		this.removeValueFromArray(this.findorCreateGuildConfig(guild).getJSONArray(key), value);
 	}
 	
-	public void deleteGuildConfig(Guild guild, String key, String value) {
-		this.deleteProperty(this.findorCreateGuildConfig(guild), key, value, this.getGuildConfig(guild, key));
+	public void setReactionroleConfig(Guild guild, String channelID, String msgid, String key, String value) {
+		this.findReactionroleConfig(guild, channelID, msgid).put(key, value);
 	}
 	
-	public void deleteUserConfig(Guild guild, User user, String key, String value) {
-		this.deleteProperty(this.findorCreateUserConfig(guild, user), key, value, this.getUserConfig(guild, user, key));
+	public void deleteReactionRoleConfig(Guild guild, String channelID, String msgid) {
+		this.findorCreateReactionroleConfigs(guild, channelID).remove(msgid);
 	}
 	
-	public void removeReactionRoleConfig(Guild guild, TextChannel channel, String msgid) {
-		this.removeProperty(this.findorCreateRRConfig(guild, channel), msgid);
+	public void setPollConfig(Guild guild, String channelID, String msgid, String key, String value) {
+		this.findPollConfig(guild, channelID, msgid).put(key, value);
 	}
 	
-	public void removeMailConfig(String key) {
-		if (this.getMailConfig1(key) != null) {
-			String userID = this.getMailConfig1(key);
-			this.removeProperty(this.findorCreateMailConfig1(), key);
-			this.removeProperty(this.findorCreateMailConfig2(), userID);
+	public void deletePollConfig(Guild guild, String channelID, String msgID) {
+		this.findPollConfigs(guild, channelID).remove(msgID);
+	}
+	//Find or Create methods
+	public JSONObject findorCreateUserConfig(User user, Guild guild) {
+		Document doc = userconfigs.find(new Document("id", user.getId())).first();
+		JSONObject usercf;
+		if (doc == null) {
+			usercf = new JSONObject(new JSONTokener(this.getClass().getClassLoader().getResourceAsStream("templates/user-template.json")));
+			usercf.put("id", user.getId());
 		} else {
-			String randomNumber = this.getMailConfig2(key);
-			this.removeProperty(this.findorCreateMailConfig2(), key);
-			this.removeProperty(this.findorCreateMailConfig1(), randomNumber);
+			usercf = new JSONObject(doc.toJson());
 		}
-	}
-	
-	public void deletePollConfig(Guild guild, String title) {
-		File pollpropertiesFile = this.findPollConfig(guild, title);
-		pollpropertiesFile.delete();
-	}
-	
-	//Find or create files
-	public File findorCreateMailConfig1() {
-		File mailpropertiesFile = new File(respath + "/configs/modmail/" + ModMail.guild.getId() + "/cache1.properties");
-		if (!mailpropertiesFile.exists()) {
-			try {
-				mailpropertiesFile.createNewFile();
-			} catch (IOException e) {e.printStackTrace();}
-		}
-		return mailpropertiesFile;
-	}
-	
-	public File findorCreateMailConfig2() {
-		File mailpropertiesFile = new File(respath + "/configs/modmail/" + ModMail.guild.getId() + "/cache2.properties");
-		if (!mailpropertiesFile.exists()) {
-			try {
-				mailpropertiesFile.createNewFile();
-			} catch (IOException e) {e.printStackTrace();}
-		}
-		return mailpropertiesFile;
-	}
-	
-	public File findorCreateRRConfig(Guild guild, TextChannel channel) {
-		File guilddir = new File(respath + "/configs/reactionroles/" + guild.getId());
-		if (!guilddir.exists()) {
-			guilddir.mkdirs();
-		}
-		File rrpropertiesFile = new File(respath + "/configs/reactionroles/" + guild.getId() + "/" + channel.getId() + ".properties");
-		if (!rrpropertiesFile.exists()) {
-			try {
-				rrpropertiesFile.createNewFile();
-			} catch (IOException e) {e.printStackTrace();}
-		}
-		return rrpropertiesFile;
-	}
-
-	public File findorCreateGuildConfig(Guild guild) {
-		Properties pps = new Properties();
-		File pFile = new File(respath + "/configs/guild/" + guild.getId() + ".properties");
-		if (!pFile.exists()) {
-			try {
-				pFile.createNewFile();
-				FileOutputStream fop = new FileOutputStream(pFile);
-				pps.setProperty("welcomemsg", "");
-				pps.setProperty("goodbyemsg", "");
-				pps.setProperty("join2create", "");
-				pps.setProperty("suggest", "");
-				pps.setProperty("autoroles", "");
-				pps.setProperty("botautoroles", "");
-				pps.setProperty("penalties", "");
-				pps.setProperty("levelrewards", "");
-				pps.setProperty("j2cs", "");
-				pps.setProperty("levelmsgch", "");
-				pps.setProperty("forbidden", "\\//\\//\\//");
-				pps.setProperty("reportchannel", "");
-				pps.setProperty("supportchat", "");
-				pps.setProperty("supporttalk", "");
-				pps.setProperty("supportcategory", "");
-				pps.setProperty("ccrole", "");
-				pps.setProperty("ccdefaccess", "");
-				pps.setProperty("ticketcount", "00001");
-				pps.setProperty("ccctgies", "");
-				pps.setProperty("offlinemsg", "");
-				pps.store(fop, null);
-				fop.close();
-			} catch (IOException e) {e.printStackTrace();}
-		}
-		return pFile;
-	}
-	
-	public File findorCreateUserConfig(Guild guild, User user) {
-		Properties pps = new Properties();
-		File guilddir = new File(respath + "/configs/user/" + guild.getId());
-		if (!guilddir.exists()) {
-			guilddir.mkdirs();
-		}
-		File pFile = new File( respath + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
-		if (!pFile.exists()) {
-			try {
-				pFile.createNewFile();
-				FileOutputStream fop = new FileOutputStream(pFile);
-				pps.setProperty("warnings", "");
-				pps.setProperty("muted", "false");
-				pps.setProperty("tempmuted", "false");
-				pps.setProperty("tempbanned", "false");
-				pps.setProperty("tbuntil", "");
-				pps.setProperty("lastxpgotten", OffsetDateTime.now().toString());
-				pps.setProperty("level", "0");
-				pps.setProperty("expe", "0");
-				pps.setProperty("levelbackground", "0");
-				pps.setProperty("lastmail", OffsetDateTime.now().toString());
-				pps.setProperty("lastsuggestion", OffsetDateTime.now().toString());
-				pps.setProperty("language", "en");
-				pps.setProperty("levelspamcount", "0");
-				pps.setProperty("cccategory", "");
-				pps.setProperty("penaltycount", "");
-				pps.store(fop, null);
-				fop.close();
-			} catch (IOException e) {e.printStackTrace();}
-		}
-		return pFile;
-	}
-	
-	public File findPollConfig(Guild guild, String msgid) {
-		File pollpropertiesFile = new File(respath + "/configs/polls/" + guild.getId() + "/" + msgid + ".properties");
-		if (pollpropertiesFile.exists()) {
-			return pollpropertiesFile;
-		} else {
-			return null;
-		}
-	}
-	
-	public File createPollConfig(Guild guild, String title) {
-		Properties pps = new Properties();
-		File guilddir = new File(respath + "/configs/polls/" + guild.getId());
-		if (!guilddir.exists()) {
-			guilddir.mkdirs();
-		}
-		File pollpropertiesFile = new File(respath + "/configs/polls/" + guild.getId() + "/" + title + ".properties");
+		JSONObject membercf;
 		try {
-			pollpropertiesFile.createNewFile();
-			FileOutputStream fop = new FileOutputStream(pollpropertiesFile);
-			pps.setProperty("description", "");
-			pps.setProperty("title", "");
-			pps.setProperty("answers", "");
-			pps.setProperty("answercount", "");
-			pps.setProperty("thumbnail", "");
-			pps.setProperty("days", "");
-			pps.setProperty("anonymous", "");
-			pps.setProperty("guild", "");
-			pps.setProperty("owner", "");
-			pps.setProperty("channel", "");
-			pps.setProperty("footer", "");
-			pps.setProperty("users", "");
-			pps.setProperty("creation", OffsetDateTime.now().toString());
-			pps.store(fop, null);
-			fop.close();
-		} catch (IOException e) {e.printStackTrace();}
-		return pollpropertiesFile;
+			membercf = usercf.getJSONObject("guilds").getJSONObject(guild.getId());
+		} catch (JSONException e) {
+			usercf.getJSONObject("guilds").put(guild.getId(), new JSONObject(new JSONTokener(this.getClass().getClassLoader().getResourceAsStream("templates/member-template.json"))));
+			membercf = usercf.getJSONObject("guilds").getJSONObject(guild.getId());
+		}
+		this.pushConfig(usercf);
+		return membercf;
 	}
 	
-	//Tool-Methods
-	private String getProperty(File file, String key) {
-		Properties pps = new Properties();
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
-			pps.load(bis);
-			bis.close();
-		} catch (Exception e) {e.printStackTrace();}
-		return pps.getProperty(key);
-	}
-	
-	private boolean setProperty(File file, String key, String value) {
-		Properties pps = new Properties();
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out = new FileOutputStream(file);
-			pps.setProperty(key, value);
-			pps.store(out, null);
-			out.close();
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
+	public JSONObject findorCreateGuildConfig(Guild guild) {
+		Document doc = guildconfigs.find(new Document("id", guild.getId())).first();
+		if (doc == null) {
+			JSONObject newDoc = new JSONObject(new JSONTokener(this.getClass().getClassLoader().getResourceAsStream("templates/guild-template.json")));
+			newDoc.put("id", guild.getId());
+			this.pushConfig(newDoc);
+			return newDoc;
+		} else {
+			return new JSONObject(doc.toJson());
 		}
 	}
 	
-	private boolean addProperty(File file, String key, String value, String current) {
-		Properties pps = new Properties();
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out = new FileOutputStream(file);
-			if (current.equals("") || current.equals(null)) {
-				pps.setProperty(key, value);
-			} else {
-				pps.setProperty(key, current + ";" + value);
+	public JSONObject findPollConfig(Guild guild, String channelID, String msgID) {
+		JSONObject pollcfs = this.findPollConfigs(guild, channelID);
+		JSONObject channel, msg;
+		channel = this.findorCreateChannelConfig(pollcfs, channelID);
+		try {
+			msg = channel.getJSONObject(msgID);
+		} catch (JSONException e) {
+			msg = null;
+		}
+		return msg;
+	}
+	
+	public JSONObject createPollConfig(Guild guild, String channelID, String msgID) {
+		JSONObject pollcfs = this.findPollConfigs(guild, channelID);
+		JSONObject channel = this.findorCreateChannelConfig(pollcfs, channelID);
+		channel.put(msgID, new JSONObject(new JSONTokener(this.getClass().getClassLoader().getResourceAsStream("templates/poll-template.json"))));
+		return channel.getJSONObject(msgID);
+	}
+	
+	public JSONObject findPollConfigs(Guild guild, String channelID) {
+		return this.findorCreateGuildConfig(guild).getJSONObject("polls");
+	}
+	
+	public JSONObject findReactionroleConfig(Guild guild, String channelID, String msgID) {
+		JSONObject rrcfs = this.findPollConfigs(guild, channelID);
+		JSONObject channel, msg;
+		channel = this.findorCreateChannelConfig(rrcfs, channelID);
+		try {
+			msg = channel.getJSONObject(msgID);
+		} catch (JSONException e) {
+			msg = null;
+		}
+		return msg;
+	}
+	
+	public JSONObject createReactionroleConfig(Guild guild, String channelID, String msgID) {
+		JSONObject rrcfs = this.findPollConfigs(guild, channelID);
+		JSONObject channel = this.findorCreateChannelConfig(rrcfs, channelID);
+		channel.put(msgID, new JSONObject());
+		return channel.getJSONObject(msgID);
+	}
+	
+	public JSONObject findorCreateReactionroleConfigs(Guild guild, String channelID) {
+		return this.findorCreateGuildConfig(guild).getJSONObject("reactionroles");
+	}
+	
+	public JSONObject findorCreateChannelConfig(JSONObject jObject, String channelID) {
+		JSONObject channel;
+		try {
+			channel = jObject.getJSONObject(channelID);
+		} catch (JSONException e) {
+			jObject.put(channelID, new JSONObject());
+			channel = jObject.getJSONObject(channelID);
+		}
+		return channel;
+	}
+	//Tool methods	
+	private void pushConfig(JSONObject jObject) {
+		MongoCollection<Document> selected = null;
+		if (jObject.getString("type").equals("guild")) {
+			selected = guildconfigs;
+		} else if (jObject.getString("type").equals("user")) {
+			selected = userconfigs;
+		}
+		Document result = selected.find(new Document("id", jObject.get("id"))).first();
+		if (result != null) {
+			selected.updateOne(result, Document.parse(jObject.toString()));
+		} else {
+			selected.insertOne(Document.parse(jObject.toString()));
+		}
+	}
+	@SuppressWarnings("unused")
+	private void removeValueFromArray(JSONArray current, String value) {
+		int index = -1;
+		for (int i = 0; i < current.length(); i++) {
+			if (current.getString(i).equals(value)) {
+				index = i;
 			}
-			pps.store(out, null);
-			out.close();
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
 		}
-	}
-	
-	private boolean deleteProperty(File file, String key, String value, String currentraw) {
-		Properties pps = new Properties();
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out = new FileOutputStream(file);
-			String[] current = currentraw.split(";");
-			if (current.length <= 1) {
-				pps.setProperty(key, "");
-			} else {
-				if(current[0].equals(value)) {
-					pps.setProperty(key, currentraw.replace(value + ";", ""));
-				} else {
-					pps.setProperty(key, currentraw.replace(";" + value, ""));
-				}
-			}
-			pps.store(out, null);
-			out.close();
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	private boolean removeProperty(File file, String key) {
-		Properties pps = new Properties();
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
-			pps.load(bis);
-			bis.close();
-			FileOutputStream out1 = new FileOutputStream(file);
-			pps.remove(key);
-			pps.store(out1, null);
-			out1.close();
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
+		if (index >= 0) {
+			current.remove(index);
 		}
 	}
  }

@@ -28,7 +28,7 @@ public class Move implements Command{
 		String vcid = Configloader.INSTANCE.getGuildConfig(guild, "supporttalk");
 		VoiceChannel st = guild.getVoiceChannelById(vcid);
 		if (st == null) {
-			Configloader.INSTANCE.deleteGuildConfig(guild, "supporttalk", vcid);
+			Configloader.INSTANCE.removeGuildConfig(guild, "supporttalk", vcid);
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}

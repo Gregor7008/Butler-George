@@ -6,7 +6,6 @@ import commands.moderation.AutoRole;
 import commands.moderation.BotAutoRole;
 import commands.moderation.Cleanup;
 import commands.moderation.Clear;
-import commands.moderation.Close;
 import commands.moderation.CustomChannelRole;
 import commands.moderation.DefaultAccessRoles;
 import commands.moderation.ForbiddenWords;
@@ -43,7 +42,6 @@ import commands.utilities.Leave;
 import commands.utilities.Level;
 import commands.utilities.Levelbackground;
 import commands.utilities.PingAndMove;
-import commands.utilities.Poll;
 import commands.utilities.Report;
 import commands.utilities.Serverinfo;
 import commands.utilities.Suggest;
@@ -64,7 +62,7 @@ public class CommandList {
 		this.utilitycmds.put("levelbackground", new Levelbackground());
 		this.utilitycmds.put("suggest", new Suggest());
 		this.utilitycmds.put("userinfo", new Userinfo());
-		this.utilitycmds.put("poll", new Poll());
+//		this.utilitycmds.put("poll", new Poll()); <--- Poll rework
 		this.utilitycmds.put("report", new Report());
 		this.utilitycmds.put("serverinfo", new Serverinfo());
 		this.utilitycmds.put("language", new Language());
@@ -88,7 +86,7 @@ public class CommandList {
 		this.moderationcmds.put("tempmute", new TempMute());
 		this.moderationcmds.put("warning", new Warning());
 		this.moderationcmds.put("welcome", new Welcome());
-		this.moderationcmds.put("close", new Close());
+//		this.moderationcmds.put("close", new Close()); <--- ModMail rework
 		this.moderationcmds.put("suggestionchannel", new SuggestionChannel());
 		this.moderationcmds.put("levelchannel", new LevelChannel());
 		this.moderationcmds.put("reportchannel", new ReportChannel());

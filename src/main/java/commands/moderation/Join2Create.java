@@ -33,7 +33,7 @@ public class Join2Create implements Command{
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
-				Configloader.INSTANCE.deleteGuildConfig(guild, "join2create", id);
+				Configloader.INSTANCE.removeGuildConfig(guild, "join2create", id);
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess").convert()).queue();
 			} else {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remerror").convert()).queue();
