@@ -1,4 +1,4 @@
-package components.base;
+package components.base.assets;
 
 import javax.annotation.Nullable;
 

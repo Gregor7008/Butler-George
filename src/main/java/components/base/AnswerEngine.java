@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import base.Bot;
+import components.base.assets.CustomMessageEmbed;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;

@@ -17,10 +17,6 @@ import net.dv8tion.jda.api.entities.User;
 public class Configloader {
 	
 	public static Configloader INSTANCE;
-	private static MongoClient client = MongoClients.create("mongodb://192.168.178.104:17389");
-	private static MongoDatabase database = client.getDatabase("butler-george");
-	private static MongoCollection<Document> userconfigs = database.getCollection("user");
-	private static MongoCollection<Document> guildconfigs = database.getCollection("guild");
 	
 	public Configloader() {
 		INSTANCE = this;
@@ -30,25 +26,25 @@ public class Configloader {
 		return this.findorCreateUserConfig(user, guild).getString(key);
 	}
 	
-//	public JSONArray getUserConfigArray(Guild guild, User user, String key) {
-//		return this.findorCreateUserConfig(user, guild).getJSONArray(key);
-//	}
+	public JSONArray getUserConfigArray(Guild guild, User user, String key) {
+		return this.findorCreateUserConfig(user, guild).getJSONArray(key);
+	}
 	
-//	public int getUserConfigInt(Guild guild, User user, String key) {
-//		return this.findorCreateUserConfig(user, guild).getInt(key);
-//	}
+	public int getUserConfigInt(Guild guild, User user, String key) {
+		return this.findorCreateUserConfig(user, guild).getInt(key);
+	}
 	
 	public String getGuildConfig(Guild guild, String key) {
 		return this.findorCreateGuildConfig(guild).getString(key);
 	}
 	
-//	public JSONArray getGuildConfigArray(Guild guild, String key) {
-//		return this.findorCreateGuildConfig(guild).getJSONArray(key);
-//	}
+	public JSONArray getGuildConfigArray(Guild guild, String key) {
+		return this.findorCreateGuildConfig(guild).getJSONArray(key);
+	}
 	
-//	public int getGuildConfigInt(Guild guild, String key) {
-//		return this.findorCreateGuildConfig(guild).getInt(key);
-//	}
+	public int getGuildConfigInt(Guild guild, String key) {
+		return this.findorCreateGuildConfig(guild).getInt(key);
+	}
 	
 	
 //	Change file in any way
@@ -57,7 +53,7 @@ public class Configloader {
 	}
 	
 	public void addUserConfig(Guild guild, User user, String key, String value) {
-//		this.findorCreateUserConfig(user, guild).getJSONArray(key).put(value);
+		this.findorCreateUserConfig(user, guild).getJSONArray(key).put(value);
 		if (this.getUserConfig(guild, user, key).equals("")) {
 			this.setUserConfig(guild, user, key, value);
 		} else {
@@ -66,7 +62,7 @@ public class Configloader {
 	}
 	
 	public void removeUserConfig(Guild guild, User user, String key, String value) {
-//		this.removeValueFromArray(this.findorCreateUserConfig(user, guild).getJSONArray(key), value);
+		this.removeValueFromArray(this.findorCreateUserConfig(user, guild).getJSONArray(key), value);
 		if (this.getUserConfig(guild, user, key).equals(value)) {
 			this.setUserConfig(guild, user, key, "");
 		} else {
@@ -79,11 +75,11 @@ public class Configloader {
 	}
 	
 	public void addGuildConfig(Guild guild, String key, String value) {
-//		this.findorCreateGuildConfig(guild).getJSONArray(key).put(value);
+		this.findorCreateGuildConfig(guild).getJSONArray(key).put(value);
 	}
 	
 	public void removeGuildConfig(Guild guild, String key, String value) {
-//		this.removeValueFromArray(this.findorCreateGuildConfig(guild).getJSONArray(key), value);
+		this.removeValueFromArray(this.findorCreateGuildConfig(guild).getJSONArray(key), value);
 	}
 	
 	public void setReactionroleConfig(Guild guild, String channelID, String msgid, String key, String value) {

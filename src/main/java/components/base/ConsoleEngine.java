@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import javax.annotation.Nullable;
 
 import base.Bot;
+import components.base.assets.ConsoleColors;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 
