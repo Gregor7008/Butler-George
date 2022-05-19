@@ -24,13 +24,13 @@ public class BotAutoRole implements Command{
 		user = event.getUser();
 		if (event.getSubcommandName().equals("add")) {
 			Role role = event.getOption("addrole").getAsRole();
-			ConfigLoader.cfl.addGuildConfig(guild, "botautoroles", role.getId());
+			ConfigLoader.run.addGuildConfig(guild, "botautoroles", role.getId());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:addsuccess").convert()).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
-			ConfigLoader.cfl.removeGuildConfig(guild, "botautoroles", role.getId());
+			ConfigLoader.run.removeGuildConfig(guild, "botautoroles", role.getId());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess").convert()).queue();
 			return;
 		}
@@ -57,7 +57,7 @@ public class BotAutoRole implements Command{
 	
 	private void listroles(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
-		String currentraw = ConfigLoader.cfl.getGuildConfig(guild, "botautoroles");
+		String currentraw = ConfigLoader.run.getGuildConfig(guild, "botautoroles");
 		if (currentraw.equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:nobotautoroles").convert()).queue();;
 			return;

@@ -18,7 +18,7 @@ public class ReportChannel implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		ConfigLoader.cfl.setGuildConfig(guild, "reportchannel", event.getOption("channel").getAsGuildChannel().getId());
+		ConfigLoader.run.setGuildConfig(guild, "reportchannel", event.getOption("channel").getAsGuildChannel().getId());
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reportchannel:success").convert()).queue();
 	}
 

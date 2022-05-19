@@ -24,7 +24,7 @@ public class Leave implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		String ctgid = ConfigLoader.cfl.getUserConfig(guild, user, "cccategory");
+		String ctgid = ConfigLoader.run.getUserConfig(guild, user, "cccategory");
 		GuildChannel channel;
 		if (event.getOption("channel") != null) {
 			channel = event.getOption("channel").getAsGuildChannel();
@@ -89,7 +89,7 @@ public class Leave implements Command{
 		for (int i = 0; i < filelist.length; i++) {
 			String[] temp1 = filelist[i].getName().split(".properties");
 			User cuser = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
-			String ccid = ConfigLoader.cfl.getUserConfig(guild, cuser, "cccategory");
+			String ccid = ConfigLoader.run.getUserConfig(guild, cuser, "cccategory");
 			if (!ccid.equals("")) {
 				if (category.equals(guild.getCategoryById(ccid))) {
 					return true;

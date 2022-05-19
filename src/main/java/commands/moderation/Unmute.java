@@ -18,13 +18,13 @@ public class Unmute implements Command{
 		final Guild guild = event.getGuild();
 		final User user =  event.getUser();
 		final User cuser = event.getOption("user").getAsUser();
-		if (!Boolean.parseBoolean(ConfigLoader.cfl.getUserConfig(guild, cuser, "muted"))) {
+		if (!Boolean.parseBoolean(ConfigLoader.run.getUserConfig(guild, cuser, "muted"))) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
 			return;
 		}
-		ConfigLoader.cfl.setUserConfig(guild, cuser, "muted", "false");
-		ConfigLoader.cfl.setUserConfig(guild, cuser, "tempmuted", "false");
-		ConfigLoader.cfl.setUserConfig(guild, cuser, "tmuntil", "");
+		ConfigLoader.run.setUserConfig(guild, cuser, "muted", "false");
+		ConfigLoader.run.setUserConfig(guild, cuser, "tempmuted", "false");
+		ConfigLoader.run.setUserConfig(guild, cuser, "tmuntil", "");
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}

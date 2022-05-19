@@ -1,13 +1,8 @@
 package components.base;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Writer;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -117,28 +112,8 @@ public class ConsoleEngine {
 						this.info(this, "User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully unbanned from " + jda.getGuildById(insplit[1]).getName());
 						break;
 					case "warn":
-						ConfigLoader.cfl.addUserConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2]), "warnings", "Administrative actions");
+						ConfigLoader.run.getUserConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2])).getJSONArray("warnings").put("Administrative actions");
 						this.debug(this, "User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
-						break;
-					case "listbugs":
-						try (BufferedReader br = new BufferedReader(new FileReader(new File(Bot.environment + "/configs/bugs.txt")))) {
-						    String fileline;
-						    while ((fileline = br.readLine()) != null) {
-						       this.info(this, fileline);
-						    }
-						}
-						break;
-					case "addbug":
-						try {
-							Writer output = new BufferedWriter(new FileWriter(Bot.environment + "/configs/bugs.txt", true));
-							String[] bug = line.split(" ", 2);
-							output.append(bug[1] + "\n");
-							output.close();
-						} catch (ArrayIndexOutOfBoundsException e) {
-							this.debug(this, "Invalid arguments! - Add the new bug behind the command!");
-							break;
-						}
-						
 						break;
 					default:
 						this.error(this, "Unknown command!");

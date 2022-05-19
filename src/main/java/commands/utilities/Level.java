@@ -74,10 +74,10 @@ public class Level implements Command {
 	}
 	
 	public File renderLevelcard(User iuser, Guild guild) {
-		String levelbackground = ConfigLoader.cfl.getUserConfig(guild, iuser, "levelbackground");
-		int level = Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, iuser, "level"));
-		String curxp = ConfigLoader.cfl.getUserConfig(guild, iuser, "expe");
-		int nedxp = LevelEngine.getInstance().xpneededforlevel(Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, iuser, "level")));
+		String levelbackground = ConfigLoader.run.getUserConfig(guild, iuser, "levelbackground");
+		int level = Integer.parseInt(ConfigLoader.run.getUserConfig(guild, iuser, "level"));
+		String curxp = ConfigLoader.run.getUserConfig(guild, iuser, "expe");
+		int nedxp = LevelEngine.getInstance().xpneededforlevel(Integer.parseInt(ConfigLoader.run.getUserConfig(guild, iuser, "level")));
 		int progress = this.calculateProgress(level, nedxp, curxp);
 		BufferedImage image = null;
 		try {

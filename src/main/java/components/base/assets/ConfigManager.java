@@ -93,14 +93,6 @@ public class ConfigManager {
 		return config;
 	}
 	
-	public JSONObject getPollConfig(Guild guild, String channelID, String messageID) {
-		JSONObject config = null;
-		try {
-			config = this.getGuildConfig(guild).getJSONObject(channelID).getJSONObject(messageID);
-		} catch (JSONException e) {}
-		return config;
-	}
-	
 	//Create JSONObjects
 	private JSONObject createUserConfig(User user) {
 		JSONObject newConfig = new JSONObject();
@@ -149,14 +141,15 @@ public class ConfigManager {
 		newConfig.put("createdchannels",			new JSONObject());
 		newConfig.put("join2createchannels",		new JSONObject());
 		newConfig.put("levelmsgchannel",			Long.valueOf(0));
-		newConfig.put("levelrewars",				new JSONObject());
-		newConfig.put("offlinemsg",					new JSONArray());
+		newConfig.put("levelrewards",				new JSONObject());
+		newConfig.put("offlinemsg",					Long.valueOf(0));
 		newConfig.put("penalties",					new JSONObject());
 		newConfig.put("reportchannel",				Long.valueOf(0));
 		newConfig.put("suggestionchannel",			Long.valueOf(0));
 		newConfig.put("supportcategory",			Long.valueOf(0));
 		newConfig.put("supportchat",				Long.valueOf(0));
-		newConfig.put("ticketcount",				Integer.valueOf(0));
+		newConfig.put("supporttalk",				Long.valueOf(0));
+		newConfig.put("ticketcount",				Integer.valueOf(1));
 		newConfig.put("welcomemsg",					"");
 		//Deep-nested values (2 layers or more)
 		newConfig.put("modmails",					new JSONObject());
@@ -167,8 +160,8 @@ public class ConfigManager {
 	}
 	
 	public JSONObject createPollConfig(Guild guild, String channelID, String messageID) {
-		if (this.getPollConfig(guild, channelID, messageID) != null) {
-			return this.getPollConfig(guild, channelID, messageID);
+		if (ConfigLoader.run.getPollConfig(guild, channelID, messageID) != null) {
+			return ConfigLoader.run.getPollConfig(guild, channelID, messageID);
 		}
 		JSONObject guildConfig = this.getGuildConfig(guild);
 		try {
@@ -180,10 +173,35 @@ public class ConfigManager {
 		//Simple values
 		newConfig.put("anonymous",					false);
 		newConfig.put("answercount",				Integer.valueOf(0));
+		newConfig.put("answers",					new JSONObject());
+		newConfig.put("channel",					Long.valueOf(channelID));
+		newConfig.put("creationdate",				OffsetDateTime.now().format(dateTimeFormatter));
+		newConfig.put("daysopen",					Integer.valueOf(0));
+		newConfig.put("description",				"");
+		newConfig.put("footer",						"");
+		newConfig.put("message",					Long.valueOf(messageID));
+		newConfig.put("owner",						Long.valueOf(0));
 		newConfig.put("possibleanswers",			"");
-		
+		newConfig.put("thumbnailurl", 				"");
+		newConfig.put("title",						"");
+		newConfig.put("guild",						guild.getIdLong());
 		
 		guildConfig.getJSONObject("polls").getJSONObject(channelID).put(messageID, newConfig);
+		return newConfig;
+	}
+	
+	public JSONObject createReactionroleConfig(Guild guild, String channelID, String messageID) {
+		if (ConfigLoader.run.getReactionroleConfig(guild, channelID, messageID) != null) {
+			return ConfigLoader.run.getReactionroleConfig(guild, channelID, messageID);
+		}
+		JSONObject guildConfig = this.getGuildConfig(guild);
+		try {
+			guildConfig.getJSONObject("reactionroles").getJSONObject(channelID);
+		} catch (JSONException e) {
+			guildConfig.getJSONObject("reactionroles").put(channelID, new JSONObject());
+		}
+		JSONObject newConfig = new JSONObject();
+		guildConfig.getJSONObject("reactionroles").getJSONObject(channelID).put(messageID, newConfig);
 		return newConfig;
 	}
 }

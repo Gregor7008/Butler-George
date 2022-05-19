@@ -21,14 +21,14 @@ public class Levelreward implements Command{
 		guild = event.getGuild();
 		user = event.getUser();
 		if (event.getSubcommandName().equals("add")) {
-			ConfigLoader.cfl.addGuildConfig(guild, "levelrewards", event.getOption("role").getAsRole().getId() + "_" + event.getOption("level").getAsString());
+			ConfigLoader.run.addGuildConfig(guild, "levelrewards", event.getOption("role").getAsRole().getId() + "_" + event.getOption("level").getAsString());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/levelreward:addsuccess")
 					.replaceDescription("{role}", event.getOption("role").getAsRole().getAsMention())
 					.replaceDescription("{level}", event.getOption("level").getAsString()).convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
-			String rawinput = ConfigLoader.cfl.getGuildConfig(guild, "levelrewards");
+			String rawinput = ConfigLoader.run.getGuildConfig(guild, "levelrewards");
 			if (rawinput.equals("")) {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/levelreward:norewards").convert()).queue();
 				return;
@@ -36,7 +36,7 @@ public class Levelreward implements Command{
 			String[] rewards = rawinput.split(";");
 			for (int i = 0; i < rewards.length; i++) {
 				if (rewards[i].contains(event.getOption("role").getAsRole().getId())) {
-					ConfigLoader.cfl.removeGuildConfig(guild, "levelrewards", rewards[i]);
+					ConfigLoader.run.removeGuildConfig(guild, "levelrewards", rewards[i]);
 					String[] reward = rewards[i].split("_");
 					event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/levelreward:addsuccess")
 							.replaceDescription("{role}", guild.getRoleById(reward[0]).getAsMention())
@@ -69,7 +69,7 @@ public class Levelreward implements Command{
 	
 	private void listrewards(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
-		String currentraw = ConfigLoader.cfl.getGuildConfig(guild, "levelrewards");
+		String currentraw = ConfigLoader.run.getGuildConfig(guild, "levelrewards");
 		if (currentraw.equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/levelreward:norewards").convert()).queue();;
 			return;

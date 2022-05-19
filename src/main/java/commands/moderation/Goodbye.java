@@ -24,17 +24,17 @@ public class Goodbye implements Command {
 		if (event.getSubcommandName().equals("set")) {
 			String message = event.getOption("message").toString();
 			String channelid = event.getOption("channel").getAsGuildChannel().getId();
-			ConfigLoader.cfl.setGuildConfig(guild, "goodbyemsg", message + ";" + channelid);
+			ConfigLoader.run.setGuildConfig(guild, "goodbyemsg", message + ";" + channelid);
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
-			ConfigLoader.cfl.setGuildConfig(guild, "goodbyemsg", "");
+			ConfigLoader.run.setGuildConfig(guild, "goodbyemsg", "");
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:offsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
-			String goodbyemsgraw = ConfigLoader.cfl.getGuildConfig(guild, "goodbyemsg");
+			String goodbyemsgraw = ConfigLoader.run.getGuildConfig(guild, "goodbyemsg");
 			LocalDateTime date = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 			String currentdate = date.format(formatter);

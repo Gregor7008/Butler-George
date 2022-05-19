@@ -34,7 +34,7 @@ public class Warning implements Command{
 			} else {
 				reason = event.getOption("reason").getAsString();
 			}
-			ConfigLoader.cfl.addUserConfig(guild, iuser, "warnings", reason);
+			ConfigLoader.run.addUserConfig(guild, iuser, "warnings", reason);
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/warning:success").convert()).queue();
 			try {
 				iuser.openPrivateChannel().queue(channel -> {
@@ -56,10 +56,10 @@ public class Warning implements Command{
 				waiter.waitForEvent(MessageReceivedEvent.class,
 						e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 						  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-						e -> {String allwarnings = ConfigLoader.cfl.getUserConfig(guild, event.getOption("user").getAsUser(), "warnings");
+						e -> {String allwarnings = ConfigLoader.run.getUserConfig(guild, event.getOption("user").getAsUser(), "warnings");
 							  String[] warnings = allwarnings.split(";");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
-							  ConfigLoader.cfl.removeUserConfig(guild, member.getUser(), "warnings", warnings[w-1]);
+							  ConfigLoader.run.removeUserConfig(guild, member.getUser(), "warnings", warnings[w-1]);
 							  channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/warning:remsuccess")
 									  .replaceDescription("{warning}", warnings[w-1])
 									  .replaceDescription("{user}", member.getEffectiveName()).convert()).queue();},
@@ -92,7 +92,7 @@ public class Warning implements Command{
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		final User iuser = event.getOption("user").getAsUser();
-		String allwarnings = ConfigLoader.cfl.getUserConfig(guild, iuser, "warnings");
+		String allwarnings = ConfigLoader.run.getUserConfig(guild, iuser, "warnings");
 		if (allwarnings.equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/warning:nowarnings").convert()).queue();
 			return false;

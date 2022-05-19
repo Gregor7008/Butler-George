@@ -17,7 +17,7 @@ public class SupportChannel implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		ConfigLoader.cfl.setGuildConfig(guild, "supportchannel", event.getOption("channel").getAsGuildChannel().getId());
+		ConfigLoader.run.setGuildConfig(guild, "supportchannel", event.getOption("channel").getAsGuildChannel().getId());
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supportchannel:success").convert()).queue();
 	}
 

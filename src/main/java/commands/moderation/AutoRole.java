@@ -24,13 +24,13 @@ public class AutoRole implements Command {
 		user = event.getUser();
 		if (event.getSubcommandName().equals("add")) {
 			Role role = event.getOption("addrole").getAsRole();
-			ConfigLoader.cfl.addGuildConfig(guild, "autoroles", role.getId());
+			ConfigLoader.run.addGuildConfig(guild, "autoroles", role.getId());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:addsuccess").convert()).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
-			ConfigLoader.cfl.removeGuildConfig(guild, "autoroles", role.getId());
+			ConfigLoader.run.removeGuildConfig(guild, "autoroles", role.getId());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:removesuccess").convert()).queue();
 			return;
 		}
@@ -57,7 +57,7 @@ public class AutoRole implements Command {
 	
 	private void listroles(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
-		String currentraw = ConfigLoader.cfl.getGuildConfig(guild, "autoroles");
+		String currentraw = ConfigLoader.run.getGuildConfig(guild, "autoroles");
 		if (currentraw.equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:noautoroles").convert()).queue();;
 			return;

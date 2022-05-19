@@ -43,27 +43,27 @@ public class Language implements Command{
 				e -> {reply.deleteOriginal().queue();
 					  switch (e.getSelectedOptions().get(0).getValue()) {
 				      case "en":
-				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "en");
+				    	  ConfigLoader.run.setUserConfig(guild, user, "language", "en");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successen").convert()).queue();
 				    	  break;
 				      case "de":
-				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "de");
+				    	  ConfigLoader.run.setUserConfig(guild, user, "language", "de");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successde").convert()).queue();
 				    	  break;
 				      case "es":
-				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "es");
+				    	  ConfigLoader.run.setUserConfig(guild, user, "language", "es");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successes").convert()).queue();
 				    	  break;
 				      case "fr":
-				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "fr");
+				    	  ConfigLoader.run.setUserConfig(guild, user, "language", "fr");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successfr").convert()).queue();
 				    	  break;
 				      case "nl":
-				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "nl");
+				    	  ConfigLoader.run.setUserConfig(guild, user, "language", "nl");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successnl").convert()).queue();
 				    	  break;
 				      case "ru":
-				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "ru");
+				    	  ConfigLoader.run.setUserConfig(guild, user, "language", "ru");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successru").convert()).queue();
 				    	  break;
 				      default:

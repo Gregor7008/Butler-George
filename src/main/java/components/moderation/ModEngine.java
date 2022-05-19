@@ -34,8 +34,8 @@ public class ModEngine {
 				File pFile = new File(Bot.environment + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
 				if (pFile.exists()) {
 					//Check for tempmute properties
-					if (!Boolean.parseBoolean(ConfigLoader.cfl.getUserConfig(guild, user, "tempmuted"))) {
-						if (Boolean.parseBoolean(ConfigLoader.cfl.getUserConfig(guild, user, "muted"))) {
+					if (!Boolean.parseBoolean(ConfigLoader.run.getUserConfig(guild, user, "tempmuted"))) {
+						if (Boolean.parseBoolean(ConfigLoader.run.getUserConfig(guild, user, "muted"))) {
 							if (!member.isTimedOut()) {
 								member.timeoutFor(27, TimeUnit.DAYS).queue();
 							}
@@ -46,7 +46,7 @@ public class ModEngine {
 						}
 					} else {
 						if (!guild.getMember(user).isTimedOut()) {
-							ConfigLoader.cfl.setUserConfig(guild, user, "tempmuted", "false");
+							ConfigLoader.run.setUserConfig(guild, user, "tempmuted", "false");
 						}
 					}
 				}
@@ -57,14 +57,14 @@ public class ModEngine {
 			for (int i = 0; i < filelist.length; i++) {
 				String[] temp1 = filelist[i].getName().split(".properties");
 				User user = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
-				if (Boolean.parseBoolean(ConfigLoader.cfl.getUserConfig(guild, user, "tempbanned"))) {
-					OffsetDateTime tbuntil = OffsetDateTime.parse(ConfigLoader.cfl.getUserConfig(guild, user, "tbuntil"));
+				if (Boolean.parseBoolean(ConfigLoader.run.getUserConfig(guild, user, "tempbanned"))) {
+					OffsetDateTime tbuntil = OffsetDateTime.parse(ConfigLoader.run.getUserConfig(guild, user, "tbuntil"));
 					OffsetDateTime now = OffsetDateTime.now();
 					long difference = Duration.between(now, tbuntil).toSeconds();
 					if (difference <= 0) {
 						guild.unban(user).queue();
-						ConfigLoader.cfl.setUserConfig(guild, user, "tempbanned", "false");
-						ConfigLoader.cfl.setUserConfig(guild, user, "tbuntil", "");
+						ConfigLoader.run.setUserConfig(guild, user, "tempbanned", "false");
+						ConfigLoader.run.setUserConfig(guild, user, "tbuntil", "");
 					}
 				}
 			}

@@ -1,15 +1,13 @@
 package components.base;
 
-import java.io.File;
-import java.util.List;
+import java.util.Set;
 
-import base.Bot;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.VoiceChannel;
 
 public class ConfigCheck {
 	
@@ -20,101 +18,101 @@ public class ConfigCheck {
 	}
 	
 	public void checkGuildConfigs(Guild guild) {
-		String id = ConfigLoader.cfl.getGuildConfig(guild, "join2create");
-		if (!id.equals("")) {
-			String[] entries = id.split(";");
-			for (int i = 0; i < entries.length; i++) {
-				VoiceChannel vc = guild.getVoiceChannelById(entries[i]);
-				if (vc == null) {
-					ConfigLoader.cfl.removeGuildConfig(guild, "join2create", entries[i]);
+		//JSONObject configs
+		JSONObject join2createchannels = ConfigLoader.run.getGuildConfig(guild).getJSONObject("join2createchannels");
+		if (!join2createchannels.isEmpty()) {
+			Set<String> channelids = join2createchannels.keySet();
+			channelids.forEach(e -> {
+				if (guild.getVoiceChannelById(e) == null) {
+					join2createchannels.remove(e);
+				}
+			});
+		}
+		
+		JSONObject levelrewards = ConfigLoader.run.getGuildConfig(guild).getJSONObject("levelrewards");
+		if (!levelrewards.isEmpty()) {
+			Set<String> levels = levelrewards.keySet();
+			levels.forEach(e -> {
+				if (guild.getRoleById(levelrewards.getLong(e)) == null) {
+					levelrewards.remove(e);
+				}
+			});
+		}
+		//JSONArray configs
+		JSONArray ccroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("customchannelroles");
+		if (!ccroles.isEmpty()) {
+			for (int i = 0; i < ccroles.length(); i++) {
+				if (guild.getRoleById(ccroles.getLong(i)) == null) {
+					ConfigLoader.run.removeValueFromArray(ccroles, i);
 				}
 			}
 		}
-		id = ConfigLoader.cfl.getGuildConfig(guild, "supporttalk");
-		if (!id.equals("")) {
-			if (guild.getVoiceChannelById(id) == null) {
-				ConfigLoader.cfl.removeGuildConfig(guild, "supporttalk", id);
+		
+		JSONArray ccaccessroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("customchannelaccessroles");
+		if (!ccaccessroles.isEmpty()) {
+			for (int i = 0; i < ccaccessroles.length(); i++) {
+				if (guild.getRoleById(ccaccessroles.getLong(i)) == null) {
+					ConfigLoader.run.removeValueFromArray(ccaccessroles, i);
+				}
 			}
 		}
-		id = ConfigLoader.cfl.getGuildConfig(guild, "supportchat");
-		if (!id.equals("")) {
+		//long configs
+		long id = ConfigLoader.run.getGuildConfig(guild).getLong("supporttalk");
+		if (id != 0) {
+			if (guild.getVoiceChannelById(id) == null) {
+				ConfigLoader.run.getGuildConfig(guild).put("supporttalk", Long.valueOf(0));
+			}
+		}
+		
+		id = ConfigLoader.run.getGuildConfig(guild).getLong("suggestionchannel");
+		if (id != 0) {
+			if (guild.getTextChannelById(id) == null) {
+				ConfigLoader.run.getGuildConfig(guild).put("suggestionchannel", Long.valueOf(0));
+			}
+		}
+		
+		id = ConfigLoader.run.getGuildConfig(guild).getLong("supportchat");
+		if (id != 0) {
 			TextChannel tc = guild.getTextChannelById(id);
 			if (tc == null) {
-				ConfigLoader.cfl.removeGuildConfig(guild, "supportchat", id);
+				ConfigLoader.run.getGuildConfig(guild).put("supportchat", Long.valueOf(0));
 			} else {
 				tc.upsertPermissionOverride(guild.getPublicRole()).setAllowed(Permission.VIEW_CHANNEL).queue();
 			}
 		}
-		id = ConfigLoader.cfl.getGuildConfig(guild, "ccrole");
-		if (!id.equals("")) {
-			if (guild.getRoleById(id) == null ) {
-				ConfigLoader.cfl.removeGuildConfig(guild, "ccrole", id);
-			}
-		}
-		id = ConfigLoader.cfl.getGuildConfig(guild, "ccdefaccess");
-		if (!id.equals("")) {
-			String[] entries = id.split(";");
-			for (int a = 0; a < entries.length; a++) {
-				if (guild.getRoleById(entries[a]) == null ) {
-					ConfigLoader.cfl.removeGuildConfig(guild, "ccdefaccess", entries[a]);
-				}
-			}
-		}
-		id = ConfigLoader.cfl.getGuildConfig(guild, "reportchannel");
-		if (!id.equals("")) {
+		
+		id = ConfigLoader.run.getGuildConfig(guild).getLong("reportchannel");
+		if (id != 0) {
 			if (guild.getTextChannelById(id) == null) {
-				ConfigLoader.cfl.removeGuildConfig(guild, "reportchannel", id);
+				ConfigLoader.run.getGuildConfig(guild).put("reportchannel", Long.valueOf(0));
 			}
 		}
-		id = ConfigLoader.cfl.getGuildConfig(guild, "supportcategory");
-		if (!id.equals("")) {
+		
+		id = ConfigLoader.run.getGuildConfig(guild).getLong("supportcategory");
+		if (id != 0) {
 			if (guild.getCategoryById(id) == null) {
-				ConfigLoader.cfl.removeGuildConfig(guild, "supportcategory", id);
+				ConfigLoader.run.getGuildConfig(guild).put("supportcategory", Long.valueOf(0));
 			}
 		}
-		id = ConfigLoader.cfl.getGuildConfig(guild, "levelrewards");
-		if (!id.equals("")) {
-			String[] entries = id.split(";");
-			for (int a = 0; a < entries.length; a++) {
-				String[] details = entries[a].split("_");
-				if (guild.getRoleById(details[0]) == null) {
-					ConfigLoader.cfl.removeGuildConfig(guild, "levelrewards", entries[a]);
-				}
-			}
-		}
-		id = ConfigLoader.cfl.getGuildConfig(guild, "welcomemsg");
-		if (!id.equals("")) {
-			String[] details = id.split(";");
+		//String configs
+		String msg = ConfigLoader.run.getGuildConfig(guild).getString("welcomemsg");
+		if (!msg.equals("")) {
+			String[] details = msg.split(";");
 			if (guild.getTextChannelById(details[1]) == null) {
-				ConfigLoader.cfl.setGuildConfig(guild, "welcomemsg", "");
+				ConfigLoader.run.getGuildConfig(guild).put("welcomemsg", "");
 			}
 		}
-		id = ConfigLoader.cfl.getGuildConfig(guild, "goodbyemsg");
-		if (!id.equals("")) {
-			String[] details = id.split(";");
+		
+		msg = ConfigLoader.run.getGuildConfig(guild).getString("goodbyemsg");
+		if (!msg.equals("")) {
+			String[] details = msg.split(";");
 			if (guild.getTextChannelById(details[1]) == null) {
-				ConfigLoader.cfl.setGuildConfig(guild, "goodbyemsg", "");
+				ConfigLoader.run.getGuildConfig(guild).put("goodbyemsg", "");
 			}
 		}
 	}
 	
 	public void checkUserConfigs(Guild guild) {
-		File guilddir = new File(Bot.environment + "/configs/user/" + guild.getId());
-		if (guilddir.exists()) {
-			List<Member> members = guild.loadMembers().get();
-    		for (int a = 0; a < members.size(); a++) {
-    			User user = members.get(a).getUser();
-    			File pFile = new File(Bot.environment + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
-    			if (pFile.exists()) {
-    				String id = ConfigLoader.cfl.getUserConfig(guild, user, "cccategory");
-    	    		if (!id.equals("")) {
-    	    			if (guild.getCategoryById(id) == null) {
-    	    				ConfigLoader.cfl.removeUserConfig(guild, user, "cccategory", id);
-    	    				ConfigLoader.cfl.removeGuildConfig(guild, "ccctgies", id);
-    	    			}
-    	    		}
-    			}
-    		}
-		}
+		//TODO
 	}
 }

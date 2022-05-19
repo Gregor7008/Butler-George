@@ -23,12 +23,12 @@ public class ForbiddenWords implements Command{
 			String rawadd = event.getOption("words").getAsString();
 			String[] splitadd = rawadd.split(";\\s");
 			int e = 0;
-			if (ConfigLoader.cfl.getGuildConfig(guild, "forbidden").equals("\\//\\//\\//")) {
-				ConfigLoader.cfl.setGuildConfig(guild, "forbidden", splitadd[0]);
+			if (ConfigLoader.run.getGuildConfig(guild, "forbidden").equals("\\//\\//\\//")) {
+				ConfigLoader.run.setGuildConfig(guild, "forbidden", splitadd[0]);
 				e++;
 			}
 			for (int i = e; i < splitadd.length; i++) {
-				ConfigLoader.cfl.addGuildConfig(guild, "forbidden", splitadd[i]);
+				ConfigLoader.run.addGuildConfig(guild, "forbidden", splitadd[i]);
 			}
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:addsuccess").convert()).queue();
 			break;
@@ -36,26 +36,26 @@ public class ForbiddenWords implements Command{
 			String rawremove = event.getOption("words").getAsString();
 			String[] splitremove = rawremove.split(";\\s");
 			for (int i = 0; i < splitremove.length; i++) {
-				ConfigLoader.cfl.removeGuildConfig(guild, "forbidden", splitremove[i]);
+				ConfigLoader.run.removeGuildConfig(guild, "forbidden", splitremove[i]);
 			}
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:removesuccess").convert()).queue();
 			break;
 		case "set":
 			String rawset = event.getOption("words").getAsString();
 			String finalset = rawset.replaceAll(";\\s", ";");
-			ConfigLoader.cfl.setGuildConfig(guild, "forbidden", finalset);
+			ConfigLoader.run.setGuildConfig(guild, "forbidden", finalset);
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:setsuccess").convert()).queue();
 			break;
 		case "clear":
-			ConfigLoader.cfl.setGuildConfig(guild, "forbidden", "");
+			ConfigLoader.run.setGuildConfig(guild, "forbidden", "");
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:clearsuccess").convert()).queue();
 			break;
 		case "list":
-			if (ConfigLoader.cfl.getGuildConfig(guild, "forbidden").equals("\\//\\//\\//")) {
+			if (ConfigLoader.run.getGuildConfig(guild, "forbidden").equals("\\//\\//\\//")) {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:none").convert()).queue();
 				break;
 			}
-			String rawlist = ConfigLoader.cfl.getGuildConfig(guild, "forbidden");
+			String rawlist = ConfigLoader.run.getGuildConfig(guild, "forbidden");
 			String finallist = rawlist.replaceAll(";", ", ");
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/forbiddenwords:list").replaceDescription("{list}", finallist).convert()).queue();
 			break;

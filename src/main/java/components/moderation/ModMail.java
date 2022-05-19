@@ -37,8 +37,8 @@ public class ModMail {
 			return;
 		}
 		if (direction) {
-			if (ConfigLoader.cfl.getMailConfig1(event.getChannel().getId()) != null) {
-				PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(ConfigLoader.cfl.getMailConfig1(event.getChannel().getId())).complete();
+			if (ConfigLoader.run.getMailConfig1(event.getChannel().getId()) != null) {
+				PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(ConfigLoader.run.getMailConfig1(event.getChannel().getId())).complete();
 				this.resendMessage(pc, event.getMessage());
 			}
 			return;
@@ -53,16 +53,16 @@ public class ModMail {
 			event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(null, null, "/components/moderation/modmail:nosupport").convert()).queue();
 			return;
 		}
-		if (ConfigLoader.cfl.getMailConfig2(user.getId()) != null) {
-			TextChannel channel = guild.getTextChannelById(ConfigLoader.cfl.getMailConfig2(user.getId()));
+		if (ConfigLoader.run.getMailConfig2(user.getId()) != null) {
+			TextChannel channel = guild.getTextChannelById(ConfigLoader.run.getMailConfig2(user.getId()));
 			this.resendMessage(channel, event.getMessage());
 			return;
 		}
 		if (!event.getMessage().getContentRaw().contains("anonym")) {
-			OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.cfl.getUserConfig(guild, user, "lastmail"));
+			OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.run.getUserConfig(guild, user, "lastmail"));
 			if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 300) {
 				event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/moderation/modmail:success").convert()).queue();
-				ConfigLoader.cfl.setUserConfig(guild, user, "lastmail", OffsetDateTime.now().toString());
+				ConfigLoader.run.setUserConfig(guild, user, "lastmail", OffsetDateTime.now().toString());
 				this.processMessage(event);
 			} else {
 				int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
@@ -70,10 +70,10 @@ public class ModMail {
 						.replaceDescription("{timeleft}", String.valueOf(timeleft)).convert()).queue();
 			}
 		} else {
-			OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.cfl.getUserConfig(guild, user, "lastmail"));
+			OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.run.getUserConfig(guild, user, "lastmail"));
 			if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 1) {
 				event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/moderation/modmail:successanonym").convert()).queue();
-				ConfigLoader.cfl.setUserConfig(guild, user, "lastmail", OffsetDateTime.now().toString());
+				ConfigLoader.run.setUserConfig(guild, user, "lastmail", OffsetDateTime.now().toString());
 				this.processAnonymousMessage(event);
 			} else {
 				int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
@@ -84,28 +84,28 @@ public class ModMail {
 	}
 	
 	private void processMessage(MessageReceivedEvent event) {
-		if (ConfigLoader.cfl.getGuildConfig(guild, "supportcategory").equals("")) {
+		if (ConfigLoader.run.getGuildConfig(guild, "supportcategory").equals("")) {
 			Category ctg = guild.createCategory("----------📝 Tickets ------------").complete();
-			ConfigLoader.cfl.setGuildConfig(guild, "supportcategory", ctg.getId());
+			ConfigLoader.run.setGuildConfig(guild, "supportcategory", ctg.getId());
 		}
-		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById(ConfigLoader.cfl.getGuildConfig(guild, "supportcategory"))).complete();
+		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById(ConfigLoader.run.getGuildConfig(guild, "supportcategory"))).complete();
 		nc.sendMessage(event.getMessage()).queue();
 		nc.sendMessage(guild.getPublicRole().getAsMention());
 		nc.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-		ConfigLoader.cfl.setMailConfig(nc.getId(), event.getAuthor().getId());
+		ConfigLoader.run.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 	
 	private void processAnonymousMessage(MessageReceivedEvent event) {
 		int rn = new Random().nextInt(100);
-		if (ConfigLoader.cfl.getGuildConfig(guild, "supportcategory").equals("")) {
+		if (ConfigLoader.run.getGuildConfig(guild, "supportcategory").equals("")) {
 			Category ctg = guild.createCategory("----------📝 Tickets ------------").complete();
-			ConfigLoader.cfl.setGuildConfig(guild, "supportcategory", ctg.getId());
+			ConfigLoader.run.setGuildConfig(guild, "supportcategory", ctg.getId());
 		}
-		TextChannel nc = guild.createTextChannel(String.valueOf(rn), guild.getCategoryById(ConfigLoader.cfl.getGuildConfig(guild, "supportcategory"))).complete();
+		TextChannel nc = guild.createTextChannel(String.valueOf(rn), guild.getCategoryById(ConfigLoader.run.getGuildConfig(guild, "supportcategory"))).complete();
 		this.resendMessage(nc, event.getMessage());
 		nc.sendMessage(guild.getPublicRole().getAsMention());
 		nc.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-		ConfigLoader.cfl.setMailConfig(nc.getId(), event.getAuthor().getId());
+		ConfigLoader.run.setMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 	
 	private void resendMessage(MessageChannel channel, Message message) {

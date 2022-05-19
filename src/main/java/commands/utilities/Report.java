@@ -21,7 +21,7 @@ public class Report implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (ConfigLoader.cfl.getGuildConfig(guild, "reportchannel").equals("")) {
+		if (ConfigLoader.run.getGuildConfig(guild, "reportchannel").equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/report:nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
@@ -36,7 +36,7 @@ public class Report implements Command{
 			eb.setTitle("Report of the user \"" + event.getOption("user").getAsUser().getName() + "\"", event.getOption("link").getAsString());
 		}
 		eb.setDescription(event.getOption("reason").getAsString());
-		guild.getTextChannelById(ConfigLoader.cfl.getGuildConfig(guild, "reportchannel")).sendMessageEmbeds(eb.build()).queue();
+		guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild, "reportchannel")).sendMessageEmbeds(eb.build()).queue();
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/report:success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 

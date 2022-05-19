@@ -24,17 +24,17 @@ public class Welcome implements Command{
 		if (event.getSubcommandName().equals("set")) {
 			String message = event.getOption("message").getAsString();
 			String channelid = event.getOption("channel").getAsGuildChannel().getId();
-			ConfigLoader.cfl.setGuildConfig(guild, "welcomemsg", message + ";" + channelid);
+			ConfigLoader.run.setGuildConfig(guild, "welcomemsg", message + ";" + channelid);
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/welcome:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
-			ConfigLoader.cfl.setGuildConfig(guild, "welcomemsg", "");
+			ConfigLoader.run.setGuildConfig(guild, "welcomemsg", "");
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/welcome:offsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
-			String welcomemsgraw = ConfigLoader.cfl.getGuildConfig(guild, "welcomemsg");
+			String welcomemsgraw = ConfigLoader.run.getGuildConfig(guild, "welcomemsg");
 			LocalDateTime date = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 			String currentdate = date.format(formatter);

@@ -26,12 +26,12 @@ public class Suggest implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		String channelid = ConfigLoader.cfl.getGuildConfig(guild, "suggest");
+		String channelid = ConfigLoader.run.getGuildConfig(guild, "suggest");
 		if (channelid.equals(null)) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
 			return;
 		}
-		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.cfl.getUserConfig(guild, user, "lastsuggestion"));
+		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.run.getUserConfig(guild, user, "lastsuggestion"));
 		if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
 			return;
@@ -53,7 +53,7 @@ public class Suggest implements Command{
 	}
 	
 	public void sendsuggestion(Guild guild, Member member, String idea) {
-		TextChannel channel = guild.getTextChannelById(ConfigLoader.cfl.getGuildConfig(guild, "suggest"));
+		TextChannel channel = guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild, "suggest"));
 		EmbedBuilder eb = new EmbedBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());

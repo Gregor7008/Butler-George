@@ -1,6 +1,5 @@
 package base;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -8,6 +7,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -65,37 +65,38 @@ public class Processor extends ListenerAdapter {
 			LevelEngine.getInstance().messagereceived(event);
 			//automoderation
 			AutoModerator.getInstance().messagereceived(event);
-			//Suggestions
-			String suggestid = ConfigLoader.cfl.getGuildConfig(guild, "suggest");
-			if (!suggestid.equals("") && event.getChannel().getId().equals(suggestid) && !user.isBot()) {
+			//suggestions
+			long suggestchid = ConfigLoader.run.getGuildConfig(guild).getLong("suggestionchannel");
+			if (suggestchid != 0 && event.getChannel().getIdLong() == suggestchid && !user.isBot()) {
 				new Suggest().sendsuggestion(guild, event.getMember(), event.getMessage().getContentRaw());
 				event.getMessage().delete().queue();
 				return;
 			}
-			//Support channel
-			String supportid = ConfigLoader.cfl.getGuildConfig(guild, "supportchat");
-			if (!supportid.equals("") && event.getChannel().getId().equals(supportid) && !user.isBot() && !ConfigLoader.cfl.getGuildConfig(guild, "supportrole").equals("")) {
-				if (guild.getCategoryById(ConfigLoader.cfl.getGuildConfig(guild, "supportcategory")) == null) {
-					Category cat = guild.createCategory("Supportchat").complete();
+			//support channel
+			long supportchid = ConfigLoader.run.getGuildConfig(guild).getLong("supportchat");
+			if (supportchid != 0 && event.getChannel().getIdLong() == supportchid && !user.isBot() && ConfigLoader.run.getGuildConfig(guild).getLong("supportrole") != 0) {
+				if (guild.getCategoryById(ConfigLoader.run.getGuildConfig(guild).getLong("supportcategory")) == null) {
+					Category cat = guild.createCategory("----------📝 Tickets ------------").complete();
 					cat.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-					cat.upsertPermissionOverride(guild.getRoleById(ConfigLoader.cfl.getGuildConfig(guild, "supportrole"))).setAllowed(Permission.VIEW_CHANNEL).queue();
-					ConfigLoader.cfl.setGuildConfig(guild, "supportcategory", cat.getId());
+					cat.upsertPermissionOverride(guild.getRoleById(ConfigLoader.run.getGuildConfig(guild).getLong("supportrole"))).setAllowed(Permission.VIEW_CHANNEL).queue();
+					ConfigLoader.run.getGuildConfig(guild).put("supportcategory", cat.getIdLong());
 				}
-				String curcount = ConfigLoader.cfl.getGuildConfig(guild, "ticketcount");
-				int newcount = Integer.parseInt(curcount) + 1;
+				int curcount = ConfigLoader.run.getGuildConfig(guild).getInt("ticketcount");
+				int newcount = curcount + 1;
 				TextChannel ntc = guild.createTextChannel(
-						"Ticket #" + curcount,
-						guild.getCategoryById(ConfigLoader.cfl.getGuildConfig(guild, "supportcategory"))).complete();
+						"Ticket #" + String.format("%05d", curcount),
+						guild.getCategoryById(ConfigLoader.run.getGuildConfig(guild).getLong("supportcategory"))).complete();
 				ntc.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-				ntc.upsertPermissionOverride(guild.getRoleById(ConfigLoader.cfl.getGuildConfig(guild, "supportrole"))).grant(Permission.VIEW_CHANNEL).queue();
+				ntc.upsertPermissionOverride(guild.getRoleById(ConfigLoader.run.getGuildConfig(guild).getLong("supportrole"))).grant(Permission.VIEW_CHANNEL).queue();
 				ntc.upsertPermissionOverride(event.getMember()).grant(Permission.VIEW_CHANNEL).queue();
-				ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" + guild.getRoleById(ConfigLoader.cfl.getGuildConfig(guild, "supportrole")).getAsMention()).queue();
-				ConfigLoader.cfl.setGuildConfig(guild, "ticketcount", String.format("%05d", newcount));
+				ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" 
+						+ guild.getRoleById(ConfigLoader.run.getGuildConfig(guild).getLong("supportrole")).getAsMention()).queue();
+				ConfigLoader.run.getGuildConfig(guild).put("ticketcount", newcount);
 				event.getMessage().delete().queue();
 				event.getTextChannel().getManager().setSlowmode(120).queue();
 				return;
 			}
-			//ModMail
+			//modmail
 			new Thread(() -> {
 				new ModMail(event, true);
 			}).start();
@@ -115,11 +116,10 @@ public class Processor extends ListenerAdapter {
 	    List<Guild> guilds = event.getJDA().getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
 			Guild guild = guilds.get(i);
-			String idpack = ConfigLoader.cfl.getGuildConfig(guild, "offlinemsg");
-			if (!idpack.equals("")) {
-				String[] ids = idpack.split("_");
-				guild.getTextChannelById(ids[0]).retrieveMessageById(ids[1]).complete().delete().queue();
-				ConfigLoader.cfl.setGuildConfig(guild, "offlinemsg", "");
+			long msgid = ConfigLoader.run.getGuildConfig(guild).getLong("offlinemsg");
+			if (msgid != 0) {
+				guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel")).retrieveMessageById(msgid).complete().delete().queue();
+				ConfigLoader.run.getGuildConfig(guild).put("offlinemsg", Long.valueOf(0));
 			}
 		}
 		//initialize Slashcommands
@@ -175,22 +175,7 @@ public class Processor extends ListenerAdapter {
 	}
 	
 	private User checkCategory(Category category, Guild guild) {
-		File guilddir = new File(Bot.environment + "/configs/user/" + guild.getId());
-		File[] filelist = guilddir.listFiles();
-		if (filelist == null) {
-			return null;
-		}
-		for (int i = 0; i < filelist.length; i++) {
-			String[] temp1 = filelist[i].getName().split(".properties");
-			User cuser = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
-			String ccid = ConfigLoader.cfl.getUserConfig(guild, cuser, "cccategory");
-			if (!ccid.equals("")) {
-				if (category.getId().equals(ccid)) {
-					return cuser;
-				}
-			}
-		}
-		return null;
+		return guild.getMemberById(ConfigLoader.run.getFirstGuildLayerConfig(guild, "customchannelcategories").getLong(category.getId())).getUser();
 	}
 	
 	@Override
@@ -198,33 +183,31 @@ public class Processor extends ListenerAdapter {
 		final Guild guild = event.getGuild();
 		//assign Autoroles
 		if (event.getMember().getUser().isBot()) {
-			String botautorolesraw = ConfigLoader.cfl.getGuildConfig(guild, "botautoroles");
-			if (!botautorolesraw.equals("")) {
-				String[] botautoroles = botautorolesraw.split(";");
-				for (int i = 0; i < botautoroles.length; i++) {
-					Role role = guild.getRoleById(botautoroles[i]);
+			JSONArray botautoroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("botautoroles");
+			if (!botautoroles.isEmpty()) {
+				for (int i = 0; i < botautoroles.length(); i++) {
+					Role role = guild.getRoleById(botautoroles.getLong(i));
 					if (role == null) {
-						ConfigLoader.cfl.removeGuildConfig(guild, "botautoroles", botautoroles[i]);
+						ConfigLoader.run.removeValueFromArray(botautoroles, botautoroles.getLong(i));;
 					} else {
 						guild.addRoleToMember(event.getMember(), role).queue();
 					}
 				}
 			}
 		} else {
-			String autorolesraw = ConfigLoader.cfl.getGuildConfig(guild, "autoroles");
-			if (!autorolesraw.equals("")) {
-				String[] autoroles = autorolesraw.split(";");
-				for (int i = 0; i < autoroles.length; i++) {
-					Role role = guild.getRoleById(autoroles[i]);
+			JSONArray autoroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("autoroles");
+			if (!autoroles.isEmpty()) {
+				for (int i = 0; i < autoroles.length(); i++) {
+					Role role = guild.getRoleById(autoroles.getLong(i));
 					if (role == null) {
-						ConfigLoader.cfl.removeGuildConfig(guild, "autoroles", autoroles[i]);
+						ConfigLoader.run.removeValueFromArray(autoroles, autoroles.getLong(i));;
 					} else {
 						guild.addRoleToMember(event.getMember(), role).queue();
 					}
 				}
 			}
 			//send Welcomemessage
-			String welcomemsgraw = ConfigLoader.cfl.getGuildConfig(guild, "welcomemsg");
+			String welcomemsgraw = ConfigLoader.run.getGuildConfig(guild).getString("welcomemsg");
 			LocalDateTime date = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 			String currentdate = date.format(formatter);
@@ -247,7 +230,7 @@ public class Processor extends ListenerAdapter {
 			return;
 		}
 		//send goodbyemessage
-		String goodbyemsgraw = ConfigLoader.cfl.getGuildConfig(guild, "welcomemsg");
+		String goodbyemsgraw = ConfigLoader.run.getGuildConfig(guild).getString("goodbyemsg");
 		LocalDateTime date = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 		String currentdate = date.format(formatter);
@@ -261,8 +244,8 @@ public class Processor extends ListenerAdapter {
 			event.getGuild().getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
 		}
 		//check for users category
-		if (!ConfigLoader.cfl.getUserConfig(guild, user, "cccategory").equals("")) {
-			Category ctg = guild.getCategoryById(ConfigLoader.cfl.getUserConfig(guild, user, "cccategory"));
+		if (ConfigLoader.run.getUserConfig(guild, user).getLong("cccategory") != 0) {
+			Category ctg = guild.getCategoryById(ConfigLoader.run.getUserConfig(guild, user).getLong("cccategory"));
 			List<GuildChannel> channels = ctg.getChannels();
 			for (int i = 0; i < channels.size(); i++) {
 				channels.get(i).delete().queue();
@@ -306,22 +289,22 @@ public class Processor extends ListenerAdapter {
 	
 	private void managej2cjoin(Guild guild, Member member, AudioChannel audioChannel) {
 		//check for Join2create-channel & create User-channel if true
-		String j2cids = ConfigLoader.cfl.getGuildConfig(guild, "join2create");
-		if (j2cids.contains(audioChannel.getId())) {
-			audioChannel.getPermissionContainer().upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VOICE_SPEAK).queue();
-			Collection<Permission> perms = new LinkedList<Permission>();
-			perms.add(Permission.VIEW_CHANNEL);
-			perms.add(Permission.MANAGE_CHANNEL);
-			perms.add(Permission.MANAGE_PERMISSIONS);
-			perms.add(Permission.CREATE_INSTANT_INVITE);
-			perms.add(Permission.VOICE_MUTE_OTHERS);
-			perms.add(Permission.VOICE_SPEAK);
-			ICategorizableChannel temp = (ICategorizableChannel) audioChannel;
-			VoiceChannel nc = guild.createVoiceChannel(member.getEffectiveName() + "'s channel", temp.getParentCategory()).complete();
-			nc.upsertPermissionOverride(member).setAllowed(perms).complete();
-			guild.moveVoiceMember(member, nc).queue();
-			ConfigLoader.cfl.addGuildConfig(guild, "j2cs", nc.getId() + "-" + member.getUser().getId());
-		}
+		try {
+			ConfigLoader.run.getGuildConfig(guild).getJSONObject("join2createchannels").get(audioChannel.getId());
+		}catch (JSONException e) {return;}
+		audioChannel.getPermissionContainer().upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VOICE_SPEAK).queue();
+		Collection<Permission> perms = new LinkedList<Permission>();
+		perms.add(Permission.VIEW_CHANNEL);
+		perms.add(Permission.MANAGE_CHANNEL);
+		perms.add(Permission.MANAGE_PERMISSIONS);
+		perms.add(Permission.CREATE_INSTANT_INVITE);
+		perms.add(Permission.VOICE_MUTE_OTHERS);
+		perms.add(Permission.VOICE_SPEAK);
+		ICategorizableChannel temp = (ICategorizableChannel) audioChannel;
+		VoiceChannel nc = guild.createVoiceChannel(member.getEffectiveName() + "'s channel", temp.getParentCategory()).complete();
+		nc.upsertPermissionOverride(member).setAllowed(perms).complete();
+		guild.moveVoiceMember(member, nc).queue();
+		ConfigLoader.run.getGuildConfig(guild).getJSONObject("createdchannels").put(nc.getId(), member.getUser().getIdLong());
 	}
 	
 	private void managej2cleave(Guild guild, User user, AudioChannel audioChannel) {
@@ -334,24 +317,26 @@ public class Processor extends ListenerAdapter {
 			}
 		}
 		//check if VoiceChannelLeft was a Userchannel
-		if (ConfigLoader.cfl.getGuildConfig(guild, "j2cs").contains(audioChannel.getId())) {
-			if (conmemb == 0) {
-				ConfigLoader.cfl.removeGuildConfig(guild, "j2cs", audioChannel.getId() + "-" + user.getId());
-				audioChannel.delete().queue();
-			} else {
-				if (ConfigLoader.cfl.getGuildConfig(guild, "j2cs").contains(audioChannel.getId() + "-" + user.getId())) {
-					Collection<Permission> perms = new LinkedList<Permission>();
-					perms.add(Permission.VIEW_CHANNEL);
-					perms.add(Permission.MANAGE_CHANNEL);
-					perms.add(Permission.MANAGE_PERMISSIONS);
-					perms.add(Permission.CREATE_INSTANT_INVITE);
-					perms.add(Permission.VOICE_MUTE_OTHERS);
-					perms.add(Permission.VOICE_SPEAK);
-					ConfigLoader.cfl.removeGuildConfig(guild, "j2cs", audioChannel.getId() + "-" + user.getId());
-					Member newowner =  audioChannel.getMembers().get(0);
-					ConfigLoader.cfl.addGuildConfig(guild, "j2cs", audioChannel.getId() + "-" + newowner.getUser().getId());
-					audioChannel.getPermissionContainer().getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(guild.getMember(user)).setName(newowner.getEffectiveName() + "'s channel").queue();
-				}
+		long ownerID = 0;
+		JSONObject createdchannels = ConfigLoader.run.getGuildConfig(guild).getJSONObject("createdchannels");
+		try {
+			ownerID = createdchannels.getLong(audioChannel.getId());
+		} catch (JSONException e) {return;}
+		if (conmemb == 0) {
+			ConfigLoader.run.getGuildConfig(guild).getJSONObject("createdchannels").remove(audioChannel.getId());
+			audioChannel.delete().queue();
+		} else {
+			if (ownerID == user.getIdLong()) {
+				Collection<Permission> perms = new LinkedList<Permission>();
+				perms.add(Permission.VIEW_CHANNEL);
+				perms.add(Permission.MANAGE_CHANNEL);
+				perms.add(Permission.MANAGE_PERMISSIONS);
+				perms.add(Permission.CREATE_INSTANT_INVITE);
+				perms.add(Permission.VOICE_MUTE_OTHERS);
+				perms.add(Permission.VOICE_SPEAK);
+				Member newowner =  audioChannel.getMembers().get(0);
+				createdchannels.put(audioChannel.getId(), newowner.getUser().getIdLong());
+				audioChannel.getPermissionContainer().getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(guild.getMember(user)).setName(newowner.getEffectiveName() + "'s channel").queue();
 			}
 		}
 	}
@@ -366,20 +351,20 @@ public class Processor extends ListenerAdapter {
 		}
 		final Guild guild = event.getGuild();
 		//if reaction on poll, process reaction
-		if (ConfigLoader.cfl.findPollConfig(guild, channelID, msgID) != null) {
+		if (ConfigLoader.run.getPollConfig(guild, channelID, msgID) != null) {
 			if (!event.getReactionEmote().getAsCodepoints().contains("U+20e3")) {
 				event.getTextChannel().removeReactionById(msgID, event.getReactionEmote().getAsCodepoints(), user).queue();
 			} else {
 				this.addPollAnswer(channelID, msgID, event.getReactionEmote().getAsCodepoints(), guild, user);
-				if (Boolean.parseBoolean(ConfigLoader.cfl.findPollConfig(guild, channelID, msgID).getString("anonymous"))) {
+				if (ConfigLoader.run.getPollConfig(guild, channelID, msgID).getBoolean("anonymous")) {
 					event.getTextChannel().removeReactionById(msgID, event.getReactionEmote().getAsCodepoints(), user).queue();
 				}
 			}
 			return;
 		}
 		//if reaction on reactionrole message, process reaction
-		if (ConfigLoader.cfl.findReactionroleConfig(guild, channelID, msgID) != null) {
-			JSONObject actions = ConfigLoader.cfl.findReactionroleConfig(guild, channelID, msgID);
+		if (ConfigLoader.run.getReactionroleConfig(guild, channelID, msgID) != null) {
+			JSONObject actions = ConfigLoader.run.getReactionroleConfig(guild, channelID, msgID);
 			try {
 				guild.addRoleToMember(user, guild.getRoleById(actions.getString(event.getReactionEmote().getAsCodepoints()))).queue();
 			} catch (JSONException e) {}
@@ -396,40 +381,24 @@ public class Processor extends ListenerAdapter {
 		}
 		final Guild guild = event.getGuild();
 		//if reaction on reactionrole message, process reaction
-		if (ConfigLoader.cfl.findReactionroleConfig(guild, channelID, msgID) != null) {
-			JSONObject actions = ConfigLoader.cfl.findReactionroleConfig(guild, channelID, msgID);
+		if (ConfigLoader.run.getReactionroleConfig(guild, channelID, msgID) != null) {
+			JSONObject actions = ConfigLoader.run.getReactionroleConfig(guild, channelID, msgID);
 			try {
-				guild.removeRoleFromMember(user, guild.getRoleById(actions.getString(event.getReactionEmote().getAsCodepoints()))).queue();
+				guild.removeRoleFromMember(user, guild.getRoleById(actions.getLong(event.getReactionEmote().getAsCodepoints()))).queue();
 			} catch (JSONException e) {}
 		}
 	}
 	
 	public void addPollAnswer(String channelID, String msgid, String emojiUnicode, Guild guild, User user) {
-		String currentusers = ConfigLoader.cfl.findPollConfig(guild, channelID, msgid).getString("users");
-		if (currentusers.contains(user.getId())) {
-			return;
+		JSONObject pollConfig = ConfigLoader.run.getPollConfig(guild, channelID, msgid);
+		try {
+			pollConfig.getJSONObject("answers").getInt(user.getId());
+		} catch (JSONException e) {
+			pollConfig.put("answercount", pollConfig.getInt("answercount") + 1);
 		}
-		String[] old = ConfigLoader.cfl.findPollConfig(guild, channelID, msgid).getString("answercount").split(";");
 		String[] temp1 = emojiUnicode.split("U");
 		int choice = Integer.parseInt(temp1[1])-31;
-		String current = String.valueOf(Integer.parseInt(old[choice])+1);
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < old.length; i++) {
-			if (i != choice) {
-				sb.append(old[i]);
-			} else {
-				sb.append(current);
-			}
-			if (i+1 != old.length) {
-				sb.append(";");
-			}
-		}
-		ConfigLoader.cfl.setPollConfig(guild, channelID, msgid, "answercount", sb.toString());
-		if (currentusers.equals("")) {
-			ConfigLoader.cfl.setPollConfig(guild, channelID, msgid, "users", user.getId() + "_" + String.valueOf(choice));
-		} else {
-			ConfigLoader.cfl.setPollConfig(guild, channelID, msgid, "users", currentusers + ";" + user.getId() + "_" + String.valueOf(choice));
-		}
+		pollConfig.getJSONObject("answers").put(user.getId(), choice);
 	}
 	
 	@Override
@@ -450,20 +419,14 @@ public class Processor extends ListenerAdapter {
 		}).start();
 		if (event.getChannelType().isAudio()) {
 			String id = event.getChannel().getId();
-			if (ConfigLoader.cfl.getGuildConfig(guild, "j2cs").contains(id)) {
-				String[] entries = ConfigLoader.cfl.getGuildConfig(guild, "j2cs").split(";");
-				for (int i = 0; i < entries.length; i++) {
-					if (entries[i].contains(id)) {
-						ConfigLoader.cfl.removeGuildConfig(guild, "j2cs", entries[i]);
-					}
-				}
+			if (ConfigLoader.run.getGuildConfig(guild).getJSONObject("createdchannels").remove(id) != null) {
 				return;
 			}
 		}
 		if (event.isFromType(ChannelType.CATEGORY)) {
 			Category ctg = (Category) event.getChannel();
 			if (this.checkCategory(ctg, guild) != null) {
-				ConfigLoader.cfl.setUserConfig(guild, this.checkCategory(ctg, guild), "cccategory", "");
+				ConfigLoader.run.getUserConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", Long.valueOf(0));
 			}
 			return;
 		}
@@ -473,7 +436,7 @@ public class Processor extends ListenerAdapter {
 			if (ctg != null) {
 				if (ctg.getChannels().size() == 0) {
 					if (this.checkCategory(ctg, guild) != null) {
-						ConfigLoader.cfl.setUserConfig(guild, this.checkCategory(ctg, guild), "cccategory", "");
+						ConfigLoader.run.getUserConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", Long.valueOf(0));
 						ctg.delete().queue();
 					}
 				}

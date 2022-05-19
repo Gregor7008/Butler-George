@@ -28,7 +28,7 @@ public class DefaultAccessRoles implements Command{
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {List<Role> roles = e.getMessage().getMentionedRoles();
 					  for (int i = 0; i < roles.size(); i++) {
-						  ConfigLoader.cfl.setGuildConfig(guild, "ccdefaccess", roles.get(i).getId());
+						  ConfigLoader.run.setGuildConfig(guild, "ccdefaccess", roles.get(i).getId());
 					  }
 					  event.getTextChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:success").convert()).queue();},
 				2, TimeUnit.MINUTES,

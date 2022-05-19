@@ -24,16 +24,16 @@ public class Join2Create implements Command{
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
-			if (ConfigLoader.cfl.getGuildConfig(guild, "join2create").contains(id)) {
+			if (ConfigLoader.run.getGuildConfig(guild, "join2create").contains(id)) {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:adderror").convert()).queue();
 			} else {
-				ConfigLoader.cfl.addGuildConfig(guild, "join2create", id);
+				ConfigLoader.run.addGuildConfig(guild, "join2create", id);
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess").convert()).queue();
 			}
 		}
 		if (event.getSubcommandName().equals("remove")) {
-			if (ConfigLoader.cfl.getGuildConfig(guild, "join2create").contains(id)) {
-				ConfigLoader.cfl.removeGuildConfig(guild, "join2create", id);
+			if (ConfigLoader.run.getGuildConfig(guild, "join2create").contains(id)) {
+				ConfigLoader.run.removeGuildConfig(guild, "join2create", id);
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess").convert()).queue();
 			} else {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remerror").convert()).queue();

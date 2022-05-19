@@ -17,7 +17,7 @@ public class CustomChannelRole implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		ConfigLoader.cfl.setGuildConfig(guild, "ccrole", event.getOption("role").getAsRole().getId());
+		ConfigLoader.run.setGuildConfig(guild, "ccrole", event.getOption("role").getAsRole().getId());
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelrole:success").convert()).queue();
 	}
 

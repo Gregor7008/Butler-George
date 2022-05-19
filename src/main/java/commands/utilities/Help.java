@@ -35,7 +35,7 @@ public class Help implements Command{
 			return;
 		}
 		if ((cmd = commandList.moderationcmds.get(input)) != null 
-				&& event.getMember().getRoles().contains(guild.getRoleById(ConfigLoader.cfl.getGuildConfig(guild, "modrole")))) {
+				&& event.getMember().getRoles().contains(guild.getRoleById(ConfigLoader.run.getGuildConfig(guild, "modrole")))) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
 			event.replyEmbeds(AnswerEngine.ae.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();

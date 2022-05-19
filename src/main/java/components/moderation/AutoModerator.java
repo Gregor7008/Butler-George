@@ -17,11 +17,11 @@ public class AutoModerator {
 	}
 	
 	public void messagereceived(MessageReceivedEvent event) {
-		String forbiddenwords = ConfigLoader.cfl.getGuildConfig(event.getGuild(), "forbidden");
+		String forbiddenwords = ConfigLoader.run.getGuildConfig(event.getGuild(), "forbidden");
 		String[] singleword = forbiddenwords.split(";");
 		for (int i = 0; i < singleword.length; i++) {
 			if (event.getMessage().getContentRaw().toLowerCase().contains(singleword[i].toLowerCase())) {
-				ConfigLoader.cfl.addUserConfig(event.getGuild(), event.getAuthor(), "warnings", "Rude behavior");
+				ConfigLoader.run.addUserConfig(event.getGuild(), event.getAuthor(), "warnings", "Rude behavior");
 				try {
 					event.getMember().getUser().openPrivateChannel().complete()
 						 .sendMessageEmbeds(AnswerEngine.ae.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")

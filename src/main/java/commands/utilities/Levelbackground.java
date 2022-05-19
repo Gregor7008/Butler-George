@@ -23,7 +23,7 @@ public class Levelbackground implements Command{
 			if (Integer.parseInt(event.getOption("number").getAsString()) > 4 || Integer.parseInt(event.getOption("number").getAsString()) < 0) {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/levelbackground:wrongarg").convert()).queue();
 			} else {
-				ConfigLoader.cfl.setUserConfig(guild, user, "levelbackground", event.getOption("number").getAsString());
+				ConfigLoader.run.setUserConfig(guild, user, "levelbackground", event.getOption("number").getAsString());
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/levelbackground:success").convert()).addFile(lv.renderLevelcard(user, guild)).queue();
 			}
 			return;

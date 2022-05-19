@@ -7,6 +7,8 @@ import java.util.TimerTask;
 
 import javax.security.auth.login.LoginException;
 
+import org.json.JSONObject;
+
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import components.base.AnswerEngine;
@@ -77,22 +79,18 @@ public class Bot {
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);
     		if (delete) {
-    			String j2csraw = ConfigLoader.cfl.getGuildConfig(guild, "j2cs");
-    			if (!j2csraw.equals("")) {
-    				String[] j2cs = j2csraw.split(";");
-    				for (int e = 0; e < j2cs.length; e++) {
-        				String[] temp1 = j2cs[e].split("-");
-        				guild.getVoiceChannelById(temp1[0]).delete().queue();
-        			}
+    			JSONObject createdchannels = ConfigLoader.run.getFirstGuildLayerConfig(guild, "createdchannels");
+    			if (!createdchannels.isEmpty()) {
+    				createdchannels.keySet().forEach(e -> guild.getVoiceChannelById(e).delete().queue());
     			}
-    			if (!ConfigLoader.cfl.getGuildConfig(guild, "levelmsgch").equals("")) {
-    				String cid = ConfigLoader.cfl.getGuildConfig(guild, "levelmsgch");
-    				String msgid = guild.getTextChannelById(cid).sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getId();
-        			ConfigLoader.cfl.setGuildConfig(guild, "offlinemsg", cid + "_" + msgid);
+    			if (ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel") != 0) {
+    				long chid = ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel");
+    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
+        			ConfigLoader.run.getGuildConfig(guild).put("offlinemsg", msgid);
         		}
     		}
-    		if (!ConfigLoader.cfl.getGuildConfig(guild, "supportchat").equals("")) {
-    			guild.getTextChannelById(ConfigLoader.cfl.getGuildConfig(guild, "supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+    		if (ConfigLoader.run.getGuildConfig(guild).getLong("supportchat") != 0) {
+    			guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
     		}
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
@@ -120,7 +118,7 @@ public class Bot {
 					Bot.INSTANCE.penaltyCheck(guild);
 					Bot.INSTANCE.modCheck(guild);
 				}
-				ConfigLoader.cfm.pushCache();
+				ConfigLoader.manager.pushCache();
 			}
 		}, 0, 1*60*1000);
 	}

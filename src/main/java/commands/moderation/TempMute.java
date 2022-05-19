@@ -40,7 +40,7 @@ public class TempMute implements Command{
 	}
 	
 	private void tempmute(int days, Guild guild, User user) {
-		ConfigLoader.cfl.setUserConfig(guild, user, "tempmuted", "true");
+		ConfigLoader.run.setUserConfig(guild, user, "tempmuted", "true");
 		guild.getMember(user).timeoutFor(days, TimeUnit.DAYS).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}

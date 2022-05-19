@@ -64,7 +64,7 @@ public class ReactionRole implements Command{
 			return;
 		}
 		if (event.getSubcommandName().equals("delete")) {
-			ConfigLoader.cfl.deleteReactionRoleConfig(guild, finalchannel.getId(), msgid);
+			ConfigLoader.run.deleteReactionRoleConfig(guild, finalchannel.getId(), msgid);
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:delsuccess").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			finalchannel.retrieveMessageById(msgid).complete().clearReactions().queue();
 			return;
@@ -76,7 +76,7 @@ public class ReactionRole implements Command{
 					  	  return e.getUser().getIdLong() == user.getIdLong();},
 					e -> {event.getHook().editOriginalEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:remsuccess").replaceDescription("{emoji}", e.getReactionEmote().getEmoji()).convert()).queue(
 									r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
-						  JSONObject actions = ConfigLoader.cfl.findReactionroleConfig(guild, finalchannel.getId(), msgid);
+						  JSONObject actions = ConfigLoader.run.findReactionroleConfig(guild, finalchannel.getId(), msgid);
 						  actions.remove(e.getReactionEmote().getAsCodepoints());
 						  finalchannel.retrieveMessageById(msgid).complete().removeReaction(e.getReactionEmote().getAsCodepoints()).queue();},
 					1, TimeUnit.MINUTES,
@@ -107,7 +107,7 @@ public class ReactionRole implements Command{
 	}
 
 	private void defineAddRoles() {
-		ConfigLoader.cfl.createReactionroleConfig(guild, finalchannel.getId(), msgid);
+		ConfigLoader.run.createReactionroleConfig(guild, finalchannel.getId(), msgid);
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;}
 								  if(e.getMessage().getMentionedRoles().isEmpty()) {return false;}
@@ -128,7 +128,7 @@ public class ReactionRole implements Command{
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 				  	  if(e.getUser().getIdLong() != user.getIdLong()) {return false;}
 				  	  return e.getMessageId().equals(msg.getId());},
-				e -> {ConfigLoader.cfl.findReactionroleConfig(guild, finalchannel.getId(), msgid).put(e.getReactionEmote().getAsCodepoints(), role.getId());
+				e -> {ConfigLoader.run.findReactionroleConfig(guild, finalchannel.getId(), msgid).put(e.getReactionEmote().getAsCodepoints(), role.getId());
 					  msg.editMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:defineAddEmojis")
 							  .replaceDescription("{role}", role.getAsMention() + "\n->" + e.getReactionEmote().getEmoji()).convert()).queue();
 					  progress++;
@@ -145,7 +145,7 @@ public class ReactionRole implements Command{
 	private void addReactions() {
 		Message msg  = channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:adding").convert()).complete();
 		messages.add(msg);
-		Set<String> actions = ConfigLoader.cfl.findReactionroleConfig(guild, finalchannel.getId(), msgid).keySet();
+		Set<String> actions = ConfigLoader.run.findReactionroleConfig(guild, finalchannel.getId(), msgid).keySet();
 		actions.forEach(e -> finalchannel.retrieveMessageById(msgid).complete().addReaction(e).queue());
 		try {Thread.sleep(2000);} catch (InterruptedException e) {}
 		msg.editMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/reactionrole:success").convert()).queue();
