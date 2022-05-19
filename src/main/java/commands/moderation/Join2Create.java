@@ -2,7 +2,7 @@ package commands.moderation;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,16 +24,16 @@ public class Join2Create implements Command{
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
-			if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
+			if (ConfigLoader.cfl.getGuildConfig(guild, "join2create").contains(id)) {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:adderror").convert()).queue();
 			} else {
-				Configloader.INSTANCE.addGuildConfig(guild, "join2create", id);
+				ConfigLoader.cfl.addGuildConfig(guild, "join2create", id);
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess").convert()).queue();
 			}
 		}
 		if (event.getSubcommandName().equals("remove")) {
-			if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
-				Configloader.INSTANCE.removeGuildConfig(guild, "join2create", id);
+			if (ConfigLoader.cfl.getGuildConfig(guild, "join2create").contains(id)) {
+				ConfigLoader.cfl.removeGuildConfig(guild, "join2create", id);
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess").convert()).queue();
 			} else {
 				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remerror").convert()).queue();

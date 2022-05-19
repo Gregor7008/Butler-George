@@ -3,7 +3,7 @@ package commands.moderation;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,13 +18,13 @@ public class Unmute implements Command{
 		final Guild guild = event.getGuild();
 		final User user =  event.getUser();
 		final User cuser = event.getOption("user").getAsUser();
-		if (!Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, cuser, "muted"))) {
+		if (!Boolean.parseBoolean(ConfigLoader.cfl.getUserConfig(guild, cuser, "muted"))) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
 			return;
 		}
-		Configloader.INSTANCE.setUserConfig(guild, cuser, "muted", "false");
-		Configloader.INSTANCE.setUserConfig(guild, cuser, "tempmuted", "false");
-		Configloader.INSTANCE.setUserConfig(guild, cuser, "tmuntil", "");
+		ConfigLoader.cfl.setUserConfig(guild, cuser, "muted", "false");
+		ConfigLoader.cfl.setUserConfig(guild, cuser, "tempmuted", "false");
+		ConfigLoader.cfl.setUserConfig(guild, cuser, "tmuntil", "");
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}

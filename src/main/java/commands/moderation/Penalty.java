@@ -7,7 +7,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -59,7 +59,7 @@ public class Penalty implements Command{
 	private void removepenalties(SlashCommandInteractionEvent event) {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		StringBuilder sB = new StringBuilder();
-		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "penalties");
+		String currentraw = ConfigLoader.cfl.getGuildConfig(guild, "penalties");
 		String[] current = currentraw.split(";");
 		if (currentraw.equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:nopenalties").convert()).queue();;
@@ -92,7 +92,7 @@ public class Penalty implements Command{
 		for (int i = 1; i <= current.length; i++) {
 		   	 String[] temp3 = current[i-1].split("_", 2);
 		   	if (temp3[0].contains(e.getMessage().getContentRaw())) {
-		   	    Configloader.INSTANCE.removeGuildConfig(e.getGuild(), "penalty", current[i-1]);
+		   	    ConfigLoader.cfl.removeGuildConfig(e.getGuild(), "penalty", current[i-1]);
 		   	    e.getMessage().addReaction("U+2705").queue();
 		    } else {
 		    	e.getMessage().addReaction("U+0078").queue();
@@ -137,7 +137,7 @@ public class Penalty implements Command{
 	}
 	
 	private void addpenalties3(String plannedpunish, int warnings) {
-		if (Configloader.INSTANCE.getGuildConfig(guild, "penalties").contains(String.valueOf(warnings))) {
+		if (ConfigLoader.cfl.getGuildConfig(guild, "penalties").contains(String.valueOf(warnings))) {
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:error").convert()).queue();
 			return;
 		}
@@ -150,7 +150,7 @@ public class Penalty implements Command{
 						  if(e.getMessage().getMentionedRoles().isEmpty()) {return false;}
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {String penalty = String.valueOf(warnings) + "_removerole_" + e.getMessage().getContentRaw();
-						  Configloader.INSTANCE.addGuildConfig(guild, "penalties", penalty);
+						  ConfigLoader.cfl.addGuildConfig(guild, "penalties", penalty);
 						  channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:successrole").convert()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
@@ -161,17 +161,17 @@ public class Penalty implements Command{
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {String penalty = String.valueOf(warnings) + "_tempmute_" + e.getMessage().getContentRaw();
-						  Configloader.INSTANCE.addGuildConfig(guild, "penalties", penalty);
+						  ConfigLoader.cfl.addGuildConfig(guild, "penalties", penalty);
 						  channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successtempmute").convert()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pm":
-			Configloader.INSTANCE.addGuildConfig(guild, "penalties", String.valueOf(warnings) + "_mute");
+			ConfigLoader.cfl.addGuildConfig(guild, "penalties", String.valueOf(warnings) + "_mute");
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successmute").convert()).queue();
 			break;
 		case "kk":
-			Configloader.INSTANCE.addGuildConfig(guild, "penalties", String.valueOf(warnings) + "_kick");
+			ConfigLoader.cfl.addGuildConfig(guild, "penalties", String.valueOf(warnings) + "_kick");
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successkick").convert()).queue();
 			break;
 		case "tb":
@@ -180,13 +180,13 @@ public class Penalty implements Command{
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {String penalty = String.valueOf(warnings) + "_tempban_" + e.getMessage().getContentRaw();
-						  Configloader.INSTANCE.addGuildConfig(guild, "penalties", penalty);
+						  ConfigLoader.cfl.addGuildConfig(guild, "penalties", penalty);
 						  channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successtempban").convert()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pb":
-			Configloader.INSTANCE.addGuildConfig(guild, "penalties", String.valueOf(warnings) + "_ban");
+			ConfigLoader.cfl.addGuildConfig(guild, "penalties", String.valueOf(warnings) + "_ban");
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successban").convert()).queue();
 			break;
 		default:
@@ -196,7 +196,7 @@ public class Penalty implements Command{
 	
 	private void listpenalties(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
-		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "penalties");
+		String currentraw = ConfigLoader.cfl.getGuildConfig(guild, "penalties");
 		if (currentraw.equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/penalty:nopenalties").convert()).queue();;
 			return;

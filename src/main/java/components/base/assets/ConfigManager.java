@@ -5,7 +5,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mongodb.client.MongoClient;
@@ -13,10 +15,11 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class ConfigHandler {
+public class ConfigManager {
 
 	private static MongoClient client = MongoClients.create("mongodb://192.168.178.104:17389");
 	private static MongoDatabase database = client.getDatabase("butler-george");
@@ -26,10 +29,11 @@ public class ConfigHandler {
 	private final ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
 	
-	public ConfigHandler() {
+	public ConfigManager() {
 		this.pullCache();
 	}
 	
+	//Manage cache
 	public void pullCache() {
 		userConfigCache.clear();
 		guildConfigCache.clear();
@@ -59,7 +63,9 @@ public class ConfigHandler {
 		} catch (Exception e) {return false;}
 	}
 	
-	public JSONObject getUserConfig(User user) {
+	//Get JSONObjects
+	@NotNull
+	public JSONObject getUserConfig(Guild guild, User user) {
 		JSONObject config = userConfigCache.get(user.getIdLong());
 		if (config == null) {
 			config = this.createUserConfig(user);
@@ -67,6 +73,18 @@ public class ConfigHandler {
 		return config;
 	}
 	
+	@NotNull
+	public JSONObject getMemberConfig(Guild guild, User user) {
+		JSONObject config = null;
+		try {
+			config = this.getUserConfig(guild, user).getJSONObject(guild.getId());
+		} catch (JSONException e) {
+			config = this.createMemberConfig(guild, user);
+		}
+		return config;
+	}
+	
+	@NotNull
 	public JSONObject getGuildConfig(Guild guild) {
 		JSONObject config = guildConfigCache.get(guild.getIdLong());
 		if (config == null) {
@@ -75,10 +93,28 @@ public class ConfigHandler {
 		return config;
 	}
 	
+	public JSONObject getPollConfig(Guild guild, String channelID, String messageID) {
+		JSONObject config = null;
+		try {
+			config = this.getGuildConfig(guild).getJSONObject(channelID).getJSONObject(messageID);
+		} catch (JSONException e) {}
+		return config;
+	}
+	
+	//Create JSONObjects
 	private JSONObject createUserConfig(User user) {
 		JSONObject newConfig = new JSONObject();
 		//Simple values
 		newConfig.put("id",							user.getIdLong());
+		
+		return newConfig;
+	}
+	
+	private JSONObject createMemberConfig(Guild guild, User user) {
+		JSONObject userConfig = this.getUserConfig(guild, user);
+		JSONObject newConfig = new JSONObject();
+		//Simple values
+		newConfig.put("guild",						guild.getIdLong());
 		newConfig.put("customchannelcategory",		Long.valueOf(0));
 		newConfig.put("experience",					Integer.valueOf(0));
 		newConfig.put("language",					"en");
@@ -95,6 +131,7 @@ public class ConfigHandler {
 		newConfig.put("tempmuted",					false);
 		newConfig.put("warnings",					new JSONArray());
 		
+		userConfig.put(guild.getId(), newConfig);
 		return newConfig;
 	}
 	
@@ -121,7 +158,7 @@ public class ConfigHandler {
 		newConfig.put("supportchat",				Long.valueOf(0));
 		newConfig.put("ticketcount",				Integer.valueOf(0));
 		newConfig.put("welcomemsg",					"");
-		//Deep-Nested values
+		//Deep-nested values (2 layers or more)
 		newConfig.put("modmails",					new JSONObject());
 		newConfig.put("polls",						new JSONObject());
 		newConfig.put("reactionroles",				new JSONObject());
@@ -129,5 +166,24 @@ public class ConfigHandler {
 		return newConfig;
 	}
 	
-	public JSONObject
+	public JSONObject createPollConfig(Guild guild, String channelID, String messageID) {
+		if (this.getPollConfig(guild, channelID, messageID) != null) {
+			return this.getPollConfig(guild, channelID, messageID);
+		}
+		JSONObject guildConfig = this.getGuildConfig(guild);
+		try {
+			guildConfig.getJSONObject("polls").getJSONObject(channelID);
+		} catch (JSONException e) {
+			guildConfig.getJSONObject("polls").put(channelID, new JSONObject());
+		}
+		JSONObject newConfig = new JSONObject();
+		//Simple values
+		newConfig.put("anonymous",					false);
+		newConfig.put("answercount",				Integer.valueOf(0));
+		newConfig.put("possibleanswers",			"");
+		
+		
+		guildConfig.getJSONObject("polls").getJSONObject(channelID).put(messageID, newConfig);
+		return newConfig;
+	}
 }

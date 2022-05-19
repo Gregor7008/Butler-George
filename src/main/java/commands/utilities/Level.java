@@ -16,10 +16,9 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 
-import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -75,10 +74,10 @@ public class Level implements Command {
 	}
 	
 	public File renderLevelcard(User iuser, Guild guild) {
-		String levelbackground = Configloader.INSTANCE.getUserConfig(guild, iuser, "levelbackground");
-		int level = Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, iuser, "level"));
-		String curxp = Configloader.INSTANCE.getUserConfig(guild, iuser, "expe");
-		int nedxp = LevelEngine.getInstance().xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, iuser, "level")));
+		String levelbackground = ConfigLoader.cfl.getUserConfig(guild, iuser, "levelbackground");
+		int level = Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, iuser, "level"));
+		String curxp = ConfigLoader.cfl.getUserConfig(guild, iuser, "expe");
+		int nedxp = LevelEngine.getInstance().xpneededforlevel(Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, iuser, "level")));
 		int progress = this.calculateProgress(level, nedxp, curxp);
 		BufferedImage image = null;
 		try {
@@ -88,7 +87,10 @@ public class Level implements Command {
 			return null;
 		}
 		BufferedImage avatar = null;
-		File avfile = new File(Bot.environment + "/cache/avatar.png");
+		File avfile = null;
+		try {
+			avfile = File.createTempFile("avatar", ".png");
+		} catch (IOException e) {}
 		try {
 			URL url = new URL(iuser.getAvatarUrl());
 			FileUtils.copyURLToFile(url, avfile);
@@ -125,7 +127,10 @@ public class Level implements Command {
         g2d.drawImage(this.makeRoundedCorner(progressbar, 30), 290, 185, null);
 		//export the image and respond to the event
 		g2d.dispose();
-		File finalimage = new File(Bot.environment + "/cache/temp.png");
+		File finalimage = null;
+		try {
+			finalimage = File.createTempFile("finalcard", ".png");
+		} catch (IOException e) {}
 		try {
 			ImageIO.write(image, "png", finalimage);
 		}catch (IOException e) {

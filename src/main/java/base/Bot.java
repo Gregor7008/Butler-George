@@ -1,6 +1,5 @@
 package base;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
@@ -11,8 +10,8 @@ import javax.security.auth.login.LoginException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import components.base.AnswerEngine;
-import components.base.Configcheck;
-import components.base.Configloader;
+import components.base.ConfigCheck;
+import components.base.ConfigLoader;
 import components.base.ConsoleEngine;
 import components.moderation.ModEngine;
 import components.moderation.PenaltyEngine;
@@ -36,7 +35,7 @@ public class Bot {
 	private ModEngine modEngine;
 	public ConsoleEngine consoleEngine;
 	private Timer timer = new Timer();
-	public static String token, environment, homeID;
+	public static String token, homeID;
 	
 	public static void main(String[] args) {
 		if (args.length <= 0) {
@@ -44,7 +43,6 @@ public class Bot {
 			System.exit(0);
 		}
 		token = args[0];
-		environment = args[1];
 		homeID = "708381749826289666";
 		try {
 			new Bot(token);
@@ -79,7 +77,7 @@ public class Bot {
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);
     		if (delete) {
-    			String j2csraw = Configloader.INSTANCE.getGuildConfig(guild, "j2cs");
+    			String j2csraw = ConfigLoader.cfl.getGuildConfig(guild, "j2cs");
     			if (!j2csraw.equals("")) {
     				String[] j2cs = j2csraw.split(";");
     				for (int e = 0; e < j2cs.length; e++) {
@@ -87,17 +85,15 @@ public class Bot {
         				guild.getVoiceChannelById(temp1[0]).delete().queue();
         			}
     			}
-    			if (!Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").equals("")) {
-    				String cid = Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch");
+    			if (!ConfigLoader.cfl.getGuildConfig(guild, "levelmsgch").equals("")) {
+    				String cid = ConfigLoader.cfl.getGuildConfig(guild, "levelmsgch");
     				String msgid = guild.getTextChannelById(cid).sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getId();
-        			Configloader.INSTANCE.setGuildConfig(guild, "offlinemsg", cid + "_" + msgid);
+        			ConfigLoader.cfl.setGuildConfig(guild, "offlinemsg", cid + "_" + msgid);
         		}
     		}
-    		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
-    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+    		if (!ConfigLoader.cfl.getGuildConfig(guild, "supportchat").equals("")) {
+    			guild.getTextChannelById(ConfigLoader.cfl.getGuildConfig(guild, "supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
     		}
-    		new File(Bot.environment + "/levelcards/cache/temp.png").delete();
-    		new File(Bot.environment + "/levelcards/cache/avatar.png").delete();
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
@@ -109,8 +105,8 @@ public class Bot {
 	private void checkConfigs() {
 		for (int i = 0; i < jda.getGuilds().size(); i++) {
     		Guild guild = jda.getGuilds().get(i);
-    		Configcheck.INSTANCE.checkGuildConfigs(guild);
-    		Configcheck.INSTANCE.checkUserConfigs(guild);
+    		ConfigCheck.INSTANCE.checkGuildConfigs(guild);
+    		ConfigCheck.INSTANCE.checkUserConfigs(guild);
 		}
 	}
 	
@@ -124,8 +120,9 @@ public class Bot {
 					Bot.INSTANCE.penaltyCheck(guild);
 					Bot.INSTANCE.modCheck(guild);
 				}
+				ConfigLoader.cfm.pushCache();
 			}
-		}, 0, 5*60*1000);
+		}, 0, 1*60*1000);
 	}
 	
 	private void wait(int time) {

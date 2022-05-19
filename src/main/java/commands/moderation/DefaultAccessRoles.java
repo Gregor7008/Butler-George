@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -28,7 +28,7 @@ public class DefaultAccessRoles implements Command{
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {List<Role> roles = e.getMessage().getMentionedRoles();
 					  for (int i = 0; i < roles.size(); i++) {
-						  Configloader.INSTANCE.setGuildConfig(guild, "ccdefaccess", roles.get(i).getId());
+						  ConfigLoader.cfl.setGuildConfig(guild, "ccdefaccess", roles.get(i).getId());
 					  }
 					  event.getTextChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:success").convert()).queue();},
 				2, TimeUnit.MINUTES,

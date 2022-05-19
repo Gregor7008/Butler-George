@@ -4,7 +4,7 @@ import java.util.List;
 
 import base.Bot;
 import commands.moderation.Rolesorting;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -39,7 +39,7 @@ public class ServerUtilities {
 				rs.sorter(guild, member, sr3, gr3);
 				rs.sorter(guild, member, sr4, gr4);
 				rs.sorter(guild, member, sr5, gr5);
-				if (member.getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
+				if (member.getRoles().contains(guild.getRoleById(ConfigLoader.cfl.getGuildConfig(guild, "muterole")))) {
 					guild.removeRoleFromMember(member, guild.getRoleById("709478250253910103")).queue();
 				} else {
 					if (!member.getRoles().contains(guild.getRoleById("709478250253910103"))) {

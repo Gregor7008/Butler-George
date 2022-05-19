@@ -2,7 +2,7 @@ package components.moderation;
 
 import base.Bot;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class AutoModerator {
@@ -17,11 +17,11 @@ public class AutoModerator {
 	}
 	
 	public void messagereceived(MessageReceivedEvent event) {
-		String forbiddenwords = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "forbidden");
+		String forbiddenwords = ConfigLoader.cfl.getGuildConfig(event.getGuild(), "forbidden");
 		String[] singleword = forbiddenwords.split(";");
 		for (int i = 0; i < singleword.length; i++) {
 			if (event.getMessage().getContentRaw().toLowerCase().contains(singleword[i].toLowerCase())) {
-				Configloader.INSTANCE.addUserConfig(event.getGuild(), event.getAuthor(), "warnings", "Rude behavior");
+				ConfigLoader.cfl.addUserConfig(event.getGuild(), event.getAuthor(), "warnings", "Rude behavior");
 				try {
 					event.getMember().getUser().openPrivateChannel().complete()
 						 .sendMessageEmbeds(AnswerEngine.ae.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")

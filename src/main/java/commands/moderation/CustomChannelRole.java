@@ -2,7 +2,7 @@ package commands.moderation;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,7 +17,7 @@ public class CustomChannelRole implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		Configloader.INSTANCE.setGuildConfig(guild, "ccrole", event.getOption("role").getAsRole().getId());
+		ConfigLoader.cfl.setGuildConfig(guild, "ccrole", event.getOption("role").getAsRole().getId());
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelrole:success").convert()).queue();
 	}
 

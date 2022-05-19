@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import base.Bot;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -34,8 +34,8 @@ public class ModEngine {
 				File pFile = new File(Bot.environment + "/configs/user/" + guild.getId() + "/" + user.getId() + ".properties");
 				if (pFile.exists()) {
 					//Check for tempmute properties
-					if (!Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempmuted"))) {
-						if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "muted"))) {
+					if (!Boolean.parseBoolean(ConfigLoader.cfl.getUserConfig(guild, user, "tempmuted"))) {
+						if (Boolean.parseBoolean(ConfigLoader.cfl.getUserConfig(guild, user, "muted"))) {
 							if (!member.isTimedOut()) {
 								member.timeoutFor(27, TimeUnit.DAYS).queue();
 							}
@@ -46,7 +46,7 @@ public class ModEngine {
 						}
 					} else {
 						if (!guild.getMember(user).isTimedOut()) {
-							Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "false");
+							ConfigLoader.cfl.setUserConfig(guild, user, "tempmuted", "false");
 						}
 					}
 				}
@@ -57,14 +57,14 @@ public class ModEngine {
 			for (int i = 0; i < filelist.length; i++) {
 				String[] temp1 = filelist[i].getName().split(".properties");
 				User user = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
-				if (Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, user, "tempbanned"))) {
-					OffsetDateTime tbuntil = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "tbuntil"));
+				if (Boolean.parseBoolean(ConfigLoader.cfl.getUserConfig(guild, user, "tempbanned"))) {
+					OffsetDateTime tbuntil = OffsetDateTime.parse(ConfigLoader.cfl.getUserConfig(guild, user, "tbuntil"));
 					OffsetDateTime now = OffsetDateTime.now();
 					long difference = Duration.between(now, tbuntil).toSeconds();
 					if (difference <= 0) {
 						guild.unban(user).queue();
-						Configloader.INSTANCE.setUserConfig(guild, user, "tempbanned", "false");
-						Configloader.INSTANCE.setUserConfig(guild, user, "tbuntil", "");
+						ConfigLoader.cfl.setUserConfig(guild, user, "tempbanned", "false");
+						ConfigLoader.cfl.setUserConfig(guild, user, "tbuntil", "");
 					}
 				}
 			}

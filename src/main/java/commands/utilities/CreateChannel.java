@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,11 +23,11 @@ public class CreateChannel implements Command{
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
-		if (Configloader.INSTANCE.getGuildConfig(guild, "ccrole").equals("")) {
+		if (ConfigLoader.cfl.getGuildConfig(guild, "ccrole").equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:norole").convert()).queue();
 			return;
 		}
-		Role permrole = guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "ccrole"));
+		Role permrole = guild.getRoleById(ConfigLoader.cfl.getGuildConfig(guild, "ccrole"));
 		if (!event.getMember().getRoles().contains(permrole) && !permrole.isPublicRole()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission").convert()).queue();
 			return;
@@ -51,20 +51,20 @@ public class CreateChannel implements Command{
 	private void createTextChannel(Guild guild, User user, String name) {
 		Collection<Permission> perms = this.setupPerms();
 		Category cgy;
-		if (Configloader.INSTANCE.getUserConfig(guild, user, "cccategory").equals("")) {
+		if (ConfigLoader.cfl.getUserConfig(guild, user, "cccategory").equals("")) {
 			cgy = guild.createCategory(user.getName() + "'s channels").complete();
 			cgy.upsertPermissionOverride(guild.getPublicRole()).setDenied(Permission.VIEW_CHANNEL).queue();
 			cgy.upsertPermissionOverride(guild.getMember(user)).setAllowed(perms).queue();
-			Configloader.INSTANCE.addGuildConfig(guild, "ccctgies", cgy.getId());
-			if (!Configloader.INSTANCE.getGuildConfig(guild, "ccdefaccess").equals("")) {
-				String[] defroles = Configloader.INSTANCE.getGuildConfig(guild, "ccdefaccess").split(";");
+			ConfigLoader.cfl.addGuildConfig(guild, "ccctgies", cgy.getId());
+			if (!ConfigLoader.cfl.getGuildConfig(guild, "ccdefaccess").equals("")) {
+				String[] defroles = ConfigLoader.cfl.getGuildConfig(guild, "ccdefaccess").split(";");
 				for (int i = 0; i < defroles.length; i++) {
 					cgy.upsertPermissionOverride(guild.getRoleById(defroles[i])).setAllowed(Permission.ALL_PERMISSIONS).queue();
 				}
 			}
-			Configloader.INSTANCE.setUserConfig(guild, user, "cccategory", cgy.getId());
+			ConfigLoader.cfl.setUserConfig(guild, user, "cccategory", cgy.getId());
   	    } else {
-  	    	cgy = guild.getCategoryById(Configloader.INSTANCE.getUserConfig(guild, user, "cccategory"));
+  	    	cgy = guild.getCategoryById(ConfigLoader.cfl.getUserConfig(guild, user, "cccategory"));
   	    }
 		guild.createTextChannel(name, cgy).complete();
 	}

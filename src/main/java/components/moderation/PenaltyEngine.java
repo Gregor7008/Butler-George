@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import base.Bot;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -24,7 +24,7 @@ public class PenaltyEngine {
 	
 	public void run(Guild guild) {
 		ConcurrentHashMap<Integer, String> penalties = new ConcurrentHashMap<>();
-		String pis = Configloader.INSTANCE.getGuildConfig(guild, "penalties");
+		String pis = ConfigLoader.cfl.getGuildConfig(guild, "penalties");
 		if (pis.equals("")) {
 			return;
 		}
@@ -38,16 +38,16 @@ public class PenaltyEngine {
 		for (int e = 0; e < members.size(); e++) {
 			Member member = members.get(e);
 			User user = members.get(e).getUser();
-			int warningcount = Configloader.INSTANCE.getUserConfig(guild, user, "warnings").split(";").length;
+			int warningcount = ConfigLoader.cfl.getUserConfig(guild, user, "warnings").split(";").length;
 			for (int a = warningcount; a > 0; a--) {
 				if (penalties.get(a) != null) {
 					warningcount = a;
 					a = 0;
 				}
 			}
-			if (penalties.get(warningcount) != null && !Configloader.INSTANCE.getUserConfig(guild, user, "penaltycount").equals(String.valueOf(warningcount))) {
+			if (penalties.get(warningcount) != null && !ConfigLoader.cfl.getUserConfig(guild, user, "penaltycount").equals(String.valueOf(warningcount))) {
 				String penalty = penalties.get(warningcount);
-				Configloader.INSTANCE.setUserConfig(guild, user, "penaltycount", String.valueOf(warningcount));
+				ConfigLoader.cfl.setUserConfig(guild, user, "penaltycount", String.valueOf(warningcount));
 				//go through penaltys
 				switch(penalty) {
 					case ("kick"):
@@ -60,13 +60,13 @@ public class PenaltyEngine {
 						if (penalty.contains("removerole")) {
 							String[] temp1 = penalty.split("_");
 							guild.removeRoleFromMember(member, guild.getRoleById(temp1[1]));
-							Configloader.INSTANCE.setUserConfig(guild, user, "expe", "0");
-							Configloader.INSTANCE.setUserConfig(guild, user, "level", "0");
+							ConfigLoader.cfl.setUserConfig(guild, user, "expe", "0");
+							ConfigLoader.cfl.setUserConfig(guild, user, "level", "0");
 							return;
 						}
 						if (penalty.contains("tempmute")) {
 							String[] temp1 = penalty.split("_");
-							Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "true");
+							ConfigLoader.cfl.setUserConfig(guild, user, "tempmuted", "true");
 							guild.getMember(user).timeoutFor(Integer.valueOf(temp1[1]), TimeUnit.DAYS).queue();
 							return;
 						}
@@ -82,8 +82,8 @@ public class PenaltyEngine {
 	
 	private void tempban(int days, Guild guild, User user) {
 		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
-		Configloader.INSTANCE.setUserConfig(guild, user, "tbuntil", until.toString());
-		Configloader.INSTANCE.setUserConfig(guild, user, "tempbanned", "true");
+		ConfigLoader.cfl.setUserConfig(guild, user, "tbuntil", until.toString());
+		ConfigLoader.cfl.setUserConfig(guild, user, "tempbanned", "true");
 		guild.getMember(user).ban(0).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}	

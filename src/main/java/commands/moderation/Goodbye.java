@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,17 +24,17 @@ public class Goodbye implements Command {
 		if (event.getSubcommandName().equals("set")) {
 			String message = event.getOption("message").toString();
 			String channelid = event.getOption("channel").getAsGuildChannel().getId();
-			Configloader.INSTANCE.setGuildConfig(guild, "goodbyemsg", message + ";" + channelid);
+			ConfigLoader.cfl.setGuildConfig(guild, "goodbyemsg", message + ";" + channelid);
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
-			Configloader.INSTANCE.setGuildConfig(guild, "goodbyemsg", "");
+			ConfigLoader.cfl.setGuildConfig(guild, "goodbyemsg", "");
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:offsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
-			String goodbyemsgraw = Configloader.INSTANCE.getGuildConfig(guild, "goodbyemsg");
+			String goodbyemsgraw = ConfigLoader.cfl.getGuildConfig(guild, "goodbyemsg");
 			LocalDateTime date = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 			String currentdate = date.format(formatter);

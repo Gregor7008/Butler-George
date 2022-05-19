@@ -7,7 +7,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -44,35 +44,35 @@ public class Reset implements Command{
 				  	  return e.getUser().getIdLong() == user.getIdLong();},
 				e -> {switch (e.getSelectedOptions().get(0).getValue()) {
 				      case "lc":
-				    	  Configloader.INSTANCE.setGuildConfig(guild, "levelmsgch", "");
+				    	  ConfigLoader.cfl.setGuildConfig(guild, "levelmsgch", "");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "level channel").convert()).queue();
 				    	  break;
 				      case "rc":
-				    	  Configloader.INSTANCE.setGuildConfig(guild, "reportchannel", "");
+				    	  ConfigLoader.cfl.setGuildConfig(guild, "reportchannel", "");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "report channel").convert()).queue();
 				    	  break;
 				      case "sgc":
-				    	  Configloader.INSTANCE.setGuildConfig(guild, "suggest", "");
+				    	  ConfigLoader.cfl.setGuildConfig(guild, "suggest", "");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "suggestion channel").convert()).queue();
 				    	  break;
 				      case "spc":
-				    	  Configloader.INSTANCE.setGuildConfig(guild, "supportchannel", "");
+				    	  ConfigLoader.cfl.setGuildConfig(guild, "supportchannel", "");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "support channel").convert()).queue();
 				    	  break;
 				      case "st":
-				    	  Configloader.INSTANCE.setGuildConfig(guild, "supporttalk", "");
+				    	  ConfigLoader.cfl.setGuildConfig(guild, "supporttalk", "");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "support talk").convert()).queue();
 				    	  break;
 				      case "mr":
-				    	  Configloader.INSTANCE.setGuildConfig(guild, "modrole", "");
+				    	  ConfigLoader.cfl.setGuildConfig(guild, "modrole", "");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "moderator role").convert()).queue();
 				    	  break;
 				      case "sr":
-				    	  Configloader.INSTANCE.setGuildConfig(guild, "supportrole", "");
+				    	  ConfigLoader.cfl.setGuildConfig(guild, "supportrole", "");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "support role").convert()).queue();
 				    	  break;
 				      case "ucr":
-				    	  Configloader.INSTANCE.setGuildConfig(guild, "ccrole", "");
+				    	  ConfigLoader.cfl.setGuildConfig(guild, "ccrole", "");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/reset:success").replaceDescription("{value}", "user channel role").convert()).queue();
 				    	  break;
 				      default:

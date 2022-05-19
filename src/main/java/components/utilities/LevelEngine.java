@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -47,18 +47,18 @@ public class LevelEngine {
 	
 	private void givexp(Guild guild, User user, OffsetDateTime time, int amount, int mindiff) {
 		OffsetDateTime now = OffsetDateTime.now();
-		OffsetDateTime lastxpgotten = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "lastxpgotten"));
+		OffsetDateTime lastxpgotten = OffsetDateTime.parse(ConfigLoader.cfl.getUserConfig(guild, user, "lastxpgotten"));
 		long difference = Duration.between(lastxpgotten, now).toSeconds();
 		if(difference >= Long.parseLong(String.valueOf(mindiff))) {
-			Configloader.INSTANCE.setUserConfig(guild, user, "levelspamcount", "0");
+			ConfigLoader.cfl.setUserConfig(guild, user, "levelspamcount", "0");
 			this.grantxp(guild, user, amount);
 			this.checklevel(guild, user);
 			this.checkforreward(guild, user);
 		} else {
-			int newcount = Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "levelspamcount")) + 1;
-			Configloader.INSTANCE.setUserConfig(guild, user, "levelspamcount", String.valueOf(newcount));
+			int newcount = Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, user, "levelspamcount")) + 1;
+			ConfigLoader.cfl.setUserConfig(guild, user, "levelspamcount", String.valueOf(newcount));
 			if (newcount > 20) {
-				Configloader.INSTANCE.addUserConfig(guild, user, "warnings", "Levelspamming");
+				ConfigLoader.cfl.addUserConfig(guild, user, "warnings", "Levelspamming");
 				user.openPrivateChannel().complete()
 						.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/utilities/levelengine:levelspam")
 								.replaceDescription("{guild}", guild.getName()).convert()).queue();
@@ -67,17 +67,17 @@ public class LevelEngine {
 	}
 
 	private void grantxp(Guild guild, User user, int amount) {
-		int current = Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "expe"));
+		int current = Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, user, "expe"));
 		int newamount = current + amount;
-		Configloader.INSTANCE.setUserConfig(guild, user, "expe", String.valueOf(newamount));
-		Configloader.INSTANCE.setUserConfig(guild, user, "lastxpgotten", OffsetDateTime.now().toString());
+		ConfigLoader.cfl.setUserConfig(guild, user, "expe", String.valueOf(newamount));
+		ConfigLoader.cfl.setUserConfig(guild, user, "lastxpgotten", OffsetDateTime.now().toString());
 	}
 
 	private void checklevel(Guild guild, User user) {
-		int currentlevel = Integer.valueOf(Configloader.INSTANCE.getUserConfig(guild, user, "level"));
+		int currentlevel = Integer.valueOf(ConfigLoader.cfl.getUserConfig(guild, user, "level"));
 		if (this.xpleftfornextlevel(guild, user) < 1) {
-			Configloader.INSTANCE.setUserConfig(guild, user, "level", String.valueOf(currentlevel + 1));
-			String id = Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch");
+			ConfigLoader.cfl.setUserConfig(guild, user, "level", String.valueOf(currentlevel + 1));
+			String id = ConfigLoader.cfl.getGuildConfig(guild, "levelmsgch");
 			if (id.equals("")) {
 				return;
 			}
@@ -87,20 +87,20 @@ public class LevelEngine {
 						.replaceTitle("{user}", guild.getMember(user).getEffectiveName())
 						.replaceDescription("{level}", String.valueOf(currentlevel+1)).convert()).queue();
 			} else {
-				Configloader.INSTANCE.setGuildConfig(guild, "levelmsgch", "");
+				ConfigLoader.cfl.setGuildConfig(guild, "levelmsgch", "");
 			}
 		}
 	}
 
 	private void checkforreward(Guild guild, User user) {
-		String rawinput = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards");
+		String rawinput = ConfigLoader.cfl.getGuildConfig(guild, "levelrewards");
 		if (rawinput.equals("")) {
 			return;
 		}
 		String[] rewards = rawinput.split(";");
 		for (int i = 0; i < rewards.length; i++) {
 			String[] reward = rewards[i].split("_");
-			if (Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "level")) >= Integer.parseInt(reward[1])) {
+			if (Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, user, "level")) >= Integer.parseInt(reward[1])) {
 				Role rewardrole = guild.getRoleById(reward[0]);
 				guild.addRoleToMember(guild.getMember(user), rewardrole);
 			}
@@ -114,12 +114,12 @@ public class LevelEngine {
 	}
 	
 	public int xpleftfornextlevel(Guild guild, User user) {
-		int xpneededfornextlevel = this.xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "level")));
-		return xpneededfornextlevel - Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "expe"));
+		int xpneededfornextlevel = this.xpneededforlevel(Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, user, "level")));
+		return xpneededfornextlevel - Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, user, "expe"));
 	}
 	
 	public String devtest(Guild guild, User user) {
-		return String.valueOf(xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "level")))) 
-				+ " | " + String.valueOf(xpleftfornextlevel(guild, user)) + " | " + Configloader.INSTANCE.getUserConfig(guild, user, "expe");
+		return String.valueOf(xpneededforlevel(Integer.parseInt(ConfigLoader.cfl.getUserConfig(guild, user, "level")))) 
+				+ " | " + String.valueOf(xpleftfornextlevel(guild, user)) + " | " + ConfigLoader.cfl.getUserConfig(guild, user, "expe");
 	}
 }

@@ -2,7 +2,7 @@ package commands.moderation;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -24,13 +24,13 @@ public class AutoRole implements Command {
 		user = event.getUser();
 		if (event.getSubcommandName().equals("add")) {
 			Role role = event.getOption("addrole").getAsRole();
-			Configloader.INSTANCE.addGuildConfig(guild, "autoroles", role.getId());
+			ConfigLoader.cfl.addGuildConfig(guild, "autoroles", role.getId());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:addsuccess").convert()).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
-			Configloader.INSTANCE.removeGuildConfig(guild, "autoroles", role.getId());
+			ConfigLoader.cfl.removeGuildConfig(guild, "autoroles", role.getId());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:removesuccess").convert()).queue();
 			return;
 		}
@@ -57,7 +57,7 @@ public class AutoRole implements Command {
 	
 	private void listroles(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
-		String currentraw = Configloader.INSTANCE.getGuildConfig(guild, "autoroles");
+		String currentraw = ConfigLoader.cfl.getGuildConfig(guild, "autoroles");
 		if (currentraw.equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/autorole:noautoroles").convert()).queue();;
 			return;

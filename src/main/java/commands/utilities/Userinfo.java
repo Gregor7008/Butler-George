@@ -4,7 +4,7 @@ import java.time.format.DateTimeFormatter;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -19,7 +19,7 @@ public class Userinfo implements Command{
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
-		if (event.getMember().getRoles().contains(event.getGuild().getRoleById(Configloader.INSTANCE.getGuildConfig(event.getGuild(), "modrole"))) && 
+		if (event.getMember().getRoles().contains(event.getGuild().getRoleById(ConfigLoader.cfl.getGuildConfig(event.getGuild(), "modrole"))) && 
 				!event.getGuild().getPublicRole().hasPermission(event.getGuildChannel(), Permission.VIEW_CHANNEL)) {
 			this.listModInfo(event);
 		} else {
@@ -72,9 +72,9 @@ public class Userinfo implements Command{
 		eb.addField(":rocket:" + titles[7], "`" + booster + "`", true);
 		eb.addField(":calendar:" + titles[8], "`" + member.getTimeJoined().format(formatter) + "`", true);
 		eb.addField(":calendar:" + titles[9], "`" + member.getUser().getTimeCreated().format(formatter) + "`", true);
-		eb.addField(":warning:" + titles[10], "`" + String.valueOf(Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "warnings").split(";").length - 1) + "`", true);
-		eb.addField(":card_index:" + titles[11], "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
-		eb.addField(":pager:" + titles[12], "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
+		eb.addField(":warning:" + titles[10], "`" + String.valueOf(ConfigLoader.cfl.getUserConfig(event.getGuild(), member.getUser(), "warnings").split(";").length - 1) + "`", true);
+		eb.addField(":card_index:" + titles[11], "`" + ConfigLoader.cfl.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
+		eb.addField(":pager:" + titles[12], "`" + ConfigLoader.cfl.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
 		//eb.addField(":alarm_clock:" + titles[13], "`" + member.getOnlineStatus().toString() + "`", true);
 		eb.addField(":abacus:" + titles[14], "`" + String.valueOf(member.getRoles().size()) + "`", true);
 		eb.addField(":arrow_up:" + titles[15], "`" + member.getRoles().get(0).getName() + "`", true);
@@ -113,8 +113,8 @@ public class Userinfo implements Command{
 		eb.addField(":robot:" + titles[6], "`" + String.valueOf(member.getUser().isBot()) + "`", true);
 		eb.addField(":rocket:" + titles[7], "`" + booster + "`", true);
 		eb.addField(":calendar:" + titles[8], "`" + member.getTimeJoined().format(formatter) + "`", true);
-		eb.addField(":card_index:" + titles[11], "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
-		eb.addField(":pager:" + titles[12], "`" + Configloader.INSTANCE.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
+		eb.addField(":card_index:" + titles[11], "`" + ConfigLoader.cfl.getUserConfig(event.getGuild(), member.getUser(), "expe") + "`", true);
+		eb.addField(":pager:" + titles[12], "`" + ConfigLoader.cfl.getUserConfig(event.getGuild(), member.getUser(), "level") + "`", true);
 		//eb.addField(":alarm_clock:" + titles[13], "`" + member.getOnlineStatus().toString() + "`", true);
 		eb.addField(":abacus:" + titles[14], "`" + String.valueOf(member.getRoles().size()) + "`", true);
 		eb.addField(":arrow_up:" + titles[15], "`" + member.getRoles().get(0).getName() + "`", true);

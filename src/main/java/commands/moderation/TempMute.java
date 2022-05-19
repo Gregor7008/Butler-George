@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -40,7 +40,7 @@ public class TempMute implements Command{
 	}
 	
 	private void tempmute(int days, Guild guild, User user) {
-		Configloader.INSTANCE.setUserConfig(guild, user, "tempmuted", "true");
+		ConfigLoader.cfl.setUserConfig(guild, user, "tempmuted", "true");
 		guild.getMember(user).timeoutFor(days, TimeUnit.DAYS).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}

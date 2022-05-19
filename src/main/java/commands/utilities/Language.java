@@ -7,7 +7,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -43,27 +43,27 @@ public class Language implements Command{
 				e -> {reply.deleteOriginal().queue();
 					  switch (e.getSelectedOptions().get(0).getValue()) {
 				      case "en":
-				    	  Configloader.INSTANCE.setUserConfig(guild, user, "language", "en");
+				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "en");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successen").convert()).queue();
 				    	  break;
 				      case "de":
-				    	  Configloader.INSTANCE.setUserConfig(guild, user, "language", "de");
+				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "de");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successde").convert()).queue();
 				    	  break;
 				      case "es":
-				    	  Configloader.INSTANCE.setUserConfig(guild, user, "language", "es");
+				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "es");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successes").convert()).queue();
 				    	  break;
 				      case "fr":
-				    	  Configloader.INSTANCE.setUserConfig(guild, user, "language", "fr");
+				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "fr");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successfr").convert()).queue();
 				    	  break;
 				      case "nl":
-				    	  Configloader.INSTANCE.setUserConfig(guild, user, "language", "nl");
+				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "nl");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successnl").convert()).queue();
 				    	  break;
 				      case "ru":
-				    	  Configloader.INSTANCE.setUserConfig(guild, user, "language", "ru");
+				    	  ConfigLoader.cfl.setUserConfig(guild, user, "language", "ru");
 				    	  e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/language:successru").convert()).queue();
 				    	  break;
 				      default:

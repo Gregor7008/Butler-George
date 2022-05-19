@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
@@ -33,7 +33,7 @@ public class Channelpermission implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		String ctgid = Configloader.INSTANCE.getUserConfig(guild, user, "cccategory");
+		String ctgid = ConfigLoader.cfl.getUserConfig(guild, user, "cccategory");
 		if (ctgid.equals("") || !event.getTextChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/channelpermission:nopermission").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;

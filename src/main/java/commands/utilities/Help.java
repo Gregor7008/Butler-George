@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import commands.Command;
 import commands.CommandList;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -35,7 +35,7 @@ public class Help implements Command{
 			return;
 		}
 		if ((cmd = commandList.moderationcmds.get(input)) != null 
-				&& event.getMember().getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "modrole")))) {
+				&& event.getMember().getRoles().contains(guild.getRoleById(ConfigLoader.cfl.getGuildConfig(guild, "modrole")))) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
 			event.replyEmbeds(AnswerEngine.ae.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();

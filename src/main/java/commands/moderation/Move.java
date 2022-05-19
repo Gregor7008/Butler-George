@@ -2,7 +2,7 @@ package commands.moderation;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -17,7 +17,7 @@ public class Move implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (Configloader.INSTANCE.getGuildConfig(guild, "supporttalk").equals("")) {
+		if (ConfigLoader.cfl.getGuildConfig(guild, "supporttalk").equals("")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
@@ -25,10 +25,10 @@ public class Move implements Command{
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:memnotconn").convert()).queue();
 			return;
 		}
-		String vcid = Configloader.INSTANCE.getGuildConfig(guild, "supporttalk");
+		String vcid = ConfigLoader.cfl.getGuildConfig(guild, "supporttalk");
 		VoiceChannel st = guild.getVoiceChannelById(vcid);
 		if (st == null) {
-			Configloader.INSTANCE.removeGuildConfig(guild, "supporttalk", vcid);
+			ConfigLoader.cfl.removeGuildConfig(guild, "supporttalk", vcid);
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
