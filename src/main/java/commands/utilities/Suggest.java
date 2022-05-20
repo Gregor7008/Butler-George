@@ -55,7 +55,7 @@ public class Suggest implements Command{
 	public void sendsuggestion(Guild guild, Member member, String idea) {
 		TextChannel channel = guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild, "suggest"));
 		EmbedBuilder eb = new EmbedBuilder();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyyy");
 		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());
 		eb.setColor(Color.YELLOW);
 		eb.setFooter(OffsetDateTime.now().format(formatter));
