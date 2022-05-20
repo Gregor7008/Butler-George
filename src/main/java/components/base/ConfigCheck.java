@@ -113,6 +113,6 @@ public class ConfigCheck {
 	}
 	
 	public void checkUserConfigs(Guild guild) {
-		//TODO
+		//TODO Running through all users, checking whether id-specific values are still valid
 	}
 }

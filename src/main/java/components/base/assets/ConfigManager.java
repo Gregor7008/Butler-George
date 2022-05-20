@@ -65,7 +65,7 @@ public class ConfigManager {
 	
 	//Get JSONObjects
 	@NotNull
-	public JSONObject getUserConfig(Guild guild, User user) {
+	public JSONObject getUserConfig(User user) {
 		JSONObject config = userConfigCache.get(user.getIdLong());
 		if (config == null) {
 			config = this.createUserConfig(user);
@@ -77,7 +77,7 @@ public class ConfigManager {
 	public JSONObject getMemberConfig(Guild guild, User user) {
 		JSONObject config = null;
 		try {
-			config = this.getUserConfig(guild, user).getJSONObject(guild.getId());
+			config = this.getUserConfig(user).getJSONObject(guild.getId());
 		} catch (JSONException e) {
 			config = this.createMemberConfig(guild, user);
 		}
@@ -103,7 +103,7 @@ public class ConfigManager {
 	}
 	
 	private JSONObject createMemberConfig(Guild guild, User user) {
-		JSONObject userConfig = this.getUserConfig(guild, user);
+		JSONObject userConfig = this.getUserConfig(user);
 		JSONObject newConfig = new JSONObject();
 		//Simple values
 		newConfig.put("guild",						guild.getIdLong());
@@ -136,7 +136,7 @@ public class ConfigManager {
 		newConfig.put("customchannelcategories",	new JSONObject());
 		newConfig.put("customchannelaccessroles",	new JSONArray());
 		newConfig.put("customchannelroles",			new JSONArray());
-		newConfig.put("forbiddenwords",				"");
+		newConfig.put("forbiddenwords",				new JSONArray());
 		newConfig.put("goodbyemsg",					"");
 		newConfig.put("createdchannels",			new JSONObject());
 		newConfig.put("join2createchannels",		new JSONObject());

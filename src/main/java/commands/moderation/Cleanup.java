@@ -1,8 +1,5 @@
 package commands.moderation;
 
-import java.io.File;
-
-import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,14 +14,7 @@ public class Cleanup implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		File guilddir = new File(Bot.environment + "/configs/user/" + guild.getId());
-		File[] ufiles = guilddir.listFiles();
-		for (int i = 0; i < ufiles.length; i++) {
-			String[] name = ufiles[i].getName().split(".properties");
-			if (event.getGuild().getMemberById(name[0]) == null) {
-				ufiles[i].delete();
-			}
-		}
+		//TODO Running through all users, checking whether they left, if so: Delete Guild Object inside Users' config-file
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/cleanup:success").convert()).queue();
 	}
 

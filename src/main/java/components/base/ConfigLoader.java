@@ -19,7 +19,7 @@ public class ConfigLoader {
 	
 	//User configs
 	public JSONObject getUserConfig(Guild guild, User user) {
-		return manager.getUserConfig(guild, user);
+		return manager.getMemberConfig(guild, user);
 	}
 	
 	public JSONObject getFirstUserLayerConfig(Guild guild, User user, String key) {

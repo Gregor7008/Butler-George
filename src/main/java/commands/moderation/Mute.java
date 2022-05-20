@@ -18,7 +18,7 @@ public class Mute implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
-		ConfigLoader.run.setUserConfig(guild, user, "muted", "true");
+		ConfigLoader.run.getUserConfig(guild, user).put("muted", true);
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/mute:success").replaceDescription("{user}", user.getName()).convert()).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}

@@ -1,5 +1,7 @@
 package commands.moderation;
 
+import org.json.JSONArray;
+
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.ConfigLoader;
@@ -24,13 +26,13 @@ public class BotAutoRole implements Command{
 		user = event.getUser();
 		if (event.getSubcommandName().equals("add")) {
 			Role role = event.getOption("addrole").getAsRole();
-			ConfigLoader.run.addGuildConfig(guild, "botautoroles", role.getId());
+			ConfigLoader.run.getGuildConfig(guild).getJSONArray("botautoroles").put(role.getIdLong());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:addsuccess").convert()).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
-			ConfigLoader.run.removeGuildConfig(guild, "botautoroles", role.getId());
+			ConfigLoader.run.removeValueFromArray(ConfigLoader.run.getGuildConfig(guild).getJSONArray("botautoroles"), role.getIdLong());
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess").convert()).queue();
 			return;
 		}
@@ -57,23 +59,18 @@ public class BotAutoRole implements Command{
 	
 	private void listroles(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
-		String currentraw = ConfigLoader.run.getGuildConfig(guild, "botautoroles");
-		if (currentraw.equals("")) {
+		JSONArray botautoroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("botautoroles");
+		if (botautoroles.isEmpty()) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:nobotautoroles").convert()).queue();;
 			return;
 		}
-		if (!currentraw.contains(";")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/botautorole:list").replaceDescription("{list}",  "#1\s\s" + guild.getRoleById(currentraw).getAsMention()).convert()).queue();
-			return;
-		}
-		String[] current = currentraw.split(";");
-		for (int i = 1; i <= current.length; i++) {
+		for (int i = 0; i < botautoroles.length(); i++) {
 			sB.append('#')
 			  .append(String.valueOf(i) + "\s\s");
-			if (i == current.length) {
-				sB.append(guild.getRoleById(current[i-1]).getAsMention());
+			if (i+1 == botautoroles.length()) {
+				sB.append(guild.getRoleById(botautoroles.getLong(i)).getAsMention());
 			} else {
-				sB.append(guild.getRoleById(current[i-1]).getAsMention() + "\n");
+				sB.append(guild.getRoleById(botautoroles.getLong(i)).getAsMention() + "\n");
 			}
 		}
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/botautorole:list").replaceDescription("{list}", sB.toString()).convert()).queue();

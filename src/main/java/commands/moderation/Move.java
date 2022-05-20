@@ -17,7 +17,7 @@ public class Move implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (ConfigLoader.run.getGuildConfig(guild, "supporttalk").equals("")) {
+		if (ConfigLoader.run.getGuildConfig(guild).getLong("supporttalk") == 0) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
@@ -25,10 +25,10 @@ public class Move implements Command{
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:memnotconn").convert()).queue();
 			return;
 		}
-		String vcid = ConfigLoader.run.getGuildConfig(guild, "supporttalk");
+		long vcid = ConfigLoader.run.getGuildConfig(guild).getLong("supporttalk");
 		VoiceChannel st = guild.getVoiceChannelById(vcid);
 		if (st == null) {
-			ConfigLoader.run.removeGuildConfig(guild, "supporttalk", vcid);
+			ConfigLoader.run.getGuildConfig(guild).put("supporttalk", Long.valueOf(0));
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
