@@ -6,6 +6,7 @@ import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.ConfigLoader;
+import components.base.assets.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -41,8 +42,8 @@ public class TempBan implements Command{
 	
 	private void tempban(int days, Guild guild, User user) {
 		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
-		ConfigLoader.run.setUserConfig(guild, user, "tbuntil", until.toString());
-		ConfigLoader.run.setUserConfig(guild, user, "tempbanned", "true");
+		ConfigLoader.run.getUserConfig(guild, user).put("tbuntil", until.format(ConfigManager.dateTimeFormatter));
+		ConfigLoader.run.getUserConfig(guild, user).put("tempbanned", true);
 		guild.getMember(user).ban(0).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}	

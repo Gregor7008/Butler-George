@@ -109,9 +109,6 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onReady(ReadyEvent event) {
-		//setup Bot
-		new ConfigLoader();
-	    new ConfigCheck();
 	    //delete Offline message
 	    List<Guild> guilds = event.getJDA().getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {

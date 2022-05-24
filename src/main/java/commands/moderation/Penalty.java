@@ -2,6 +2,10 @@ package commands.moderation;
 
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
@@ -37,7 +41,10 @@ public class Penalty implements Command{
 			this.removepenalties(event);
 		}
 		if (event.getSubcommandName().equals("list")) {
-			this.listpenalties(event);
+			String response = this.listpenalties(event);
+			if (response != null) {
+				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:list").replaceDescription("{list}", response).convert()).queue();
+			}
 		}
 		
 	}
@@ -58,45 +65,22 @@ public class Penalty implements Command{
 	
 	private void removepenalties(SlashCommandInteractionEvent event) {
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
-		StringBuilder sB = new StringBuilder();
-		String currentraw = ConfigLoader.run.getGuildConfig(guild, "penalties");
-		String[] current = currentraw.split(";");
-		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:nopenalties").convert()).queue();;
-			return;
-		}
-		if (!currentraw.contains(";")) {
-			String[] temp1 = currentraw.split("_");
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:remlist").replaceDescription("{list}", "#" + temp1[1] + "\s\s" + temp1[0]).convert()).queue();
-		} else {
-			for (int i = 1; i <= current.length; i++) {
-				 String[] temp2 = current[i-1].split("_");
-				 sB.append(temp2[1] + "\son\s");
-				 if (i == current.length) {
-				 	 sB.append(temp2[0] + "\swarnings");
-				 } else {
-					 sB.append(temp2[0] + "\swarnings,\n");
-				 }
-			}
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:remlist").replaceDescription("{list}", sB.toString()).convert()).queue();
-		}
-		waiter.waitForEvent(MessageReceivedEvent.class,
-				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
-				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-				e -> {this.removefinal(e, current);},
-				1, TimeUnit.MINUTES,
-				() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
-	}
-	
-	private void removefinal(MessageReceivedEvent e, String[] current) {
-		for (int i = 1; i <= current.length; i++) {
-		   	 String[] temp3 = current[i-1].split("_", 2);
-		   	if (temp3[0].contains(e.getMessage().getContentRaw())) {
-		   	    ConfigLoader.run.removeGuildConfig(e.getGuild(), "penalty", current[i-1]);
-		   	    e.getMessage().addReaction("U+2705").queue();
-		    } else {
-		    	e.getMessage().addReaction("U+0078").queue();
-		    }
+		String response = this.listpenalties(event);
+		if (response != null) {
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:remlist").replaceDescription("{list}", response).convert()).queue();
+			JSONObject penalties = ConfigLoader.run.getGuildConfig(guild).getJSONObject("penalties");
+			waiter.waitForEvent(MessageReceivedEvent.class,
+					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
+					e -> {try {
+						penalties.getJSONArray(e.getMessage().getContentRaw());
+						penalties.remove(e.getMessage().getContentRaw());
+					} catch (JSONException ex) {
+						channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:norem").convert()).queue();
+					}
+					},
+					1, TimeUnit.MINUTES,
+					() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 		}
 	}
 	
@@ -105,9 +89,9 @@ public class Penalty implements Command{
 				.addOption("Removal of role", "rr")
 				.addOption("Temporary mute", "tm")
 				.addOption("Permanent mute", "pm")
-				.addOption("Kick", "kk")
+				.addOption("Kick", "ki")
 				.addOption("Temporary ban", "tb")
-				.addOption("Permanent ban", "pb")
+				.addOption("Permanent ban", "pm")
 				.build();
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:add1").convert())
@@ -128,20 +112,22 @@ public class Penalty implements Command{
 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:add2").convert()).queue();
 		waiter.waitForEvent(MessageReceivedEvent.class,
-				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;}
+					  try {Integer.valueOf(e.getMessage().getContentRaw());} catch (NumberFormatException ex) {return false;}
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-				e -> {int warnings = Integer.parseInt(e.getMessage().getContentRaw());
-					  this.addpenalties3(plannedpunish, warnings);},
+				e -> {this.addpenalties3(plannedpunish, e.getMessage().getContentRaw());},
 				1, TimeUnit.MINUTES,
 				() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
-	private void addpenalties3(String plannedpunish, int warnings) {
-		if (ConfigLoader.run.getGuildConfig(guild, "penalties").contains(String.valueOf(warnings))) {
+	private void addpenalties3(String plannedpunish, String warnings) {
+		JSONObject penalties = ConfigLoader.run.getGuildConfig(guild).getJSONObject("penalties");
+		try {
+			penalties.getJSONArray(warnings);
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:error").convert()).queue();
 			return;
-		}
-		EventWaiter waiter = Bot.INSTANCE.getWaiter();
+		} catch (JSONException e) {}
+ 		EventWaiter waiter = Bot.INSTANCE.getWaiter();
 		switch (plannedpunish) {
 		case "rr":
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:add3role").convert()).queue();
@@ -149,8 +135,7 @@ public class Penalty implements Command{
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 						  if(e.getMessage().getMentionedRoles().isEmpty()) {return false;}
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-					e -> {String penalty = String.valueOf(warnings) + "_removerole_" + e.getMessage().getContentRaw();
-						  ConfigLoader.run.addGuildConfig(guild, "penalties", penalty);
+					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getMentionedRoles().get(0).getId()));
 						  channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:successrole").convert()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
@@ -158,35 +143,35 @@ public class Penalty implements Command{
 		case "tm":
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:add3time").convert()).queue();
 			waiter.waitForEvent(MessageReceivedEvent.class,
-					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;}
+					 	  try {Integer.valueOf(e.getMessage().getContentRaw());} catch (NumberFormatException ex) {return false;}
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-					e -> {String penalty = String.valueOf(warnings) + "_tempmute_" + e.getMessage().getContentRaw();
-						  ConfigLoader.run.addGuildConfig(guild, "penalties", penalty);
+					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
 						  channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successtempmute").convert()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pm":
-			ConfigLoader.run.addGuildConfig(guild, "penalties", String.valueOf(warnings) + "_mute");
+			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successmute").convert()).queue();
 			break;
-		case "kk":
-			ConfigLoader.run.addGuildConfig(guild, "penalties", String.valueOf(warnings) + "_kick");
+		case "ki":
+			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successkick").convert()).queue();
 			break;
 		case "tb":
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:add3time").convert()).queue();
 			waiter.waitForEvent(MessageReceivedEvent.class,
-					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
+					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;}
+						  try {Integer.valueOf(e.getMessage().getContentRaw());} catch (NumberFormatException ex) {return false;}
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-					e -> {String penalty = String.valueOf(warnings) + "_tempban_" + e.getMessage().getContentRaw();
-						  ConfigLoader.run.addGuildConfig(guild, "penalties", penalty);
+					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
 						  channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successtempban").convert()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pb":
-			ConfigLoader.run.addGuildConfig(guild, "penalties", String.valueOf(warnings) + "_ban");
+			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
 			channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/penalty:successban").convert()).queue();
 			break;
 		default:
@@ -194,28 +179,40 @@ public class Penalty implements Command{
 		}
 	}
 	
-	private void listpenalties(SlashCommandInteractionEvent event) {
+	private String listpenalties(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
-		String currentraw = ConfigLoader.run.getGuildConfig(guild, "penalties");
-		if (currentraw.equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(event.getGuild(), event.getUser(),"/commands/moderation/penalty:nopenalties").convert()).queue();;
-			return;
+		JSONObject current = ConfigLoader.run.getGuildConfig(guild).getJSONObject("penalties");
+		if (current.isEmpty()) {
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:nopenalties").convert()).queue();;
+			return null;
 		}
-		if (!currentraw.contains(";")) {
-			String[] temp1 = currentraw.split("_");
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:list").replaceDescription("{list}", "#" + temp1[1] + "\s\s" + temp1[0]).convert()).queue();
-			return;
-		}
-		String[] current = currentraw.split(";");
-		for (int i = 1; i <= current.length; i++) {
-			String[] temp2 = current[i-1].split("_");
-			sB.append(temp2[1] + "\son\s");
-			if (i == current.length) {
-				sB.append(temp2[0] + "\swarnings");
-			} else {
-				sB.append(temp2[0] + "\swarnings,\n");
+		current.keySet().forEach(e -> {
+			sB.append("• " + e + ": ");
+			JSONArray penalty = current.getJSONArray(e);
+			switch (penalty.getString(0)) {
+				case "rr":
+					sB.append("Remove role " + guild.getRoleById(penalty.getString(1)).getAsMention());
+					break;
+				case "tm":
+					sB.append("Mute for " + penalty.getString(1) + " days");
+					break;
+				case "pm":
+					sB.append("Permanent mute");
+					break;
+				case "ki":
+					sB.append("Kick from server");
+					break;
+				case "tb":
+					sB.append("Ban from server for " + penalty.getString(1) + " days");
+					break;
+				case "pb":
+					sB.append("Permanent ban from server");
+					break;
+				default:
+					channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:fatal").convert()).queue();
 			}
-		}
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/penalty:list").replaceDescription("{list}", sB.toString()).convert()).queue();
+			sB.append("\n");
+		});
+		return sB.toString();
 	}
 }

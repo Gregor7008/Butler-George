@@ -17,15 +17,23 @@ public class SupportChannel implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		ConfigLoader.run.setGuildConfig(guild, "supportchannel", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supportchannel:success").convert()).queue();
+		if (event.getSubcommandName().equals("set")) {
+			ConfigLoader.run.getGuildConfig(guild).put("suggestionchannel", event.getOption("channel").getAsGuildChannel().getIdLong());
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supportchannel:setsuccess").convert()).queue();
+			return;
+		}
+		if (event.getSubcommandName().equals("clear")) {
+			ConfigLoader.run.getGuildConfig(guild).put("suggestionchannel", Long.valueOf(0));
+			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/supportchannel:clearsuccess").convert()).queue();
+		}
 	}
 
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("supportchannel", "0")
 				.addSubcommands(new SubcommandData("set", "Sets the support channel of this server")
-						.addOption(OptionType.CHANNEL, "channel", "Mention a text channel", true));
+						.addOption(OptionType.CHANNEL, "channel", "Mention a text channel", true))
+				.addSubcommands(new SubcommandData("clear", "Unassigns the channel for ticket creation"));
 		return command;
 	}
 

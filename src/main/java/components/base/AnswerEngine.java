@@ -12,12 +12,8 @@ import net.dv8tion.jda.api.entities.User;
 
 public class AnswerEngine {
 	
-	public static AnswerEngine ae;
+	public static AnswerEngine ae = new AnswerEngine();
 	public String footer = "Made with ❤️ by Gregor7008";
-	
-	public AnswerEngine() {
-		ae = this;
-	}
 	
 	public CustomMessageEmbed fetchMessage(Guild guild, User user, String input)  {
 		return this.buildMessage(this.getTitle(guild, user, input), this.getDescription(guild, user, input));

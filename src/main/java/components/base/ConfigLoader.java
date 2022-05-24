@@ -10,12 +10,8 @@ import net.dv8tion.jda.api.entities.User;
 
 public class ConfigLoader {
 	
-	public static ConfigLoader run;
+	public static ConfigLoader run = new ConfigLoader();
 	public static ConfigManager manager = new ConfigManager();
-	
-	public ConfigLoader() {
-		run = this;
-	}
 	
 	//User configs
 	public JSONObject getUserConfig(Guild guild, User user) {

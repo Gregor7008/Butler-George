@@ -1,5 +1,7 @@
 package commands.moderation;
 
+import org.json.JSONObject;
+
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
@@ -18,13 +20,13 @@ public class Unmute implements Command{
 		final Guild guild = event.getGuild();
 		final User user =  event.getUser();
 		final User cuser = event.getOption("user").getAsUser();
-		if (!Boolean.parseBoolean(ConfigLoader.run.getUserConfig(guild, cuser, "muted"))) {
+		JSONObject userconfig = ConfigLoader.run.getUserConfig(guild, cuser);
+		if (!userconfig.getBoolean("muted") && !userconfig.getBoolean("tempmuted")) {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
 			return;
 		}
-		ConfigLoader.run.setUserConfig(guild, cuser, "muted", "false");
-		ConfigLoader.run.setUserConfig(guild, cuser, "tempmuted", "false");
-		ConfigLoader.run.setUserConfig(guild, cuser, "tmuntil", "");
+		userconfig.put("muted", false);
+		userconfig.put("tempmuted", false);
 		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}

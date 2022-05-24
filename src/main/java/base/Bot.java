@@ -68,7 +68,6 @@ public class Bot {
 	    modEngine = new ModEngine();
 	    consoleEngine = new ConsoleEngine();
 	    new ServerUtilities().controlChannels(true);
-	    new AnswerEngine();
     	this.checkConfigs();
     	this.startTimer();
 	}
