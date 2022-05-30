@@ -1,5 +1,7 @@
 package components.moderation;
 
+import org.json.JSONArray;
+
 import base.Bot;
 import components.base.AnswerEngine;
 import components.base.ConfigLoader;
@@ -17,11 +19,10 @@ public class AutoModerator {
 	}
 	
 	public void messagereceived(MessageReceivedEvent event) {
-		String forbiddenwords = ConfigLoader.run.getGuildConfig(event.getGuild(), "forbidden");
-		String[] singleword = forbiddenwords.split(";");
-		for (int i = 0; i < singleword.length; i++) {
-			if (event.getMessage().getContentRaw().toLowerCase().contains(singleword[i].toLowerCase())) {
-				ConfigLoader.run.addUserConfig(event.getGuild(), event.getAuthor(), "warnings", "Rude behavior");
+		JSONArray forbiddenwords = ConfigLoader.run.getGuildConfig(event.getGuild()).getJSONArray("forbiddenwords");
+		for (int i = 0; i < forbiddenwords.length(); i++) {
+			if (event.getMessage().getContentRaw().toLowerCase().contains(forbiddenwords.getString(i).toLowerCase())) {
+				ConfigLoader.run.getUserConfig(event.getGuild(), event.getAuthor()).getJSONArray("warnings").put("Rude behavior");
 				try {
 					event.getMember().getUser().openPrivateChannel().complete()
 						 .sendMessageEmbeds(AnswerEngine.ae.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")
@@ -29,6 +30,7 @@ public class AutoModerator {
 				} catch (Exception e) {e.printStackTrace();}
 				event.getMessage().delete().queue();
 				Bot.INSTANCE.penaltyCheck(event.getGuild());
+				i = forbiddenwords.length();
 			}
 		}
 	}

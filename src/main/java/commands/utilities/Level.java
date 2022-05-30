@@ -43,9 +43,9 @@ public class Level implements Command {
 			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "eastereggs:3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		event.reply("...").queue();
+		event.deferReply(true).queue();
 		File finalimage = this.renderLevelcard(user, guild);
-        event.getHook().editOriginal("").addFile(finalimage).queue();
+        event.getHook().sendMessage("").addFile(finalimage).queue();
 	}
 
 	@Override

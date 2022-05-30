@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 
 import components.base.AnswerEngine;
 import components.base.ConfigLoader;
+import components.base.assets.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -47,10 +48,10 @@ public class LevelEngine {
 	
 	private void givexp(Guild guild, User user, OffsetDateTime time, int amount, int mindiff) {
 		OffsetDateTime now = OffsetDateTime.now();
-		OffsetDateTime lastxpgotten = OffsetDateTime.parse(ConfigLoader.run.getUserConfig(guild, user, "lastxpgotten"));
+		OffsetDateTime lastxpgotten = OffsetDateTime.parse(ConfigLoader.run.getUserConfig(guild, user).getString("lastxpgotten"), ConfigManager.dateTimeFormatter);
 		long difference = Duration.between(lastxpgotten, now).toSeconds();
 		if(difference >= Long.parseLong(String.valueOf(mindiff))) {
-			ConfigLoader.run.setUserConfig(guild, user, "levelspamcount", "0");
+			ConfigLoader.run.getUserConfig(guild, user).put("levelspamcount", Integer.valueOf(0));
 			this.grantxp(guild, user, amount);
 			this.checklevel(guild, user);
 			this.checkforreward(guild, user);
@@ -107,19 +108,14 @@ public class LevelEngine {
 		}
 	}
 	
-	public int xpneededforlevel(int currentlevel) {
+	private int xpneededforlevel(int currentlevel) {
 		if (currentlevel == 0) {return 100;} else {
 			return ((((currentlevel+1) * (currentlevel+1))+currentlevel+1)/2)*100;
 		}
 	}
 	
-	public int xpleftfornextlevel(Guild guild, User user) {
+	private int xpleftfornextlevel(Guild guild, User user) {
 		int xpneededfornextlevel = this.xpneededforlevel(Integer.parseInt(ConfigLoader.run.getUserConfig(guild, user, "level")));
 		return xpneededfornextlevel - Integer.parseInt(ConfigLoader.run.getUserConfig(guild, user, "expe"));
-	}
-	
-	public String devtest(Guild guild, User user) {
-		return String.valueOf(xpneededforlevel(Integer.parseInt(ConfigLoader.run.getUserConfig(guild, user, "level")))) 
-				+ " | " + String.valueOf(xpleftfornextlevel(guild, user)) + " | " + ConfigLoader.run.getUserConfig(guild, user, "expe");
 	}
 }

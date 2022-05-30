@@ -133,14 +133,10 @@ public class Bot {
 	}
 	
 	public void penaltyCheck(Guild guild) {
-		new Thread(() -> {
-			this.penaltyEngine.run(guild);
-		}).start();
+		this.penaltyEngine.run(guild);
 	}
 	
 	public void modCheck(Guild guild) {
-		new Thread(() -> {
-			this.modEngine.run(guild);
-		}).start();
+		this.modEngine.run(guild);
 	}
 }

@@ -42,7 +42,7 @@ public class TempBan implements Command{
 	
 	private void tempban(int days, Guild guild, User user) {
 		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
-		ConfigLoader.run.getUserConfig(guild, user).put("tbuntil", until.format(ConfigManager.dateTimeFormatter));
+		ConfigLoader.run.getUserConfig(guild, user).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
 		ConfigLoader.run.getUserConfig(guild, user).put("tempbanned", true);
 		guild.getMember(user).ban(0).queue();
 		Bot.INSTANCE.modCheck(guild);

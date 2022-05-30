@@ -63,6 +63,15 @@ public class ConfigManager {
 		} catch (Exception e) {return false;}
 	}
 	
+	//Get Cache
+	public ConcurrentHashMap<Long, JSONObject> getUserCache() {
+		return userConfigCache;
+	}
+	
+	public ConcurrentHashMap<Long, JSONObject> getGuildCache() {
+		return guildConfigCache;
+	}
+	
 	//Get JSONObjects
 	@NotNull
 	public JSONObject getUserConfig(User user) {
