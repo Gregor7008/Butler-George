@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import base.Bot;
 import components.base.assets.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -74,7 +75,32 @@ public class ConfigLoader {
 	}
 	
 	//Modmail configs
-	public JSONObject getModmailConfig(Guild guild) {
+	public Long getModMailOfUser(String userID) {
+		try {
+			return this.getModMailConfig(Bot.INSTANCE.jda.getGuildById(Bot.homeID)).getLong(userID);
+		} catch (JSONException e) {
+			return null;
+		}
+	}
+	
+	public Long getModMailOfChannel(String channelID) {
+		JSONObject modmailConfig = this.getModMailConfig(Bot.INSTANCE.jda.getGuildById(Bot.homeID));
+		String[] keys = (String[]) modmailConfig.keySet().toArray();
+		Long returnValue = null;
+		for (int i = 0; i < keys.length; i++) {
+			if (modmailConfig.getLong(keys[i]) == Long.valueOf(channelID)) {
+				returnValue = Long.valueOf(keys[i]);
+				i = keys.length;
+			}
+		}
+		return returnValue;
+	}
+	
+	public void setModMailConfig(String channelID, String userID) {
+		this.getModMailConfig(Bot.INSTANCE.jda.getGuildById(Bot.homeID)).put(userID, channelID);
+	}
+	
+	private JSONObject getModMailConfig(Guild guild) {
 		return this.getFirstGuildLayerConfig(guild, "modmails");
 	}
 	

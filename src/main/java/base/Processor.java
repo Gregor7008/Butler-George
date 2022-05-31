@@ -97,13 +97,9 @@ public class Processor extends ListenerAdapter {
 				return;
 			}
 			//modmail
-			new Thread(() -> {
-				new ModMail(event, true);
-			}).start();
+			new ModMail(event, true);
 		} else {
-			new Thread(() -> {
-				new ModMail(event, false);
-			}).start();
+			new ModMail(event, false);
 		}		
 	}
 	

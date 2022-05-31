@@ -2,11 +2,15 @@ package components.moderation;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import base.Bot;
 import components.base.ConfigLoader;
+import components.base.assets.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -22,58 +26,55 @@ public class PenaltyEngine {
 	
 	public void run(Guild guild) {
 		new Thread(() -> {
-			ConcurrentHashMap<Integer, String> penalties = new ConcurrentHashMap<>();
-			String pis = ConfigLoader.run.getGuildConfig(guild, "penalties");
-			if (pis.equals("")) {
+			JSONObject penalties = ConfigLoader.run.getGuildConfig(guild).getJSONObject("penalties");
+			if (penalties.isEmpty()) {
 				return;
 			}
-			String[] pn = pis.split(";");
-			for (int a = 0; a < pn.length; a++) {
-				String[] temp1 = pn[a].split("_", 2);
-				penalties.put(Integer.valueOf(temp1[0]), temp1[1]);
-			}
 			List<Member> members = guild.loadMembers().get();
-			//go through members
+			//Go through members
 			for (int e = 0; e < members.size(); e++) {
 				Member member = members.get(e);
 				User user = members.get(e).getUser();
-				int warningcount = ConfigLoader.run.getUserConfig(guild, user, "warnings").split(";").length;
+				int warningcount = ConfigLoader.run.getUserConfig(guild, user).getJSONArray("warnings").length();
+				boolean error = false;
 				for (int a = warningcount; a > 0; a--) {
-					if (penalties.get(a) != null) {
+					try {
+						penalties.getJSONArray(String.valueOf(a));
 						warningcount = a;
 						a = 0;
+					} catch (JSONException ex) {
+						error = true;
 					}
 				}
-				if (penalties.get(warningcount) != null && !ConfigLoader.run.getUserConfig(guild, user, "penaltycount").equals(String.valueOf(warningcount))) {
-					String penalty = penalties.get(warningcount);
-					ConfigLoader.run.setUserConfig(guild, user, "penaltycount", String.valueOf(warningcount));
+				if (!error && ConfigLoader.run.getUserConfig(guild, user).getInt("penaltycount") < warningcount) {
+					JSONArray penalty = penalties.getJSONArray(String.valueOf(warningcount));
+					ConfigLoader.run.getUserConfig(guild, user).put("penaltycount", warningcount);
 					//go through penaltys
-					switch(penalty) {
-						case ("kick"):
+					switch(penalty.getString(0)) {
+						case ("rr"):
+							guild.removeRoleFromMember(member, guild.getRoleById(penalty.getString(1)));
+							ConfigLoader.run.getUserConfig(guild, user).put("experience", Integer.valueOf(0));
+							ConfigLoader.run.getUserConfig(guild, user).put("level", Integer.valueOf(0));
+							break;
+						case ("tm"):
+							ConfigLoader.run.getUserConfig(guild, user).put("tempmuted", true);
+							guild.getMember(user).timeoutFor(Integer.valueOf(penalty.getString(1)), TimeUnit.DAYS).queue();
+							break;
+						case ("pm"):
+							ConfigLoader.run.getUserConfig(guild, user).put("muted", true);
+							Bot.INSTANCE.modCheck(guild);
+							break;
+						case ("kk"):
 							member.kick().queue();
 							break;
-						case ("ban"):
-							member.ban(0, "Too many warnings!").queue();
+						case ("tb"):
+							this.tempban(Integer.valueOf(penalty.getString(1)), guild, user);
+							break;
+						case ("pb"):
+							member.ban(0, "Too many warnings").queue();
 							break;
 						default:
-							if (penalty.contains("removerole")) {
-								String[] temp1 = penalty.split("_");
-								guild.removeRoleFromMember(member, guild.getRoleById(temp1[1]));
-								ConfigLoader.run.setUserConfig(guild, user, "expe", "0");
-								ConfigLoader.run.setUserConfig(guild, user, "level", "0");
-								return;
-							}
-							if (penalty.contains("tempmute")) {
-								String[] temp1 = penalty.split("_");
-								ConfigLoader.run.setUserConfig(guild, user, "tempmuted", "true");
-								guild.getMember(user).timeoutFor(Integer.valueOf(temp1[1]), TimeUnit.DAYS).queue();
-								return;
-							}
-							if (penalty.contains("tempban")) {
-								String[] temp1 = penalty.split("_");
-								this.tempban(Integer.valueOf(temp1[1]), guild, user);
-								return;
-							}
+							return;
 					}
 				}
 			}
@@ -81,9 +82,9 @@ public class PenaltyEngine {
 	}
 	
 	private void tempban(int days, Guild guild, User user) {
-		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
-		ConfigLoader.run.setUserConfig(guild, user, "tempbanneduntil", until.toString());
-		ConfigLoader.run.setUserConfig(guild, user, "tempbanned", "true");
+		OffsetDateTime until = OffsetDateTime.now().plusDays(days);
+		ConfigLoader.run.getUserConfig(guild, user).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
+		ConfigLoader.run.getUserConfig(guild, user).put("tempbanned", true);
 		guild.getMember(user).ban(0).queue();
 		Bot.INSTANCE.modCheck(guild);
 	}	
