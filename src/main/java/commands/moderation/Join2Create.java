@@ -24,26 +24,26 @@ public class Join2Create implements Command{
 		final String id = event.getOption("channel").getAsGuildChannel().getId();
 		JSONObject join2createchannels = ConfigLoader.run.getGuildConfig(guild).getJSONObject("join2createchannels");
 		if (guild.getVoiceChannelById(id) == null) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:invalid").convert()).queue();
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/join2create:invalid").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			try {
 				join2createchannels.get(id);
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:adderror").convert()).queue();
+				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/join2create:adderror").convert()).queue();
 			} catch (JSONException e) {
 				join2createchannels.put(id, new JSONObject());
 				//TODO Implement option to define settings for channels created of this join2create channel
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess").convert()).queue();
+				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess").convert()).queue();
 			}
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			try {
 				join2createchannels.get(id);
 				join2createchannels.remove(id);
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess").convert()).queue();
+				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess").convert()).queue();
 			} catch (JSONException e) {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remerror").convert()).queue();
+				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/join2create:remerror").convert()).queue();
 			}
 		}
 	}
@@ -60,6 +60,6 @@ public class Join2Create implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/join2create:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/join2create:help");
 	}
 }

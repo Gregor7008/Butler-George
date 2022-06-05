@@ -16,6 +16,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 import components.base.ConfigLoader;
+import components.base.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -60,7 +61,10 @@ public class ConfigManager {
 				}
 			});
 			return true;
-		} catch (Exception e) {return false;}
+		} catch (Exception e) {
+			ConsoleEngine.run.error(this, "Push failed!");
+			return false;
+		}
 	}
 	
 	//Get Cache
@@ -75,7 +79,10 @@ public class ConfigManager {
 	//Get JSONObjects
 	@NotNull
 	public JSONObject getUserConfig(User user) {
-		JSONObject config = userConfigCache.get(user.getIdLong());
+		JSONObject config = null;
+		try {
+			config = userConfigCache.get(user.getIdLong());
+		} catch (NullPointerException e) {}
 		if (config == null) {
 			config = this.createUserConfig(user);
 		}
@@ -95,7 +102,10 @@ public class ConfigManager {
 	
 	@NotNull
 	public JSONObject getGuildConfig(Guild guild) {
-		JSONObject config = guildConfigCache.get(guild.getIdLong());
+		JSONObject config = null;
+		try {
+			config = guildConfigCache.get(guild.getIdLong());
+		} catch (NullPointerException e) {}
 		if (config == null) {
 			config = this.createGuildConfig(guild);
 		}
@@ -115,7 +125,7 @@ public class ConfigManager {
 		JSONObject userConfig = this.getUserConfig(user);
 		JSONObject newConfig = new JSONObject();
 		//Simple values
-		newConfig.put("guild",						guild.getIdLong());
+		newConfig.put("guildid",						guild.getIdLong());
 		newConfig.put("customchannelcategory",		Long.valueOf(0));
 		newConfig.put("experience",					Integer.valueOf(0));
 		newConfig.put("language",					"en");
@@ -200,8 +210,8 @@ public class ConfigManager {
 	}
 	
 	public JSONObject createReactionroleConfig(Guild guild, String channelID, String messageID) {
-		if (ConfigLoader.run.getReactionroleConfig(guild, channelID, messageID) != null) {
-			return ConfigLoader.run.getReactionroleConfig(guild, channelID, messageID);
+		if (ConfigLoader.run.getReactionMessageConfig(guild, channelID, messageID) != null) {
+			return ConfigLoader.run.getReactionMessageConfig(guild, channelID, messageID);
 		}
 		JSONObject guildConfig = this.getGuildConfig(guild);
 		try {

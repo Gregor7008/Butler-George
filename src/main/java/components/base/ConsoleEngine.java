@@ -16,9 +16,11 @@ import net.dv8tion.jda.api.entities.User;
 public class ConsoleEngine {
     
 	private DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm");
-	private final JDA jda = Bot.INSTANCE.jda;
+	private final JDA jda = Bot.run.jda;
+	public static ConsoleEngine run;
 	
 	public ConsoleEngine() {
+		run = this;
 		this.commandListener();
 		System.out.println(ConsoleColors.BLUE_BRIGHT + "--------------------------| Console Engine V1.0 |--------------------------" + ConsoleColors.RESET);
 	}
@@ -40,7 +42,7 @@ public class ConsoleEngine {
 		String className = fullClassName[fullClassName.length - 1];
 		String output = OffsetDateTime.now().format(format) + " [" + className + "] " + message;
 		if (color == null) {
-			System.out.println(color);
+			System.out.println(output);
 		} else {
 			System.out.println(color + output + ConsoleColors.RESET);
 		}
@@ -60,7 +62,7 @@ public class ConsoleEngine {
 						try {
 							delete = Boolean.parseBoolean(insplit[1]);
 						} catch (IndexOutOfBoundsException e) {}
-						Bot.INSTANCE.shutdown(delete);
+						Bot.run.shutdown(delete);
 						break;
 					case "exit":
 						jda.shutdown();
@@ -114,6 +116,16 @@ public class ConsoleEngine {
 					case "warn":
 						ConfigLoader.run.getUserConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2])).getJSONArray("warnings").put("Administrative actions");
 						this.debug(this, "User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
+						break;
+					case "pushCache":
+						if (ConfigLoader.manager.pushCache()) {
+							this.debug(this, "Cache successfully pushed");
+						}
+						break;
+					case "printCache":
+						ConfigLoader.manager.getUserCache().forEach((id, obj) -> {
+							this.info(ConfigLoader.manager, Bot.run.jda.getUserById(id).getName());
+						});
 						break;
 					default:
 						this.error(this, "Unknown command!");

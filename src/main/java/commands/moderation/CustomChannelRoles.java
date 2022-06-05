@@ -24,22 +24,22 @@ public class CustomChannelRoles implements Command{
 		if (event.getSubcommandName().equals("set")) {
 			ccroles.clear();
 			ccroles.put(roleID);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelroles:setsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/customchannelroles:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			ccroles.put(roleID);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelroles:addsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/customchannelroles:addsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			ConfigLoader.run.removeValueFromArray(ccroles, roleID);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelroles:remsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/customchannelroles:remsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
 			ccroles.clear();
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/customchannelroles:clearsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/customchannelroles:clearsuccess").convert()).queue();
 			return;
 		}
 	}
@@ -56,6 +56,6 @@ public class CustomChannelRoles implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/customchannelroles:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/customchannelroles:help");
 	}
 }

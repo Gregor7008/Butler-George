@@ -27,13 +27,13 @@ public class BotAutoRole implements Command{
 		if (event.getSubcommandName().equals("add")) {
 			Role role = event.getOption("addrole").getAsRole();
 			ConfigLoader.run.getGuildConfig(guild).getJSONArray("botautoroles").put(role.getIdLong());
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:addsuccess").convert()).queue();;
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/botautorole:addsuccess").convert()).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
 			ConfigLoader.run.removeValueFromArray(ConfigLoader.run.getGuildConfig(guild).getJSONArray("botautoroles"), role.getIdLong());
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
@@ -54,14 +54,14 @@ public class BotAutoRole implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/botautorole:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/botautorole:help");
 	}
 	
 	private void listroles(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
 		JSONArray botautoroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("botautoroles");
 		if (botautoroles.isEmpty()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/botautorole:nobotautoroles").convert()).queue();;
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/botautorole:nobotautoroles").convert()).queue();;
 			return;
 		}
 		for (int i = 0; i < botautoroles.length(); i++) {
@@ -73,6 +73,6 @@ public class BotAutoRole implements Command{
 				sB.append(guild.getRoleById(botautoroles.getLong(i)).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/botautorole:list").replaceDescription("{list}", sB.toString()).convert()).queue();
+		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/botautorole:list").replaceDescription("{list}", sB.toString()).convert()).queue();
 	}
 }

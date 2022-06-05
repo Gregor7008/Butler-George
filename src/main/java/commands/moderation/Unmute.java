@@ -2,10 +2,10 @@ package commands.moderation;
 
 import org.json.JSONObject;
 
-import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.ConfigLoader;
+import components.moderation.ModEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -22,13 +22,13 @@ public class Unmute implements Command{
 		final User cuser = event.getOption("user").getAsUser();
 		JSONObject userconfig = ConfigLoader.run.getUserConfig(guild, cuser);
 		if (!userconfig.getBoolean("muted") && !userconfig.getBoolean("tempmuted")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
 			return;
 		}
 		userconfig.put("muted", false);
 		userconfig.put("tempmuted", false);
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
-		Bot.INSTANCE.modCheck(guild);
+		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
+		ModEngine.run.modCheck(guild);
 	}
 
 	@Override
@@ -39,6 +39,6 @@ public class Unmute implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/unmute:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/unmute:help");
 	}
 }

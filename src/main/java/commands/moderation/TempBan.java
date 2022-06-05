@@ -2,11 +2,11 @@ package commands.moderation;
 
 import java.time.OffsetDateTime;
 
-import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.ConfigLoader;
 import components.base.assets.ConfigManager;
+import components.moderation.ModEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -22,7 +22,7 @@ public class TempBan implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), guild, user);
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/tempban:success")
+		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/tempban:success")
 				.replaceDescription("{user}", user.getName())
 				.replaceDescription("{time}", event.getOption("days").getAsString()).convert()).queue();
 	}
@@ -37,7 +37,7 @@ public class TempBan implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/tempban:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/tempban:help");
 	}
 	
 	private void tempban(int days, Guild guild, User user) {
@@ -45,6 +45,6 @@ public class TempBan implements Command{
 		ConfigLoader.run.getUserConfig(guild, user).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
 		ConfigLoader.run.getUserConfig(guild, user).put("tempbanned", true);
 		guild.getMember(user).ban(0).queue();
-		Bot.INSTANCE.modCheck(guild);
+		ModEngine.run.modCheck(guild);
 	}	
 }

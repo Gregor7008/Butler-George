@@ -5,6 +5,7 @@ import java.util.List;
 import base.Bot;
 import commands.moderation.Rolesorting;
 import components.base.ConfigLoader;
+import components.base.ConsoleEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -13,7 +14,7 @@ import net.dv8tion.jda.api.entities.Role;
 public class ServerUtilities {
 	
 	public void rolecheck() {
-		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
+		final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
 		final List<Member> members = guild.getMembers();
 		Role gr1 = guild.getRoleById("837742608604332052");
 		int gr1p = gr1.getPosition();
@@ -51,9 +52,9 @@ public class ServerUtilities {
 	}
 	
 	public void controlChannels(boolean action) {
-		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
+		final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
 		if (guild == null) {
-			Bot.INSTANCE.consoleEngine.debug(this, "Couldn't find home guild!");
+			ConsoleEngine.run.debug(this, "Couldn't find home guild!");
 			return;
 		}
 		if (action) {

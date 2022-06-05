@@ -11,7 +11,11 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 public class ConfigCheck {
 	
-	public static ConfigCheck INSTANCE = new ConfigCheck();
+	public static ConfigCheck run;
+	
+	public ConfigCheck() {
+		run = this;
+	}
 	
 	public void checkGuildConfigs(Guild guild) {
 		//JSONObject configs

@@ -26,7 +26,7 @@ public class Rolesorting implements Command{
 	private Role grouprole;
 	private List<Role> subroles;
 	private List<Member> members;
-	private EventWaiter waiter = Bot.INSTANCE.getWaiter();
+	private EventWaiter waiter = Bot.run.getWaiter();
 	private Guild guild;
 	private Member member;
 	private User user;
@@ -51,11 +51,11 @@ public class Rolesorting implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/rolesorting:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/rolesorting:help");
 	}
 
 	private void definegroup() {
-		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/rolesorting:definegroup").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/rolesorting:definegroup").convert()).complete());
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
@@ -64,11 +64,11 @@ public class Rolesorting implements Command{
 								  this.definesub();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definesub() {
-		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/rolesorting:definesub").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/rolesorting:definesub").convert()).complete());
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
@@ -77,11 +77,11 @@ public class Rolesorting implements Command{
 								  this.definemember();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void definemember() {
-		messages.add(channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/rolesorting:definemember").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/rolesorting:definemember").convert()).complete());
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
@@ -90,7 +90,7 @@ public class Rolesorting implements Command{
 								  this.rolesorter();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void rolesorter() {
@@ -98,7 +98,7 @@ public class Rolesorting implements Command{
 			this.sorter(guild, members.get(e), subroles, grouprole);
 		}
 		this.cleanup();
-		channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/rolesorting:success").convert()).queue(response -> response.delete().queueAfter(10, TimeUnit.SECONDS));
+		channel.sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/rolesorting:success").convert()).queue(response -> response.delete().queueAfter(10, TimeUnit.SECONDS));
 	}
 	
 	public void sorter(Guild iguild, Member mb, List<Role> sr, Role gr) {

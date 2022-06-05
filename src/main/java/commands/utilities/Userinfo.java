@@ -1,6 +1,7 @@
 package commands.utilities;
 
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 
 import commands.Command;
 import components.base.AnswerEngine;
@@ -35,7 +36,7 @@ public class Userinfo implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/userinfo:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/utilities/userinfo:help");
 	}
 	
 	private void listInfo (SlashCommandInteractionEvent event, boolean moderator) {
@@ -43,15 +44,15 @@ public class Userinfo implements Command{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
-		String[] titles = AnswerEngine.ae.getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
-		if (event.getOption("member") == null) {
+		String[] titles = AnswerEngine.run.getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
+		if (event.getOption("user") == null) {
 			member = event.getMember();
 		} else {
-			member = event.getGuild().getMember(event.getOption("member").getAsUser());
+			member = event.getGuild().getMember(event.getOption("user").getAsUser());
 		}
 		if (member.equals(event.getGuild().getSelfMember())) {
-			event.reply("You think you're funny or what?").queue();
-			return; 
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(event.getGuild(), event.getUser(), "/eastereggs:6").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			return;
 		}
 		if (member.getTimeBoosted() == null) {
 			booster = "false";
@@ -61,7 +62,7 @@ public class Userinfo implements Command{
 		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(AnswerEngine.ae.footer);
+		eb.setFooter(AnswerEngine.run.footer);
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getUser().getName() + "`", true);
@@ -78,8 +79,9 @@ public class Userinfo implements Command{
 		eb.addField(":pager:" + titles[12], "`" + String.valueOf(ConfigLoader.run.getUserConfig(event.getGuild(), member.getUser()).getInt("level")) + "`", true);
 		eb.addField(":alarm_clock:" + titles[13], "`" + member.getOnlineStatus().toString() + "`", true);
 		eb.addField(":abacus:" + titles[14], "`" + String.valueOf(member.getRoles().size()) + "`", true);
-		eb.addField(":arrow_up:" + titles[15], "`" + member.getRoles().get(0).getName() + "`", true);
-		
+		if (member.getRoles().size() > 0) {
+			eb.addField(":arrow_up:" + titles[15], "`" + member.getRoles().get(0).getName() + "`", true);
+		}
 		event.replyEmbeds(eb.build()).queue();
 	}
 }

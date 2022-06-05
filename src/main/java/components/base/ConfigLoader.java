@@ -11,8 +11,13 @@ import net.dv8tion.jda.api.entities.User;
 
 public class ConfigLoader {
 	
-	public static ConfigLoader run = new ConfigLoader();
-	public static ConfigManager manager = new ConfigManager();
+	public static ConfigLoader run;
+	public static ConfigManager manager;
+	
+	public ConfigLoader() {
+		run = this;
+		manager = new ConfigManager();
+	}
 	
 	//User configs
 	public JSONObject getUserConfig(Guild guild, User user) {
@@ -62,11 +67,11 @@ public class ConfigLoader {
 	}
 	
 	//Reactionrole configs
-	public JSONObject createReactionroleConfig(Guild guild, String channelID, String messageID) {
+	public JSONObject createReactionMessageConfig(Guild guild, String channelID, String messageID) {
 		return manager.createReactionroleConfig(guild, channelID, messageID);
 	}
 	
-	public JSONObject getReactionroleConfig(Guild guild, String channelID, String messageID) {
+	public JSONObject getReactionMessageConfig(Guild guild, String channelID, String messageID) {
 		JSONObject config = null;
 		try {
 			config = this.getThirdGuildLayerConfig(guild, "reactionroles", channelID, messageID);
@@ -74,17 +79,25 @@ public class ConfigLoader {
 		return config;
 	}
 	
+	public JSONObject getReactionChannelConfig(Guild guild, String channelID) {
+		JSONObject config = null;
+		try {
+			config = this.getSecondGuildLayerConfig(guild, "reactionroles", channelID);
+		} catch (JSONException e) {}
+		return config;
+	}
+	
 	//Modmail configs
 	public Long getModMailOfUser(String userID) {
 		try {
-			return this.getModMailConfig(Bot.INSTANCE.jda.getGuildById(Bot.homeID)).getLong(userID);
+			return this.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID)).getLong(userID);
 		} catch (JSONException e) {
 			return null;
 		}
 	}
 	
 	public Long getModMailOfChannel(String channelID) {
-		JSONObject modmailConfig = this.getModMailConfig(Bot.INSTANCE.jda.getGuildById(Bot.homeID));
+		JSONObject modmailConfig = this.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID));
 		String[] keys = (String[]) modmailConfig.keySet().toArray();
 		Long returnValue = null;
 		for (int i = 0; i < keys.length; i++) {
@@ -97,7 +110,7 @@ public class ConfigLoader {
 	}
 	
 	public void setModMailConfig(String channelID, String userID) {
-		this.getModMailConfig(Bot.INSTANCE.jda.getGuildById(Bot.homeID)).put(userID, channelID);
+		this.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID)).put(userID, channelID);
 	}
 	
 	private JSONObject getModMailConfig(Guild guild) {
@@ -129,14 +142,11 @@ public class ConfigLoader {
 	}
 	
 	public void removeValueFromArray(JSONArray current, Object value) {
-		int index = -1;
 		for (int i = 0; i < current.length(); i++) {
 			if (current.get(i).equals(value)) {
-				index = i;
+				current.remove(i);
+				i = current.length(); //optional -> Remove when all matching values should be removed
 			}
-		}
-		if (index >= 0) {
-			current.remove(index);
 		}
 	}
  }

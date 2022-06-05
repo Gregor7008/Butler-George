@@ -26,7 +26,7 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 public class ModMail {
 	
-	public static final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
+	public static final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
 
 	public ModMail(MessageReceivedEvent event, boolean direction) {
 		new Thread(() -> {
@@ -44,7 +44,7 @@ public class ModMail {
 		}
 		if (direction) {
 			if (ConfigLoader.run.getModMailOfChannel(event.getChannel().getId()) != null) {
-				PrivateChannel pc = Bot.INSTANCE.jda.openPrivateChannelById(ConfigLoader.run.getModMailOfChannel(event.getChannel().getId())).complete();
+				PrivateChannel pc = Bot.run.jda.openPrivateChannelById(ConfigLoader.run.getModMailOfChannel(event.getChannel().getId())).complete();
 				this.resendMessage(pc, event.getMessage());
 			}
 			return;
@@ -56,7 +56,7 @@ public class ModMail {
 			}
 		} catch (ErrorResponseException e) {}
 		if (guild.retrieveBan(user).complete() == null && !member) {
-			event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(null, null, "/components/moderation/modmail:nosupport").convert()).queue();
+			event.getChannel().sendMessageEmbeds(AnswerEngine.run.fetchMessage(null, null, "/components/moderation/modmail:nosupport").convert()).queue();
 			return;
 		}
 		if (ConfigLoader.run.getModMailOfUser(user.getId()) != null) {
@@ -66,12 +66,12 @@ public class ModMail {
 		}
 		OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.run.getUserConfig(guild, user).getString("lastmail"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 300) {
-			event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/moderation/modmail:success").convert()).queue();
+			event.getChannel().sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/components/moderation/modmail:success").convert()).queue();
 			ConfigLoader.run.getUserConfig(guild, user).put("lastmail", OffsetDateTime.now().format(ConfigManager.dateTimeFormatter));
 			this.processMessage(event);
 		} else {
 			int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
-			event.getChannel().sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/moderation/modmail:timelimit")
+			event.getChannel().sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/components/moderation/modmail:timelimit")
 					.replaceDescription("{timeleft}", String.valueOf(timeleft)).convert()).queue();
 		}
 	}

@@ -17,19 +17,22 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 
 public class ModEngine {
+	
+	public static ModEngine run;
 
 	public ModEngine() {
-		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
+		run = this;
+		List<Guild> guilds = Bot.run.jda.getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
-			this.run(guilds.get(i));
+			this.modCheck(guilds.get(i));
 		}
 	}
 	
-	public void run(Guild guild) {
+	public void modCheck(Guild guild) {
 		new Thread(() -> {
 			ConcurrentHashMap<Long, JSONObject> usersCached = ConfigLoader.manager.getUserCache();
 			usersCached.forEach((id, obj) -> {
-				User user = Bot.INSTANCE.jda.retrieveUserById(id).complete();
+				User user = Bot.run.jda.retrieveUserById(id).complete();
 				Member member = guild.retrieveMember(user).complete();
 				//Check the user
 				try {

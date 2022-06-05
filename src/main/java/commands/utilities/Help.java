@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import commands.Command;
 import commands.CommandList;
 import components.base.AnswerEngine;
-import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -25,29 +24,28 @@ public class Help implements Command{
 		Command cmd;
 		String help = null;
 		if (input.equals("help")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "eastereggs:2").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/eastereggs:2").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if ((cmd = commandList.utilitycmds.get(input)) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.ae.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.run.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
-		if ((cmd = commandList.moderationcmds.get(input)) != null 
-				&& event.getMember().getRoles().contains(guild.getRoleById(ConfigLoader.run.getGuildConfig(guild, "modrole")))) {
+		if ((cmd = commandList.moderationcmds.get(input)) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.ae.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.run.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
 		if ((cmd = commandList.musiccmds.get(input)) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.ae.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.run.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/help:unknown").convert()).queue();
+		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/help:unknown").convert()).queue();
 	}
 
 	@Override

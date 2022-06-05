@@ -17,14 +17,17 @@ import net.dv8tion.jda.api.entities.User;
 
 public class PenaltyEngine {
 	
+	public static PenaltyEngine run;
+	
 	public PenaltyEngine() {
-		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
+		run = this;
+		List<Guild> guilds = Bot.run.jda.getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
-			this.run(guilds.get(i));
+			this.penaltyCheck(guilds.get(i));
 		}
 	}
 	
-	public void run(Guild guild) {
+	public void penaltyCheck(Guild guild) {
 		new Thread(() -> {
 			JSONObject penalties = ConfigLoader.run.getGuildConfig(guild).getJSONObject("penalties");
 			if (penalties.isEmpty()) {
@@ -62,7 +65,7 @@ public class PenaltyEngine {
 							break;
 						case ("pm"):
 							ConfigLoader.run.getUserConfig(guild, user).put("muted", true);
-							Bot.INSTANCE.modCheck(guild);
+							ModEngine.run.modCheck(guild);
 							break;
 						case ("kk"):
 							member.kick().queue();
@@ -86,6 +89,6 @@ public class PenaltyEngine {
 		ConfigLoader.run.getUserConfig(guild, user).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
 		ConfigLoader.run.getUserConfig(guild, user).put("tempbanned", true);
 		guild.getMember(user).ban(0).queue();
-		Bot.INSTANCE.modCheck(guild);
+		ModEngine.run.modCheck(guild);
 	}	
 }

@@ -156,7 +156,7 @@ public class Processor extends ListenerAdapter {
 			if (this.checkCategory(event.getTextChannel().getParentCategory(), guild) == null) {
 				modcmd.perform(event);
 			} else {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/base/processor:userchannel").convert()).queue();
+				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/base/processor:userchannel").convert()).queue();
 			}
 		}
 		Command musiccmd;
@@ -168,7 +168,11 @@ public class Processor extends ListenerAdapter {
 	}
 	
 	private User checkCategory(Category category, Guild guild) {
-		return guild.getMemberById(ConfigLoader.run.getFirstGuildLayerConfig(guild, "customchannelcategories").getLong(category.getId())).getUser();
+		try {
+			return Bot.run.jda.getUserById(ConfigLoader.run.getFirstGuildLayerConfig(guild, "customchannelcategories").getLong(category.getId()));
+		} catch (JSONException e) {
+			return null;
+		}
 	}
 	
 	@Override
@@ -356,8 +360,8 @@ public class Processor extends ListenerAdapter {
 			return;
 		}
 		//if reaction on reactionrole message, process reaction
-		if (ConfigLoader.run.getReactionroleConfig(guild, channelID, msgID) != null) {
-			JSONObject actions = ConfigLoader.run.getReactionroleConfig(guild, channelID, msgID);
+		if (ConfigLoader.run.getReactionMessageConfig(guild, channelID, msgID) != null) {
+			JSONObject actions = ConfigLoader.run.getReactionMessageConfig(guild, channelID, msgID);
 			try {
 				guild.addRoleToMember(user, guild.getRoleById(actions.getString(event.getReactionEmote().getAsCodepoints()))).queue();
 			} catch (JSONException e) {}
@@ -374,8 +378,8 @@ public class Processor extends ListenerAdapter {
 		}
 		final Guild guild = event.getGuild();
 		//if reaction on reactionrole message, process reaction
-		if (ConfigLoader.run.getReactionroleConfig(guild, channelID, msgID) != null) {
-			JSONObject actions = ConfigLoader.run.getReactionroleConfig(guild, channelID, msgID);
+		if (ConfigLoader.run.getReactionMessageConfig(guild, channelID, msgID) != null) {
+			JSONObject actions = ConfigLoader.run.getReactionMessageConfig(guild, channelID, msgID);
 			try {
 				guild.removeRoleFromMember(user, guild.getRoleById(actions.getLong(event.getReactionEmote().getAsCodepoints()))).queue();
 			} catch (JSONException e) {}
@@ -408,7 +412,7 @@ public class Processor extends ListenerAdapter {
 	public void onChannelDelete(ChannelDeleteEvent event) {
 		Guild guild = event.getGuild();
 		new Thread(() -> {
-			ConfigCheck.INSTANCE.checkGuildConfigs(guild);
+			ConfigCheck.run.checkGuildConfigs(guild);
 		}).start();
 		if (event.getChannelType().isAudio()) {
 			String id = event.getChannel().getId();
@@ -440,7 +444,7 @@ public class Processor extends ListenerAdapter {
 	@Override
 	public void onRoleDelete(RoleDeleteEvent event) {
 		new Thread(() -> {
-			ConfigCheck.INSTANCE.checkGuildConfigs(event.getGuild());
+			ConfigCheck.run.checkGuildConfigs(event.getGuild());
 		}).start();
 	}
 }

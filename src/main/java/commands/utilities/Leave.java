@@ -1,8 +1,9 @@
 package commands.utilities;
 
-import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.json.JSONException;
 
 import base.Bot;
 import commands.Command;
@@ -24,11 +25,11 @@ public class Leave implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		String ctgid = ConfigLoader.run.getUserConfig(guild, user, "cccategory");
+		Long ctgid = ConfigLoader.run.getUserConfig(guild, user).getLong("customchannelcategory");
 		GuildChannel channel;
 		if (event.getOption("channel") != null) {
 			channel = event.getOption("channel").getAsGuildChannel();
-			if (!ctgid.equals("")) {
+			if (ctgid == 0) {
 				Category ctg = event.getTextChannel().getParentCategory();
 				if (ctg.equals(guild.getCategoryById(ctgid))) {
 					if (ctg.getChannels().size() <=1) {
@@ -39,7 +40,7 @@ public class Leave implements Command{
 				}
 			}
 		} else {
-			if (!ctgid.equals("")) {
+			if (ctgid == 0) {
 				if (event.getTextChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
 					List<GuildChannel> channels = guild.getCategoryById(ctgid).getChannels();
 					for (int i = 0; i < channels.size(); i++) {
@@ -68,7 +69,7 @@ public class Leave implements Command{
 			event.reply("Done...").queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/leave:invalid").convert()).queue();
+		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/leave:invalid").convert()).queue();
 	}
 
 	@Override
@@ -80,22 +81,15 @@ public class Leave implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/leave:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/utilities/leave:help");
 	}
 	
 	private boolean checkCategory(Category category, Guild guild) {
-		File guilddir = new File(Bot.environment + "/configs/user/" + guild.getId());
-		File[] filelist = guilddir.listFiles();
-		for (int i = 0; i < filelist.length; i++) {
-			String[] temp1 = filelist[i].getName().split(".properties");
-			User cuser = Bot.INSTANCE.jda.retrieveUserById(temp1[0]).complete();
-			String ccid = ConfigLoader.run.getUserConfig(guild, cuser, "cccategory");
-			if (!ccid.equals("")) {
-				if (category.equals(guild.getCategoryById(ccid))) {
-					return true;
-				}
-			}
+		try {
+			Bot.run.jda.getUserById(ConfigLoader.run.getFirstGuildLayerConfig(guild, "customchannelcategories").getLong(category.getId()));
+			return true;
+		} catch (JSONException e) {
+			return false;
 		}
-		return false;
 	}
 }

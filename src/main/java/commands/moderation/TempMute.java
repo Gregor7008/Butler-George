@@ -2,10 +2,10 @@ package commands.moderation;
 
 import java.util.concurrent.TimeUnit;
 
-import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.ConfigLoader;
+import components.moderation.ModEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,7 +21,7 @@ public class TempMute implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), guild, user);
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/tempmute:success")
+		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/tempmute:success")
 				.replaceDescription("{user}", user.getName())
 				.replaceDescription("{time}", event.getOption("days").getAsString()).convert()).queue();
 	}
@@ -36,12 +36,12 @@ public class TempMute implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/tempmute:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/tempmute:help");
 	}
 	
 	private void tempmute(int days, Guild guild, User user) {
 		ConfigLoader.run.getUserConfig(guild, user).put("tempmuted", true);
 		guild.getMember(user).timeoutFor(days, TimeUnit.DAYS).queue();
-		Bot.INSTANCE.modCheck(guild);
+		ModEngine.run.modCheck(guild);
 	}
 }

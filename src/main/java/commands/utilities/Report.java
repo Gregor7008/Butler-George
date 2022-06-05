@@ -21,8 +21,8 @@ public class Report implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (ConfigLoader.run.getGuildConfig(guild, "reportchannel").equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/report:nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		if (ConfigLoader.run.getGuildConfig(guild).getLong("reportchannel") == 0) {
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/report:nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyy");
@@ -36,8 +36,8 @@ public class Report implements Command{
 			eb.setTitle("Report of the user \"" + event.getOption("user").getAsUser().getName() + "\"", event.getOption("link").getAsString());
 		}
 		eb.setDescription(event.getOption("reason").getAsString());
-		guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild, "reportchannel")).sendMessageEmbeds(eb.build()).queue();
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/report:success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("reportchannel")).sendMessageEmbeds(eb.build()).queue();
+		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/report:success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 
 	@Override
@@ -51,6 +51,6 @@ public class Report implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/report:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/utilities/report:help");
 	}
 }

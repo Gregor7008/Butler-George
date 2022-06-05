@@ -65,7 +65,7 @@ public class LevelEngine {
 			if (newcount > 20) {
 				userconfig.getJSONArray("warnings").put("Spamming for Levels");
 				user.openPrivateChannel().complete()
-						.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/utilities/levelengine:levelspam")
+						.sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/components/utilities/levelengine:levelspam")
 								.replaceDescription("{guild}", guild.getName()).convert()).queue();
 			}
 		}
@@ -90,7 +90,7 @@ public class LevelEngine {
 			}
 			TextChannel channel = guild.getTextChannelById(id);
 			if (channel != null) {
-				channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/utilities/levelengine:levelup")
+				channel.sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/components/utilities/levelengine:levelup")
 						.replaceTitle("{user}", guild.getMember(user).getEffectiveName())
 						.replaceDescription("{level}", String.valueOf(currentlevel+1)).convert()).queue();
 			} else {
@@ -111,7 +111,7 @@ public class LevelEngine {
 		} catch (JSONException e) {}
 	}
 	
-	private int xpneededforlevel(int currentlevel) {
+	public int xpneededforlevel(int currentlevel) {
 		if (currentlevel == 0) {return 100;} else {
 			return ((((currentlevel+1) * (currentlevel+1))+currentlevel+1)/2)*100;
 		}

@@ -25,12 +25,12 @@ public class Goodbye implements Command {
 			String message = event.getOption("message").toString();
 			String channelid = event.getOption("channel").getAsGuildChannel().getId();
 			ConfigLoader.run.getGuildConfig(guild).put("goodbyemsg", message + ";" + channelid);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:setsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/goodbye:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
 			ConfigLoader.run.getGuildConfig(guild).put("goodbyemsg", "");
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:offsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/goodbye:offsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
@@ -44,9 +44,9 @@ public class Goodbye implements Command {
 							.replace("{membercount}", Integer.toString(guild.getMemberCount()))
 							.replace("{timejoined}", event.getMember().getTimeJoined().format(formatter)).replace("{date}", currentdate);
 				guild.getTextChannelById(goodbyemsg[1]).sendMessage(msg).queue();
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/goodbye:testsuccess").convert()).queue();
+				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/goodbye:testsuccess").convert()).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/goodbye:nonedefined").convert()).queue();
+				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/goodbye:nonedefined").convert()).queue();
 			}
 		}
 	}
@@ -64,6 +64,6 @@ public class Goodbye implements Command {
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/goodbye:help");
+		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/goodbye:help");
 	}
 }
