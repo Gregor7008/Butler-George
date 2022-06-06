@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
+//TODO Rework so command applies for user channels & support tickets
 public class DefaultAccessRoles implements Command{
 
 	@Override
@@ -23,22 +24,22 @@ public class DefaultAccessRoles implements Command{
 		if (event.getSubcommandName().equals("set")) {
 			ccdefroles.clear();
 			ccdefroles.put(roleID);
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:setsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			ccdefroles.put(roleID);
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:addsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:addsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			ConfigLoader.run.removeValueFromArray(ccdefroles, roleID);
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:remsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:remsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
 			ccdefroles.clear();
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:clearsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:clearsuccess").convert()).queue();
 			return;
 		}
 	}
@@ -52,7 +53,7 @@ public class DefaultAccessRoles implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/defaultaccessroles:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/defaultaccessroles:help");
 	}
 
 }

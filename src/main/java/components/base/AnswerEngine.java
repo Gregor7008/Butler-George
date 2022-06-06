@@ -11,11 +11,11 @@ import net.dv8tion.jda.api.entities.User;
 
 public class AnswerEngine {
 	
-	public static AnswerEngine run;
+	public static AnswerEngine build;
 	public String footer = "Made with ❤️ by Gregor7008";
 	
 	public AnswerEngine() {
-		run = this;
+		build = this;
 	}
 	
 	public CustomMessageEmbed fetchMessage(Guild guild, User user, String input)  {
@@ -56,13 +56,13 @@ public class AnswerEngine {
 		String key = temp1[1];
 		Properties properties = new Properties();
 		if (!path.startsWith("/")) {
-			ConsoleEngine.run.info(this, "Path error for path \"" + path + "\"");
+			ConsoleEngine.out.info(this, "Path error for path \"" + path + "\"");
 			path = "/" + path;
 		}
 		try {
 			properties.load(this.getClass().getClassLoader().getResourceAsStream("languages/" + lang + path + ".properties"));
 		} catch (NullPointerException | IOException e) {
-			ConsoleEngine.run.error(this, "Couldn't find language files!");
+			ConsoleEngine.out.error(this, "Couldn't find language files!");
 			return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
 		}
 		String temp2 = properties.getProperty(key);

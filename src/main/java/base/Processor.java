@@ -92,6 +92,7 @@ public class Processor extends ListenerAdapter {
 				ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" 
 						+ guild.getRoleById(ConfigLoader.run.getGuildConfig(guild).getLong("supportrole")).getAsMention()).queue();
 				ConfigLoader.run.getGuildConfig(guild).put("ticketcount", newcount);
+				ConfigLoader.run.getGuildConfig(guild).getJSONArray("ticketchannels").put(ntc.getIdLong());
 				event.getMessage().delete().queue();
 				event.getTextChannel().getManager().setSlowmode(120).queue();
 				return;
@@ -156,7 +157,7 @@ public class Processor extends ListenerAdapter {
 			if (this.checkCategory(event.getTextChannel().getParentCategory(), guild) == null) {
 				modcmd.perform(event);
 			} else {
-				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/base/processor:userchannel").convert()).queue();
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/base/processor:userchannel").convert()).queue();
 			}
 		}
 		Command musiccmd;
@@ -241,8 +242,8 @@ public class Processor extends ListenerAdapter {
 			event.getGuild().getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
 		}
 		//check for users category
-		if (ConfigLoader.run.getUserConfig(guild, user).getLong("cccategory") != 0) {
-			Category ctg = guild.getCategoryById(ConfigLoader.run.getUserConfig(guild, user).getLong("cccategory"));
+		if (ConfigLoader.run.getMemberConfig(guild, user).getLong("cccategory") != 0) {
+			Category ctg = guild.getCategoryById(ConfigLoader.run.getMemberConfig(guild, user).getLong("cccategory"));
 			List<GuildChannel> channels = ctg.getChannels();
 			for (int i = 0; i < channels.size(); i++) {
 				channels.get(i).delete().queue();
@@ -347,18 +348,6 @@ public class Processor extends ListenerAdapter {
 			return;
 		}
 		final Guild guild = event.getGuild();
-		//if reaction on poll, process reaction
-		if (ConfigLoader.run.getPollConfig(guild, channelID, msgID) != null) {
-			if (!event.getReactionEmote().getAsCodepoints().contains("U+20e3")) {
-				event.getTextChannel().removeReactionById(msgID, event.getReactionEmote().getAsCodepoints(), user).queue();
-			} else {
-				this.addPollAnswer(channelID, msgID, event.getReactionEmote().getAsCodepoints(), guild, user);
-				if (ConfigLoader.run.getPollConfig(guild, channelID, msgID).getBoolean("anonymous")) {
-					event.getTextChannel().removeReactionById(msgID, event.getReactionEmote().getAsCodepoints(), user).queue();
-				}
-			}
-			return;
-		}
 		//if reaction on reactionrole message, process reaction
 		if (ConfigLoader.run.getReactionMessageConfig(guild, channelID, msgID) != null) {
 			JSONObject actions = ConfigLoader.run.getReactionMessageConfig(guild, channelID, msgID);
@@ -423,7 +412,7 @@ public class Processor extends ListenerAdapter {
 		if (event.isFromType(ChannelType.CATEGORY)) {
 			Category ctg = (Category) event.getChannel();
 			if (this.checkCategory(ctg, guild) != null) {
-				ConfigLoader.run.getUserConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", Long.valueOf(0));
+				ConfigLoader.run.getMemberConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", Long.valueOf(0));
 			}
 			return;
 		}
@@ -433,7 +422,7 @@ public class Processor extends ListenerAdapter {
 			if (ctg != null) {
 				if (ctg.getChannels().size() == 0) {
 					if (this.checkCategory(ctg, guild) != null) {
-						ConfigLoader.run.getUserConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", Long.valueOf(0));
+						ConfigLoader.run.getMemberConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", Long.valueOf(0));
 						ctg.delete().queue();
 					}
 				}

@@ -54,7 +54,7 @@ public class ModEngine {
 								memberConfig.put("tempmuted", false);
 							}
 						}
-						if (ConfigLoader.run.getUserConfig(guild, user).getBoolean("tempbanned")) {
+						if (ConfigLoader.run.getMemberConfig(guild, user).getBoolean("tempbanned")) {
 							OffsetDateTime tbuntil = OffsetDateTime.parse(memberConfig.getString("tempbanneduntil"), ConfigManager.dateTimeFormatter);
 							OffsetDateTime now = OffsetDateTime.now();
 							long difference = Duration.between(now, tbuntil).toSeconds();

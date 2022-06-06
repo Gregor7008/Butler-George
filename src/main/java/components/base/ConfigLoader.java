@@ -20,16 +20,20 @@ public class ConfigLoader {
 	}
 	
 	//User configs
-	public JSONObject getUserConfig(Guild guild, User user) {
+	public JSONObject getUserConfig(User user) {
+		return manager.getUserConfig(user);
+	}
+	
+	public JSONObject getMemberConfig(Guild guild, User user) {
 		return manager.getMemberConfig(guild, user);
 	}
 	
-	public JSONObject getFirstUserLayerConfig(Guild guild, User user, String key) {
-		return this.getUserConfig(guild, user).getJSONObject(key);
+	public JSONObject getFirstMemberLayerConfig(Guild guild, User user, String key) {
+		return this.getMemberConfig(guild, user).getJSONObject(key);
 	}
 	
-	public JSONObject getSecondUserLayerConfig(Guild guild, User user, String key, String subKey) {
-		return this.getFirstUserLayerConfig(guild, user, key).getJSONObject(subKey);
+	public JSONObject getSecondMemberLayerConfig(Guild guild, User user, String key, String subKey) {
+		return this.getFirstMemberLayerConfig(guild, user, key).getJSONObject(subKey);
 	}
 	
 	//Guild configs
@@ -141,12 +145,14 @@ public class ConfigLoader {
 		} catch (JSONException e) {}
 	}
 	
-	public void removeValueFromArray(JSONArray current, Object value) {
+	public boolean removeValueFromArray(JSONArray current, Object value) {
 		for (int i = 0; i < current.length(); i++) {
 			if (current.get(i).equals(value)) {
 				current.remove(i);
-				i = current.length(); //optional -> Remove when all matching values should be removed
+				i = current.length();
+				return true;
 			}
 		}
+		return false;
 	}
  }

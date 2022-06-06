@@ -21,10 +21,10 @@ public class AutoModerator {
 		JSONArray forbiddenwords = ConfigLoader.run.getGuildConfig(event.getGuild()).getJSONArray("forbiddenwords");
 		for (int i = 0; i < forbiddenwords.length(); i++) {
 			if (event.getMessage().getContentRaw().toLowerCase().contains(forbiddenwords.getString(i).toLowerCase())) {
-				ConfigLoader.run.getUserConfig(event.getGuild(), event.getAuthor()).getJSONArray("warnings").put("Rude behavior");
+				ConfigLoader.run.getMemberConfig(event.getGuild(), event.getAuthor()).getJSONArray("warnings").put("Rude behavior");
 				try {
 					event.getMember().getUser().openPrivateChannel().complete()
-						 .sendMessageEmbeds(AnswerEngine.run.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")
+						 .sendMessageEmbeds(AnswerEngine.build.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")
 								 .replaceDescription("{guild}", event.getGuild().getName()).convert()).queue();
 				} catch (Exception e) {e.printStackTrace();}
 				event.getMessage().delete().queue();

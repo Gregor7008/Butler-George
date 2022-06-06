@@ -24,28 +24,28 @@ public class Help implements Command{
 		Command cmd;
 		String help = null;
 		if (input.equals("help")) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/eastereggs:2").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/eastereggs:2").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if ((cmd = commandList.utilitycmds.get(input)) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.run.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.build.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
 		if ((cmd = commandList.moderationcmds.get(input)) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.run.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.build.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
 		if ((cmd = commandList.musiccmds.get(input)) != null) {
 			help = cmd.getHelp(guild, user);
 			String[] helpsplit = help.split(";\\s+");
-			event.replyEmbeds(AnswerEngine.run.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
+			event.replyEmbeds(AnswerEngine.build.createMessage(helpsplit[0].replace("{cmd}", "`/" + input + "`"), ":bulb: | " + helpsplit[1])).queue();
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/help:unknown").convert()).queue();
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/help:unknown").convert()).queue();
 	}
 
 	@Override

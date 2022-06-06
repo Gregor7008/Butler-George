@@ -19,12 +19,12 @@ public class SupportChannel implements Command{
 		final User user = event.getUser();
 		if (event.getSubcommandName().equals("set")) {
 			ConfigLoader.run.getGuildConfig(guild).put("suggestionchannel", event.getOption("channel").getAsGuildChannel().getIdLong());
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/supportchannel:setsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/supportchannel:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
 			ConfigLoader.run.getGuildConfig(guild).put("suggestionchannel", Long.valueOf(0));
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/supportchannel:clearsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/supportchannel:clearsuccess").convert()).queue();
 		}
 	}
 
@@ -39,6 +39,6 @@ public class SupportChannel implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/supportchannel:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/supportchannel:help");
 	}
 }

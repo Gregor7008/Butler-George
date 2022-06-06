@@ -26,7 +26,7 @@ public class Levelreward implements Command{
 		JSONObject levelrewards = ConfigLoader.run.getGuildConfig(guild).getJSONObject("levelrewards");
 		if (event.getSubcommandName().equals("add")) {
 			levelrewards.put(String.valueOf(event.getOption("level").getAsInt()), event.getOption("role").getAsRole().getIdLong());
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/levelreward:addsuccess")
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/levelreward:addsuccess")
 					.replaceDescription("{role}", event.getOption("role").getAsRole().getAsMention())
 					.replaceDescription("{level}", String.valueOf(event.getOption("level").getAsInt())).convert()).queue();
 			return;
@@ -36,11 +36,11 @@ public class Levelreward implements Command{
 			try {
 				levelrewards.getLong(String.valueOf(level));
 			} catch (JSONException e) {
-				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/levelreward:noreward").convert()).queue();
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/levelreward:noreward").convert()).queue();
 				return;
 			}
 			long roleID = levelrewards.getLong(String.valueOf(level));
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/levelreward:remsuccess")
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/levelreward:remsuccess")
 					.replaceDescription("{role}", guild.getRoleById(roleID).getAsMention())
 					.replaceDescription("{level}", String.valueOf(level)).convert()).queue();
 			levelrewards.remove(String.valueOf(level));
@@ -64,13 +64,13 @@ public class Levelreward implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/levelreward:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/levelreward:help");
 	}
 	
 	private void listrewards(SlashCommandInteractionEvent event, JSONObject levelrewards) {
 		StringBuilder sB = new StringBuilder();
 		if (levelrewards.isEmpty()) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/levelreward:norewards").convert()).queue();;
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/levelreward:norewards").convert()).queue();;
 			return;
 		}
 		String[] rewards = (String[]) levelrewards.keySet().toArray();
@@ -83,6 +83,6 @@ public class Levelreward implements Command{
 				sB.append(guild.getRoleById(levelrewards.getLong(rewards[i])).getAsMention() + "\s->\s" + rewards[i] + "\n");
 			}
 		}
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/levelreward:list").replaceDescription("{list}", sB.toString()).convert()).queue();
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/levelreward:list").replaceDescription("{list}", sB.toString()).convert()).queue();
 	}
 }

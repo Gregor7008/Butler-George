@@ -30,39 +30,58 @@ public class ConfigManager {
 	private final ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
 	
-	public ConfigManager() {
-		this.pullCache();
-	}
-	
-	//Manage cache
-	public void pullCache() {
-		userConfigCache.clear();
-		guildConfigCache.clear();
-		userconfigs.find().forEach(doc -> userConfigCache.put(doc.getLong("id"), new JSONObject(doc.toJson())));
-		guildconfigs.find().forEach(doc -> guildConfigCache.put(doc.getLong("id"), new JSONObject(doc.toJson())));
-	}
-	
+	//Manage cache	
 	public boolean pushCache() {
 		try {
 			userConfigCache.forEach((id, obj) -> {
 				Document searchresult = userconfigs.find(new Document("id", Long.valueOf(id))).first();
 				if (searchresult != null) {
-					userconfigs.updateOne(searchresult, Document.parse(obj.toString()));
+					userconfigs.replaceOne(searchresult, Document.parse(obj.toString()));
 				} else {
 					userconfigs.insertOne(Document.parse(obj.toString()));
 				}
 			});
+			userConfigCache.clear();
 			guildConfigCache.forEach((id, obj) -> {
 				Document searchresult = guildconfigs.find(new Document("id", Long.valueOf(id))).first();
 				if (searchresult != null) {
-					userconfigs.updateOne(searchresult, Document.parse(obj.toString()));
+					guildconfigs.replaceOne(searchresult, Document.parse(obj.toString()));
 				} else {
-					userconfigs.insertOne(Document.parse(obj.toString()));
+					guildconfigs.insertOne(Document.parse(obj.toString()));
 				}
 			});
+			guildConfigCache.clear();
 			return true;
 		} catch (Exception e) {
-			ConsoleEngine.run.error(this, "Push failed!");
+			ConsoleEngine.out.error(this, "Push failed!");
+			return false;
+		}
+	}
+	
+	public boolean pushSingle(Long id) {
+		try {
+			if (userConfigCache.get(id) != null) {
+				Document searchresult = userconfigs.find(new Document("id", Long.valueOf(id))).first();
+				if (searchresult != null) {
+					userconfigs.replaceOne(searchresult, Document.parse(userConfigCache.get(id).toString()));
+				} else {
+					userconfigs.insertOne(Document.parse(userConfigCache.get(id).toString()));
+				}
+				return true;
+			}
+			if (guildConfigCache.get(id) != null) {
+				Document searchresult = guildconfigs.find(new Document("id", Long.valueOf(id))).first();
+				if (searchresult != null) {
+					guildconfigs.replaceOne(searchresult, Document.parse(guildConfigCache.get(id).toString()));
+				} else {
+					guildconfigs.insertOne(Document.parse(guildConfigCache.get(id).toString()));
+				}
+				return true;
+			}
+			ConsoleEngine.out.debug(this, "Config for ID:'" + String.valueOf(id) + "' was not cached!");
+			throw new IllegalArgumentException();
+		} catch (Exception e) {
+			ConsoleEngine.out.error(this, "Push for ID:'" + String.valueOf(id) + "' failed!");
 			return false;
 		}
 	}
@@ -76,13 +95,24 @@ public class ConfigManager {
 		return guildConfigCache;
 	}
 	
+	public MongoCollection<Document> getUserCollection() {
+		return userconfigs;
+	}
+	
+	public MongoCollection<Document> getGuildCollection() {
+		return guildconfigs;
+	}
+	
 	//Get JSONObjects
 	@NotNull
 	public JSONObject getUserConfig(User user) {
 		JSONObject config = null;
-		try {
+		config = userConfigCache.get(user.getIdLong());
+		if (config == null) {
+			Document doc = userconfigs.find(new Document("id", user.getIdLong())).first();
+			userConfigCache.put(user.getIdLong(), new JSONObject(doc.toJson()));
 			config = userConfigCache.get(user.getIdLong());
-		} catch (NullPointerException e) {}
+		}
 		if (config == null) {
 			config = this.createUserConfig(user);
 		}
@@ -103,9 +133,12 @@ public class ConfigManager {
 	@NotNull
 	public JSONObject getGuildConfig(Guild guild) {
 		JSONObject config = null;
-		try {
+		config = guildConfigCache.get(guild.getIdLong());
+		if (config == null) {
+			Document doc = guildconfigs.find(new Document("id", guild.getIdLong())).first();
+			guildConfigCache.put(guild.getIdLong(), new JSONObject(doc.toJson()));
 			config = guildConfigCache.get(guild.getIdLong());
-		} catch (NullPointerException e) {}
+		}
 		if (config == null) {
 			config = this.createGuildConfig(guild);
 		}
@@ -118,6 +151,7 @@ public class ConfigManager {
 		//Simple values
 		newConfig.put("id",							user.getIdLong());
 		
+		userConfigCache.put(user.getIdLong(), newConfig);
 		return newConfig;
 	}
 	
@@ -168,6 +202,7 @@ public class ConfigManager {
 		newConfig.put("supportcategory",			Long.valueOf(0));
 		newConfig.put("supportchat",				Long.valueOf(0));
 		newConfig.put("supporttalk",				Long.valueOf(0));
+		newConfig.put("ticketchannels",				new JSONArray());
 		newConfig.put("ticketcount",				Integer.valueOf(1));
 		newConfig.put("welcomemsg",					"");
 		//Deep-nested values (2 layers or more)
@@ -175,6 +210,7 @@ public class ConfigManager {
 		newConfig.put("polls",						new JSONObject());
 		newConfig.put("reactionroles",				new JSONObject());
 		
+		guildConfigCache.put(guild.getIdLong(), newConfig);
 		return newConfig;
 	}
 	
@@ -200,7 +236,7 @@ public class ConfigManager {
 		newConfig.put("footer",						"");
 		newConfig.put("message",					Long.valueOf(messageID));
 		newConfig.put("owner",						Long.valueOf(0));
-		newConfig.put("possibleanswers",			"");
+		newConfig.put("possibleanswers",			new JSONArray());
 		newConfig.put("thumbnailurl", 				"");
 		newConfig.put("title",						"");
 		newConfig.put("guild",						guild.getIdLong());

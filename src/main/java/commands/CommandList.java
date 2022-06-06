@@ -4,8 +4,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import commands.moderation.AutoRole;
 import commands.moderation.BotAutoRole;
-import commands.moderation.Cleanup;
 import commands.moderation.Clear;
+import commands.moderation.Close;
 import commands.moderation.CustomChannelRoles;
 import commands.moderation.DefaultAccessRoles;
 import commands.moderation.ForbiddenWords;
@@ -61,7 +61,6 @@ public class CommandList {
 		this.utilitycmds.put("levelbackground", new Levelbackground());
 		this.utilitycmds.put("suggest", new Suggest());
 		this.utilitycmds.put("userinfo", new Userinfo());
-//		this.utilitycmds.put("poll", new Poll()); <--- Poll rework
 		this.utilitycmds.put("report", new Report());
 		this.utilitycmds.put("serverinfo", new Serverinfo());
 		this.utilitycmds.put("language", new Language());
@@ -85,7 +84,7 @@ public class CommandList {
 		this.moderationcmds.put("tempmute", new TempMute());
 		this.moderationcmds.put("warning", new Warning());
 		this.moderationcmds.put("welcome", new Welcome());
-//		this.moderationcmds.put("close", new Close()); <--- ModMail rework
+		this.moderationcmds.put("close", new Close());
 		this.moderationcmds.put("suggestionchannel", new SuggestionChannel());
 		this.moderationcmds.put("levelchannel", new LevelChannel());
 		this.moderationcmds.put("reportchannel", new ReportChannel());
@@ -97,8 +96,6 @@ public class CommandList {
 		this.moderationcmds.put("defaultaccessroles", new DefaultAccessRoles());
 		this.moderationcmds.put("customchannelroles", new CustomChannelRoles());
 		this.moderationcmds.put("unmute", new Unmute());
-		//Developement
-		this.moderationcmds.put("cleanup", new Cleanup());
 		
 		//Music
 		this.musiccmds.put("nowplaying", new Nowplaying());

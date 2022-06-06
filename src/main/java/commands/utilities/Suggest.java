@@ -29,16 +29,16 @@ public class Suggest implements Command{
 		final Guild guild = event.getGuild();
 		Long channelid = ConfigLoader.run.getGuildConfig(guild).getLong("suggest");
 		if (channelid == 0) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
 			return;
 		}
-		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.run.getUserConfig(guild, user).getString("lastsuggestion"), ConfigManager.dateTimeFormatter);
+		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.run.getMemberConfig(guild, user).getString("lastsuggestion"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
 			return;
 		}
 		this.sendsuggestion(guild, event.getMember(), event.getOption("suggestion").getAsString());
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/utilities/suggest:success").convert()).queue();
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/suggest:success").convert()).queue();
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class Suggest implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/utilities/suggest:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/suggest:help");
 	}
 	
 	public void sendsuggestion(Guild guild, Member member, String idea) {

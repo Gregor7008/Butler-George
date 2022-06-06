@@ -18,25 +18,25 @@ public class Move implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (ConfigLoader.run.getGuildConfig(guild).getLong("supporttalk") == 0) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
 		if (!guild.getMember(event.getOption("member").getAsUser()).getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/move:memnotconn").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:memnotconn").convert()).queue();
 			return;
 		}
 		long vcid = ConfigLoader.run.getGuildConfig(guild).getLong("supporttalk");
 		VoiceChannel st = guild.getVoiceChannelById(vcid);
 		if (st == null) {
 			ConfigLoader.run.getGuildConfig(guild).put("supporttalk", Long.valueOf(0));
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
 		if (st.getMembers().contains(event.getMember())) {
 			guild.moveVoiceMember(guild.getMember(event.getOption("member").getAsUser()), st).queue();
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/move:success").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:success").convert()).queue();
 		} else {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/move:notconnected").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:notconnected").convert()).queue();
 		}
 	}
 
@@ -48,6 +48,6 @@ public class Move implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/move:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/move:help");
 	}
 }

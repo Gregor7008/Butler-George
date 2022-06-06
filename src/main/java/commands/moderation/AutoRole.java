@@ -27,13 +27,13 @@ public class AutoRole implements Command {
 		if (event.getSubcommandName().equals("add")) {
 			Role role = event.getOption("addrole").getAsRole();
 			ConfigLoader.run.getGuildConfig(guild).getJSONArray("autoroles").put(role.getIdLong());
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/autorole:addsuccess").convert()).queue();;
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/autorole:addsuccess").convert()).queue();;
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			Role role = event.getOption("removerole").getAsRole();
 			ConfigLoader.run.removeValueFromArray(ConfigLoader.run.getGuildConfig(guild).getJSONArray("autoroles"), role.getIdLong());
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/autorole:removesuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/autorole:removesuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("list")) {
@@ -54,14 +54,14 @@ public class AutoRole implements Command {
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/autorole:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/autorole:help");
 	}
 	
 	private void listroles(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
 		JSONArray autoroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("autoroles");
 		if (autoroles.isEmpty()) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/autorole:noautoroles").convert()).queue();;
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/autorole:noautoroles").convert()).queue();;
 			return;
 		}
 		for (int i = 0; i < autoroles.length(); i++) {
@@ -73,6 +73,6 @@ public class AutoRole implements Command {
 				sB.append(guild.getRoleById(autoroles.getLong(i)).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/autorole:list").replaceDescription("{list}", sB.toString()).convert()).queue();
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/autorole:list").replaceDescription("{list}", sB.toString()).convert()).queue();
 	}
 }

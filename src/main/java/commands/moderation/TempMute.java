@@ -21,7 +21,7 @@ public class TempMute implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		this.tempmute(Integer.parseInt(event.getOption("days").getAsString()), guild, user);
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/tempmute:success")
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/tempmute:success")
 				.replaceDescription("{user}", user.getName())
 				.replaceDescription("{time}", event.getOption("days").getAsString()).convert()).queue();
 	}
@@ -36,11 +36,11 @@ public class TempMute implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/tempmute:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/tempmute:help");
 	}
 	
 	private void tempmute(int days, Guild guild, User user) {
-		ConfigLoader.run.getUserConfig(guild, user).put("tempmuted", true);
+		ConfigLoader.run.getMemberConfig(guild, user).put("tempmuted", true);
 		guild.getMember(user).timeoutFor(days, TimeUnit.DAYS).queue();
 		ModEngine.run.modCheck(guild);
 	}

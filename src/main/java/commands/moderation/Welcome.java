@@ -25,12 +25,12 @@ public class Welcome implements Command{
 			String message = event.getOption("message").getAsString();
 			String channelid = event.getOption("channel").getAsGuildChannel().getId();
 			ConfigLoader.run.getGuildConfig(guild).put("welcomemsg", message + ";" + channelid);
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/welcome:setsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/welcome:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
 			ConfigLoader.run.getGuildConfig(guild).put("welcomemsg", "");
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/welcome:offsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/welcome:offsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
@@ -43,9 +43,9 @@ public class Welcome implements Command{
 				String msg = welcomemsg[0].replace("{server}", guild.getName()).replace("{member}", event.getMember().getAsMention())
 							.replace("{membercount}", Integer.toString(guild.getMemberCount())).replace("{date}", currentdate);
 				guild.getTextChannelById(welcomemsg[1]).sendMessage(msg).queue();
-				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/welcome:testsuccess").convert()).queue();
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/welcome:testsuccess").convert()).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/moderation/welcome:nonedefined").convert()).queue();
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/welcome:nonedefined").convert()).queue();
 			}
 		}
 	}
@@ -63,6 +63,6 @@ public class Welcome implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/welcome:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/welcome:help");
 	}
 }

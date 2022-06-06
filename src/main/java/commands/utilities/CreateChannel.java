@@ -25,18 +25,18 @@ public class CreateChannel implements Command{
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
 		if (ConfigLoader.run.getGuildConfig(guild).getJSONArray("customchannelroles").isEmpty()) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/createchannel:norole").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/createchannel:norole").convert()).queue();
 			return;
 		}
 		JSONArray cccroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("customchannelroles");
 		for (int i = 0; i < cccroles.length(); i++) {
 			if (!event.getMember().getRoles().contains(guild.getRoleById(cccroles.getLong(i))) && !guild.getRoleById(cccroles.getLong(i)).isPublicRole()) {
-				event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission").convert()).queue();
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission").convert()).queue();
 				return;
 			}
 		}
 		this.createTextChannel(guild, user, name);
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user,"/commands/utilities/createchannel:success").convert()).queue();
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/createchannel:success").convert()).queue();
 	}
 
 	@Override
@@ -48,13 +48,13 @@ public class CreateChannel implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/utilities/createchannel:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/createchannel:help");
 	}
 	
 	private void createTextChannel(Guild guild, User user, String name) {
 		Collection<Permission> perms = this.setupPerms();
 		Category cgy;
-		if (ConfigLoader.run.getUserConfig(guild, user).getLong("customchannelcategory") == 0) {
+		if (ConfigLoader.run.getMemberConfig(guild, user).getLong("customchannelcategory") == 0) {
 			cgy = guild.createCategory(user.getName() + "'s channels").complete();
 			cgy.upsertPermissionOverride(guild.getPublicRole()).setDenied(Permission.VIEW_CHANNEL).queue();
 			cgy.upsertPermissionOverride(guild.getMember(user)).setAllowed(perms).queue();
@@ -65,9 +65,9 @@ public class CreateChannel implements Command{
 					cgy.upsertPermissionOverride(guild.getRoleById(defroles.getLong(i))).setAllowed(Permission.ALL_PERMISSIONS).queue();
 				}
 			}
-			ConfigLoader.run.getUserConfig(guild, user).put("customchannelcategory", cgy.getIdLong());
+			ConfigLoader.run.getMemberConfig(guild, user).put("customchannelcategory", cgy.getIdLong());
   	    } else {
-  	    	cgy = guild.getCategoryById(ConfigLoader.run.getUserConfig(guild, user).getLong("customchannelcategory"));
+  	    	cgy = guild.getCategoryById(ConfigLoader.run.getMemberConfig(guild, user).getLong("customchannelcategory"));
   	    }
 		guild.createTextChannel(name, cgy).complete();
 	}

@@ -22,7 +22,7 @@ public class TempBan implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
 		this.tempban(Integer.parseInt(event.getOption("days").getAsString()), guild, user);
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/tempban:success")
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/tempban:success")
 				.replaceDescription("{user}", user.getName())
 				.replaceDescription("{time}", event.getOption("days").getAsString()).convert()).queue();
 	}
@@ -37,13 +37,13 @@ public class TempBan implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/tempban:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/tempban:help");
 	}
 	
 	private void tempban(int days, Guild guild, User user) {
 		OffsetDateTime until = OffsetDateTime.now().plusDays(Long.parseLong(String.valueOf(days)));
-		ConfigLoader.run.getUserConfig(guild, user).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
-		ConfigLoader.run.getUserConfig(guild, user).put("tempbanned", true);
+		ConfigLoader.run.getMemberConfig(guild, user).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
+		ConfigLoader.run.getMemberConfig(guild, user).put("tempbanned", true);
 		guild.getMember(user).ban(0).queue();
 		ModEngine.run.modCheck(guild);
 	}	

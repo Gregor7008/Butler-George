@@ -22,7 +22,7 @@ public class Report implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (ConfigLoader.run.getGuildConfig(guild).getLong("reportchannel") == 0) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/report:nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/report:nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyy");
@@ -37,7 +37,7 @@ public class Report implements Command{
 		}
 		eb.setDescription(event.getOption("reason").getAsString());
 		guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("reportchannel")).sendMessageEmbeds(eb.build()).queue();
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/report:success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/report:success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 
 	@Override
@@ -51,6 +51,6 @@ public class Report implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/utilities/report:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/report:help");
 	}
 }

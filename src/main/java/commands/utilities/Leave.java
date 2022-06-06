@@ -25,7 +25,7 @@ public class Leave implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		Long ctgid = ConfigLoader.run.getUserConfig(guild, user).getLong("customchannelcategory");
+		Long ctgid = ConfigLoader.run.getMemberConfig(guild, user).getLong("customchannelcategory");
 		GuildChannel channel;
 		if (event.getOption("channel") != null) {
 			channel = event.getOption("channel").getAsGuildChannel();
@@ -69,7 +69,7 @@ public class Leave implements Command{
 			event.reply("Done...").queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/utilities/leave:invalid").convert()).queue();
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/leave:invalid").convert()).queue();
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class Leave implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/utilities/leave:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/leave:help");
 	}
 	
 	private boolean checkCategory(Category category, Guild guild) {

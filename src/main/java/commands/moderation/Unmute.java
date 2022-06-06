@@ -20,14 +20,14 @@ public class Unmute implements Command{
 		final Guild guild = event.getGuild();
 		final User user =  event.getUser();
 		final User cuser = event.getOption("user").getAsUser();
-		JSONObject userconfig = ConfigLoader.run.getUserConfig(guild, cuser);
+		JSONObject userconfig = ConfigLoader.run.getMemberConfig(guild, cuser);
 		if (!userconfig.getBoolean("muted") && !userconfig.getBoolean("tempmuted")) {
-			event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
 			return;
 		}
 		userconfig.put("muted", false);
 		userconfig.put("tempmuted", false);
-		event.replyEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
 		ModEngine.run.modCheck(guild);
 	}
 
@@ -39,6 +39,6 @@ public class Unmute implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.run.getRaw(guild, user, "/commands/moderation/unmute:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/unmute:help");
 	}
 }

@@ -56,7 +56,7 @@ public class ModMail {
 			}
 		} catch (ErrorResponseException e) {}
 		if (guild.retrieveBan(user).complete() == null && !member) {
-			event.getChannel().sendMessageEmbeds(AnswerEngine.run.fetchMessage(null, null, "/components/moderation/modmail:nosupport").convert()).queue();
+			event.getChannel().sendMessageEmbeds(AnswerEngine.build.fetchMessage(null, null, "/components/moderation/modmail:nosupport").convert()).queue();
 			return;
 		}
 		if (ConfigLoader.run.getModMailOfUser(user.getId()) != null) {
@@ -64,14 +64,14 @@ public class ModMail {
 			this.resendMessage(channel, event.getMessage());
 			return;
 		}
-		OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.run.getUserConfig(guild, user).getString("lastmail"), ConfigManager.dateTimeFormatter);
+		OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.run.getMemberConfig(guild, user).getString("lastmail"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 300) {
-			event.getChannel().sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/components/moderation/modmail:success").convert()).queue();
-			ConfigLoader.run.getUserConfig(guild, user).put("lastmail", OffsetDateTime.now().format(ConfigManager.dateTimeFormatter));
+			event.getChannel().sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/components/moderation/modmail:success").convert()).queue();
+			ConfigLoader.run.getMemberConfig(guild, user).put("lastmail", OffsetDateTime.now().format(ConfigManager.dateTimeFormatter));
 			this.processMessage(event);
 		} else {
 			int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
-			event.getChannel().sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, user, "/components/moderation/modmail:timelimit")
+			event.getChannel().sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/components/moderation/modmail:timelimit")
 					.replaceDescription("{timeleft}", String.valueOf(timeleft)).convert()).queue();
 		}
 	}

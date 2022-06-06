@@ -3,6 +3,7 @@ package components.base;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -13,14 +14,14 @@ import components.base.assets.ConsoleColors;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 
-public class ConsoleEngine {
+public class ConsoleEngine implements UncaughtExceptionHandler{
     
-	private DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm");
+	private DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
 	private final JDA jda = Bot.run.jda;
-	public static ConsoleEngine run;
+	public static ConsoleEngine out;
 	
 	public ConsoleEngine() {
-		run = this;
+		out = this;
 		this.commandListener();
 		System.out.println(ConsoleColors.BLUE_BRIGHT + "--------------------------| Console Engine V1.0 |--------------------------" + ConsoleColors.RESET);
 	}
@@ -37,15 +38,33 @@ public class ConsoleEngine {
 		this.print(ConsoleColors.RED, object, message);
 	}
 	
-	private void print(@Nullable String color, Object object, String message) {
-		String fullClassName[] = object.getClass().getName().split("\\.");
-		String className = fullClassName[fullClassName.length - 1];
-		String output = OffsetDateTime.now().format(format) + " [" + className + "] " + message;
+	public void title(String title) {
+		this.print(ConsoleColors.BLUE_BRIGHT, null, "---------| " + title + " |---------");
+	}
+	
+	private void print(@Nullable String color, @Nullable Object object, @Nullable String message) {
+		if (message == null) {
+			message = "No message";
+		}
+		String output = "";
+		if (object == null) {
+			output = OffsetDateTime.now().format(format) + " " + message;
+		} else {
+			String fullClassName[] = object.getClass().getName().split("\\.");
+			String className = fullClassName[fullClassName.length - 1];
+			output = OffsetDateTime.now().format(format) + " [" + className + "] " + message;
+		}
 		if (color == null) {
 			System.out.println(output);
 		} else {
 			System.out.println(color + output + ConsoleColors.RESET);
 		}
+	}
+	
+	@Override
+	public void uncaughtException(Thread t, Throwable e) {
+		Bot.run.noErrorOccured = false;
+		this.error(t.getClass(), e.getCause().getMessage());
 	}
 	
 	private void commandListener() {
@@ -114,8 +133,11 @@ public class ConsoleEngine {
 						this.info(this, "User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully unbanned from " + jda.getGuildById(insplit[1]).getName());
 						break;
 					case "warn":
-						ConfigLoader.run.getUserConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2])).getJSONArray("warnings").put("Administrative actions");
+						ConfigLoader.run.getMemberConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2])).getJSONArray("warnings").put("Administrative actions");
 						this.debug(this, "User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
+						break;
+					case "printTimer":
+						this.info(this, String.valueOf(Bot.run.timerCount));
 						break;
 					case "pushCache":
 						if (ConfigLoader.manager.pushCache()) {
@@ -123,8 +145,13 @@ public class ConsoleEngine {
 						}
 						break;
 					case "printCache":
+						this.title("User-Cache");
 						ConfigLoader.manager.getUserCache().forEach((id, obj) -> {
 							this.info(ConfigLoader.manager, Bot.run.jda.getUserById(id).getName());
+						});
+						this.title("Guild-Cache");
+						ConfigLoader.manager.getGuildCache().forEach((id, obj) -> {
+							this.info(ConfigLoader.manager, Bot.run.jda.getGuildById(id).getName());
 						});
 						break;
 					default:

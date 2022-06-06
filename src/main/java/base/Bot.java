@@ -34,6 +34,8 @@ public class Bot {
 	public JDA jda;
 	private EventWaiter eventWaiter = new EventWaiter();
 	private Timer timer = new Timer();
+	public int timerCount = 0;
+	public boolean noErrorOccured = true;
 	public static String token, homeID;
 	
 	public static void main(String[] args) {
@@ -64,7 +66,7 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing("V1.3-beta"));
 	    //Startup engines
-	    new ConsoleEngine();
+	    Thread.setDefaultUncaughtExceptionHandler(new ConsoleEngine());
 	    new ConfigCheck();
 	    new AnswerEngine();
 	    new PenaltyEngine();
@@ -86,7 +88,7 @@ public class Bot {
     			}
     			if (ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel") != 0) {
     				long chid = ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel");
-    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(AnswerEngine.run.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
+    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
         			ConfigLoader.run.getGuildConfig(guild).put("offlinemsg", msgid);
         		}
     		}
@@ -96,8 +98,10 @@ public class Bot {
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
-		ConfigLoader.manager.pushCache();
-		ConsoleEngine.run.info(this, "Bot offline");
+		if (noErrorOccured) {
+			ConfigLoader.manager.pushCache();
+		}
+		ConsoleEngine.out.info(this, "Bot offline");
 		this.wait(2000);
 		System.exit(0);
 	}
@@ -120,9 +124,12 @@ public class Bot {
 					PenaltyEngine.run.penaltyCheck(guild);
 					ModEngine.run.modCheck(guild);
 				}
-				ConfigLoader.manager.pushCache();
+				if (timerCount > 0 && noErrorOccured) {
+					ConfigLoader.manager.pushCache();
+				}
+				timerCount++;
 			}
-		}, 0, 1*60*1000);
+		}, 0, 5*60*1000);
 	}
 	
 	private void wait(int time) {
