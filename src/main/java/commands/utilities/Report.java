@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -21,8 +21,8 @@ public class Report implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (Configloader.INSTANCE.getGuildConfig(guild, "reportchannel").equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/report:nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		if (ConfigLoader.run.getGuildConfig(guild).getLong("reportchannel") == 0) {
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/report:nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyy");
@@ -36,8 +36,8 @@ public class Report implements Command{
 			eb.setTitle("Report of the user \"" + event.getOption("user").getAsUser().getName() + "\"", event.getOption("link").getAsString());
 		}
 		eb.setDescription(event.getOption("reason").getAsString());
-		guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "reportchannel")).sendMessageEmbeds(eb.build()).queue();
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/report:success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("reportchannel")).sendMessageEmbeds(eb.build()).queue();
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/report:success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 
 	@Override
@@ -51,6 +51,6 @@ public class Report implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/report:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/report:help");
 	}
 }

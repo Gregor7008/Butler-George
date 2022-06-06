@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
@@ -33,9 +33,9 @@ public class Channelpermission implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		String ctgid = Configloader.INSTANCE.getUserConfig(guild, user, "cccategory");
-		if (ctgid.equals("") || !event.getTextChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/channelpermission:nopermission").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		Long ctgid = ConfigLoader.run.getMemberConfig(guild, user).getLong("customchannelcategory");
+		if (ctgid == 0 || !event.getTextChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/channelpermission:nopermission").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		SelectMenu menu = SelectMenu.create("permselection")
@@ -56,10 +56,10 @@ public class Channelpermission implements Command{
 				.addOption("Use Slash-Commands", "usc")
 				.addOption("All Permissions", "apm")
 				.build();
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/channelpermission:selperm").convert())
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/channelpermission:selperm").convert())
 				.addActionRow(menu)
 				.queue();
-		Bot.INSTANCE.getWaiter().waitForEvent(SelectMenuInteractionEvent.class,
+		Bot.run.getWaiter().waitForEvent(SelectMenuInteractionEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getTextChannel().getId())) {return false;} 
 				  	  return e.getUser().getIdLong() == user.getIdLong();},
 				e -> {if (event.getSubcommandName().equals("grant")) {
@@ -68,7 +68,7 @@ public class Channelpermission implements Command{
 						  this.defineEdit(e.getSelectedOptions().get(0).getValue(), event, e, false);
 					  }},
 				1, TimeUnit.MINUTES,
-				() -> {event.getHook().editOriginalEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});	
+				() -> {event.getHook().editOriginalEmbeds(AnswerEngine.build.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});	
 	}
 	
 	@Override
@@ -85,7 +85,7 @@ public class Channelpermission implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/channelpermission:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/channelpermission:help");
 	}
 	
 	private void defineEdit(String selected, SlashCommandInteractionEvent event, SelectMenuInteractionEvent sme, boolean action) {
@@ -95,7 +95,7 @@ public class Channelpermission implements Command{
 		GuildChannel channel = guild.getGuildChannelById(event.getOption("channel_or_category").getAsLong());
 		Category category = guild.getCategoryById(event.getOption("channel_or_category").getAsLong());
 		if (pholder.equals(guild.getSelfMember()) && !action) {
-			sme.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "eastereggs:1").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			sme.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/eastereggs:1").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (category != null) {
@@ -105,22 +105,22 @@ public class Channelpermission implements Command{
 			}
 			this.updateCategoryPerms(pholder, category, selected, action);
 			if (action) {
-				sme.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/channelpermission:addsuccess").convert()).queue();
+				sme.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/channelpermission:addsuccess").convert()).queue();
 			} else {
-				sme.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/channelpermission:remsuccess").convert()).queue();
+				sme.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/channelpermission:remsuccess").convert()).queue();
 			}
 			return;
 		}
 		if (channel != null) {
 			this.updateChannelPerms(pholder, channel, selected, action);
 			if (action) {
-				sme.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/channelpermission:addsuccess").convert()).queue();
+				sme.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/channelpermission:addsuccess").convert()).queue();
 			} else {
-				sme.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/channelpermission:remsuccess").convert()).queue();
+				sme.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/channelpermission:remsuccess").convert()).queue();
 			}
 			return;
 		}
-		sme.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "general:fatal").convert()).queue();
+		sme.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "general:fatal").convert()).queue();
 	}
 	
 	private void updateChannelPerms(IPermissionHolder pholder, GuildChannel channel, String selected, boolean action) {

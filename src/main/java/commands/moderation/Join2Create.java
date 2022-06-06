@@ -1,8 +1,11 @@
 package commands.moderation;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -19,24 +22,28 @@ public class Join2Create implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final String id = event.getOption("channel").getAsGuildChannel().getId();
+		JSONObject join2createchannels = ConfigLoader.run.getGuildConfig(guild).getJSONObject("join2createchannels");
 		if (guild.getVoiceChannelById(id) == null) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:invalid").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/join2create:invalid").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
-			if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:adderror").convert()).queue();
-			} else {
-				Configloader.INSTANCE.addGuildConfig(guild, "join2create", id);
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess").convert()).queue();
+			try {
+				join2createchannels.get(id);
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/join2create:adderror").convert()).queue();
+			} catch (JSONException e) {
+				join2createchannels.put(id, new JSONObject());
+				//TODO Implement option to define settings for channels created of this join2create channel
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess").convert()).queue();
 			}
 		}
 		if (event.getSubcommandName().equals("remove")) {
-			if (Configloader.INSTANCE.getGuildConfig(guild, "join2create").contains(id)) {
-				Configloader.INSTANCE.deleteGuildConfig(guild, "join2create", id);
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess").convert()).queue();
-			} else {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/join2create:remerror").convert()).queue();
+			try {
+				join2createchannels.get(id);
+				join2createchannels.remove(id);
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/join2create:remsuccess").convert()).queue();
+			} catch (JSONException e) {
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/join2create:remerror").convert()).queue();
 			}
 		}
 	}
@@ -53,6 +60,6 @@ public class Join2Create implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/join2create:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/join2create:help");
 	}
 }

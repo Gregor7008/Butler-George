@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,17 +24,17 @@ public class Welcome implements Command{
 		if (event.getSubcommandName().equals("set")) {
 			String message = event.getOption("message").getAsString();
 			String channelid = event.getOption("channel").getAsGuildChannel().getId();
-			Configloader.INSTANCE.setGuildConfig(guild, "welcomemsg", message + ";" + channelid);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/welcome:setsuccess").convert()).queue();
+			ConfigLoader.run.getGuildConfig(guild).put("welcomemsg", message + ";" + channelid);
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/welcome:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("off")) {
-			Configloader.INSTANCE.setGuildConfig(guild, "welcomemsg", "");
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/welcome:offsuccess").convert()).queue();
+			ConfigLoader.run.getGuildConfig(guild).put("welcomemsg", "");
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/welcome:offsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("test")) {
-			String welcomemsgraw = Configloader.INSTANCE.getGuildConfig(guild, "welcomemsg");
+			String welcomemsgraw = ConfigLoader.run.getGuildConfig(guild).getString("welcomemsg");
 			LocalDateTime date = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 			String currentdate = date.format(formatter);
@@ -43,9 +43,9 @@ public class Welcome implements Command{
 				String msg = welcomemsg[0].replace("{server}", guild.getName()).replace("{member}", event.getMember().getAsMention())
 							.replace("{membercount}", Integer.toString(guild.getMemberCount())).replace("{date}", currentdate);
 				guild.getTextChannelById(welcomemsg[1]).sendMessage(msg).queue();
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/welcome:testsuccess").convert()).queue();
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/welcome:testsuccess").convert()).queue();
 			} else {
-				event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/welcome:nonedefined").convert()).queue();
+				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/welcome:nonedefined").convert()).queue();
 			}
 		}
 	}
@@ -63,6 +63,6 @@ public class Welcome implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/welcome:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/welcome:help");
 	}
 }

@@ -1,6 +1,5 @@
 package base;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
@@ -8,11 +7,13 @@ import java.util.TimerTask;
 
 import javax.security.auth.login.LoginException;
 
+import org.json.JSONObject;
+
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import components.base.AnswerEngine;
-import components.base.Configcheck;
-import components.base.Configloader;
+import components.base.ConfigCheck;
+import components.base.ConfigLoader;
 import components.base.ConsoleEngine;
 import components.moderation.ModEngine;
 import components.moderation.PenaltyEngine;
@@ -28,23 +29,21 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 public class Bot {
 	
-	public static Bot INSTANCE;
+	public static Bot run;
 	
 	public JDA jda;
 	private EventWaiter eventWaiter = new EventWaiter();
-	private PenaltyEngine penaltyEngine;
-	private ModEngine modEngine;
-	public ConsoleEngine consoleEngine;
 	private Timer timer = new Timer();
-	public static String token, environment, homeID;
+	public int timerCount = 0;
+	public boolean noErrorOccured = true;
+	public static String token, homeID;
 	
 	public static void main(String[] args) {
 		if (args.length <= 0) {
-			System.out.println("You have to provide 1. a bot token, 2. the path to my resource folder!");
+			System.out.println("You have to provide a bot token!");
 			System.exit(0);
 		}
 		token = args[0];
-		environment = args[1];
 		homeID = "708381749826289666";
 		try {
 			new Bot(token);
@@ -54,7 +53,9 @@ public class Bot {
 	}
 	
 	private Bot(String token) throws LoginException, InterruptedException, IOException {
-		INSTANCE = this;
+		run = this;
+	    new ConfigLoader();
+	    //Create Bot
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
@@ -64,11 +65,13 @@ public class Bot {
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing("V1.3-beta"));
-	    penaltyEngine = new PenaltyEngine();
-	    modEngine = new ModEngine();
-	    consoleEngine = new ConsoleEngine();
-	    new ServerUtilities().controlChannels(true);
+	    //Startup engines
+	    Thread.setDefaultUncaughtExceptionHandler(new ConsoleEngine());
+	    new ConfigCheck();
 	    new AnswerEngine();
+	    new PenaltyEngine();
+	    new ModEngine();
+	    new ServerUtilities().controlChannels(true);
     	this.checkConfigs();
     	this.startTimer();
 	}
@@ -79,29 +82,26 @@ public class Bot {
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);
     		if (delete) {
-    			String j2csraw = Configloader.INSTANCE.getGuildConfig(guild, "j2cs");
-    			if (!j2csraw.equals("")) {
-    				String[] j2cs = j2csraw.split(";");
-    				for (int e = 0; e < j2cs.length; e++) {
-        				String[] temp1 = j2cs[e].split("-");
-        				guild.getVoiceChannelById(temp1[0]).delete().queue();
-        			}
+    			JSONObject createdchannels = ConfigLoader.run.getFirstGuildLayerConfig(guild, "createdchannels");
+    			if (!createdchannels.isEmpty()) {
+    				createdchannels.keySet().forEach(e -> guild.getVoiceChannelById(e).delete().queue());
     			}
-    			if (!Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch").equals("")) {
-    				String cid = Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch");
-    				String msgid = guild.getTextChannelById(cid).sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getId();
-        			Configloader.INSTANCE.setGuildConfig(guild, "offlinemsg", cid + "_" + msgid);
+    			if (ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel") != 0) {
+    				long chid = ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel");
+    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
+        			ConfigLoader.run.getGuildConfig(guild).put("offlinemsg", msgid);
         		}
     		}
-    		if (!Configloader.INSTANCE.getGuildConfig(guild, "supportchat").equals("")) {
-    			guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+    		if (ConfigLoader.run.getGuildConfig(guild).getLong("supportchat") != 0) {
+    			guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
     		}
-    		new File(Bot.environment + "/levelcards/cache/temp.png").delete();
-    		new File(Bot.environment + "/levelcards/cache/avatar.png").delete();
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
-		consoleEngine.info(this, "Bot offline");
+		if (noErrorOccured) {
+			ConfigLoader.manager.pushCache();
+		}
+		ConsoleEngine.out.info(this, "Bot offline");
 		this.wait(2000);
 		System.exit(0);
 	}
@@ -109,8 +109,8 @@ public class Bot {
 	private void checkConfigs() {
 		for (int i = 0; i < jda.getGuilds().size(); i++) {
     		Guild guild = jda.getGuilds().get(i);
-    		Configcheck.INSTANCE.checkGuildConfigs(guild);
-    		Configcheck.INSTANCE.checkUserConfigs(guild);
+    		ConfigCheck.run.checkGuildConfigs(guild);
+    		ConfigCheck.run.checkUserConfigs(guild);
 		}
 	}
 	
@@ -121,9 +121,13 @@ public class Bot {
 				List<Guild> guilds = jda.getGuilds();
 				for (int i = 0; i < guilds.size(); i++) {
 					Guild guild = guilds.get(i);
-					Bot.INSTANCE.penaltyCheck(guild);
-					Bot.INSTANCE.modCheck(guild);
+					PenaltyEngine.run.penaltyCheck(guild);
+					ModEngine.run.modCheck(guild);
 				}
+				if (timerCount > 0 && noErrorOccured) {
+					ConfigLoader.manager.pushCache();
+				}
+				timerCount++;
 			}
 		}, 0, 5*60*1000);
 	}
@@ -136,17 +140,5 @@ public class Bot {
 	
 	public EventWaiter getWaiter() {
 		return eventWaiter;
-	}
-	
-	public void penaltyCheck(Guild guild) {
-		new Thread(() -> {
-			this.penaltyEngine.run(guild);
-		}).start();
-	}
-	
-	public void modCheck(Guild guild) {
-		new Thread(() -> {
-			this.modEngine.run(guild);
-		}).start();
 	}
 }

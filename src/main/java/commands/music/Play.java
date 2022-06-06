@@ -30,15 +30,15 @@ public class Play implements Command{
 		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/play:wrongusage").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/music/play:wrongusage").convert()).queue();
 			return;
 		}
 		if (!member.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/play:noVCdefined").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/music/play:noVCdefined").convert()).queue();
 			return;
 		}
 		if (self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/music/play:alreadyinuse").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/music/play:alreadyinuse").convert()).queue();
 			return;
 		}
 		this.load(event, argument, musicManager, channel, member);
@@ -79,6 +79,6 @@ public class Play implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/music/play:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/music/play:help");
 	}
 }

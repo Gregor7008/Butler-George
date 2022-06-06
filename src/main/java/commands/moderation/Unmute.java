@@ -1,9 +1,11 @@
 package commands.moderation;
 
-import base.Bot;
+import org.json.JSONObject;
+
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
+import components.moderation.ModEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,15 +20,15 @@ public class Unmute implements Command{
 		final Guild guild = event.getGuild();
 		final User user =  event.getUser();
 		final User cuser = event.getOption("user").getAsUser();
-		if (!Boolean.parseBoolean(Configloader.INSTANCE.getUserConfig(guild, cuser, "muted"))) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
+		JSONObject userconfig = ConfigLoader.run.getMemberConfig(guild, cuser);
+		if (!userconfig.getBoolean("muted") && !userconfig.getBoolean("tempmuted")) {
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
 			return;
 		}
-		Configloader.INSTANCE.setUserConfig(guild, cuser, "muted", "false");
-		Configloader.INSTANCE.setUserConfig(guild, cuser, "tempmuted", "false");
-		Configloader.INSTANCE.setUserConfig(guild, cuser, "tmuntil", "");
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
-		Bot.INSTANCE.modCheck(guild);
+		userconfig.put("muted", false);
+		userconfig.put("tempmuted", false);
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
+		ModEngine.run.modCheck(guild);
 	}
 
 	@Override
@@ -37,6 +39,6 @@ public class Unmute implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/unmute:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/unmute:help");
 	}
 }

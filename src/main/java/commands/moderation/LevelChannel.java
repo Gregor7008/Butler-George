@@ -2,7 +2,7 @@ package commands.moderation;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,20 +17,28 @@ public class LevelChannel implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		Configloader.INSTANCE.setGuildConfig(guild, "levelmsgch", event.getOption("channel").getAsGuildChannel().getId());
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/levelchannel:success").convert()).queue();
+		if (event.getSubcommandName().equals("set")) {
+			ConfigLoader.run.getGuildConfig(guild).put("levelmsgchannel", event.getOption("channel").getAsGuildChannel().getIdLong());
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/levelchannel:setsuccess").convert()).queue();
+			return;
+		}
+		if (event.getSubcommandName().equals("clear")) {
+			ConfigLoader.run.getGuildConfig(guild).put("levelmsgchannel", Long.valueOf(0));
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/levelchannel:clearsuccess").convert()).queue();
+		}
 	}
 
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("levelchannel", "0")
 				.addSubcommands(new SubcommandData("set", "Sets a channel for level-up messages for this server")
-						.addOption(OptionType.CHANNEL, "channel", "Mention a text channel!", true));
+						.addOption(OptionType.CHANNEL, "channel", "The wanted text channel", true))
+				.addSubcommands(new SubcommandData("clear", "Unassigns the channel for level-up messsages"));
 		return command;
 	}
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/levelchannel:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/levelchannel:help");
 	}
 }

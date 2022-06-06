@@ -25,36 +25,36 @@ public class PingAndMove implements Command{
 		final User user = event.getUser();
 		final Member omember = guild.getMember(event.getOption("user").getAsUser());
 		if (omember.equals(guild.getMember(user))) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "eastereggs:4").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/eastereggs:4").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (omember.equals(guild.getSelfMember())) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "eastereggs:5").convert()).queue(r -> r.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/eastereggs:5").convert()).queue(r -> r.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
 			return;
 		}
 		if (!omember.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/pingandmove:memnoncon").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/pingandmove:memnoncon").convert()).queue();
 			return;
 		}
 		if (!guild.getMember(user).getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/pingandmove:notcon").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/pingandmove:notcon").convert()).queue();
 			return;
 		}
-		InteractionHook ih = event.reply(omember.getAsMention()).addEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/pingandmove:request")
+		InteractionHook ih = event.reply(omember.getAsMention()).addEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/pingandmove:request")
 				.replaceDescription("{user}", guild.getMember(user).getAsMention()).convert())
 								.addActionRow(Button.primary("accept", Emoji.fromUnicode("U+2705")),
 											  Button.primary("deny", Emoji.fromUnicode("U+274C"))).complete();
-		Bot.INSTANCE.getWaiter().waitForEvent(ButtonInteractionEvent.class,
+		Bot.run.getWaiter().waitForEvent(ButtonInteractionEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 			  	  	  return e.getUser().getIdLong() == omember.getIdLong();},
 				e -> {if (e.getButton().getId().equals("accept")) {
 						 guild.moveVoiceMember(guild.getMember(user), omember.getVoiceState().getChannel()).queue();
-						 e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/pingandmove:accepted").convert()).queue();
+						 e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/pingandmove:accepted").convert()).queue();
 						 return;}
 					  if (e.getButton().getId().equals("deny")) {
-						 e.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/utilities/pingandmove:denied").convert()).queue();}},
+						 e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/utilities/pingandmove:denied").convert()).queue();}},
 				1, TimeUnit.MINUTES,
-				() -> {ih.editOriginalEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/pingandmove:denied").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {ih.editOriginalEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/pingandmove:denied").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override
@@ -65,6 +65,6 @@ public class PingAndMove implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/pingandmove:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/pingandmove:help");
 	}
 }

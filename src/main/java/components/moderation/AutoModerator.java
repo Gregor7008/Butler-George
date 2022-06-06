@@ -1,8 +1,9 @@
 package components.moderation;
 
-import base.Bot;
+import org.json.JSONArray;
+
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class AutoModerator {
@@ -17,18 +18,18 @@ public class AutoModerator {
 	}
 	
 	public void messagereceived(MessageReceivedEvent event) {
-		String forbiddenwords = Configloader.INSTANCE.getGuildConfig(event.getGuild(), "forbidden");
-		String[] singleword = forbiddenwords.split(";");
-		for (int i = 0; i < singleword.length; i++) {
-			if (event.getMessage().getContentRaw().toLowerCase().contains(singleword[i].toLowerCase())) {
-				Configloader.INSTANCE.addUserConfig(event.getGuild(), event.getAuthor(), "warnings", "Rude behavior");
+		JSONArray forbiddenwords = ConfigLoader.run.getGuildConfig(event.getGuild()).getJSONArray("forbiddenwords");
+		for (int i = 0; i < forbiddenwords.length(); i++) {
+			if (event.getMessage().getContentRaw().toLowerCase().contains(forbiddenwords.getString(i).toLowerCase())) {
+				ConfigLoader.run.getMemberConfig(event.getGuild(), event.getAuthor()).getJSONArray("warnings").put("Rude behavior");
 				try {
 					event.getMember().getUser().openPrivateChannel().complete()
-						 .sendMessageEmbeds(AnswerEngine.ae.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")
+						 .sendMessageEmbeds(AnswerEngine.build.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")
 								 .replaceDescription("{guild}", event.getGuild().getName()).convert()).queue();
 				} catch (Exception e) {e.printStackTrace();}
 				event.getMessage().delete().queue();
-				Bot.INSTANCE.penaltyCheck(event.getGuild());
+				PenaltyEngine.run.penaltyCheck(event.getGuild());
+				i = forbiddenwords.length();
 			}
 		}
 	}

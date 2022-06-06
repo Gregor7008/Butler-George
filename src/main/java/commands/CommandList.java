@@ -4,10 +4,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import commands.moderation.AutoRole;
 import commands.moderation.BotAutoRole;
-import commands.moderation.Cleanup;
 import commands.moderation.Clear;
 import commands.moderation.Close;
-import commands.moderation.CustomChannelRole;
+import commands.moderation.CustomChannelRoles;
 import commands.moderation.DefaultAccessRoles;
 import commands.moderation.ForbiddenWords;
 import commands.moderation.Goodbye;
@@ -19,7 +18,6 @@ import commands.moderation.Mute;
 import commands.moderation.Penalty;
 import commands.moderation.ReactionRole;
 import commands.moderation.ReportChannel;
-import commands.moderation.Reset;
 import commands.moderation.Rolesorting;
 import commands.moderation.SuggestionChannel;
 import commands.moderation.SupportChannel;
@@ -43,7 +41,6 @@ import commands.utilities.Leave;
 import commands.utilities.Level;
 import commands.utilities.Levelbackground;
 import commands.utilities.PingAndMove;
-import commands.utilities.Poll;
 import commands.utilities.Report;
 import commands.utilities.Serverinfo;
 import commands.utilities.Suggest;
@@ -64,7 +61,6 @@ public class CommandList {
 		this.utilitycmds.put("levelbackground", new Levelbackground());
 		this.utilitycmds.put("suggest", new Suggest());
 		this.utilitycmds.put("userinfo", new Userinfo());
-		this.utilitycmds.put("poll", new Poll());
 		this.utilitycmds.put("report", new Report());
 		this.utilitycmds.put("serverinfo", new Serverinfo());
 		this.utilitycmds.put("language", new Language());
@@ -96,13 +92,10 @@ public class CommandList {
 		this.moderationcmds.put("supportchannel", new SupportChannel());
 		this.moderationcmds.put("supporttalk", new SupportTalk());
 		this.moderationcmds.put("forbiddenwords", new ForbiddenWords());
-		this.moderationcmds.put("reset", new Reset());
 		this.moderationcmds.put("move", new Move());
-		this.moderationcmds.put("defaultaccessrole", new DefaultAccessRoles());
-		this.moderationcmds.put("customchannelrole", new CustomChannelRole());
+		this.moderationcmds.put("defaultaccessroles", new DefaultAccessRoles());
+		this.moderationcmds.put("customchannelroles", new CustomChannelRoles());
 		this.moderationcmds.put("unmute", new Unmute());
-		//Developement
-		this.moderationcmds.put("cleanup", new Cleanup());
 		
 		//Music
 		this.musiccmds.put("nowplaying", new Nowplaying());

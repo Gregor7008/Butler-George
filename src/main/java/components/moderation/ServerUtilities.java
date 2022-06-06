@@ -4,7 +4,7 @@ import java.util.List;
 
 import base.Bot;
 import commands.moderation.Rolesorting;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -13,7 +13,10 @@ import net.dv8tion.jda.api.entities.Role;
 public class ServerUtilities {
 	
 	public void rolecheck() {
-		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
+		final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
+		if (guild == null) {
+			return;
+		}
 		final List<Member> members = guild.getMembers();
 		Role gr1 = guild.getRoleById("837742608604332052");
 		int gr1p = gr1.getPosition();
@@ -39,7 +42,7 @@ public class ServerUtilities {
 				rs.sorter(guild, member, sr3, gr3);
 				rs.sorter(guild, member, sr4, gr4);
 				rs.sorter(guild, member, sr5, gr5);
-				if (member.getRoles().contains(guild.getRoleById(Configloader.INSTANCE.getGuildConfig(guild, "muterole")))) {
+				if (member.getRoles().contains(guild.getRoleById(ConfigLoader.run.getGuildConfig(guild).getLong("muterole")))) {
 					guild.removeRoleFromMember(member, guild.getRoleById("709478250253910103")).queue();
 				} else {
 					if (!member.getRoles().contains(guild.getRoleById("709478250253910103"))) {
@@ -51,9 +54,8 @@ public class ServerUtilities {
 	}
 	
 	public void controlChannels(boolean action) {
-		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
+		final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
 		if (guild == null) {
-			Bot.INSTANCE.consoleEngine.debug(this, "Couldn't find home guild!");
 			return;
 		}
 		if (action) {

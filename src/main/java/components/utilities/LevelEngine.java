@@ -3,8 +3,12 @@ package components.utilities;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
+import components.base.assets.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -46,65 +50,65 @@ public class LevelEngine {
 	}
 	
 	private void givexp(Guild guild, User user, OffsetDateTime time, int amount, int mindiff) {
+		JSONObject userconfig = ConfigLoader.run.getMemberConfig(guild, user);
 		OffsetDateTime now = OffsetDateTime.now();
-		OffsetDateTime lastxpgotten = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "lastxpgotten"));
+		OffsetDateTime lastxpgotten = OffsetDateTime.parse(ConfigLoader.run.getMemberConfig(guild, user).getString("lastxpgotten"), ConfigManager.dateTimeFormatter);
 		long difference = Duration.between(lastxpgotten, now).toSeconds();
 		if(difference >= Long.parseLong(String.valueOf(mindiff))) {
-			Configloader.INSTANCE.setUserConfig(guild, user, "levelspamcount", "0");
+			userconfig.put("levelspamcount", Integer.valueOf(0));
 			this.grantxp(guild, user, amount);
 			this.checklevel(guild, user);
 			this.checkforreward(guild, user);
 		} else {
-			int newcount = Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "levelspamcount")) + 1;
-			Configloader.INSTANCE.setUserConfig(guild, user, "levelspamcount", String.valueOf(newcount));
+			int newcount = ConfigLoader.run.getMemberConfig(guild, user).getInt("levelspamcount") + 1;
+			userconfig.put("levelspamcount", newcount);
 			if (newcount > 20) {
-				Configloader.INSTANCE.addUserConfig(guild, user, "warnings", "Levelspamming");
+				userconfig.getJSONArray("warnings").put("Spamming for Levels");
 				user.openPrivateChannel().complete()
-						.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/utilities/levelengine:levelspam")
+						.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/components/utilities/levelengine:levelspam")
 								.replaceDescription("{guild}", guild.getName()).convert()).queue();
 			}
 		}
 	}
 
 	private void grantxp(Guild guild, User user, int amount) {
-		int current = Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "expe"));
+		JSONObject userconfig = ConfigLoader.run.getMemberConfig(guild, user);
+		int current = ConfigLoader.run.getMemberConfig(guild, user).getInt("experience");
 		int newamount = current + amount;
-		Configloader.INSTANCE.setUserConfig(guild, user, "expe", String.valueOf(newamount));
-		Configloader.INSTANCE.setUserConfig(guild, user, "lastxpgotten", OffsetDateTime.now().toString());
+		userconfig.put("experience", newamount);
+		userconfig.put("lastxpgotten", OffsetDateTime.now().format(ConfigManager.dateTimeFormatter));
 	}
 
 	private void checklevel(Guild guild, User user) {
-		int currentlevel = Integer.valueOf(Configloader.INSTANCE.getUserConfig(guild, user, "level"));
+		JSONObject userconfig = ConfigLoader.run.getMemberConfig(guild, user);
+		int currentlevel = ConfigLoader.run.getMemberConfig(guild, user).getInt("level");
 		if (this.xpleftfornextlevel(guild, user) < 1) {
-			Configloader.INSTANCE.setUserConfig(guild, user, "level", String.valueOf(currentlevel + 1));
-			String id = Configloader.INSTANCE.getGuildConfig(guild, "levelmsgch");
-			if (id.equals("")) {
+			userconfig.put("level", currentlevel + 1);
+			Long id = ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel");
+			if (id == 0) {
 				return;
 			}
 			TextChannel channel = guild.getTextChannelById(id);
 			if (channel != null) {
-				channel.sendMessageEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/components/utilities/levelengine:levelup")
+				channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/components/utilities/levelengine:levelup")
 						.replaceTitle("{user}", guild.getMember(user).getEffectiveName())
 						.replaceDescription("{level}", String.valueOf(currentlevel+1)).convert()).queue();
 			} else {
-				Configloader.INSTANCE.setGuildConfig(guild, "levelmsgch", "");
+				ConfigLoader.run.getGuildConfig(guild).put("levelmsgchannel",Long.valueOf(0));
 			}
 		}
 	}
 
 	private void checkforreward(Guild guild, User user) {
-		String rawinput = Configloader.INSTANCE.getGuildConfig(guild, "levelrewards");
-		if (rawinput.equals("")) {
+		JSONObject levelrewards = ConfigLoader.run.getGuildConfig(guild).getJSONObject("levelrewards");
+		if (levelrewards.isEmpty()) {
 			return;
 		}
-		String[] rewards = rawinput.split(";");
-		for (int i = 0; i < rewards.length; i++) {
-			String[] reward = rewards[i].split("_");
-			if (Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "level")) >= Integer.parseInt(reward[1])) {
-				Role rewardrole = guild.getRoleById(reward[0]);
-				guild.addRoleToMember(guild.getMember(user), rewardrole);
-			}
-		}
+		try {
+			Long rewardID = levelrewards.getLong(String.valueOf(ConfigLoader.run.getMemberConfig(guild, user).getInt("level")));
+			Role rewardrole = guild.getRoleById(rewardID);
+			guild.addRoleToMember(guild.getMember(user), rewardrole);
+		} catch (JSONException e) {}
 	}
 	
 	public int xpneededforlevel(int currentlevel) {
@@ -113,13 +117,8 @@ public class LevelEngine {
 		}
 	}
 	
-	public int xpleftfornextlevel(Guild guild, User user) {
-		int xpneededfornextlevel = this.xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "level")));
-		return xpneededfornextlevel - Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "expe"));
-	}
-	
-	public String devtest(Guild guild, User user) {
-		return String.valueOf(xpneededforlevel(Integer.parseInt(Configloader.INSTANCE.getUserConfig(guild, user, "level")))) 
-				+ " | " + String.valueOf(xpleftfornextlevel(guild, user)) + " | " + Configloader.INSTANCE.getUserConfig(guild, user, "expe");
+	private int xpleftfornextlevel(Guild guild, User user) {
+		int xpneededfornextlevel = this.xpneededforlevel(ConfigLoader.run.getMemberConfig(guild, user).getInt("level"));
+		return xpneededfornextlevel - ConfigLoader.run.getMemberConfig(guild, user).getInt("experience");
 	}
 }

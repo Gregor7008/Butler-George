@@ -25,10 +25,10 @@ public class Clear implements Command{
 		int count = Integer.parseInt(event.getOption("count").getAsString());
 		List<Message> messages = channel.getHistory().retrievePast(count).complete();
 		try {channel.deleteMessages(messages).queue();} catch (Exception e) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/clear:error").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/clear:error").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/moderation/clear:done").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/clear:done").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 
 	@Override
@@ -40,6 +40,6 @@ public class Clear implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/clear:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/clear:help");
 	}
 }

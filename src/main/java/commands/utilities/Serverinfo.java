@@ -19,11 +19,11 @@ public class Serverinfo implements Command{
 		EmbedBuilder eb = new EmbedBuilder();
 		Guild guild = event.getGuild();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
-		String[] titles = AnswerEngine.ae.getRaw(guild, event.getUser(), "/commands/utilities/serverinfo:titles").split(",");
+		String[] titles = AnswerEngine.build.getRaw(guild, event.getUser(), "/commands/utilities/serverinfo:titles").split(",");
 		eb.setTitle(titles[0] + "\s" + guild.getName());
 		eb.setThumbnail(guild.getIconUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(AnswerEngine.ae.footer);
+		eb.setFooter(AnswerEngine.build.footer);
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[1], "`" + guild.getName() + "`", true);
@@ -47,6 +47,6 @@ public class Serverinfo implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/serverinfo:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/serverinfo:help");
 	}
 }

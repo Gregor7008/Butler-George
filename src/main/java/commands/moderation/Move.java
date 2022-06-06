@@ -2,7 +2,7 @@ package commands.moderation;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -17,26 +17,26 @@ public class Move implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (Configloader.INSTANCE.getGuildConfig(guild, "supporttalk").equals("")) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
+		if (ConfigLoader.run.getGuildConfig(guild).getLong("supporttalk") == 0) {
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
 		if (!guild.getMember(event.getOption("member").getAsUser()).getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:memnotconn").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:memnotconn").convert()).queue();
 			return;
 		}
-		String vcid = Configloader.INSTANCE.getGuildConfig(guild, "supporttalk");
+		long vcid = ConfigLoader.run.getGuildConfig(guild).getLong("supporttalk");
 		VoiceChannel st = guild.getVoiceChannelById(vcid);
 		if (st == null) {
-			Configloader.INSTANCE.deleteGuildConfig(guild, "supporttalk", vcid);
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
+			ConfigLoader.run.getGuildConfig(guild).put("supporttalk", Long.valueOf(0));
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:nochannel").convert()).queue();
 			return;
 		}
 		if (st.getMembers().contains(event.getMember())) {
 			guild.moveVoiceMember(guild.getMember(event.getOption("member").getAsUser()), st).queue();
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:success").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:success").convert()).queue();
 		} else {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user, "/commands/moderation/move:notconnected").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/move:notconnected").convert()).queue();
 		}
 	}
 
@@ -48,6 +48,6 @@ public class Move implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/moderation/move:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/move:help");
 	}
 }

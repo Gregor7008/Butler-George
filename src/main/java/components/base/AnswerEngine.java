@@ -3,7 +3,7 @@ package components.base;
 import java.io.IOException;
 import java.util.Properties;
 
-import base.Bot;
+import components.base.assets.CustomMessageEmbed;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -11,11 +11,11 @@ import net.dv8tion.jda.api.entities.User;
 
 public class AnswerEngine {
 	
-	public static AnswerEngine ae;
+	public static AnswerEngine build;
 	public String footer = "Made with ❤️ by Gregor7008";
 	
 	public AnswerEngine() {
-		ae = this;
+		build = this;
 	}
 	
 	public CustomMessageEmbed fetchMessage(Guild guild, User user, String input)  {
@@ -49,16 +49,20 @@ public class AnswerEngine {
 	public String getRaw(Guild guild, User user, String input) {
 		String lang = "en";
 		if (user != null && guild != null) {
-			//lang = Configloader.INSTANCE.getUserConfig(guild, user, "language"); <= Deactivated as translations are not ready
+			//lang = ConfigLoader.run.getUserConfig(guild, user).getString("language"); <= Deactivated as translations are not ready
 		}
 		String[] temp1 = input.split(":");
 		String path = temp1[0];
 		String key = temp1[1];
 		Properties properties = new Properties();
+		if (!path.startsWith("/")) {
+			ConsoleEngine.out.info(this, "Path error for path \"" + path + "\"");
+			path = "/" + path;
+		}
 		try {
 			properties.load(this.getClass().getClassLoader().getResourceAsStream("languages/" + lang + path + ".properties"));
 		} catch (NullPointerException | IOException e) {
-			Bot.INSTANCE.consoleEngine.error(this, "Couldn't find language files!");
+			ConsoleEngine.out.error(this, "Couldn't find language files!");
 			return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
 		}
 		String temp2 = properties.getProperty(key);

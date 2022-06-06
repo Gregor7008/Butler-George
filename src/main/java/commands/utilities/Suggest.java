@@ -7,7 +7,8 @@ import java.time.format.DateTimeFormatter;
 
 import commands.Command;
 import components.base.AnswerEngine;
-import components.base.Configloader;
+import components.base.ConfigLoader;
+import components.base.assets.ConfigManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -26,18 +27,18 @@ public class Suggest implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		String channelid = Configloader.INSTANCE.getGuildConfig(guild, "suggest");
-		if (channelid.equals(null)) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
+		Long channelid = ConfigLoader.run.getGuildConfig(guild).getLong("suggest");
+		if (channelid == 0) {
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
 			return;
 		}
-		OffsetDateTime lastsuggestion = OffsetDateTime.parse(Configloader.INSTANCE.getUserConfig(guild, user, "lastsuggestion"));
+		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.run.getMemberConfig(guild, user).getString("lastsuggestion"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
-			event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
+			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
 			return;
 		}
 		this.sendsuggestion(guild, event.getMember(), event.getOption("suggestion").getAsString());
-		event.replyEmbeds(AnswerEngine.ae.fetchMessage(guild, user,"/commands/utilities/suggest:success").convert()).queue();
+		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/suggest:success").convert()).queue();
 	}
 
 	@Override
@@ -49,13 +50,13 @@ public class Suggest implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.ae.getRaw(guild, user, "/commands/utilities/suggest:help");
+		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/suggest:help");
 	}
 	
 	public void sendsuggestion(Guild guild, Member member, String idea) {
-		TextChannel channel = guild.getTextChannelById(Configloader.INSTANCE.getGuildConfig(guild, "suggest"));
+		TextChannel channel = guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("suggest"));
 		EmbedBuilder eb = new EmbedBuilder();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyyy");
 		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());
 		eb.setColor(Color.YELLOW);
 		eb.setFooter(OffsetDateTime.now().format(formatter));
