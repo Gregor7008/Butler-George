@@ -23,7 +23,7 @@ public class SuggestionChannel implements Command{
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
-			ConfigLoader.run.getGuildConfig(guild).put("suggestionchannel", Long.valueOf(0));
+			ConfigLoader.run.getGuildConfig(guild).put("suggestionchannel", 0L);
 			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/suggestionchannel:clearsuccess").convert()).queue();
 		}
 	}

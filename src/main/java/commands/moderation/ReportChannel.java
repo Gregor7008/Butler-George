@@ -24,7 +24,7 @@ public class ReportChannel implements Command{
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
-			ConfigLoader.run.getGuildConfig(guild).put("reportchannel", Long.valueOf(0));
+			ConfigLoader.run.getGuildConfig(guild).put("reportchannel", 0L);
 			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/reportchannel:clearsuccess").convert()).queue();
 		}
 	}

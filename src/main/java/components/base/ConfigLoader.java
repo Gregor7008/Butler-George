@@ -135,12 +135,12 @@ public class ConfigLoader {
 		} catch (JSONException e) {}
 		try {
 			jObject.getInt(key);
-			jObject.put(key, Integer.valueOf(0));
+			jObject.put(key, 0);
 			return;
 		} catch (JSONException e) {}
 		try {
 			jObject.getLong(key);
-			jObject.put(key, Long.valueOf(0));
+			jObject.put(key, 0L);
 			return;
 		} catch (JSONException e) {}
 	}

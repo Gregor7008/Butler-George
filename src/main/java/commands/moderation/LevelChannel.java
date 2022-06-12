@@ -23,7 +23,7 @@ public class LevelChannel implements Command{
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
-			ConfigLoader.run.getGuildConfig(guild).put("levelmsgchannel", Long.valueOf(0));
+			ConfigLoader.run.getGuildConfig(guild).put("levelmsgchannel", 0L);
 			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/levelchannel:clearsuccess").convert()).queue();
 		}
 	}

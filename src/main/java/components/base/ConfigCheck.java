@@ -60,14 +60,14 @@ public class ConfigCheck {
 		long id = ConfigLoader.run.getGuildConfig(guild).getLong("supporttalk");
 		if (id != 0) {
 			if (guild.getVoiceChannelById(id) == null) {
-				ConfigLoader.run.getGuildConfig(guild).put("supporttalk", Long.valueOf(0));
+				ConfigLoader.run.getGuildConfig(guild).put("supporttalk", 0L);
 			}
 		}
 		
 		id = ConfigLoader.run.getGuildConfig(guild).getLong("suggestionchannel");
 		if (id != 0) {
 			if (guild.getTextChannelById(id) == null) {
-				ConfigLoader.run.getGuildConfig(guild).put("suggestionchannel", Long.valueOf(0));
+				ConfigLoader.run.getGuildConfig(guild).put("suggestionchannel", 0L);
 			}
 		}
 		
@@ -75,7 +75,7 @@ public class ConfigCheck {
 		if (id != 0) {
 			TextChannel tc = guild.getTextChannelById(id);
 			if (tc == null) {
-				ConfigLoader.run.getGuildConfig(guild).put("supportchat", Long.valueOf(0));
+				ConfigLoader.run.getGuildConfig(guild).put("supportchat", 0L);
 			} else {
 				tc.upsertPermissionOverride(guild.getPublicRole()).setAllowed(Permission.VIEW_CHANNEL).queue();
 			}
@@ -84,14 +84,14 @@ public class ConfigCheck {
 		id = ConfigLoader.run.getGuildConfig(guild).getLong("reportchannel");
 		if (id != 0) {
 			if (guild.getTextChannelById(id) == null) {
-				ConfigLoader.run.getGuildConfig(guild).put("reportchannel", Long.valueOf(0));
+				ConfigLoader.run.getGuildConfig(guild).put("reportchannel", 0L);
 			}
 		}
 		
 		id = ConfigLoader.run.getGuildConfig(guild).getLong("supportcategory");
 		if (id != 0) {
 			if (guild.getCategoryById(id) == null) {
-				ConfigLoader.run.getGuildConfig(guild).put("supportcategory", Long.valueOf(0));
+				ConfigLoader.run.getGuildConfig(guild).put("supportcategory", 0L);
 			}
 		}
 		//String configs

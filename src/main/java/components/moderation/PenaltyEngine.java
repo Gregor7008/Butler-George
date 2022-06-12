@@ -56,8 +56,8 @@ public class PenaltyEngine {
 					switch(penalty.getString(0)) {
 						case ("rr"):
 							guild.removeRoleFromMember(member, guild.getRoleById(penalty.getString(1)));
-							ConfigLoader.run.getMemberConfig(guild, user).put("experience", Integer.valueOf(0));
-							ConfigLoader.run.getMemberConfig(guild, user).put("level", Integer.valueOf(0));
+							ConfigLoader.run.getMemberConfig(guild, user).put("experience", 0);
+							ConfigLoader.run.getMemberConfig(guild, user).put("level", 0);
 							break;
 						case ("tm"):
 							ConfigLoader.run.getMemberConfig(guild, user).put("tempmuted", true);

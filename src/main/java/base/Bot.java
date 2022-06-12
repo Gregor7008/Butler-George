@@ -30,29 +30,14 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 public class Bot {
 	
 	public static Bot run;
-	
+	public static String homeID = "708381749826289666";
 	public JDA jda;
 	private EventWaiter eventWaiter = new EventWaiter();
 	private Timer timer = new Timer();
 	public int timerCount = 0;
 	public boolean noErrorOccured = true;
-	public static String token, homeID;
 	
-	public static void main(String[] args) {
-		if (args.length <= 0) {
-			System.out.println("You have to provide a bot token!");
-			System.exit(0);
-		}
-		token = args[0];
-		homeID = "708381749826289666";
-		try {
-			new Bot(token);
-		} catch (LoginException | InterruptedException | IOException ex) {
-			ex.printStackTrace();
-		}
-	}
-	
-	private Bot(String token) throws LoginException, InterruptedException, IOException {
+	public Bot(String token) throws LoginException, InterruptedException, IOException {
 		run = this;
 	    new ConfigLoader();
 	    //Create Bot
@@ -64,9 +49,9 @@ public class Bot {
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
-	    jda.getPresence().setActivity(Activity.playing("V1.3-beta"));
+	    jda.getPresence().setActivity(Activity.playing("V2.0-dev"));
 	    //Startup engines
-	    Thread.setDefaultUncaughtExceptionHandler(new ConsoleEngine());
+	    Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.out);
 	    new ConfigCheck();
 	    new AnswerEngine();
 	    new PenaltyEngine();

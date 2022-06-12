@@ -55,7 +55,7 @@ public class LevelEngine {
 		OffsetDateTime lastxpgotten = OffsetDateTime.parse(ConfigLoader.run.getMemberConfig(guild, user).getString("lastxpgotten"), ConfigManager.dateTimeFormatter);
 		long difference = Duration.between(lastxpgotten, now).toSeconds();
 		if(difference >= Long.parseLong(String.valueOf(mindiff))) {
-			userconfig.put("levelspamcount", Integer.valueOf(0));
+			userconfig.put("levelspamcount", 0);
 			this.grantxp(guild, user, amount);
 			this.checklevel(guild, user);
 			this.checkforreward(guild, user);
@@ -94,7 +94,7 @@ public class LevelEngine {
 						.replaceTitle("{user}", guild.getMember(user).getEffectiveName())
 						.replaceDescription("{level}", String.valueOf(currentlevel+1)).convert()).queue();
 			} else {
-				ConfigLoader.run.getGuildConfig(guild).put("levelmsgchannel",Long.valueOf(0));
+				ConfigLoader.run.getGuildConfig(guild).put("levelmsgchannel",0L);
 			}
 		}
 	}

@@ -113,7 +113,7 @@ public class Processor extends ListenerAdapter {
 			long msgid = ConfigLoader.run.getGuildConfig(guild).getLong("offlinemsg");
 			if (msgid != 0) {
 				guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel")).retrieveMessageById(msgid).complete().delete().queue();
-				ConfigLoader.run.getGuildConfig(guild).put("offlinemsg", Long.valueOf(0));
+				ConfigLoader.run.getGuildConfig(guild).put("offlinemsg", 0L);
 			}
 		}
 		//initialize Slashcommands
@@ -412,7 +412,7 @@ public class Processor extends ListenerAdapter {
 		if (event.isFromType(ChannelType.CATEGORY)) {
 			Category ctg = (Category) event.getChannel();
 			if (this.checkCategory(ctg, guild) != null) {
-				ConfigLoader.run.getMemberConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", Long.valueOf(0));
+				ConfigLoader.run.getMemberConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", 0L);
 			}
 			return;
 		}
@@ -422,7 +422,7 @@ public class Processor extends ListenerAdapter {
 			if (ctg != null) {
 				if (ctg.getChannels().size() == 0) {
 					if (this.checkCategory(ctg, guild) != null) {
-						ConfigLoader.run.getMemberConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", Long.valueOf(0));
+						ConfigLoader.run.getMemberConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", 0L);
 						ctg.delete().queue();
 					}
 				}
