@@ -31,7 +31,6 @@ public class Language implements Command{
 				.addOption("Español", "es")
 				.addOption("Français", "fr")
 				.addOption("Dutch", "nl")
-				.addOption("Pусский", "ru")
 				.build();
 		InteractionHook reply = event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:chooselang").convert())
 				.addActionRow(menu)
@@ -49,10 +48,12 @@ public class Language implements Command{
 				      case "de":
 				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "de");
 				    	  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:successde").convert()).queue();
+				    	  reply.deleteOriginal();
 				    	  break;
 				      case "es":
 				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "es");
 				    	  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:successes").convert()).queue();
+				    	  reply.deleteOriginal();
 				    	  break;
 				      case "fr":
 				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "fr");
@@ -61,10 +62,6 @@ public class Language implements Command{
 				      case "nl":
 				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "nl");
 				    	  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:successnl").convert()).queue();
-				    	  break;
-				      case "ru":
-				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "ru");
-				    	  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:successru").convert()).queue();
 				    	  break;
 				      default:
 						  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"general:fatal").convert()).queue();

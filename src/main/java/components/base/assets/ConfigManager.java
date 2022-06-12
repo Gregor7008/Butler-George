@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +13,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.lang.NonNull;
 
 import components.base.ConfigLoader;
 import components.base.ConsoleEngine;
@@ -58,34 +58,6 @@ public class ConfigManager {
 		}
 	}
 	
-	public boolean pushSingle(Long id) {
-		try {
-			if (userConfigCache.get(id) != null) {
-				Document searchresult = userconfigs.find(new Document("id", Long.valueOf(id))).first();
-				if (searchresult != null) {
-					userconfigs.replaceOne(searchresult, Document.parse(userConfigCache.get(id).toString()));
-				} else {
-					userconfigs.insertOne(Document.parse(userConfigCache.get(id).toString()));
-				}
-				return true;
-			}
-			if (guildConfigCache.get(id) != null) {
-				Document searchresult = guildconfigs.find(new Document("id", Long.valueOf(id))).first();
-				if (searchresult != null) {
-					guildconfigs.replaceOne(searchresult, Document.parse(guildConfigCache.get(id).toString()));
-				} else {
-					guildconfigs.insertOne(Document.parse(guildConfigCache.get(id).toString()));
-				}
-				return true;
-			}
-			ConsoleEngine.out.debug(this, "Config for ID:'" + String.valueOf(id) + "' was not cached!");
-			throw new IllegalArgumentException();
-		} catch (Exception e) {
-			ConsoleEngine.out.error(this, "Push for ID:'" + String.valueOf(id) + "' failed!");
-			return false;
-		}
-	}
-	
 	//Get Cache
 	public ConcurrentHashMap<Long, JSONObject> getUserCache() {
 		return userConfigCache;
@@ -104,7 +76,7 @@ public class ConfigManager {
 	}
 	
 	//Get JSONObjects
-	@NotNull
+	@NonNull
 	public JSONObject getUserConfig(User user) {
 		JSONObject config = null;
 		config = userConfigCache.get(user.getIdLong());
@@ -119,7 +91,7 @@ public class ConfigManager {
 		return config;
 	}
 	
-	@NotNull
+	@NonNull
 	public JSONObject getMemberConfig(Guild guild, User user) {
 		JSONObject config = null;
 		try {
@@ -130,7 +102,7 @@ public class ConfigManager {
 		return config;
 	}
 	
-	@NotNull
+	@NonNull
 	public JSONObject getGuildConfig(Guild guild) {
 		JSONObject config = null;
 		config = guildConfigCache.get(guild.getIdLong());

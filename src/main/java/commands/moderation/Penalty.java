@@ -133,9 +133,9 @@ public class Penalty implements Command{
 			channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:add3role").convert()).queue();
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
-						  if(e.getMessage().getMentionedRoles().isEmpty()) {return false;}
+						  if(e.getMessage().getMentions().getRoles().isEmpty()) {return false;}
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
-					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getMentionedRoles().get(0).getId()));
+					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getMentions().getRoles().get(0).getId()));
 						  channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:successrole").convert()).queue();},
 					1, TimeUnit.MINUTES,
 					() -> {channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});

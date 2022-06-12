@@ -105,10 +105,10 @@ public class ReactionRole implements Command{
 		ConfigLoader.run.createReactionMessageConfig(guild, finalchannel.getId(), msgid);
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;}
-								  if(e.getMessage().getMentionedRoles().isEmpty()) {return false;}
+								  if(e.getMessage().getMentions().getRoles().isEmpty()) {return false;}
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 							e -> {messages.add(e.getMessage());
-								  List<Role> roles = e.getMessage().getMentionedRoles();
+								  List<Role> roles = e.getMessage().getMentions().getRoles();
 								  this.defineAddEmojis(roles);},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();

@@ -1,9 +1,8 @@
 package components.music;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.collections4.map.HashedMap;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -26,7 +25,7 @@ public class PlayerManager {
 	private final AudioPlayerManager audioPlayerManager;
 	
 	public PlayerManager() {
-		musicManagers = new HashedMap<>();
+		musicManagers = new HashMap<>();
 		audioPlayerManager = new DefaultAudioPlayerManager();		
 		AudioSourceManagers.registerRemoteSources(audioPlayerManager);
 		AudioSourceManagers.registerLocalSource(audioPlayerManager);

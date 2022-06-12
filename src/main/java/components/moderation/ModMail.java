@@ -101,7 +101,7 @@ public class ModMail {
 			}
 			if (deleted) {
 				try {
-					attachements.get(i).downloadToFile(file).get();
+					attachements.get(i).getProxy().downloadToFile(file).get();
 				} catch (InterruptedException | ExecutionException e) {}
 				files.add(file);
 			}

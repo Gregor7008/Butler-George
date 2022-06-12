@@ -60,7 +60,7 @@ public class Rolesorting implements Command{
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
 							e -> {messages.add(e.getMessage());
-								  grouprole = e.getMessage().getMentionedRoles().get(0);
+								  grouprole = e.getMessage().getMentions().getRoles().get(0);
 								  this.definesub();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
@@ -73,7 +73,7 @@ public class Rolesorting implements Command{
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
 							e -> {messages.add(e.getMessage());
-								  subroles = e.getMessage().getMentionedRoles();
+								  subroles = e.getMessage().getMentions().getRoles();
 								  this.definemember();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
@@ -86,7 +86,7 @@ public class Rolesorting implements Command{
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == member.getUser().getIdLong();},
 							e -> {messages.add(e.getMessage());
-								  members = e.getMessage().getMentionedMembers();
+								  members = e.getMessage().getMentions().getMembers();
 								  this.rolesorter();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();

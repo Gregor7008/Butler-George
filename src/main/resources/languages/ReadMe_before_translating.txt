@@ -2,7 +2,7 @@ Hey!
 Thanks for considering to translate this bot to another language.
 Before you start though, please read the following notes carefully!
 
-1. We currently have 6 languages implemented in the bot to choose from. 5 of those languages need translation.
+1. We currently have 5 languages implemented in the bot to choose from. 4 of those languages need translation.
    You can view our current progress in "Progress.txt" right next to this file.
    The folders for each language are already created though the files not translated.
    If you create a folder for a different language, please copy the "en" folder and rename the copy to your language.
