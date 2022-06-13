@@ -1,6 +1,5 @@
 package components.base;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -23,42 +22,43 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		out = this;
 		//TODO System.setOut();
 		//TODO System.setErr();
-		this.print(Color.blue, null, "--------------| Console Engine V1.0 |--------------");
+		this.print(null, null, "---------->| Console Engine V1.0 |<----------");
 	}
 	
 	public void debug(Object object, String message) {
-		this.print(Color.yellow, object, message);
+		this.print("warning", object, message);
 	}
 	
 	public void info(Object object, String message) {
-		this.print(Color.green, object, message);
+		this.print("info", object, message);
 	}
 	
 	public void error(Object object, String message) {
-		this.print(Color.red, object, message);
+		this.print("error", object, message);
 	}
 	
 	public void title(String title) {
-		this.print(Color.blue, null, "              ---------| " + title + " |---------");
+		this.print(null, null, "---------| " + title + " |---------");
 	}
 	
-	private void print(@Nullable Color color, @Nullable Object object, @Nullable String message) {
+	private void print(@Nullable String prefix, @Nullable Object object, @Nullable String message) {
+		String className = "";
+		String timeCodeText = OffsetDateTime.now().format(format);
+		if (prefix == null) {
+			prefix = "";
+		} else {
+			prefix = "[" + prefix.toUpperCase() + "]";
+		}
+		if (object == null) {
+			className = "";
+		} else {
+			String fullClassName[] = object.getClass().getName().split("\\.");
+			className = "[" + fullClassName[fullClassName.length - 1] + "]";
+		}
 		if (message == null) {
 			message = "No message";
 		}
-		String output = "";
-		if (object == null) {
-			output = OffsetDateTime.now().format(format) + " " + message;
-		} else {
-			String fullClassName[] = object.getClass().getName().split("\\.");
-			String className = fullClassName[fullClassName.length - 1];
-			output = OffsetDateTime.now().format(format) + " [" + className + "] " + message;
-		}
-		if (color == null) {
-			GUI.console.append(output + "\n");
-		} else {
-			GUI.console.append(output + "\n");
-		}
+		GUI.console.append(timeCodeText + " | " + prefix + " " + className + " " + message + "\n");
 	}
 	
 	@Override

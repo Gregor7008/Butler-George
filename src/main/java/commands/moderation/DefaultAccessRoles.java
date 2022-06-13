@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-//TODO Rework so command applies for user channels & support tickets
 public class DefaultAccessRoles implements Command{
 
 	@Override

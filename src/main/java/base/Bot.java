@@ -30,6 +30,8 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 public class Bot {
 	
 	public static Bot run;
+	public static String version = "V2.0-dev";
+	public static String name = "Butler George";
 	public static String homeID = "708381749826289666";
 	public JDA jda;
 	private EventWaiter eventWaiter = new EventWaiter();
@@ -49,7 +51,7 @@ public class Bot {
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
-	    jda.getPresence().setActivity(Activity.playing("V2.0-dev"));
+	    jda.getPresence().setActivity(Activity.playing(version));
 	    //Startup engines
 	    Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.out);
 	    new ConfigCheck();
