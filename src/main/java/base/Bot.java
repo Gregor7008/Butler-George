@@ -58,6 +58,7 @@ public class Bot {
 	    GUI.get.setProgress(75);
 	    //Startup engines
 	    Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.out);
+	    new ConfigVerifier();
 	    new PenaltyEngine();
 	    new ModEngine();
 	    ServerUtilities.controlChannels(true);
@@ -95,6 +96,8 @@ public class Bot {
 			ConfigManager.pushCache();
 		}
 		ConsoleEngine.out.info(this, "Bot offline");
+		run = null;
+		jda = null;
 	}
 	
 	private void checkConfigs() {

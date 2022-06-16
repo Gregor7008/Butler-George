@@ -67,9 +67,11 @@ public class ConfigVerifier {
 		}
 		
 		String goodbyemsg = guildConfig.getString("goodbyemsg");
-		String[] goodbyeSplit = goodbyemsg.split(";");
-		if (guild.getTextChannelById(goodbyeSplit[1]) == null) {
-			guildConfig.put("goodbyemsg", "");
+		if (goodbyemsg != "") {
+			String[] goodbyeSplit = goodbyemsg.split(";");
+			if (guild.getTextChannelById(goodbyeSplit[1]) == null) {
+				guildConfig.put("goodbyemsg", "");
+			}
 		}
 		
 		JSONObject createdchannels = guildConfig.getJSONObject("createdchannels");
@@ -106,10 +108,15 @@ public class ConfigVerifier {
 			}
 		});
 		
-		String offlinemsg = guildConfig.getString("offlinemsg");
-		String[] offlineSplit = offlinemsg.split(";");
-		if (guild.getTextChannelById(offlineSplit[1]) == null) {
-			guildConfig.put("offlinemsg", "");
+		long offlinemsg = guildConfig.getLong("offlinemsg");
+		if (offlinemsg != 0) {
+			if (guildConfig.getLong("systeminfochannel") != 0) {
+				if (guild.getTextChannelById(guildConfig.getLong("systeminfochannel")).retrieveMessageById(offlinemsg).complete() == null) {
+					guildConfig.put("offlinemsg", 0L);
+				}
+			} else {
+				guildConfig.put("offlinemsg", 0L);
+			}
 		}
 		
 		JSONObject penalties = guildConfig.getJSONObject("penalties");
@@ -145,6 +152,11 @@ public class ConfigVerifier {
 			guildConfig.put("supporttalk", 0L);
 		}
 		
+		long systeminfochannel = guildConfig.getLong("systeminfochannel");
+		if (guild.getTextChannelById(systeminfochannel) == null) {
+			guildConfig.put("systeminfochannel", 0L);
+		}
+		
 		JSONArray ticketchannels = guildConfig.getJSONArray("ticketchannels");
 		for (int i = 0; i < ticketchannels.length(); i++) {
 			if (guild.getTextChannelById(ticketchannels.getLong(i)) == null) {
@@ -153,9 +165,11 @@ public class ConfigVerifier {
 		}
 		
 		String welcomemsg = guildConfig.getString("welcomemsg");
-		String[] welcomeSplit = welcomemsg.split(";");
-		if (guild.getTextChannelById(welcomeSplit[1]) == null) {
-			guildConfig.put("welcomemsg", "");
+		if (welcomemsg != "") {
+			String[] welcomeSplit = welcomemsg.split(";");
+			if (guild.getTextChannelById(welcomeSplit[1]) == null) {
+				guildConfig.put("welcomemsg", "");
+			}
 		}
 		
 		JSONObject modmails = guildConfig.getJSONObject("modmails");

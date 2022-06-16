@@ -73,14 +73,14 @@ public class Levelreward implements Command{
 			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/moderation/levelreward:norewards").convert()).queue();;
 			return;
 		}
-		String[] rewards = (String[]) levelrewards.keySet().toArray();
+		Object[] rewards = levelrewards.keySet().toArray();
 		for (int i = 0; i < rewards.length; i++) {
 			sB.append('#')
-			  .append(String.valueOf(i) + "\s\s");
+			  .append(String.valueOf(i+1) + "\s\s");
 			if (i+1 == rewards.length) {
-				sB.append(guild.getRoleById(levelrewards.getLong(rewards[i])).getAsMention() + "\s->\s" + rewards[i]);
+				sB.append(guild.getRoleById(levelrewards.getLong((String) rewards[i])).getAsMention() + "\s->\s" + rewards[i]);
 			} else {
-				sB.append(guild.getRoleById(levelrewards.getLong(rewards[i])).getAsMention() + "\s->\s" + rewards[i] + "\n");
+				sB.append(guild.getRoleById(levelrewards.getLong((String) rewards[i])).getAsMention() + "\s->\s" + rewards[i] + "\n");
 			}
 		}
 		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/levelreward:list").replaceDescription("{list}", sB.toString()).convert()).queue();

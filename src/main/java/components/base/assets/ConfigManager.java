@@ -82,8 +82,10 @@ public class ConfigManager {
 		config = userConfigCache.get(user.getIdLong());
 		if (config == null) {
 			Document doc = userconfigs.find(new Document("id", user.getIdLong())).first();
-			userConfigCache.put(user.getIdLong(), new JSONObject(doc.toJson()));
-			config = userConfigCache.get(user.getIdLong());
+			if (doc != null) {
+				userConfigCache.put(user.getIdLong(), new JSONObject(doc.toJson()));
+				config = userConfigCache.get(user.getIdLong());
+			}
 		}
 		if (config == null) {
 			config = ConfigManager.createUserConfig(user);
@@ -108,8 +110,10 @@ public class ConfigManager {
 		config = guildConfigCache.get(guild.getIdLong());
 		if (config == null) {
 			Document doc = guildconfigs.find(new Document("id", guild.getIdLong())).first();
-			guildConfigCache.put(guild.getIdLong(), new JSONObject(doc.toJson()));
-			config = guildConfigCache.get(guild.getIdLong());
+			if (doc != null) {
+				guildConfigCache.put(guild.getIdLong(), new JSONObject(doc.toJson()));
+				config = guildConfigCache.get(guild.getIdLong());
+			}
 		}
 		if (config == null) {
 			config = ConfigManager.createGuildConfig(guild);

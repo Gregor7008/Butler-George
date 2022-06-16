@@ -33,15 +33,15 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		this.checkStreams();
 	}
 	
-	public void debug(Object object, String message) {
+	public void debug(@Nullable Object object, @Nullable String message) {
 		this.print("warning", object, message, true);
 	}
 	
-	public void info(Object object, String message) {
+	public void info(@Nullable Object object, @Nullable String message) {
 		this.print("info", object, message, true);
 	}
 	
-	public void error(Object object, String message) {
+	public void error(@Nullable Object object, @Nullable String message) {
 		this.print("error", object, message, true);
 	}
 	
@@ -94,12 +94,6 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 			}
 		}, 0, 2*1000);
 	}
-	
-	@Override
-	public void uncaughtException(Thread t, Throwable e) {
-		Bot.run.noErrorOccured = false;
-		this.error(t.getClass(), e.getCause().getMessage());
-	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -110,6 +104,12 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		} else {
 			this.info(this, "Input ignored as the bot is offline!");
 		}
+	}
+	
+	@Override
+	public void uncaughtException(Thread t, Throwable e) {
+		Bot.run.noErrorOccured = false;
+		e.printStackTrace();
 	}
 	
 	private void commandListener(String line) {
