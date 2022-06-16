@@ -40,13 +40,13 @@ public class Level implements Command {
 			user = event.getOption("user").getAsUser();
 		}
 		if (guild.getMember(user).equals(guild.getSelfMember())) {
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/eastereggs:3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/eastereggs:3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		event.deferReply().queue();
 		File finalimage = this.renderLevelcard(user, guild);
         if (finalimage == null) {
-        	event.getHook().sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/general:fatal").convert()).queue();
+        	event.getHook().sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/general:fatal").convert()).queue();
         } else {
         	event.getHook().sendMessage("").addFile(finalimage).queue();
         }
@@ -61,13 +61,13 @@ public class Level implements Command {
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/level:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/utilities/level:help");
 	}
 	
 	public File renderLevelcard(User iuser, Guild guild) {
-		String levelbackground = String.valueOf(ConfigLoader.run.getMemberConfig(guild, iuser).getInt("levelbackground"));
-		int level = ConfigLoader.run.getMemberConfig(guild, iuser).getInt("level");
-		String curxp = String.valueOf(ConfigLoader.run.getMemberConfig(guild, iuser).getInt("experience"));
+		String levelbackground = String.valueOf(ConfigLoader.getMemberConfig(guild, iuser).getInt("levelbackground"));
+		int level = ConfigLoader.getMemberConfig(guild, iuser).getInt("level");
+		String curxp = String.valueOf(ConfigLoader.getMemberConfig(guild, iuser).getInt("experience"));
 		int nedxp = LevelEngine.getInstance().xpneededforlevel(level);
 		int progress = this.calculateProgress(level, nedxp, curxp);
 		BufferedImage image = null;

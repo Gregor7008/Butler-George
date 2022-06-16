@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
@@ -32,42 +31,40 @@ public class Language implements Command{
 				.addOption("Français", "fr")
 				.addOption("Dutch", "nl")
 				.build();
-		InteractionHook reply = event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:chooselang").convert())
+		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:chooselang").convert())
 				.addActionRow(menu)
 				.complete();
 		EventWaiter waiter = Bot.run.getWaiter();
 		waiter.waitForEvent(SelectMenuInteractionEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 				  	  return e.getUser().getIdLong() == user.getIdLong();},
-				e -> {reply.deleteOriginal().queue();
-					  switch (e.getSelectedOptions().get(0).getValue()) {
-				      case "en":
-				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "en");
-				    	  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:successen").convert()).queue();
-				    	  break;
-				      case "de":
-				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "de");
-				    	  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:successde").convert()).queue();
-				    	  reply.deleteOriginal();
-				    	  break;
-				      case "es":
-				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "es");
-				    	  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:successes").convert()).queue();
-				    	  reply.deleteOriginal();
-				    	  break;
-				      case "fr":
-				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "fr");
-				    	  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:successfr").convert()).queue();
-				    	  break;
-				      case "nl":
-				    	  ConfigLoader.run.getMemberConfig(guild, user).put("language", "nl");
-				    	  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/language:successnl").convert()).queue();
-				    	  break;
-				      default:
-						  e.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"general:fatal").convert()).queue();
-				      }},
+				e -> {switch (e.getSelectedOptions().get(0).getValue()) {
+				      	case "en":
+				      		ConfigLoader.getMemberConfig(guild, user).put("language", "en");
+				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successen").convert()).queue();
+				      		break;
+				      	case "de":
+				      		ConfigLoader.getMemberConfig(guild, user).put("language", "de");
+				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successde").convert()).queue();
+				      		break;
+				      	case "es":
+				      		ConfigLoader.getMemberConfig(guild, user).put("language", "es");
+				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successes").convert()).queue();
+				      		break;
+				      	case "fr":
+				      		ConfigLoader.getMemberConfig(guild, user).put("language", "fr");
+				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successfr").convert()).queue();
+				      		break;
+				      	case "nl":
+				      		ConfigLoader.getMemberConfig(guild, user).put("language", "nl");
+				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successnl").convert()).queue();
+				      		break;
+				      	default:
+				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"general:fatal").convert()).queue();
+						}
+					},
 				1, TimeUnit.MINUTES,
-				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override
@@ -78,6 +75,6 @@ public class Language implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/language:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/utilities/language:help");
 	}
 }

@@ -43,7 +43,7 @@ public class Penalty implements Command{
 		if (event.getSubcommandName().equals("list")) {
 			String response = this.listpenalties(event);
 			if (response != null) {
-				event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:list").replaceDescription("{list}", response).convert()).queue();
+				event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:list").replaceDescription("{list}", response).convert()).queue();
 			}
 		}
 		
@@ -60,15 +60,15 @@ public class Penalty implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/penalty:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/moderation/penalty:help");
 	}
 	
 	private void removepenalties(SlashCommandInteractionEvent event) {
 		EventWaiter waiter = Bot.run.getWaiter();
 		String response = this.listpenalties(event);
 		if (response != null) {
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:remlist").replaceDescription("{list}", response).convert()).queue();
-			JSONObject penalties = ConfigLoader.run.getGuildConfig(guild).getJSONObject("penalties");
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:remlist").replaceDescription("{list}", response).convert()).queue();
+			JSONObject penalties = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -76,11 +76,11 @@ public class Penalty implements Command{
 						penalties.getJSONArray(e.getMessage().getContentRaw());
 						penalties.remove(e.getMessage().getContentRaw());
 					} catch (JSONException ex) {
-						channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:norem").convert()).queue();
+						channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:norem").convert()).queue();
 					}
 					},
 					1, TimeUnit.MINUTES,
-					() -> {channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 		}
 	}
 	
@@ -94,7 +94,7 @@ public class Penalty implements Command{
 				.addOption("Permanent ban", "pm")
 				.build();
 		EventWaiter waiter = Bot.run.getWaiter();
-		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:add1").convert())
+		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:add1").convert())
 				.setEphemeral(true)
 				.addActionRow(menu)
 				.queue();
@@ -105,85 +105,85 @@ public class Penalty implements Command{
 					  this.addpenalties2(plannedpunish);},
 				1, TimeUnit.MINUTES,
 				() -> {event.getHook().deleteOriginal().queue();
-					   channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					   channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addpenalties2(String plannedpunish) {
 		EventWaiter waiter = Bot.run.getWaiter();
-		channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:add2").convert()).queue();
+		channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:add2").convert()).queue();
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;}
 					  try {Integer.valueOf(e.getMessage().getContentRaw());} catch (NumberFormatException ex) {return false;}
 				  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 				e -> {this.addpenalties3(plannedpunish, e.getMessage().getContentRaw());},
 				1, TimeUnit.MINUTES,
-				() -> {channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addpenalties3(String plannedpunish, String warnings) {
-		JSONObject penalties = ConfigLoader.run.getGuildConfig(guild).getJSONObject("penalties");
+		JSONObject penalties = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
 		try {
 			penalties.getJSONArray(warnings);
-			channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:error").convert()).queue();
+			channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:error").convert()).queue();
 			return;
 		} catch (JSONException e) {}
  		EventWaiter waiter = Bot.run.getWaiter();
 		switch (plannedpunish) {
 		case "rr":
-			channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:add3role").convert()).queue();
+			channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:add3role").convert()).queue();
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 						  if(e.getMessage().getMentions().getRoles().isEmpty()) {return false;}
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getMentions().getRoles().get(0).getId()));
-						  channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:successrole").convert()).queue();},
+						  channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:successrole").convert()).queue();},
 					1, TimeUnit.MINUTES,
-					() -> {channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "tm":
-			channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:add3time").convert()).queue();
+			channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:add3time").convert()).queue();
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;}
 					 	  try {Integer.valueOf(e.getMessage().getContentRaw());} catch (NumberFormatException ex) {return false;}
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
-						  channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/penalty:successtempmute").convert()).queue();},
+						  channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/moderation/penalty:successtempmute").convert()).queue();},
 					1, TimeUnit.MINUTES,
-					() -> {channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pm":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
-			channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/penalty:successmute").convert()).queue();
+			channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/moderation/penalty:successmute").convert()).queue();
 			break;
 		case "ki":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
-			channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/penalty:successkick").convert()).queue();
+			channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/moderation/penalty:successkick").convert()).queue();
 			break;
 		case "tb":
-			channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/penalty:add3time").convert()).queue();
+			channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/moderation/penalty:add3time").convert()).queue();
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;}
 						  try {Integer.valueOf(e.getMessage().getContentRaw());} catch (NumberFormatException ex) {return false;}
 					  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
-						  channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/penalty:successtempban").convert()).queue();},
+						  channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/moderation/penalty:successtempban").convert()).queue();},
 					1, TimeUnit.MINUTES,
-					() -> {channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pb":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
-			channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/penalty:successban").convert()).queue();
+			channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/moderation/penalty:successban").convert()).queue();
 			break;
 		default:
-			channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "general:fatal").convert()).queue();
+			channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "general:fatal").convert()).queue();
 		}
 	}
 	
 	private String listpenalties(SlashCommandInteractionEvent event) {
 		StringBuilder sB = new StringBuilder();
-		JSONObject current = ConfigLoader.run.getGuildConfig(guild).getJSONObject("penalties");
+		JSONObject current = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
 		if (current.isEmpty()) {
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/penalty:nopenalties").convert()).queue();;
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/penalty:nopenalties").convert()).queue();;
 			return null;
 		}
 		current.keySet().forEach(e -> {
@@ -209,7 +209,7 @@ public class Penalty implements Command{
 					sB.append("Permanent ban from server");
 					break;
 				default:
-					channel.sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "general:fatal").convert()).queue();
+					channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "general:fatal").convert()).queue();
 			}
 			sB.append("\n");
 		});

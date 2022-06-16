@@ -19,13 +19,13 @@ public class ReportChannel implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (event.getSubcommandName().equals("set")) {
-			ConfigLoader.run.getGuildConfig(guild).put("reportchannel", event.getOption("channel").getAsGuildChannel().getIdLong());
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/reportchannel:setsuccess").convert()).queue();
+			ConfigLoader.getGuildConfig(guild).put("reportchannel", event.getOption("channel").getAsGuildChannel().getIdLong());
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/reportchannel:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
-			ConfigLoader.run.getGuildConfig(guild).put("reportchannel", 0L);
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/reportchannel:clearsuccess").convert()).queue();
+			ConfigLoader.getGuildConfig(guild).put("reportchannel", 0L);
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/reportchannel:clearsuccess").convert()).queue();
 		}
 	}
 
@@ -40,6 +40,6 @@ public class ReportChannel implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/reportchannel:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/moderation/reportchannel:help");
 	}
 }

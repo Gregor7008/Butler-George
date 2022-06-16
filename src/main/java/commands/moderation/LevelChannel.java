@@ -18,13 +18,13 @@ public class LevelChannel implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (event.getSubcommandName().equals("set")) {
-			ConfigLoader.run.getGuildConfig(guild).put("levelmsgchannel", event.getOption("channel").getAsGuildChannel().getIdLong());
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/levelchannel:setsuccess").convert()).queue();
+			ConfigLoader.getGuildConfig(guild).put("levelmsgchannel", event.getOption("channel").getAsGuildChannel().getIdLong());
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/levelchannel:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
-			ConfigLoader.run.getGuildConfig(guild).put("levelmsgchannel", 0L);
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/levelchannel:clearsuccess").convert()).queue();
+			ConfigLoader.getGuildConfig(guild).put("levelmsgchannel", 0L);
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/levelchannel:clearsuccess").convert()).queue();
 		}
 	}
 
@@ -39,6 +39,6 @@ public class LevelChannel implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/levelchannel:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/moderation/levelchannel:help");
 	}
 }

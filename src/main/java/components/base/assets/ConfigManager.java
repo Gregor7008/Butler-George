@@ -26,12 +26,12 @@ public class ConfigManager {
 	private static MongoDatabase database = client.getDatabase("butler-george");
 	private static MongoCollection<Document> userconfigs = database.getCollection("user");
 	private static MongoCollection<Document> guildconfigs = database.getCollection("guild");
-	private final ConcurrentHashMap<Long, JSONObject> userConfigCache = new ConcurrentHashMap<Long, JSONObject>();
-	private final ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
+	private static ConcurrentHashMap<Long, JSONObject> userConfigCache = new ConcurrentHashMap<Long, JSONObject>();
+	private static ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
 	
 	//Manage cache	
-	public boolean pushCache() {
+	public static boolean pushCache() {
 		try {
 			userConfigCache.forEach((id, obj) -> {
 				Document searchresult = userconfigs.find(new Document("id", Long.valueOf(id))).first();
@@ -53,31 +53,31 @@ public class ConfigManager {
 			guildConfigCache.clear();
 			return true;
 		} catch (Exception e) {
-			ConsoleEngine.out.error(this, "Push failed!");
+			ConsoleEngine.out.error(ConfigManager.class, "Push failed!");
 			return false;
 		}
 	}
 	
 	//Get Cache
-	public ConcurrentHashMap<Long, JSONObject> getUserCache() {
+	public static ConcurrentHashMap<Long, JSONObject> getUserCache() {
 		return userConfigCache;
 	}
 	
-	public ConcurrentHashMap<Long, JSONObject> getGuildCache() {
+	public static ConcurrentHashMap<Long, JSONObject> getGuildCache() {
 		return guildConfigCache;
 	}
 	
-	public MongoCollection<Document> getUserCollection() {
+	public static MongoCollection<Document> getUserCollection() {
 		return userconfigs;
 	}
 	
-	public MongoCollection<Document> getGuildCollection() {
+	public static MongoCollection<Document> getGuildCollection() {
 		return guildconfigs;
 	}
 	
 	//Get JSONObjects
 	@NonNull
-	public JSONObject getUserConfig(User user) {
+	public static JSONObject getUserConfig(User user) {
 		JSONObject config = null;
 		config = userConfigCache.get(user.getIdLong());
 		if (config == null) {
@@ -86,24 +86,24 @@ public class ConfigManager {
 			config = userConfigCache.get(user.getIdLong());
 		}
 		if (config == null) {
-			config = this.createUserConfig(user);
+			config = ConfigManager.createUserConfig(user);
 		}
 		return config;
 	}
 	
 	@NonNull
-	public JSONObject getMemberConfig(Guild guild, User user) {
+	public static JSONObject getMemberConfig(Guild guild, User user) {
 		JSONObject config = null;
 		try {
-			config = this.getUserConfig(user).getJSONObject(guild.getId());
+			config = ConfigManager.getUserConfig(user).getJSONObject(guild.getId());
 		} catch (JSONException e) {
-			config = this.createMemberConfig(guild, user);
+			config = ConfigManager.createMemberConfig(guild, user);
 		}
 		return config;
 	}
 	
 	@NonNull
-	public JSONObject getGuildConfig(Guild guild) {
+	public static JSONObject getGuildConfig(Guild guild) {
 		JSONObject config = null;
 		config = guildConfigCache.get(guild.getIdLong());
 		if (config == null) {
@@ -112,13 +112,13 @@ public class ConfigManager {
 			config = guildConfigCache.get(guild.getIdLong());
 		}
 		if (config == null) {
-			config = this.createGuildConfig(guild);
+			config = ConfigManager.createGuildConfig(guild);
 		}
 		return config;
 	}
 	
 	//Create JSONObjects
-	private JSONObject createUserConfig(User user) {
+	private static JSONObject createUserConfig(User user) {
 		JSONObject newConfig = new JSONObject();
 		//Simple values
 		newConfig.put("id",							user.getIdLong());
@@ -127,13 +127,13 @@ public class ConfigManager {
 		return newConfig;
 	}
 	
-	private JSONObject createMemberConfig(Guild guild, User user) {
-		JSONObject userConfig = this.getUserConfig(user);
+	private static JSONObject createMemberConfig(Guild guild, User user) {
+		JSONObject userConfig = ConfigManager.getUserConfig(user);
 		JSONObject newConfig = new JSONObject();
 		//Simple values
 		newConfig.put("guildid",					guild.getIdLong());
 		newConfig.put("customchannelcategory",		0L);
-		newConfig.put("experience",					0L);
+		newConfig.put("experience",					0);
 		newConfig.put("language",					"en");
 		newConfig.put("lastmail", 					OffsetDateTime.now().minusDays(1).format(dateTimeFormatter));
 		newConfig.put("lastsuggestion", 			OffsetDateTime.now().minusDays(1).format(dateTimeFormatter));
@@ -152,7 +152,7 @@ public class ConfigManager {
 		return newConfig;
 	}
 	
-	private JSONObject createGuildConfig(Guild guild) {
+	private static JSONObject createGuildConfig(Guild guild) {
 		JSONObject newConfig = new JSONObject();
 		//Simple values
 		newConfig.put("id",							guild.getIdLong());
@@ -167,13 +167,16 @@ public class ConfigManager {
 		newConfig.put("join2createchannels",		new JSONObject());
 		newConfig.put("levelmsgchannel",			0L);
 		newConfig.put("levelrewards",				new JSONObject());
+		newConfig.put("modrole",					0L);
 		newConfig.put("offlinemsg",					0L);
 		newConfig.put("penalties",					new JSONObject());
 		newConfig.put("reportchannel",				0L);
 		newConfig.put("suggestionchannel",			0L);
 		newConfig.put("supportcategory",			0L);
 		newConfig.put("supportchat",				0L);
+		newConfig.put("supportrole",				0L);
 		newConfig.put("supporttalk",				0L);
+		newConfig.put("systeminfochannel",			0L);
 		newConfig.put("ticketchannels",				new JSONArray());
 		newConfig.put("ticketcount",				1);
 		newConfig.put("welcomemsg",					"");
@@ -186,11 +189,11 @@ public class ConfigManager {
 		return newConfig;
 	}
 	
-	public JSONObject createPollConfig(Guild guild, String channelID, String messageID) {
-		if (ConfigLoader.run.getPollConfig(guild, channelID, messageID) != null) {
-			return ConfigLoader.run.getPollConfig(guild, channelID, messageID);
+	public static JSONObject createPollConfig(Guild guild, String channelID, String messageID) {
+		if (ConfigLoader.getPollConfig(guild, channelID, messageID) != null) {
+			return ConfigLoader.getPollConfig(guild, channelID, messageID);
 		}
-		JSONObject guildConfig = this.getGuildConfig(guild);
+		JSONObject guildConfig = ConfigManager.getGuildConfig(guild);
 		try {
 			guildConfig.getJSONObject("polls").getJSONObject(channelID);
 		} catch (JSONException e) {
@@ -217,11 +220,11 @@ public class ConfigManager {
 		return newConfig;
 	}
 	
-	public JSONObject createReactionroleConfig(Guild guild, String channelID, String messageID) {
-		if (ConfigLoader.run.getReactionMessageConfig(guild, channelID, messageID) != null) {
-			return ConfigLoader.run.getReactionMessageConfig(guild, channelID, messageID);
+	public static JSONObject createReactionroleConfig(Guild guild, String channelID, String messageID) {
+		if (ConfigLoader.getReactionMessageConfig(guild, channelID, messageID) != null) {
+			return ConfigLoader.getReactionMessageConfig(guild, channelID, messageID);
 		}
-		JSONObject guildConfig = this.getGuildConfig(guild);
+		JSONObject guildConfig = ConfigManager.getGuildConfig(guild);
 		try {
 			guildConfig.getJSONObject("reactionroles").getJSONObject(channelID);
 		} catch (JSONException e) {

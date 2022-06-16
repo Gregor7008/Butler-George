@@ -7,122 +7,115 @@ import org.json.JSONObject;
 import base.Bot;
 import components.base.assets.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
 public class ConfigLoader {
 	
-	public static ConfigLoader run;
-	public static ConfigManager manager;
-	
-	public ConfigLoader() {
-		run = this;
-		manager = new ConfigManager();
-	}
-	
 	//User configs
-	public JSONObject getUserConfig(User user) {
-		return manager.getUserConfig(user);
+	public static JSONObject getUserConfig(User user) {
+		return ConfigManager.getUserConfig(user);
 	}
 	
-	public JSONObject getMemberConfig(Guild guild, User user) {
-		return manager.getMemberConfig(guild, user);
+	public static JSONObject getMemberConfig(Guild guild, User user) {
+		return ConfigManager.getMemberConfig(guild, user);
 	}
 	
-	public JSONObject getFirstMemberLayerConfig(Guild guild, User user, String key) {
-		return this.getMemberConfig(guild, user).getJSONObject(key);
+	public static JSONObject getFirstMemberLayerConfig(Guild guild, User user, String key) {
+		return ConfigLoader.getMemberConfig(guild, user).getJSONObject(key);
 	}
 	
-	public JSONObject getSecondMemberLayerConfig(Guild guild, User user, String key, String subKey) {
-		return this.getFirstMemberLayerConfig(guild, user, key).getJSONObject(subKey);
+	public static JSONObject getSecondMemberLayerConfig(Guild guild, User user, String key, String subKey) {
+		return ConfigLoader.getFirstMemberLayerConfig(guild, user, key).getJSONObject(subKey);
 	}
 	
 	//Guild configs
-	public JSONObject getGuildConfig(Guild guild) {
-		return manager.getGuildConfig(guild);
+	public static JSONObject getGuildConfig(Guild guild) {
+		return ConfigManager.getGuildConfig(guild);
 	}
 	
-	public JSONObject getFirstGuildLayerConfig(Guild guild, String firstKey) {
-		return this.getGuildConfig(guild).getJSONObject(firstKey);
+	public static JSONObject getFirstGuildLayerConfig(Guild guild, String firstKey) {
+		return ConfigLoader.getGuildConfig(guild).getJSONObject(firstKey);
 	}
 	
-	public JSONObject getSecondGuildLayerConfig(Guild guild, String key, String subKey) {
-		return this.getFirstGuildLayerConfig(guild, key).getJSONObject(subKey);
+	public static JSONObject getSecondGuildLayerConfig(Guild guild, String key, String subKey) {
+		return ConfigLoader.getFirstGuildLayerConfig(guild, key).getJSONObject(subKey);
 	}
 	
-	public JSONObject getThirdGuildLayerConfig(Guild guild, String key, String subKey, String subSubKey) {
-		return this.getSecondGuildLayerConfig(guild, key, subKey).getJSONObject(subSubKey);
+	public static JSONObject getThirdGuildLayerConfig(Guild guild, String key, String subKey, String subSubKey) {
+		return ConfigLoader.getSecondGuildLayerConfig(guild, key, subKey).getJSONObject(subSubKey);
 	}
 	
 	//Poll configs
-	public JSONObject createPollConfig(Guild guild, String channelID, String messageID) {
-		return manager.createPollConfig(guild, channelID, messageID);
+	public static JSONObject createPollConfig(Guild guild, String channelID, String messageID) {
+		return ConfigManager.createPollConfig(guild, channelID, messageID);
 	}
 	
-	public JSONObject getPollConfig(Guild guild, String channelID, String messageID) {
+	public static JSONObject getPollConfig(Guild guild, String channelID, String messageID) {
 		JSONObject config = null;
 		try {
-			config = this.getThirdGuildLayerConfig(guild, "polls", channelID, messageID);
+			config = ConfigLoader.getThirdGuildLayerConfig(guild, "polls", channelID, messageID);
 		} catch (JSONException e) {}
 		return config;
 	}
 	
-	public JSONObject getPollAnswers(Guild guild, String channelID, String messageID) {
-		return this.getPollConfig(guild, channelID, messageID).getJSONObject("answers");
+	public static JSONObject getPollAnswers(Guild guild, String channelID, String messageID) {
+		return ConfigLoader.getPollConfig(guild, channelID, messageID).getJSONObject("answers");
 	}
 	
 	//Reactionrole configs
-	public JSONObject createReactionMessageConfig(Guild guild, String channelID, String messageID) {
-		return manager.createReactionroleConfig(guild, channelID, messageID);
+	public static JSONObject createReactionMessageConfig(Guild guild, String channelID, String messageID) {
+		return ConfigManager.createReactionroleConfig(guild, channelID, messageID);
 	}
 	
-	public JSONObject getReactionMessageConfig(Guild guild, String channelID, String messageID) {
+	public static JSONObject getReactionMessageConfig(Guild guild, String channelID, String messageID) {
 		JSONObject config = null;
 		try {
-			config = this.getThirdGuildLayerConfig(guild, "reactionroles", channelID, messageID);
+			config = ConfigLoader.getThirdGuildLayerConfig(guild, "reactionroles", channelID, messageID);
 		} catch (JSONException e) {}
 		return config;
 	}
 	
-	public JSONObject getReactionChannelConfig(Guild guild, String channelID) {
+	public static JSONObject getReactionChannelConfig(Guild guild, String channelID) {
 		JSONObject config = null;
 		try {
-			config = this.getSecondGuildLayerConfig(guild, "reactionroles", channelID);
+			config = ConfigLoader.getSecondGuildLayerConfig(guild, "reactionroles", channelID);
 		} catch (JSONException e) {}
 		return config;
 	}
 	
 	//Modmail configs
-	public Long getModMailOfUser(String userID) {
+	public static TextChannel getModMailOfUser(String userID) {
 		try {
-			return this.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID)).getLong(userID);
+			return Bot.run.jda.getGuildById(Bot.homeID).getTextChannelById(ConfigLoader.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID)).getLong(userID));
 		} catch (JSONException e) {
 			return null;
 		}
 	}
 	
-	public Long getModMailOfChannel(String channelID) {
-		JSONObject modmailConfig = this.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID));
+	public static User getModMailOfChannel(String channelID) {
+		JSONObject modmailConfig = ConfigLoader.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID));
 		String[] keys = (String[]) modmailConfig.keySet().toArray();
-		Long returnValue = null;
+		User returnValue = null;
 		for (int i = 0; i < keys.length; i++) {
 			if (modmailConfig.getLong(keys[i]) == Long.valueOf(channelID)) {
-				returnValue = Long.valueOf(keys[i]);
+				returnValue = Bot.run.jda.getUserById(Long.valueOf(keys[i]));
 				i = keys.length;
 			}
 		}
 		return returnValue;
 	}
 	
-	public void setModMailConfig(String channelID, String userID) {
-		this.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID)).put(userID, channelID);
+	public static void setModMailConfig(String channelID, String userID) {
+		ConfigLoader.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID)).put(userID, channelID);
 	}
 	
-	private JSONObject getModMailConfig(Guild guild) {
-		return this.getFirstGuildLayerConfig(guild, "modmails");
+	private static JSONObject getModMailConfig(Guild guild) {
+		return ConfigLoader.getFirstGuildLayerConfig(guild, "modmails");
 	}
 	
 	//Tool methods
-	public void clearValue(JSONObject jObject, String key) {
+	public static void clearValue(JSONObject jObject, String key) {
 		try {
 			jObject.getString(key);
 			jObject.put(key, "");
@@ -145,7 +138,7 @@ public class ConfigLoader {
 		} catch (JSONException e) {}
 	}
 	
-	public boolean removeValueFromArray(JSONArray current, Object value) {
+	public static boolean removeValueFromArray(JSONArray current, Object value) {
 		for (int i = 0; i < current.length(); i++) {
 			if (current.get(i).equals(value)) {
 				current.remove(i);

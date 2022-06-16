@@ -12,9 +12,10 @@ import org.json.JSONObject;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import components.base.AnswerEngine;
-import components.base.ConfigCheck;
+import components.base.ConfigVerifier;
 import components.base.ConfigLoader;
 import components.base.ConsoleEngine;
+import components.base.assets.ConfigManager;
 import components.moderation.ModEngine;
 import components.moderation.PenaltyEngine;
 import components.moderation.ServerUtilities;
@@ -41,7 +42,7 @@ public class Bot {
 	
 	public Bot(String token) throws LoginException, InterruptedException, IOException {
 		run = this;
-	    new ConfigLoader();
+	    GUI.get.setProgress(25);
 	    //Create Bot
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(eventWaiter);
@@ -49,55 +50,58 @@ public class Bot {
 		builder.setRawEventsEnabled(true);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_PRESENCES);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
+		GUI.get.setProgress(50);
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing(version));
+	    GUI.get.setBotRunning(true);
+	    GUI.get.setProgress(75);
 	    //Startup engines
 	    Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.out);
-	    new ConfigCheck();
-	    new AnswerEngine();
 	    new PenaltyEngine();
 	    new ModEngine();
-	    new ServerUtilities().controlChannels(true);
+	    ServerUtilities.controlChannels(true);
+	    GUI.get.setProgress(100);
     	this.checkConfigs();
     	this.startTimer();
+    	GUI.get.setProgress(0);
+    	
 	}
 	
-	public void shutdown(Boolean delete) {
-		new ServerUtilities().controlChannels(false);
+	public void shutdown(boolean handleManagedChannels) {
+		ServerUtilities.controlChannels(false);
 		List<Guild> guilds = jda.getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);
-    		if (delete) {
-    			JSONObject createdchannels = ConfigLoader.run.getFirstGuildLayerConfig(guild, "createdchannels");
+    		if (handleManagedChannels) {
+    			JSONObject createdchannels = ConfigLoader.getFirstGuildLayerConfig(guild, "createdchannels");
     			if (!createdchannels.isEmpty()) {
     				createdchannels.keySet().forEach(e -> guild.getVoiceChannelById(e).delete().queue());
     			}
-    			if (ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel") != 0) {
-    				long chid = ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel");
-    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
-        			ConfigLoader.run.getGuildConfig(guild).put("offlinemsg", msgid);
+    			if (ConfigLoader.getGuildConfig(guild).getLong("systeminfochannel") != 0) {
+    				long chid = ConfigLoader.getGuildConfig(guild).getLong("systeminfochannel");
+    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(AnswerEngine.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
+        			ConfigLoader.getGuildConfig(guild).put("offlinemsg", msgid);
         		}
     		}
-    		if (ConfigLoader.run.getGuildConfig(guild).getLong("supportchat") != 0) {
-    			guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+    		if (ConfigLoader.getGuildConfig(guild).getLong("supportchat") != 0) {
+    			guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
     		}
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
+		GUI.get.setBotRunning(false);
 		if (noErrorOccured) {
-			ConfigLoader.manager.pushCache();
+			ConfigManager.pushCache();
 		}
 		ConsoleEngine.out.info(this, "Bot offline");
-		this.wait(2000);
-		System.exit(0);
 	}
 	
 	private void checkConfigs() {
 		for (int i = 0; i < jda.getGuilds().size(); i++) {
     		Guild guild = jda.getGuilds().get(i);
-    		ConfigCheck.run.checkGuildConfigs(guild);
-    		ConfigCheck.run.checkUserConfigs(guild);
+    		ConfigVerifier.run.guildCheck(guild);
+    		ConfigVerifier.run.usersCheck(guild);
 		}
 	}
 	
@@ -108,21 +112,15 @@ public class Bot {
 				List<Guild> guilds = jda.getGuilds();
 				for (int i = 0; i < guilds.size(); i++) {
 					Guild guild = guilds.get(i);
-					PenaltyEngine.run.penaltyCheck(guild);
-					ModEngine.run.modCheck(guild);
+					PenaltyEngine.run.guildCheck(guild);
+					ModEngine.run.guildCheck(guild);
 				}
 				if (timerCount > 0 && noErrorOccured) {
-					ConfigLoader.manager.pushCache();
+					ConfigManager.pushCache();
 				}
 				timerCount++;
 			}
 		}, 0, 5*60*1000);
-	}
-	
-	private void wait(int time) {
-		try {
-			Thread.sleep(time);
-		} catch (InterruptedException e) {}
 	}
 	
 	public EventWaiter getWaiter() {

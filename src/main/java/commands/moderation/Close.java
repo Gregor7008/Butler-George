@@ -1,6 +1,5 @@
 package commands.moderation;
 
-import base.Bot;
 import commands.Command;
 import components.base.AnswerEngine;
 import components.base.ConfigLoader;
@@ -18,25 +17,25 @@ public class Close implements Command {
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (ConfigLoader.run.removeValueFromArray(ConfigLoader.run.getGuildConfig(guild).getJSONArray("ticketchannels"), event.getTextChannel().getIdLong())) {
+		if (ConfigLoader.removeValueFromArray(ConfigLoader.getGuildConfig(guild).getJSONArray("ticketchannels"), event.getTextChannel().getIdLong())) {
 			event.getTextChannel().delete().queue();
 			return;
 		}
-		if (ConfigLoader.run.getModMailOfChannel(event.getTextChannel().getId()) != null) {
+		if (ConfigLoader.getModMailOfChannel(event.getTextChannel().getId()) != null) {
 			String cid = event.getTextChannel().getId();
 			event.getTextChannel().delete().queue();
-			User cuser = Bot.run.jda.getUserById(ConfigLoader.run.getModMailOfChannel(cid));
-			Bot.run.jda.getUserById(ConfigLoader.run.getModMailOfChannel(cid)).openPrivateChannel().complete().sendMessageEmbeds(
-					AnswerEngine.build.fetchMessage(guild, cuser, "/commands/moderation/close:closed").replaceDescription("{reason}", event.getOption("reason").getAsString()).convert()).queue();
-			ConfigLoader.run.getFirstGuildLayerConfig(guild, "modmails").remove(String.valueOf(ConfigLoader.run.getModMailOfChannel(cid)));
+			User cuser = ConfigLoader.getModMailOfChannel(cid);
+			ConfigLoader.getModMailOfChannel(cid).openPrivateChannel().complete().sendMessageEmbeds(
+					AnswerEngine.fetchMessage(guild, cuser, "/commands/moderation/close:closed").replaceDescription("{reason}", event.getOption("reason").getAsString()).convert()).queue();
+			ConfigLoader.getFirstGuildLayerConfig(guild, "modmails").remove(String.valueOf(ConfigLoader.getModMailOfChannel(cid)));
 			try {
 				if (event.getOption("warning").getAsBoolean()) {
-					ConfigLoader.run.getMemberConfig(guild, cuser).getJSONArray("warnings").put("Modmail abuse");
-					PenaltyEngine.run.penaltyCheck(guild);
+					ConfigLoader.getMemberConfig(guild, cuser).getJSONArray("warnings").put("Modmail abuse");
+					PenaltyEngine.run.guildCheck(guild);
 				}
 			} catch (NullPointerException e) {}
 		} else {
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/moderation/close:nochannel").convert()).queue();
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/moderation/close:nochannel").convert()).queue();
 		}
 	}
 
@@ -50,6 +49,6 @@ public class Close implements Command {
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/close:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/moderation/close:help");
 	}
 }

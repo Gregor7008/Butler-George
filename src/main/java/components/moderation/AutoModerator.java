@@ -18,17 +18,17 @@ public class AutoModerator {
 	}
 	
 	public void messagereceived(MessageReceivedEvent event) {
-		JSONArray forbiddenwords = ConfigLoader.run.getGuildConfig(event.getGuild()).getJSONArray("forbiddenwords");
+		JSONArray forbiddenwords = ConfigLoader.getGuildConfig(event.getGuild()).getJSONArray("forbiddenwords");
 		for (int i = 0; i < forbiddenwords.length(); i++) {
 			if (event.getMessage().getContentRaw().toLowerCase().contains(forbiddenwords.getString(i).toLowerCase())) {
-				ConfigLoader.run.getMemberConfig(event.getGuild(), event.getAuthor()).getJSONArray("warnings").put("Rude behavior");
+				ConfigLoader.getMemberConfig(event.getGuild(), event.getAuthor()).getJSONArray("warnings").put("Rude behavior");
 				try {
 					event.getMember().getUser().openPrivateChannel().complete()
-						 .sendMessageEmbeds(AnswerEngine.build.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")
+						 .sendMessageEmbeds(AnswerEngine.fetchMessage(event.getGuild(), event.getAuthor(), "/components/moderation/automoderator:warning")
 								 .replaceDescription("{guild}", event.getGuild().getName()).convert()).queue();
 				} catch (Exception e) {e.printStackTrace();}
 				event.getMessage().delete().queue();
-				PenaltyEngine.run.penaltyCheck(event.getGuild());
+				PenaltyEngine.run.guildCheck(event.getGuild());
 				i = forbiddenwords.length();
 			}
 		}

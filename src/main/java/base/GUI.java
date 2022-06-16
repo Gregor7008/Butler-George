@@ -63,12 +63,12 @@ public class GUI extends JFrame implements WindowListener{
 			redLEDOff = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/red_off.png").readAllBytes());
 		} catch (IOException e) {}
 		
-		setSize(800, 600);
+		setSize(1200, 600);
 		setTitle(Bot.name + " - " + Bot.version);
 		setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(this);
-		getContentPane().setLayout(new MigLayout("", "[300,grow][200:200:200][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][510][20:n]"));
+		getContentPane().setLayout(new MigLayout("", "[600,grow][200:200:200][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][510][20:n]"));
 		
 		console.setEditable(false);
 		
@@ -76,7 +76,6 @@ public class GUI extends JFrame implements WindowListener{
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		getContentPane().add(scrollPane, "flowx,cell 0 0 1 4,grow");
 		
-		//TODO add functionality to the LEDs
 		greenLED.setIcon(greenLEDOff);
 		getContentPane().add(greenLED, "cell 3 0");
 		
@@ -102,10 +101,8 @@ public class GUI extends JFrame implements WindowListener{
 		getContentPane().add(startButton, "flowx,cell 1 2,growx,aligny center");
 		
 		stopButton.addActionListener(e -> {
-			if (Bot.run != null) {
-				if (Bot.run.jda != null) {
-					Bot.run.shutdown(true);	
-				}
+			if (Bot.run != null && Bot.run.jda != null) {
+				Bot.run.shutdown(true);	
 			}
 		});
 		getContentPane().add(stopButton, "cell 2 2 3 1,growx,aligny center");
@@ -124,22 +121,39 @@ public class GUI extends JFrame implements WindowListener{
 		
 		setVisible(true);
 	}
+	
+	public void setBotRunning(boolean status) {
+		if (status) {
+			greenLED.setIcon(greenLEDOn);
+			redLED.setIcon(redLEDOff);
+		} else {
+			redLED.setIcon(redLEDOn);
+			greenLED.setIcon(greenLEDOff);
+		}
+	}
+	
+	public void setProgress(int progress) {
+		if (0 <= progress && progress <= 100) {
+			progressBar.setValue(progress);
+			progressLabel.setText(String.valueOf(progress) + "%");
+		}
+	}
 
 	@Override
 	public void windowOpened(WindowEvent e) {}
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		if (Bot.run != null) {
-			if (Bot.run.jda != null) {
-				Bot.run.shutdown(true);	
-			}
+		if (Bot.run != null && Bot.run.jda != null) {
+			Bot.run.shutdown(true);	
 		}
 		e.getWindow().dispose();
 	}
 
 	@Override
-	public void windowClosed(WindowEvent e) {}
+	public void windowClosed(WindowEvent e) {
+		System.exit(0);
+	}
 
 	@Override
 	public void windowIconified(WindowEvent e) {}

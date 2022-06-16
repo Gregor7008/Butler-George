@@ -18,27 +18,27 @@ public class DefaultAccessRoles implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		JSONArray ccdefroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("customchannelaccessroles");
+		JSONArray ccdefroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelaccessroles");
 		long roleID = event.getOption("role").getAsRole().getIdLong();
 		if (event.getSubcommandName().equals("set")) {
 			ccdefroles.clear();
 			ccdefroles.put(roleID);
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:setsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			ccdefroles.put(roleID);
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:addsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:addsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
-			ConfigLoader.run.removeValueFromArray(ccdefroles, roleID);
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:remsuccess").convert()).queue();
+			ConfigLoader.removeValueFromArray(ccdefroles, roleID);
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:remsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
 			ccdefroles.clear();
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:clearsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/defaultaccessroles:clearsuccess").convert()).queue();
 			return;
 		}
 	}
@@ -52,7 +52,7 @@ public class DefaultAccessRoles implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/defaultaccessroles:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/moderation/defaultaccessroles:help");
 	}
 
 }

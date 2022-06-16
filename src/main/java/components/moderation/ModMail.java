@@ -43,8 +43,8 @@ public class ModMail {
 			return;
 		}
 		if (direction) {
-			if (ConfigLoader.run.getModMailOfChannel(event.getChannel().getId()) != null) {
-				PrivateChannel pc = Bot.run.jda.openPrivateChannelById(ConfigLoader.run.getModMailOfChannel(event.getChannel().getId())).complete();
+			if (ConfigLoader.getModMailOfChannel(event.getChannel().getId()) != null) {
+				PrivateChannel pc = ConfigLoader.getModMailOfChannel(event.getChannel().getId()).openPrivateChannel().complete();
 				this.resendMessage(pc, event.getMessage());
 			}
 			return;
@@ -56,36 +56,36 @@ public class ModMail {
 			}
 		} catch (ErrorResponseException e) {}
 		if (guild.retrieveBan(user).complete() == null && !member) {
-			event.getChannel().sendMessageEmbeds(AnswerEngine.build.fetchMessage(null, null, "/components/moderation/modmail:nosupport").convert()).queue();
+			event.getChannel().sendMessageEmbeds(AnswerEngine.fetchMessage(null, null, "/components/moderation/modmail:nosupport").convert()).queue();
 			return;
 		}
-		if (ConfigLoader.run.getModMailOfUser(user.getId()) != null) {
-			TextChannel channel = guild.getTextChannelById(ConfigLoader.run.getModMailOfUser(user.getId()));
+		if (ConfigLoader.getModMailOfUser(user.getId()) != null) {
+			TextChannel channel = ConfigLoader.getModMailOfUser(user.getId());
 			this.resendMessage(channel, event.getMessage());
 			return;
 		}
-		OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.run.getMemberConfig(guild, user).getString("lastmail"), ConfigManager.dateTimeFormatter);
+		OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.getMemberConfig(guild, user).getString("lastmail"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 300) {
-			event.getChannel().sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/components/moderation/modmail:success").convert()).queue();
-			ConfigLoader.run.getMemberConfig(guild, user).put("lastmail", OffsetDateTime.now().format(ConfigManager.dateTimeFormatter));
+			event.getChannel().sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/components/moderation/modmail:success").convert()).queue();
+			ConfigLoader.getMemberConfig(guild, user).put("lastmail", OffsetDateTime.now().format(ConfigManager.dateTimeFormatter));
 			this.processMessage(event);
 		} else {
 			int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
-			event.getChannel().sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/components/moderation/modmail:timelimit")
+			event.getChannel().sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/components/moderation/modmail:timelimit")
 					.replaceDescription("{timeleft}", String.valueOf(timeleft)).convert()).queue();
 		}
 	}
 	
 	private void processMessage(MessageReceivedEvent event) {
-		if (ConfigLoader.run.getGuildConfig(guild).getLong("supportcategory") == 0) {
+		if (ConfigLoader.getGuildConfig(guild).getLong("supportcategory") == 0) {
 			Category ctg = guild.createCategory("----------📝 Tickets ------------").complete();
-			ConfigLoader.run.getGuildConfig(guild).put("supportcategory", ctg.getIdLong());
+			ConfigLoader.getGuildConfig(guild).put("supportcategory", ctg.getIdLong());
 		}
-		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById(ConfigLoader.run.getGuildConfig(guild).getLong("supportcategory"))).complete();
+		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById(ConfigLoader.getGuildConfig(guild).getLong("supportcategory"))).complete();
 		this.resendMessage(nc, event.getMessage());
 		nc.sendMessage(guild.getPublicRole().getAsMention());
 		nc.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-		ConfigLoader.run.setModMailConfig(nc.getId(), event.getAuthor().getId());
+		ConfigLoader.setModMailConfig(nc.getId(), event.getAuthor().getId());
 	}
 	
 	private void resendMessage(MessageChannel channel, Message message) {

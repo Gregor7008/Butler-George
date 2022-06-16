@@ -27,18 +27,18 @@ public class Suggest implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
-		Long channelid = ConfigLoader.run.getGuildConfig(guild).getLong("suggest");
+		Long channelid = ConfigLoader.getGuildConfig(guild).getLong("suggest");
 		if (channelid == 0) {
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
 			return;
 		}
-		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.run.getMemberConfig(guild, user).getString("lastsuggestion"), ConfigManager.dateTimeFormatter);
+		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.getMemberConfig(guild, user).getString("lastsuggestion"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
 			return;
 		}
 		this.sendsuggestion(guild, event.getMember(), event.getOption("suggestion").getAsString());
-		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user,"/commands/utilities/suggest:success").convert()).queue();
+		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/suggest:success").convert()).queue();
 	}
 
 	@Override
@@ -50,11 +50,11 @@ public class Suggest implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/suggest:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/utilities/suggest:help");
 	}
 	
 	public void sendsuggestion(Guild guild, Member member, String idea) {
-		TextChannel channel = guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("suggest"));
+		TextChannel channel = guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("suggest"));
 		EmbedBuilder eb = new EmbedBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyyy");
 		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());
