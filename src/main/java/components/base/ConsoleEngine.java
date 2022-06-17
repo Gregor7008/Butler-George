@@ -43,6 +43,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 	
 	public void error(@Nullable Object object, @Nullable String message) {
 		this.print("error", object, message, true);
+		GUI.get.increaseErrorCounter();
 	}
 	
 	public void title(String title) {
@@ -108,8 +109,10 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 	
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
-		Bot.run.noErrorOccured = false;
 		e.printStackTrace();
+		Bot.run.noErrorOccured = false;
+		GUI.get.increaseErrorCounter();
+		GUI.get.setTableValue(7, true);
 	}
 	
 	private void commandListener(String line) {

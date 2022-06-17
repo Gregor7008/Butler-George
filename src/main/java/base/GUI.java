@@ -3,6 +3,10 @@ package base;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.ImageIcon;
@@ -16,10 +20,11 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 
 import components.base.ConsoleEngine;
 import net.miginfocom.swing.MigLayout;
-import javax.swing.UIManager;
 
 public class GUI extends JFrame implements WindowListener{
 	
@@ -39,6 +44,7 @@ public class GUI extends JFrame implements WindowListener{
 	public static JLabel progressLabel = new JLabel("0%");
 	public static JTable infoTable = new JTable();
 	
+	private Timer runtimeRefresher;
 	public ImageIcon greenLEDOn;
 	public ImageIcon greenLEDOff;
 	public ImageIcon redLEDOn;
@@ -108,6 +114,45 @@ public class GUI extends JFrame implements WindowListener{
 		getContentPane().add(stopButton, "cell 2 2 3 1,growx,aligny center");
 		
 		getContentPane().add(tabbedPane, "cell 1 3 4 1,grow");
+		infoTable.setShowGrid(false);
+		infoTable.setModel(new DefaultTableModel(
+			new Object[][] {
+				{"Name:", Bot.name},
+				{"Version:", Bot.version},
+				{"ID:", Bot.id},
+				{"Runtime:", "00:00:00:00"},
+				{"Errors:", 0},
+				{"Executions:", 0},
+				{"Servers:", 0},
+				{"Users:", 0},
+				{"Push Paused:", false},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+				{null, null},
+			},
+			new String[] {
+				"key", "value"
+			}
+		) {private static final long serialVersionUID = -4012626449837340333L;
+		
+		   public boolean isCellEditable(int row, int column) {
+				return false;
+		   }
+		});
+		infoTable.getColumnModel().getColumn(0).setResizable(false);
 		
 		tabbedPane.addTab("Info", null, infoTable, null);
 		
@@ -137,6 +182,49 @@ public class GUI extends JFrame implements WindowListener{
 			progressBar.setValue(progress);
 			progressLabel.setText(String.valueOf(progress) + "%");
 		}
+	}
+	
+	public void increaseErrorCounter() {
+		this.setTableValue(4, (int) this.getTableValue(4) + 1);
+	}
+	
+	public void increaseExecutionsCounter() {
+		this.setTableValue(5, (int) this.getTableValue(5) + 1);
+	}
+	
+	public void updateStatistics() {
+		GUI.get.setTableValue(6, Bot.run.jda.getGuilds().size());
+		GUI.get.setTableValue(7, Bot.run.jda.getUsers().size());
+	}
+	
+	public void startRuntimeMeasuring() {
+		OffsetDateTime startTime = OffsetDateTime.now();
+		runtimeRefresher = new Timer();
+		runtimeRefresher.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				Duration diff = Duration.between(startTime, OffsetDateTime.now());
+				GUI.get.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
+						diff.toDays(),
+                        diff.toHours(), 
+                        diff.toMinutesPart(), 
+                        diff.toSecondsPart()));
+			}
+		}, 0, 1000);
+	}
+	
+	public void stopRuntimeMeasuring() {
+		runtimeRefresher.cancel();
+		runtimeRefresher = null;
+	}
+	
+	public void setTableValue(int row, Object value) {
+		infoTable.getModel().setValueAt(value, row, 1);
+		infoTable.repaint();
+	}
+	
+	public Object getTableValue(int row) {
+		return infoTable.getModel().getValueAt(row, 1);
 	}
 
 	@Override

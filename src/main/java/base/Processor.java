@@ -35,6 +35,8 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
@@ -94,6 +96,7 @@ public class Processor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
+		GUI.get.increaseExecutionsCounter();
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		CommandList commandList = new CommandList();
@@ -163,6 +166,7 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+		GUI.get.updateStatistics();
 		final Guild guild = event.getGuild();
 		if (event.getMember().getUser().isBot()) {
 			JSONArray botautoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("botautoroles");
@@ -194,6 +198,7 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
+		GUI.get.updateStatistics();
 		if (event.getUser().isBot()) {
 			return;
 		}
@@ -218,6 +223,16 @@ public class Processor extends ListenerAdapter {
 			ctg.delete().queue();
 			ConfigLoader.getMemberConfig(guild, user).put("customchannelcategory", 0L);
 		}
+	}
+	
+	@Override
+	public void onGuildJoin(GuildJoinEvent event) {
+		GUI.get.updateStatistics();
+	}
+	
+	@Override
+	public void onGuildLeave(GuildLeaveEvent event) {
+		GUI.get.updateStatistics();
 	}
 	
 	@Override

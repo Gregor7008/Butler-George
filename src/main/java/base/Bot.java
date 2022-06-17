@@ -33,6 +33,7 @@ public class Bot {
 	public static Bot run;
 	public static String version = "V2.0-dev";
 	public static String name = "Butler George";
+	public static String id = "853887837823959041";
 	public static String homeID = "708381749826289666";
 	public JDA jda;
 	private EventWaiter eventWaiter = new EventWaiter();
@@ -42,7 +43,6 @@ public class Bot {
 	
 	public Bot(String token) throws LoginException, InterruptedException, IOException {
 		run = this;
-	    GUI.get.setProgress(25);
 	    //Create Bot
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(eventWaiter);
@@ -50,23 +50,20 @@ public class Bot {
 		builder.setRawEventsEnabled(true);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_PRESENCES);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
-		GUI.get.setProgress(50);
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing(version));
 	    GUI.get.setBotRunning(true);
-	    GUI.get.setProgress(75);
 	    //Startup engines
 	    Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.out);
 	    new ConfigVerifier();
 	    new PenaltyEngine();
 	    new ModEngine();
 	    ServerUtilities.controlChannels(true);
-	    GUI.get.setProgress(100);
     	this.checkConfigs();
     	this.startTimer();
-    	GUI.get.setProgress(0);
-    	
+    	GUI.get.updateStatistics();
+    	GUI.get.startRuntimeMeasuring();
 	}
 	
 	public void shutdown(boolean handleManagedChannels) {
@@ -92,6 +89,7 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
 		GUI.get.setBotRunning(false);
+		GUI.get.stopRuntimeMeasuring();
 		if (noErrorOccured) {
 			ConfigManager.pushCache();
 		}
