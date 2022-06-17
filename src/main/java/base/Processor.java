@@ -17,7 +17,6 @@ import commands.utilities.Suggest;
 import components.base.AnswerEngine;
 import components.base.ConfigLoader;
 import components.base.ConfigVerifier;
-import components.moderation.AutoModerator;
 import components.moderation.ModMail;
 import components.moderation.ServerUtilities;
 import components.utilities.LevelEngine;
@@ -125,7 +124,6 @@ public class Processor extends ListenerAdapter {
 		final User user = event.getAuthor();
 		if (event.getChannelType().isGuild()) {
 			final Guild guild = event.getGuild();
-			AutoModerator.getInstance().messagereceived(event);
 			long suggestchid = ConfigLoader.getGuildConfig(guild).getLong("suggestionchannel");
 			if (suggestchid != 0 && event.getChannel().getIdLong() == suggestchid && !user.isBot()) {
 				new Suggest().sendsuggestion(guild, event.getMember(), event.getMessage().getContentRaw());
@@ -211,13 +209,14 @@ public class Processor extends ListenerAdapter {
 			goodbyemsg[0].replace("{timejoined}", event.getMember().getTimeJoined().format(AnswerEngine.formatter));
 			event.getGuild().getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
 		}
-		if (ConfigLoader.getMemberConfig(guild, user).getLong("cccategory") != 0) {
-			Category ctg = guild.getCategoryById(ConfigLoader.getMemberConfig(guild, user).getLong("cccategory"));
+		if (ConfigLoader.getMemberConfig(guild, user).getLong("customchannelcategory") != 0) {
+			Category ctg = guild.getCategoryById(ConfigLoader.getMemberConfig(guild, user).getLong("customchannelcategory"));
 			List<GuildChannel> channels = ctg.getChannels();
 			for (int i = 0; i < channels.size(); i++) {
 				channels.get(i).delete().queue();
 			}
 			ctg.delete().queue();
+			ConfigLoader.getMemberConfig(guild, user).put("customchannelcategory", 0L);
 		}
 	}
 	
@@ -300,27 +299,11 @@ public class Processor extends ListenerAdapter {
 	@Override
 	public void onChannelDelete(ChannelDeleteEvent event) {
 		Guild guild = event.getGuild();
-		new Thread(() -> {
-			ConfigVerifier.run.guildCheck(guild);
-		}).start();
+		ConfigVerifier.run.guildCheck(guild);
 		if (event.isFromType(ChannelType.CATEGORY)) {
 			Category ctg = (Category) event.getChannel();
 			if (this.checkCategory(ctg, guild) != null) {
-				ConfigLoader.getMemberConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", 0L);
-			}
-			return;
-		}
-		if (event.getChannelType().isGuild()) {
-			try {
-				ICategorizableChannel channel = (ICategorizableChannel) event.getChannel();
-				Category ctg = channel.getParentCategory();
-				if (ctg != null && ctg.getChannels().size() == 0 && this.checkCategory(ctg, guild) != null) {
-					ConfigLoader.getMemberConfig(guild, this.checkCategory(ctg, guild)).put("customchannelcategory", 0L);
-					ctg.delete().queue();
-				}
-				return;
-			} catch (ClassCastException e) {
-				return;
+				ConfigVerifier.run.userCheck(guild, this.checkCategory(ctg, guild));
 			}
 		}
 	}

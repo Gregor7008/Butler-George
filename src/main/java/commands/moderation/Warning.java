@@ -59,10 +59,10 @@ public class Warning implements Command{
 						  	  return e.getAuthor().getIdLong() == user.getIdLong();},
 						e -> {JSONArray warnings = ConfigLoader.getMemberConfig(guild, iuser).getJSONArray("warnings");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
-							  ConfigLoader.removeValueFromArray(warnings, warnings.get(w-1));
 							  channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/warning:remsuccess")
-									  .replaceDescription("{warning}", warnings.getString(w-1))
-									  .replaceDescription("{user}", guild.getMember(iuser).getEffectiveName()).convert()).queue();},
+									  .replaceDescription("{warning}", "`" + warnings.getString(w-1) + "`")
+									  .replaceDescription("{user}", guild.getMember(iuser).getEffectiveName()).convert()).queue();
+							  warnings.remove(w-1);},
 						1, TimeUnit.MINUTES,
 						() -> {channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/moderation/warning:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			}

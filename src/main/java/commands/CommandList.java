@@ -8,7 +8,6 @@ import commands.moderation.Clear;
 import commands.moderation.Close;
 import commands.moderation.CustomChannelRoles;
 import commands.moderation.DefaultAccessRoles;
-import commands.moderation.ForbiddenWords;
 import commands.moderation.Goodbye;
 import commands.moderation.Join2Create;
 import commands.moderation.LevelChannel;
@@ -91,7 +90,6 @@ public class CommandList {
 		this.moderationcmds.put("reactionrole", new ReactionRole());
 		this.moderationcmds.put("supportchannel", new SupportChannel());
 		this.moderationcmds.put("supporttalk", new SupportTalk());
-		this.moderationcmds.put("forbiddenwords", new ForbiddenWords());
 		this.moderationcmds.put("move", new Move());
 		this.moderationcmds.put("defaultaccessroles", new DefaultAccessRoles());
 		this.moderationcmds.put("customchannelroles", new CustomChannelRoles());
