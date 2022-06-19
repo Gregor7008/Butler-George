@@ -32,7 +32,6 @@ public class GUI extends JFrame implements WindowListener{
 	private static final long serialVersionUID = 5923282583431103590L;
 	
 	public static JTextArea console = new JTextArea();
-	public static JScrollPane scrollPane = new JScrollPane(console);
 	public static JLabel greenLED = new JLabel();
 	public static JLabel redLED = new JLabel();
 	public static JTextField token = new JTextField();
@@ -43,6 +42,7 @@ public class GUI extends JFrame implements WindowListener{
 	public static JProgressBar progressBar = new JProgressBar();
 	public static JLabel progressLabel = new JLabel("0%");
 	public static JTable infoTable = new JTable();
+	public static JTable commandTable = new JTable();
 	
 	private Timer runtimeRefresher;
 	public ImageIcon greenLEDOn;
@@ -78,9 +78,10 @@ public class GUI extends JFrame implements WindowListener{
 		
 		console.setEditable(false);
 		
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		getContentPane().add(scrollPane, "flowx,cell 0 0 1 4,grow");
+		JScrollPane consoleScrollPane = new JScrollPane(console);
+		consoleScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		consoleScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		getContentPane().add(consoleScrollPane, "flowx,cell 0 0 1 4,grow");
 		
 		greenLED.setIcon(greenLEDOff);
 		getContentPane().add(greenLED, "cell 3 0");
@@ -114,6 +115,7 @@ public class GUI extends JFrame implements WindowListener{
 		getContentPane().add(stopButton, "cell 2 2 3 1,growx,aligny center");
 		
 		getContentPane().add(tabbedPane, "cell 1 3 4 1,grow");
+		
 		infoTable.setShowGrid(false);
 		infoTable.setModel(new DefaultTableModel(
 			new Object[][] {
@@ -126,35 +128,35 @@ public class GUI extends JFrame implements WindowListener{
 				{"Servers:", 0},
 				{"Users:", 0},
 				{"Push Paused:", false},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
 			},
 			new String[] {
 				"key", "value"
 			}
-		) {private static final long serialVersionUID = -4012626449837340333L;
+		) {private static final long serialVersionUID = 4012626449837340333L;
 		
 		   public boolean isCellEditable(int row, int column) {
 				return false;
 		   }
 		});
 		infoTable.getColumnModel().getColumn(0).setResizable(false);
-		
 		tabbedPane.addTab("Info", null, infoTable, null);
+
+		commandTable.setShowGrid(false);
+		commandTable.setModel(new DefaultTableModel(
+			new Object[][] {
+				{null, null},
+			},
+			new String[] {
+				"key", "value"
+			}
+		) {private static final long serialVersionUID = 7041769283649777050L;
+
+		public boolean isCellEditable(int row, int column) {
+				return false;
+		   }
+		});
+		commandTable.getColumnModel().getColumn(0).setResizable(false);
+		tabbedPane.addTab("Commands", null, commandTable, null);
 		
 		getContentPane().add(consoleIn, "cell 0 4,growx,aligny center");
 		consoleIn.setColumns(10);

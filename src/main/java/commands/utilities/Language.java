@@ -12,8 +12,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class Language implements Command{
@@ -31,14 +33,16 @@ public class Language implements Command{
 				.addOption("Français", "fr")
 				.addOption("Dutch", "nl")
 				.build();
-		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:chooselang").convert())
+		InteractionHook reply = event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:chooselang").convert())
 				.addActionRow(menu)
 				.complete();
 		EventWaiter waiter = Bot.run.getWaiter();
 		waiter.waitForEvent(SelectMenuInteractionEvent.class,
 				e -> {if(!e.getChannel().getId().equals(event.getChannel().getId())) {return false;} 
 				  	  return e.getUser().getIdLong() == user.getIdLong();},
-				e -> {switch (e.getSelectedOptions().get(0).getValue()) {
+				e -> {ActionRow newRow = ActionRow.of(menu.asDisabled());
+					  reply.editOriginalComponents(newRow).queue();
+					  switch (e.getSelectedOptions().get(0).getValue()) {
 				      	case "en":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "en");
 				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successen").convert()).queue();
