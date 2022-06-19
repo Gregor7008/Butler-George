@@ -11,9 +11,9 @@ Our long-term goal is to be able to remove all bots that are up to mischief on o
 Otherwise, it should of course also provide us with the wide range of possibilities that Discord provides bots.
 
 # Who can participate?
-Pretty much anyone who understands Java and can put up with reading through the JDA Documentation. Of course he should also be a member of the Discord server (https://www.discord.gg/gNTFUVYm6B) and be reliable and trustworthy!
+Pretty much anyone who understands Java and can put up with reading through the JDA Documentation. Of course he should also be a member of the Discord server (https://www.discord.gg/6FBK9d2dDZ) and be reliable and trustworthy!
 Once accepted, you also get a purple "Developer" role and access to any development channels on the server. If you are interested, just get in touch on the Discord server!
 
 # How do we work?
 The whole repository is built like a Maven project. It doesn't really matter which editor you use for this, but I work with Eclipse and if we want to be able to help each other with problems, it would make more sense that we all work with one editor. However, if you don't care about that, I won't stand in your way if you want to use a different one.
-Otherwise we communicate via a separate channel on the NoLimits Discord Server and otherwise organize ourselves completely via it. Also, with the #👽-github-logs channel, we can follow what's happening with the repository here!
+Otherwise we communicate via a separate channel on the NoLimits Discord Server and otherwise organize ourselves completely via it. Also, with the #👽-dev-logs channel, we can follow what's happening with the repository here!
