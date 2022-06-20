@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.Role;
 
 public class ServerUtilities {
 	
-	public void rolecheck() {
+	public static void rolecheck() {
 		final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
 		if (guild == null) {
 			return;
@@ -42,7 +42,7 @@ public class ServerUtilities {
 				rs.sorter(guild, member, sr3, gr3);
 				rs.sorter(guild, member, sr4, gr4);
 				rs.sorter(guild, member, sr5, gr5);
-				if (member.getRoles().contains(guild.getRoleById(ConfigLoader.run.getGuildConfig(guild).getLong("muterole")))) {
+				if (member.getRoles().contains(guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("muterole")))) {
 					guild.removeRoleFromMember(member, guild.getRoleById("709478250253910103")).queue();
 				} else {
 					if (!member.getRoles().contains(guild.getRoleById("709478250253910103"))) {
@@ -53,7 +53,7 @@ public class ServerUtilities {
 		}
 	}
 	
-	public void controlChannels(boolean action) {
+	public static void controlChannels(boolean action) {
 		final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
 		if (guild == null) {
 			return;

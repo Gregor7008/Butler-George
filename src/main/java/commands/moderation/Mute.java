@@ -18,9 +18,9 @@ public class Mute implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getOption("member").getAsUser();
-		ConfigLoader.run.getMemberConfig(guild, user).put("muted", true);
-		event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/mute:success").replaceDescription("{user}", user.getName()).convert()).queue();
-		ModEngine.run.modCheck(guild);
+		ConfigLoader.getMemberConfig(guild, user).put("muted", true);
+		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/mute:success").replaceDescription("{user}", user.getName()).convert()).queue();
+		ModEngine.run.guildCheck(guild);
 	}
 
 	@Override
@@ -32,6 +32,6 @@ public class Mute implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/mute:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/moderation/mute:help");
 	}
 }

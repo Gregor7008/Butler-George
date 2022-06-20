@@ -36,7 +36,7 @@ public class Userinfo implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/utilities/userinfo:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/utilities/userinfo:help");
 	}
 	
 	private void listInfo (SlashCommandInteractionEvent event, boolean moderator) {
@@ -44,14 +44,14 @@ public class Userinfo implements Command{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
-		String[] titles = AnswerEngine.build.getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
+		String[] titles = AnswerEngine.getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
 		if (event.getOption("user") == null) {
 			member = event.getMember();
 		} else {
 			member = event.getGuild().getMember(event.getOption("user").getAsUser());
 		}
 		if (member.equals(event.getGuild().getSelfMember())) {
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(event.getGuild(), event.getUser(), "/eastereggs:6").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(AnswerEngine.fetchMessage(event.getGuild(), event.getUser(), "/eastereggs:6").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (member.getTimeBoosted() == null) {
@@ -62,7 +62,7 @@ public class Userinfo implements Command{
 		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(AnswerEngine.build.footer);
+		eb.setFooter(AnswerEngine.footer);
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getUser().getName() + "`", true);
@@ -73,10 +73,10 @@ public class Userinfo implements Command{
 		eb.addField(":rocket:" + titles[7], "`" + booster + "`", true);
 		eb.addField(":calendar:" + titles[8], "`" + member.getTimeJoined().format(formatter) + "`", true);
 		if(moderator) {eb.addField(":calendar:" + titles[9], "`" + member.getUser().getTimeCreated().format(formatter) + "`", true);
-					   eb.addField(":warning:" + titles[10], "`" + String.valueOf(ConfigLoader.run.getMemberConfig(event.getGuild(), member.getUser()).getJSONArray("warnings").length()) + "`", true);
+					   eb.addField(":warning:" + titles[10], "`" + String.valueOf(ConfigLoader.getMemberConfig(event.getGuild(), member.getUser()).getJSONArray("warnings").length()) + "`", true);
 					   eb.addField(":clock11:" + titles[16], "`" + member.getTimeOutEnd().format(formatter) + "`", true);}
-		eb.addField(":card_index:" + titles[11], "`" + String.valueOf(ConfigLoader.run.getMemberConfig(event.getGuild(), member.getUser()).getInt("experience")) + "`", true);
-		eb.addField(":pager:" + titles[12], "`" + String.valueOf(ConfigLoader.run.getMemberConfig(event.getGuild(), member.getUser()).getInt("level")) + "`", true);
+		eb.addField(":card_index:" + titles[11], "`" + String.valueOf(ConfigLoader.getMemberConfig(event.getGuild(), member.getUser()).getInt("experience")) + "`", true);
+		eb.addField(":pager:" + titles[12], "`" + String.valueOf(ConfigLoader.getMemberConfig(event.getGuild(), member.getUser()).getInt("level")) + "`", true);
 		eb.addField(":alarm_clock:" + titles[13], "`" + member.getOnlineStatus().toString() + "`", true);
 		eb.addField(":abacus:" + titles[14], "`" + String.valueOf(member.getRoles().size()) + "`", true);
 		if (member.getRoles().size() > 0) {

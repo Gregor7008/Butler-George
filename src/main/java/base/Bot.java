@@ -12,9 +12,10 @@ import org.json.JSONObject;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import components.base.AnswerEngine;
-import components.base.ConfigCheck;
+import components.base.ConfigVerifier;
 import components.base.ConfigLoader;
 import components.base.ConsoleEngine;
+import components.base.assets.ConfigManager;
 import components.moderation.ModEngine;
 import components.moderation.PenaltyEngine;
 import components.moderation.ServerUtilities;
@@ -30,31 +31,18 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 public class Bot {
 	
 	public static Bot run;
-	
+	public static String version = "V2.0-dev";
+	public static String name = "Butler George";
+	public static String id = "853887837823959041";
+	public static String homeID = "708381749826289666";
 	public JDA jda;
 	private EventWaiter eventWaiter = new EventWaiter();
 	private Timer timer = new Timer();
 	public int timerCount = 0;
 	public boolean noErrorOccured = true;
-	public static String token, homeID;
 	
-	public static void main(String[] args) {
-		if (args.length <= 0) {
-			System.out.println("You have to provide a bot token!");
-			System.exit(0);
-		}
-		token = args[0];
-		homeID = "708381749826289666";
-		try {
-			new Bot(token);
-		} catch (LoginException | InterruptedException | IOException ex) {
-			ex.printStackTrace();
-		}
-	}
-	
-	private Bot(String token) throws LoginException, InterruptedException, IOException {
+	public Bot(String token) throws LoginException, InterruptedException, IOException {
 		run = this;
-	    new ConfigLoader();
 	    //Create Bot
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(eventWaiter);
@@ -64,53 +52,57 @@ public class Bot {
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
-	    jda.getPresence().setActivity(Activity.playing("V1.3-beta"));
+	    jda.getPresence().setActivity(Activity.playing(version));
+	    GUI.get.setBotRunning(true);
 	    //Startup engines
-	    Thread.setDefaultUncaughtExceptionHandler(new ConsoleEngine());
-	    new ConfigCheck();
-	    new AnswerEngine();
+	    Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.out);
+	    new ConfigVerifier();
 	    new PenaltyEngine();
 	    new ModEngine();
-	    new ServerUtilities().controlChannels(true);
+	    ServerUtilities.controlChannels(true);
     	this.checkConfigs();
     	this.startTimer();
+    	GUI.get.updateStatistics();
+    	GUI.get.startRuntimeMeasuring();
 	}
 	
-	public void shutdown(Boolean delete) {
-		new ServerUtilities().controlChannels(false);
+	public void shutdown(boolean handleManagedChannels) {
+		ServerUtilities.controlChannels(false);
 		List<Guild> guilds = jda.getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);
-    		if (delete) {
-    			JSONObject createdchannels = ConfigLoader.run.getFirstGuildLayerConfig(guild, "createdchannels");
+    		if (handleManagedChannels) {
+    			JSONObject createdchannels = ConfigLoader.getFirstGuildLayerConfig(guild, "createdchannels");
     			if (!createdchannels.isEmpty()) {
     				createdchannels.keySet().forEach(e -> guild.getVoiceChannelById(e).delete().queue());
     			}
-    			if (ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel") != 0) {
-    				long chid = ConfigLoader.run.getGuildConfig(guild).getLong("levelmsgchannel");
-    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(AnswerEngine.build.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
-        			ConfigLoader.run.getGuildConfig(guild).put("offlinemsg", msgid);
+    			if (ConfigLoader.getGuildConfig(guild).getLong("systeminfochannel") != 0) {
+    				long chid = ConfigLoader.getGuildConfig(guild).getLong("systeminfochannel");
+    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(AnswerEngine.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
+        			ConfigLoader.getGuildConfig(guild).put("offlinemsg", msgid);
         		}
     		}
-    		if (ConfigLoader.run.getGuildConfig(guild).getLong("supportchat") != 0) {
-    			guild.getTextChannelById(ConfigLoader.run.getGuildConfig(guild).getLong("supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+    		if (ConfigLoader.getGuildConfig(guild).getLong("supportchat") != 0) {
+    			guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
     		}
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
+		GUI.get.setBotRunning(false);
+		GUI.get.stopRuntimeMeasuring();
 		if (noErrorOccured) {
-			ConfigLoader.manager.pushCache();
+			ConfigManager.pushCache();
 		}
 		ConsoleEngine.out.info(this, "Bot offline");
-		this.wait(2000);
-		System.exit(0);
+		run = null;
+		jda = null;
 	}
 	
 	private void checkConfigs() {
 		for (int i = 0; i < jda.getGuilds().size(); i++) {
     		Guild guild = jda.getGuilds().get(i);
-    		ConfigCheck.run.checkGuildConfigs(guild);
-    		ConfigCheck.run.checkUserConfigs(guild);
+    		ConfigVerifier.run.guildCheck(guild);
+    		ConfigVerifier.run.usersCheck(guild);
 		}
 	}
 	
@@ -121,21 +113,16 @@ public class Bot {
 				List<Guild> guilds = jda.getGuilds();
 				for (int i = 0; i < guilds.size(); i++) {
 					Guild guild = guilds.get(i);
-					PenaltyEngine.run.penaltyCheck(guild);
-					ModEngine.run.modCheck(guild);
+					PenaltyEngine.run.guildCheck(guild);
+					ModEngine.run.guildCheck(guild);
 				}
 				if (timerCount > 0 && noErrorOccured) {
-					ConfigLoader.manager.pushCache();
+					ConfigManager.pushCache();
 				}
 				timerCount++;
+				GUI.get.increaseCyclesCounter();
 			}
 		}, 0, 5*60*1000);
-	}
-	
-	private void wait(int time) {
-		try {
-			Thread.sleep(time);
-		} catch (InterruptedException e) {}
 	}
 	
 	public EventWaiter getWaiter() {

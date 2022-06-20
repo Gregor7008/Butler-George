@@ -19,27 +19,27 @@ public class CustomChannelRoles implements Command{
 	public void perform(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		JSONArray ccroles = ConfigLoader.run.getGuildConfig(guild).getJSONArray("customchannelroles");
+		JSONArray ccroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles");
 		long roleID = event.getOption("role").getAsRole().getIdLong();
 		if (event.getSubcommandName().equals("set")) {
 			ccroles.clear();
 			ccroles.put(roleID);
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/customchannelroles:setsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/customchannelroles:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("add")) {
 			ccroles.put(roleID);
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/customchannelroles:addsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/customchannelroles:addsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("remove")) {
-			ConfigLoader.run.removeValueFromArray(ccroles, roleID);
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/customchannelroles:remsuccess").convert()).queue();
+			ConfigLoader.removeValueFromArray(ccroles, roleID);
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/customchannelroles:remsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubcommandName().equals("clear")) {
 			ccroles.clear();
-			event.replyEmbeds(AnswerEngine.build.fetchMessage(guild, user, "/commands/moderation/customchannelroles:clearsuccess").convert()).queue();
+			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/moderation/customchannelroles:clearsuccess").convert()).queue();
 			return;
 		}
 	}
@@ -56,6 +56,6 @@ public class CustomChannelRoles implements Command{
 
 	@Override
 	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.build.getRaw(guild, user, "/commands/moderation/customchannelroles:help");
+		return AnswerEngine.getRaw(guild, user, "/commands/moderation/customchannelroles:help");
 	}
 }
