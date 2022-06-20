@@ -28,7 +28,7 @@ public class Levelreward implements ActionRequest {
 			levelrewards.put(String.valueOf(event.getSubAction().getOptionAsInt(1)), event.getOptionAsRole(0).getIdLong());
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/levelreward:addsuccess")
 					.replaceDescription("{role}", event.getOptionAsRole(0).getAsMention())
-					.replaceDescription("{level}", String.valueOf(event.getSubAction().getOptionAsInt(1))));
+					.replaceDescription("{level}", String.valueOf(event.getSubAction().getOptionAsInt(1)))).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("remove")) {
@@ -36,13 +36,13 @@ public class Levelreward implements ActionRequest {
 			try {
 				levelrewards.getLong(String.valueOf(level));
 			} catch (JSONException e) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/levelreward:noreward"));
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/levelreward:noreward")).queue();
 				return;
 			}
 			long roleID = levelrewards.getLong(String.valueOf(level));
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/levelreward:remsuccess")
 					.replaceDescription("{role}", guild.getRoleById(roleID).getAsMention())
-					.replaceDescription("{level}", String.valueOf(level)));
+					.replaceDescription("{level}", String.valueOf(level))).queue();
 			levelrewards.remove(String.valueOf(level));
 			return;
 		}
@@ -68,7 +68,7 @@ public class Levelreward implements ActionRequest {
 	private void listrewards(Action event, JSONObject levelrewards) {
 		StringBuilder sB = new StringBuilder();
 		if (levelrewards.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/levelreward:norewards"));;
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/levelreward:norewards")).queue();
 			return;
 		}
 		Object[] rewards = levelrewards.keySet().toArray();
@@ -81,6 +81,6 @@ public class Levelreward implements ActionRequest {
 				sB.append(guild.getRoleById(levelrewards.getLong((String) rewards[i])).getAsMention() + "\s->\s" + rewards[i] + "\n");
 			}
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/levelreward:list").replaceDescription("{list}", sB.toString()));
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/levelreward:list").replaceDescription("{list}", sB.toString())).queue();
 	}
 }

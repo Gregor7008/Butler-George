@@ -1,4 +1,4 @@
-package commands.utilities;
+package commands.administration;
 
 import components.base.LanguageEngine;
 import components.commands.Command;

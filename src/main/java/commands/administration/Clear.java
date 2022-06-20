@@ -1,4 +1,4 @@
-package commands.utilities;
+package commands.administration;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

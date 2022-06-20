@@ -24,13 +24,13 @@ public class AutoRole implements ActionRequest {
 		if (event.getSubAction().getName().equals("add")) {
 			Role role = event.getSubAction().getOptionAsRole(0);
 			ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles").put(role.getIdLong());
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/autorole:addsuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/autorole:addsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("remove")) {
 			Role role = event.getSubAction().getOptionAsRole(0);
 			ConfigLoader.removeValueFromArray(ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles"), role.getIdLong());
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/autorole:removesuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/autorole:removesuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("list")) {
@@ -56,7 +56,7 @@ public class AutoRole implements ActionRequest {
 		StringBuilder sB = new StringBuilder();
 		JSONArray autoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles");
 		if (autoroles.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/autorole:noautoroles"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/autorole:noautoroles")).queue();
 			return;
 		}
 		for (int i = 0; i < autoroles.length(); i++) {
@@ -68,6 +68,6 @@ public class AutoRole implements ActionRequest {
 				sB.append(guild.getRoleById(autoroles.getLong(i)).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/autorole:list").replaceDescription("{list}", sB.toString()));
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/autorole:list").replaceDescription("{list}", sB.toString())).queue();
 	}
 }

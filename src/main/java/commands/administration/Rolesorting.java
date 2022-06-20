@@ -1,4 +1,4 @@
-package commands.utilities;
+package commands.administration;
 
 import java.util.ArrayList;
 import java.util.List;

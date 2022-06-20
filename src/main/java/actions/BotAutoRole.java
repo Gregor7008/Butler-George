@@ -26,13 +26,13 @@ public class BotAutoRole implements ActionRequest {
 		if (event.getSubAction().getName().equals("add")) {
 			Role role = event.getSubAction().getOptionAsRole(0);
 			ConfigLoader.getGuildConfig(guild).getJSONArray("botautoroles").put(role.getIdLong());
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/botautorole:addsuccess"));;
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/botautorole:addsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("remove")) {
 			Role role = event.getSubAction().getOptionAsRole(0);
 			ConfigLoader.removeValueFromArray(ConfigLoader.getGuildConfig(guild).getJSONArray("botautoroles"), role.getIdLong());
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/botautorole:removesuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("list")) {
@@ -58,7 +58,7 @@ public class BotAutoRole implements ActionRequest {
 		StringBuilder sB = new StringBuilder();
 		JSONArray botautoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("botautoroles");
 		if (botautoroles.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/botautorole:nobotautoroles"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/botautorole:nobotautoroles")).queue();
 			return;
 		}
 		for (int i = 0; i < botautoroles.length(); i++) {
@@ -70,6 +70,6 @@ public class BotAutoRole implements ActionRequest {
 				sB.append(guild.getRoleById(botautoroles.getLong(i)).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/botautorole:list").replaceDescription("{list}", sB.toString()));
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/botautorole:list").replaceDescription("{list}", sB.toString())).queue();
 	}
 }

@@ -24,12 +24,12 @@ public class Goodbye implements ActionRequest {
 			String message = event.getSubAction().getOptionAsString(0);
 			String channelid = event.getSubAction().getOptionAsChannel(1).getId();
 			ConfigLoader.getGuildConfig(guild).put("goodbyemsg", message + ";" + channelid);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/goodbye:setsuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/goodbye:setsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("off")) {
 			ConfigLoader.getGuildConfig(guild).put("goodbyemsg", "");
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/goodbye:offsuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/goodbye:offsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("test")) {
@@ -43,9 +43,9 @@ public class Goodbye implements ActionRequest {
 							.replace("{membercount}", Integer.toString(guild.getMemberCount()))
 							.replace("{timejoined}", event.getMember().getTimeJoined().format(formatter)).replace("{date}", currentdate);
 				guild.getTextChannelById(goodbyemsg[1]).sendMessage(msg).queue();
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/goodbye:testsuccess"));
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/goodbye:testsuccess")).queue();
 			} else {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/goodbye:nonedefined"));
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/goodbye:nonedefined")).queue();
 			}
 		}
 	}

@@ -3,7 +3,7 @@ package components.commands.moderation;
 import java.util.List;
 
 import base.Bot;
-import commands.utilities.Rolesorting;
+import commands.administration.Rolesorting;
 import components.base.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;

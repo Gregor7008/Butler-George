@@ -19,12 +19,12 @@ public class LevelChannel implements ActionRequest {
 		final User user = event.getUser();
 		if (event.getSubAction().getName().equals("set")) {
 			ConfigLoader.getGuildConfig(guild).put("levelmsgchannel", event.getOptionAsChannel(0).getIdLong());
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/levelchannel:setsuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/levelchannel:setsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("clear")) {
 			ConfigLoader.getGuildConfig(guild).put("levelmsgchannel", 0L);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/levelchannel:clearsuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/levelchannel:clearsuccess")).queue();
 		}
 	}
 
