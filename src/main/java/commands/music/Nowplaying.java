@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Nowplaying implements Command{
+public class Nowplaying implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -36,5 +36,10 @@ public class Nowplaying implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("nowplaying", "Shows you information about the currently playing track!");
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 }

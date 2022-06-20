@@ -1,10 +1,11 @@
 package commands.utilities;
 
+import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.base.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,7 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-public class Levelbackground implements Command{
+public class Levelbackground implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -64,5 +65,10 @@ public class Levelbackground implements Command{
 		} catch (IllegalArgumentException e) {}
 		
 		event.replyEmbeds(eb0.build(), eb1.build(), eb2.build(), eb3.build(), eb4.build()).queue();
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 }

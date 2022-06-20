@@ -11,17 +11,16 @@ import org.json.JSONObject;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
-import components.base.LanguageEngine;
-import components.commands.moderation.ModEngine;
-import components.commands.moderation.ServerUtilities;
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
 import components.base.ConfigVerifier;
 import components.base.ConsoleEngine;
+import components.base.LanguageEngine;
+import components.commands.moderation.ModEngine;
+import components.commands.moderation.ServerUtilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -74,14 +73,11 @@ public class Bot {
     			if (!createdchannels.isEmpty()) {
     				createdchannels.keySet().forEach(e -> guild.getVoiceChannelById(e).delete().queue());
     			}
-    			if (ConfigLoader.getGuildConfig(guild).getLong("systeminfochannel") != 0) {
-    				long chid = ConfigLoader.getGuildConfig(guild).getLong("systeminfochannel");
+    			if (ConfigLoader.getGuildConfig(guild).getLong("communityinbox") != 0) {
+    				long chid = ConfigLoader.getGuildConfig(guild).getLong("communityinbox");
     				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
         			ConfigLoader.getGuildConfig(guild).put("offlinemsg", msgid);
         		}
-    		}
-    		if (ConfigLoader.getGuildConfig(guild).getLong("supportchat") != 0) {
-    			guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("supportchat")).upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
     		}
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);

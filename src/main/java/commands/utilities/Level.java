@@ -17,12 +17,13 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 
+import components.base.ConfigLoader;
+import components.base.ConsoleEngine;
 import components.base.LanguageEngine;
 import components.commands.Command;
 import components.commands.utilities.LevelEngine;
-import components.base.ConfigLoader;
-import components.base.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -57,6 +58,11 @@ public class Level implements Command {
 		CommandData command = Commands.slash("level", "Check your current level or the one of another user!")
 											  .addOptions(new OptionData(OptionType.USER, "user", "Mention another user (optional)").setRequired(false));
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 	
 	public File renderLevelcard(User iuser, Guild guild) {

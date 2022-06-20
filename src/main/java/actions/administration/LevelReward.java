@@ -1,4 +1,4 @@
-package actions;
+package actions.administration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class Levelreward implements ActionRequest {
+public class LevelReward implements ActionRequest {
 
 	private Guild guild;
 	private User user;

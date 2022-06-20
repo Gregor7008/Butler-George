@@ -2,7 +2,6 @@ package commands;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import actions.Close;
 import commands.administration.Clear;
 import commands.administration.Move;
 import commands.administration.Rolesorting;
@@ -47,7 +46,6 @@ public class CommandList {
 		this.commands.put("leave", new Leave());
 		this.commands.put("clear", new Clear());
 		this.commands.put("rolesort", new Rolesorting());
-		this.commands.put("close", new Close());
 		this.commands.put("move", new Move());
 		
 		//Music

@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Skip implements Command{
+public class Skip implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -48,5 +48,10 @@ public class Skip implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("skip", "Skips the currently playing track!");
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 }

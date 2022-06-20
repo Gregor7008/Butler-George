@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public class PingAndMove implements Command{
+public class PingAndMove implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -61,5 +61,10 @@ public class PingAndMove implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("pingandmove", "Join a user in a full voice channel!").addOption(OptionType.USER, "user", "The user whoms channel you want to join", true);
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 }

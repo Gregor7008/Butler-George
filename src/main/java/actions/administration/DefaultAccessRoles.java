@@ -1,4 +1,4 @@
-package actions;
+package actions.administration;
 
 import org.json.JSONArray;
 

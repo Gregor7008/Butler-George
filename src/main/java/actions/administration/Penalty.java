@@ -1,4 +1,4 @@
-package actions;
+package actions.administration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class Penalty implements ActionRequest {
 	
+	private final EventWaiter waiter = Bot.run.getWaiter();
 	private Action event;
 	private Message message;
 	private User user;
@@ -67,7 +68,6 @@ public class Penalty implements ActionRequest {
 	}
 	
 	private void removepenalties(Action event) {
-		EventWaiter waiter = Bot.run.getWaiter();
 		String response = this.listpenalties(event);
 		if (response != null) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/penalty:remlist").replaceDescription("{list}", response)).queue();
@@ -95,7 +95,6 @@ public class Penalty implements ActionRequest {
 				.addOption("Temporary ban", "tb")
 				.addOption("Permanent ban", "pm")
 				.build();
-		EventWaiter waiter = Bot.run.getWaiter();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/penalty:add1")).complete()
 			 .editMessageComponents(ActionRow.of(menu)).queue();
 		waiter.waitForEvent(SelectMenuInteractionEvent.class,
@@ -108,7 +107,6 @@ public class Penalty implements ActionRequest {
 	}
 	
 	private void addpenalties2(String plannedpunish) {
-		EventWaiter waiter = Bot.run.getWaiter();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/penalty:add2")).queue();
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				e -> {if(!e.getChannel().getId().equals(message.getChannel().getId())) {return false;}
@@ -126,7 +124,6 @@ public class Penalty implements ActionRequest {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/penalty:error")).queue();
 			return;
 		} catch (JSONException e) {}
- 		EventWaiter waiter = Bot.run.getWaiter();
 		switch (plannedpunish) {
 		case "rr":
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/penalty:add3role")).queue();

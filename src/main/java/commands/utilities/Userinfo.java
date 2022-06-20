@@ -3,9 +3,9 @@ package commands.utilities;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
+import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.base.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Userinfo implements Command{
+public class Userinfo implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -30,6 +30,11 @@ public class Userinfo implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("userinfo", "Requests information about a user").addOption(OptionType.USER, "user", "The member the information should be about", false);
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 	
 	private void listInfo (SlashCommandInteractionEvent event, boolean moderator) {

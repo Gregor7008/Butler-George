@@ -6,14 +6,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import base.Bot;
+import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.base.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.IPermissionHolder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.User;
@@ -25,7 +26,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
-public class Channelpermission implements Command{
+public class Channelpermission implements Command {
 	
 	List<Message> msgs = new ArrayList<>();
 
@@ -81,6 +82,11 @@ public class Channelpermission implements Command{
 						.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
 						.addOption(OptionType.USER, "user", "The wanted user", true));
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 	
 	private void defineEdit(String selected, SlashCommandInteractionEvent event, SelectMenuInteractionEvent sme, boolean action) {

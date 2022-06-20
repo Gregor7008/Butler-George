@@ -160,6 +160,7 @@ public class ConfigManager {
 		newConfig.put("id",							guild.getIdLong());
 		newConfig.put("autoroles",					new JSONArray());
 		newConfig.put("botautoroles",				new JSONArray());
+		newConfig.put("communityinbox",				0L);
 		newConfig.put("customchannelcategories",	new JSONObject());
 		newConfig.put("customchannelaccessroles",	new JSONArray());
 		newConfig.put("customchannelroles",			new JSONArray());
@@ -167,18 +168,15 @@ public class ConfigManager {
 		newConfig.put("goodbyemsg",					"");
 		newConfig.put("createdchannels",			new JSONObject());
 		newConfig.put("join2createchannels",		new JSONObject());
-		newConfig.put("levelmsgchannel",			0L);
 		newConfig.put("levelrewards",				new JSONObject());
 		newConfig.put("modrole",					0L);
+		newConfig.put("modinbox",					0L);
 		newConfig.put("offlinemsg",					0L);
 		newConfig.put("penalties",					new JSONObject());
 		newConfig.put("reportchannel",				0L);
 		newConfig.put("suggestionchannel",			0L);
-		newConfig.put("supportcategory",			0L);
-		newConfig.put("supportchat",				0L);
 		newConfig.put("supportrole",				0L);
 		newConfig.put("supporttalk",				0L);
-		newConfig.put("systeminfochannel",			0L);
 		newConfig.put("ticketchannels",				new JSONArray());
 		newConfig.put("ticketcount",				1);
 		newConfig.put("welcomemsg",					"");

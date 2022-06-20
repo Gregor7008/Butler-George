@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Queue implements Command{
+public class Queue implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -68,16 +68,21 @@ public class Queue implements Command{
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/music/queue:queue").replaceDescription("{list}", sB.toString()).convert()).queue();
 	}
 
+	@Override
+	public CommandData initialize() {
+		CommandData command = Commands.slash("queue", "Displays the current music queue!");
+		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
+	}
+
 	private String formatTime(long timeInMillis) {
 		final long hours = timeInMillis / TimeUnit.HOURS.toMillis(1);
 		final long minutes = timeInMillis / TimeUnit.MINUTES.toMillis(1);
 		final long seconds = timeInMillis % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
 		return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-	}
-
-	@Override
-	public CommandData initialize() {
-		CommandData command = Commands.slash("queue", "Displays the current music queue!");
-		return command;
 	}
 }

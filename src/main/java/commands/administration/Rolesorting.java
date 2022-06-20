@@ -9,6 +9,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import base.Bot;
 import components.base.LanguageEngine;
 import components.commands.Command;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -20,7 +21,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Rolesorting implements Command{
+public class Rolesorting implements Command {
 	
 	private SlashCommandInteractionEvent oevent;
 	private Role grouprole;
@@ -47,6 +48,11 @@ public class Rolesorting implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("rolesort", "Adds and removes roles by other roles (If member has a role, give him another role)");
 		return command;
+	}
+	
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return member.hasPermission(Permission.MANAGE_ROLES);
 	}
 
 	private void definegroup() {

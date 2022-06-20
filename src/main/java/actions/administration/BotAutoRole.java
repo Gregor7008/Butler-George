@@ -1,4 +1,4 @@
-package actions;
+package actions.administration;
 
 import org.json.JSONArray;
 
@@ -43,14 +43,14 @@ public class BotAutoRole implements ActionRequest {
 	@Override
 	public ActionData initialize() {
 		ActionData actionData = new ActionData(this).setName("BotAutoRoles")
-				  											  .setInfo("Configure roles that should be given to every new bot joining")
-				  											  .setMinimumPermission(Permission.MANAGE_ROLES)
-				  											  .setSubActions(new SubActionData[] {
-				  													  new SubActionData("add", OptionType.ROLE),
-				  													  new SubActionData("remove", OptionType.ROLE),
-				  													  new SubActionData("list")
-				  										      })
-				  											  .setCategory(ActionData.ADMINISTRATION);
+				  									.setInfo("Configure roles that should be given to every new bot joining")
+				  									.setMinimumPermission(Permission.MANAGE_ROLES)
+				  									.setCategory(ActionData.ADMINISTRATION)
+				  									.setSubActions(new SubActionData[] {
+				  											new SubActionData("add", OptionType.ROLE),
+				  											new SubActionData("remove", OptionType.ROLE),
+				  											 new SubActionData("list")
+				  									});
 		return actionData;
 	}
 	

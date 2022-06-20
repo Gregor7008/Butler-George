@@ -1,4 +1,4 @@
-package actions;
+package actions.administration;
 
 import components.actions.Action;
 import components.actions.ActionData;
@@ -32,8 +32,8 @@ public class SuggestionChannel implements ActionRequest {
 	public ActionData initialize() {
 		ActionData actionData = new ActionData(this).setName("SuggestionChannel")
 													.setInfo("Configure a channel to receive suggestions on your server")
-													.setCategory(ActionData.ADMINISTRATION)
 													.setMinimumPermission(Permission.MANAGE_SERVER)
+													.setCategory(ActionData.ADMINISTRATION)
 													.setSubActions(new SubActionData[] {
 															new SubActionData("set", OptionType.CHANNEL),
 															new SubActionData("clear")

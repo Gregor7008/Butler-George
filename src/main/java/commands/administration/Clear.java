@@ -5,7 +5,9 @@ import java.util.concurrent.TimeUnit;
 
 import components.base.LanguageEngine;
 import components.commands.Command;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -15,7 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class Clear implements Command{
+public class Clear implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -36,5 +38,10 @@ public class Clear implements Command{
 		CommandData command = Commands.slash("clear", "Deletes a specific number of messages from this channel!")
 				.addOptions(new OptionData(OptionType.INTEGER, "count", "Hand over the number of messages you want to delete!", true));
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return member.hasPermission(Permission.MESSAGE_MANAGE);
 	}
 }

@@ -5,10 +5,10 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
-import components.base.LanguageEngine;
-import components.commands.Command;
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class Suggest implements Command{
+public class Suggest implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -59,5 +59,10 @@ public class Suggest implements Command{
 		Message message = channel.sendMessageEmbeds(eb.build()).complete();
 		message.addReaction("U+1F44D").queue();
 		message.addReaction("U+1F44E").queue();
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 }

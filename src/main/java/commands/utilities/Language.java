@@ -5,10 +5,11 @@ import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
+import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
@@ -18,7 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
-public class Language implements Command{
+public class Language implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -77,5 +78,10 @@ public class Language implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("language", "Sets your preferred language in which the bot should answer you in on this server");
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 }

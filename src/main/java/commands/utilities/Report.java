@@ -4,18 +4,19 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
+import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.base.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Report implements Command{
+public class Report implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -47,5 +48,10 @@ public class Report implements Command{
 										.addOption(OptionType.STRING, "reason", "The reason for your report", true)
 										.addOption(OptionType.STRING, "link", "The link to a message for evidence", false);
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 }

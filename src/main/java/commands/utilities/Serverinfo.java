@@ -7,11 +7,12 @@ import components.base.LanguageEngine;
 import components.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Serverinfo implements Command{
+public class Serverinfo implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -42,5 +43,10 @@ public class Serverinfo implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("serverinfo", "Lists information about this server");
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 }

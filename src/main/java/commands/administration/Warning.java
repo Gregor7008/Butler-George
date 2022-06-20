@@ -7,11 +7,13 @@ import org.json.JSONArray;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
+import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
 import components.commands.moderation.ModEngine;
-import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -22,7 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-public class Warning implements Command{
+public class Warning implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -81,6 +83,16 @@ public class Warning implements Command{
 								  .addSubcommands(new SubcommandData("remove", "Removes a warning of a user")
 										  	  .addOptions(new OptionData(OptionType.USER, "user", "The user you want to remove the warning from", true)));
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		Role modRole = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("modrole"));
+		if (modRole == null) {
+			return false;
+		} else {
+			return member.getRoles().contains(modRole);
+		}
 	}
 	
 	private boolean listwarnings(SlashCommandInteractionEvent event) {

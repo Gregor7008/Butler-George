@@ -1,25 +1,23 @@
-package actions;
+package actions.moderation;
 
 import org.json.JSONObject;
 
-import components.base.LanguageEngine;
-import components.commands.Command;
-import components.commands.moderation.ModEngine;
+import components.actions.Action;
+import components.actions.ActionData;
+import components.actions.ActionRequest;
 import components.base.ConfigLoader;
+import components.base.LanguageEngine;
+import components.commands.moderation.ModEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Unmute implements Command{
+public class Unmute implements ActionRequest {
 
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(Action event) {
 		final Guild guild = event.getGuild();
 		final User user =  event.getUser();
-		final User cuser = event.getOption("user").getAsUser();
+		final User cuser = event.getOptionAsUser(0);
 		JSONObject userconfig = ConfigLoader.getMemberConfig(guild, cuser);
 		if (!userconfig.getBoolean("muted") && !userconfig.getBoolean("tempmuted")) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
@@ -32,8 +30,8 @@ public class Unmute implements Command{
 	}
 
 	@Override
-	public CommandData initialize() {
-		CommandData command = Commands.slash("unmute", "Unmute a user").addOption(OptionType.USER, "user", "The user that should be unmuted", true);
-		return command;
+	public ActionData initialize() {
+		//TODO Initialize Unmute
+		return null;
 	}
 }

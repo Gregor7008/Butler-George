@@ -1,7 +1,6 @@
 package base;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,13 +12,13 @@ import org.json.JSONObject;
 import commands.CommandList;
 import commands.music.Stop;
 import commands.utilities.Suggest;
+import components.base.ConfigLoader;
+import components.base.ConfigVerifier;
 import components.base.LanguageEngine;
 import components.commands.Command;
 import components.commands.moderation.ModMail;
 import components.commands.moderation.ServerUtilities;
 import components.commands.utilities.LevelEngine;
-import components.base.ConfigLoader;
-import components.base.ConfigVerifier;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Category;
@@ -29,7 +28,6 @@ import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -62,18 +60,14 @@ public class Processor extends ListenerAdapter {
 			Guild guild = guilds.get(i);
 			long msgid = ConfigLoader.getGuildConfig(guild).getLong("offlinemsg");
 			if (msgid != 0) {
-				guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("systeminfochannel")).retrieveMessageById(msgid).complete().delete().queue();
+				guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("communityinbox")).retrieveMessageById(msgid).complete().delete().queue();
 				ConfigLoader.getGuildConfig(guild).put("offlinemsg", 0L);
 			}
 		}
 		CommandListUpdateAction clua = event.getJDA().updateCommands();
-		CommandList commandList = new CommandList();
-		List<String> commandNames = new ArrayList<>();
-		commandNames.addAll(commandList.commands.keySet());
-		for (int e = 0; e < commandNames.size(); e++) {
-			Command cmd = commandList.commands.get(commandNames.get(e));
+		new CommandList().commands.forEach((name, cmd) -> {
 			clua.addCommands(cmd.initialize());
-		}
+		});
 		clua.queue();
 	}
 	
@@ -84,9 +78,11 @@ public class Processor extends ListenerAdapter {
 		}
 		GUI.get.increaseExecutionsCounter();
 		CommandList commandList = new CommandList();
-		Command command;
+		Command command = null;
 		if ((command = commandList.commands.get(event.getName())) != null) {
-			command.perform(event);
+			if (command.canBeAccessedBy(event.getMember()) || event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+				command.perform(event);
+			}
 		}
 		LevelEngine.getInstance().slashcommand(event);
 	}
@@ -105,30 +101,30 @@ public class Processor extends ListenerAdapter {
 				event.getMessage().delete().queue();
 				return;
 			}
-			long supportchid = ConfigLoader.getGuildConfig(guild).getLong("supportchat");
-			if (supportchid != 0 && event.getChannel().getIdLong() == supportchid && !user.isBot() && ConfigLoader.getGuildConfig(guild).getLong("supportrole") != 0) {
-				if (ConfigLoader.getGuildConfig(guild).getLong("supportcategory") == 0) {
-					Category cat = guild.createCategory("----------📝 Tickets ------------").complete();
-					cat.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-					cat.upsertPermissionOverride(guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole"))).setAllowed(Permission.VIEW_CHANNEL).queue();
-					ConfigLoader.getGuildConfig(guild).put("supportcategory", cat.getIdLong());
-				}
-				int curcount = ConfigLoader.getGuildConfig(guild).getInt("ticketcount");
-				int newcount = curcount + 1;
-				TextChannel ntc = guild.createTextChannel(
-						"Ticket #" + String.format("%05d", curcount),
-						guild.getCategoryById(ConfigLoader.getGuildConfig(guild).getLong("supportcategory"))).complete();
-				ntc.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-				ntc.upsertPermissionOverride(guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole"))).grant(Permission.VIEW_CHANNEL).queue();
-				ntc.upsertPermissionOverride(event.getMember()).grant(Permission.VIEW_CHANNEL).queue();
-				ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" 
-						+ guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole")).getAsMention()).queue();
-				ConfigLoader.getGuildConfig(guild).put("ticketcount", newcount);
-				ConfigLoader.getGuildConfig(guild).getJSONArray("ticketchannels").put(ntc.getIdLong());
-				event.getMessage().delete().queue();
-				event.getTextChannel().getManager().setSlowmode(120).queue();
-				return;
-			}
+//			long supportchid = ConfigLoader.getGuildConfig(guild).getLong("supportchat");
+//			if (supportchid != 0 && event.getChannel().getIdLong() == supportchid && !user.isBot() && ConfigLoader.getGuildConfig(guild).getLong("supportrole") != 0) {
+//				if (ConfigLoader.getGuildConfig(guild).getLong("supportcategory") == 0) {
+//					Category cat = guild.createCategory("----------📝 Tickets ------------").complete();
+//					cat.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+//					cat.upsertPermissionOverride(guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole"))).setAllowed(Permission.VIEW_CHANNEL).queue();
+//					ConfigLoader.getGuildConfig(guild).put("supportcategory", cat.getIdLong());
+//				}
+//				int curcount = ConfigLoader.getGuildConfig(guild).getInt("ticketcount");
+//				int newcount = curcount + 1;
+//				TextChannel ntc = guild.createTextChannel(
+//						"Ticket #" + String.format("%05d", curcount),
+//						guild.getCategoryById(ConfigLoader.getGuildConfig(guild).getLong("supportcategory"))).complete();
+//				ntc.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
+//				ntc.upsertPermissionOverride(guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole"))).grant(Permission.VIEW_CHANNEL).queue();
+//				ntc.upsertPermissionOverride(event.getMember()).grant(Permission.VIEW_CHANNEL).queue();
+//				ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" 
+//						+ guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole")).getAsMention()).queue();
+//				ConfigLoader.getGuildConfig(guild).put("ticketcount", newcount);
+//				ConfigLoader.getGuildConfig(guild).getJSONArray("ticketchannels").put(ntc.getIdLong());
+//				event.getMessage().delete().queue();
+//				event.getTextChannel().getManager().setSlowmode(120).queue();
+//				return;
+//			}
 			new ModMail(event, true);
 			LevelEngine.getInstance().messagereceived(event);
 		} else {

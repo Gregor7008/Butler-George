@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Embed implements Command{
+public class Embed implements Command {
 
 	private SlashCommandInteractionEvent oevent;
 	private EmbedBuilder eb;
@@ -54,6 +54,11 @@ public class Embed implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("embed", "Creates a custom embedded message!");
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 	
 	private void definetitle() {

@@ -8,13 +8,14 @@ import components.commands.Command;
 import components.commands.utilities.WebhookEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Webhook implements Command{
+public class Webhook implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -40,5 +41,10 @@ public class Webhook implements Command{
 										.addOption(OptionType.STRING, "link", "The link of the webhook", true)
 										.addOption(OptionType.STRING, "message", "The message that should be sent", true);
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 }

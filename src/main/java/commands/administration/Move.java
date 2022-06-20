@@ -1,9 +1,11 @@
 package commands.administration;
 
+import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -11,7 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Move implements Command{
+public class Move implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -44,5 +46,15 @@ public class Move implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("move", "Move a member into the support talk").addOption(OptionType.USER, "member", "The member you want to move", true);
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		Role supportRole = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("supportrole"));
+		if (supportRole == null) {
+			return false;
+		} else {
+			return member.getRoles().contains(supportRole);
+		}
 	}
 }

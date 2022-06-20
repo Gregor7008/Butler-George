@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Stop implements Command{
+public class Stop implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -41,6 +41,11 @@ public class Stop implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("stop", "Stops the currently playing music!");
 		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 	
 	public void stopandleave(Guild guild) {

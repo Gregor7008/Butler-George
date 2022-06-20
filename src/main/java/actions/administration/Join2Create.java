@@ -1,4 +1,4 @@
-package actions;
+package actions.administration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +32,6 @@ public class Join2Create implements ActionRequest {
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/join2create:adderror")).queue();
 			} catch (JSONException e) {
 				join2createchannels.put(id, new JSONObject());
-				//TODO Implement option to define settings for channels created of this join2create channel
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/join2create:addsuccess")).queue();
 			}
 		}

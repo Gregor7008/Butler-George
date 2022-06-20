@@ -1,4 +1,4 @@
-package actions;
+package actions.moderation;
 
 import components.actions.Action;
 import components.actions.ActionData;

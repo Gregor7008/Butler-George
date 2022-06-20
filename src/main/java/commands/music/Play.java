@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class Play implements Command{
+public class Play implements Command {
 
 	@Override
 	public void perform(SlashCommandInteractionEvent event) {
@@ -42,6 +42,17 @@ public class Play implements Command{
 			return;
 		}
 		this.load(event, argument, musicManager, channel, member);
+	}
+
+	@Override
+	public CommandData initialize() {
+		CommandData command = Commands.slash("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!", true));
+		return command;
+	}
+
+	@Override
+	public boolean canBeAccessedBy(Member member) {
+		return true;
 	}
 	
 	private void load(SlashCommandInteractionEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
@@ -69,11 +80,5 @@ public class Play implements Command{
 		} catch (MalformedURLException e) {
 			return false;
 		}
-	}
-
-	@Override
-	public CommandData initialize() {
-		CommandData command = Commands.slash("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!", true));
-		return command;
 	}
 }
