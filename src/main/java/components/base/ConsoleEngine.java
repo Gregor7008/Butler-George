@@ -180,9 +180,6 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 				ConfigLoader.getMemberConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2])).getJSONArray("warnings").put("Administrative actions");
 				this.debug(this, "User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
 				break;
-			case "printTimer":
-				this.info(this, String.valueOf(Bot.run.timerCount));
-				break;
 			case "pushCache":
 				if (ConfigManager.pushCache()) {
 					this.debug(this, "Cache successfully pushed");

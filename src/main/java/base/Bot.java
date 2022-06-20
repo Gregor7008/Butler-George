@@ -120,6 +120,7 @@ public class Bot {
 					ConfigManager.pushCache();
 				}
 				timerCount++;
+				GUI.get.increaseCyclesCounter();
 			}
 		}, 0, 5*60*1000);
 	}

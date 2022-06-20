@@ -128,6 +128,7 @@ public class GUI extends JFrame implements WindowListener{
 				{"Servers:", 0},
 				{"Users:", 0},
 				{"Push Paused:", false},
+				{"Timer Cycles:", 0}
 			},
 			new String[] {
 				"key", "value"
@@ -144,7 +145,16 @@ public class GUI extends JFrame implements WindowListener{
 		commandTable.setShowGrid(false);
 		commandTable.setModel(new DefaultTableModel(
 			new Object[][] {
-				{null, null},
+				{"stop", ""},
+				{"exit", ""},
+				{"giverole", "[Guild ID]  [User ID]  [Role ID]"},
+				{"removerole", "[Guild ID]  [User ID]  [Role ID]"},
+				{"kick", "[Guild ID]  [User ID]"},
+				{"ban", "[Guild ID]  [User ID]"},
+				{"unban", "[Guild ID]  [User ID]"},
+				{"warn", "[Guild ID]  [User ID]"},
+				{"pushCache", ""},
+				{"printCache", ""}
 			},
 			new String[] {
 				"key", "value"
@@ -192,6 +202,10 @@ public class GUI extends JFrame implements WindowListener{
 	
 	public void increaseExecutionsCounter() {
 		this.setTableValue(5, (int) this.getTableValue(5) + 1);
+	}
+	
+	public void increaseCyclesCounter() {
+		this.setTableValue(9, (int) this.getTableValue(9) + 1);
 	}
 	
 	public void updateStatistics() {
