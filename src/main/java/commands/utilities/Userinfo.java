@@ -3,14 +3,12 @@ package commands.utilities;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import components.base.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -33,25 +31,20 @@ public class Userinfo implements Command{
 		CommandData command = Commands.slash("userinfo", "Requests information about a user").addOption(OptionType.USER, "user", "The member the information should be about", false);
 		return command;
 	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/userinfo:help");
-	}
 	
 	private void listInfo (SlashCommandInteractionEvent event, boolean moderator) {
 		EmbedBuilder eb = new EmbedBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
-		String[] titles = AnswerEngine.getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
+		String[] titles = LanguageEngine.getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
 		if (event.getOption("user") == null) {
 			member = event.getMember();
 		} else {
 			member = event.getGuild().getMember(event.getOption("user").getAsUser());
 		}
 		if (member.equals(event.getGuild().getSelfMember())) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(event.getGuild(), event.getUser(), "/eastereggs:6").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), "/eastereggs:6").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (member.getTimeBoosted() == null) {
@@ -62,7 +55,7 @@ public class Userinfo implements Command{
 		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(AnswerEngine.footer);
+		eb.setFooter(LanguageEngine.footer);
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getUser().getName() + "`", true);

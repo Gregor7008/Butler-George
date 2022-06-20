@@ -11,14 +11,13 @@ import org.json.JSONObject;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
-import components.base.AnswerEngine;
-import components.base.ConfigVerifier;
+import components.base.LanguageEngine;
+import components.commands.moderation.ModEngine;
+import components.commands.moderation.ServerUtilities;
 import components.base.ConfigLoader;
+import components.base.ConfigManager;
+import components.base.ConfigVerifier;
 import components.base.ConsoleEngine;
-import components.base.assets.ConfigManager;
-import components.moderation.ModEngine;
-import components.moderation.PenaltyEngine;
-import components.moderation.ServerUtilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -57,7 +56,6 @@ public class Bot {
 	    //Startup engines
 	    Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.out);
 	    new ConfigVerifier();
-	    new PenaltyEngine();
 	    new ModEngine();
 	    ServerUtilities.controlChannels(true);
     	this.checkConfigs();
@@ -78,7 +76,7 @@ public class Bot {
     			}
     			if (ConfigLoader.getGuildConfig(guild).getLong("systeminfochannel") != 0) {
     				long chid = ConfigLoader.getGuildConfig(guild).getLong("systeminfochannel");
-    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(AnswerEngine.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
+    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
         			ConfigLoader.getGuildConfig(guild).put("offlinemsg", msgid);
         		}
     		}
@@ -113,8 +111,8 @@ public class Bot {
 				List<Guild> guilds = jda.getGuilds();
 				for (int i = 0; i < guilds.size(); i++) {
 					Guild guild = guilds.get(i);
-					PenaltyEngine.run.guildCheck(guild);
-					ModEngine.run.guildCheck(guild);
+					ModEngine.run.guildPenaltyCheck(guild);
+					ModEngine.run.guildModCheck(guild);
 				}
 				if (timerCount > 0 && noErrorOccured) {
 					ConfigManager.pushCache();

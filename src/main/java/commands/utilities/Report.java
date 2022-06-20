@@ -4,8 +4,8 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import components.base.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,7 +22,7 @@ public class Report implements Command{
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (ConfigLoader.getGuildConfig(guild).getLong("reportchannel") == 0) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/utilities/report:nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/utilities/report:nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyy");
@@ -37,7 +37,7 @@ public class Report implements Command{
 		}
 		eb.setDescription(event.getOption("reason").getAsString());
 		guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("reportchannel")).sendMessageEmbeds(eb.build()).queue();
-		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/utilities/report:success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/utilities/report:success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 
 	@Override
@@ -47,10 +47,5 @@ public class Report implements Command{
 										.addOption(OptionType.STRING, "reason", "The reason for your report", true)
 										.addOption(OptionType.STRING, "link", "The link to a message for evidence", false);
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/report:help");
 	}
 }

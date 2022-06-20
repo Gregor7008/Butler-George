@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -33,7 +33,7 @@ public class Language implements Command{
 				.addOption("Français", "fr")
 				.addOption("Dutch", "nl")
 				.build();
-		InteractionHook reply = event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:chooselang").convert())
+		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/language:chooselang").convert())
 				.addActionRow(menu)
 				.complete();
 		EventWaiter waiter = Bot.run.getWaiter();
@@ -45,40 +45,37 @@ public class Language implements Command{
 					  switch (e.getSelectedOptions().get(0).getValue()) {
 				      	case "en":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "en");
-				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successen").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/language:successen").convert()).queue();
 				      		break;
 				      	case "de":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "de");
-				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successde").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/language:successde").convert()).queue();
 				      		break;
 				      	case "es":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "es");
-				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successes").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/language:successes").convert()).queue();
 				      		break;
 				      	case "fr":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "fr");
-				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successfr").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/language:successfr").convert()).queue();
 				      		break;
 				      	case "nl":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "nl");
-				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/language:successnl").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/language:successnl").convert()).queue();
 				      		break;
 				      	default:
-				      		e.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"general:fatal").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"general:fatal").convert()).queue();
 						}
 					},
 				1, TimeUnit.MINUTES,
-				() -> {event.getChannel().sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {ActionRow newRow = ActionRow.of(menu.asDisabled());
+				  	   reply.editOriginalComponents(newRow).queue();
+					   event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("language", "Sets your preferred language in which the bot should answer you in on this server");
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/language:help");
 	}
 }

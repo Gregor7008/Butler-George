@@ -1,9 +1,9 @@
 package commands.music;
 
-import commands.Command;
-import components.base.AnswerEngine;
-import components.music.GuildMusicManager;
-import components.music.PlayerManager;
+import components.base.LanguageEngine;
+import components.commands.Command;
+import components.commands.music.GuildMusicManager;
+import components.commands.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -21,31 +21,26 @@ public class Stop implements Command{
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/stop:notconnected").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/stop:notconnected").convert()).queue();
 			return;
 		}
 		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/stop:nopermission").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/stop:nopermission").convert()).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/stop:nopermission").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/stop:nopermission").convert()).queue();
 			return;
 		}
 		this.stopandleave(guild);
-		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/stop:stopped").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/stop:stopped").convert()).queue();
 	}
 
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("stop", "Stops the currently playing music!");
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/music/stop:help");
 	}
 	
 	public void stopandleave(Guild guild) {

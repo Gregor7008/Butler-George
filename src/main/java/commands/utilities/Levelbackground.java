@@ -1,7 +1,7 @@
 package commands.utilities;
 
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import components.base.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -21,10 +21,10 @@ public class Levelbackground implements Command{
 		if (event.getSubcommandName().equals("set")) {
 			Level lv = new Level();
 			if (Integer.parseInt(event.getOption("number").getAsString()) > 4 || Integer.parseInt(event.getOption("number").getAsString()) < 0) {
-				event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/levelbackground:wrongarg").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/levelbackground:wrongarg").convert()).queue();
 			} else {
 				ConfigLoader.getMemberConfig(guild, user).put("levelbackground", event.getOption("number").getAsInt());
-				event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/levelbackground:success").convert()).addFile(lv.renderLevelcard(user, guild)).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/levelbackground:success").convert()).addFile(lv.renderLevelcard(user, guild)).queue();
 			}
 			return;
 		}
@@ -40,11 +40,6 @@ public class Levelbackground implements Command{
 											.addOption(OptionType.INTEGER, "number", "The number of your new levelbackground", true))
 									.addSubcommands(new SubcommandData("list", "List all possible backgrounds"));
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/levelbackground:help");
 	}
 	
 	private void listlevelcards(SlashCommandInteractionEvent event) {

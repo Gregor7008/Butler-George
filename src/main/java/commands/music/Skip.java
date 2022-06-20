@@ -2,10 +2,10 @@ package commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 
-import commands.Command;
-import components.base.AnswerEngine;
-import components.music.GuildMusicManager;
-import components.music.PlayerManager;
+import components.base.LanguageEngine;
+import components.commands.Command;
+import components.commands.music.GuildMusicManager;
+import components.commands.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -24,34 +24,29 @@ public class Skip implements Command{
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final AudioPlayer audioPlayer = musicManager.audioPlayer;
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/skip:notconnected").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/skip:notconnected").convert()).queue();
 			return;
 		}
 		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/skip:nopermission").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/skip:nopermission").convert()).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/skip:nopermission").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/skip:nopermission").convert()).queue();
 			return;
 		}
 		if (audioPlayer.getPlayingTrack() == null) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/skip:noneplaying").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/skip:noneplaying").convert()).queue();
 			return;
 		}
 		musicManager.scheduler.nextTrack();
-		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/skip:skipped").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/skip:skipped").convert()).queue();
 	}
 
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("skip", "Skips the currently playing track!");
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/music/skip:help");
 	}
 }

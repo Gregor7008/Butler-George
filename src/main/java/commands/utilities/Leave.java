@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 
 import base.Bot;
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
@@ -69,7 +69,7 @@ public class Leave implements Command{
 			event.reply("Done...").queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/utilities/leave:invalid").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/utilities/leave:invalid").convert()).queue();
 	}
 
 	@Override
@@ -77,11 +77,6 @@ public class Leave implements Command{
 		CommandData command = Commands.slash("leave", "Leave this (or another) channel")
 				.addOption(OptionType.CHANNEL, "channel", "If it's a channel you can't run commands in");
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/leave:help");
 	}
 	
 	private boolean checkCategory(Category category, Guild guild) {

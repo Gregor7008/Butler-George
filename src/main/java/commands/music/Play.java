@@ -3,10 +3,10 @@ package commands.music;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import commands.Command;
-import components.base.AnswerEngine;
-import components.music.GuildMusicManager;
-import components.music.PlayerManager;
+import components.base.LanguageEngine;
+import components.commands.Command;
+import components.commands.music.GuildMusicManager;
+import components.commands.music.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -30,15 +30,15 @@ public class Play implements Command{
 		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/play:wrongusage").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/play:wrongusage").convert()).queue();
 			return;
 		}
 		if (!member.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/play:noVCdefined").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/play:noVCdefined").convert()).queue();
 			return;
 		}
 		if (self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/music/play:alreadyinuse").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/play:alreadyinuse").convert()).queue();
 			return;
 		}
 		this.load(event, argument, musicManager, channel, member);
@@ -75,10 +75,5 @@ public class Play implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!", true));
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/music/play:help");
 	}
 }

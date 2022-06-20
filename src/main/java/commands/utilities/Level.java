@@ -17,11 +17,11 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
+import components.commands.utilities.LevelEngine;
 import components.base.ConfigLoader;
 import components.base.ConsoleEngine;
-import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -40,13 +40,13 @@ public class Level implements Command {
 			user = event.getOption("user").getAsUser();
 		}
 		if (guild.getMember(user).equals(guild.getSelfMember())) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/eastereggs:3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/eastereggs:3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		event.deferReply().queue();
 		File finalimage = this.renderLevelcard(user, guild);
         if (finalimage == null) {
-        	event.getHook().sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user, "/general:fatal").convert()).queue();
+        	event.getHook().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, "/general:fatal").convert()).queue();
         } else {
         	event.getHook().sendMessage("").addFile(finalimage).queue();
         }
@@ -57,11 +57,6 @@ public class Level implements Command {
 		CommandData command = Commands.slash("level", "Check your current level or the one of another user!")
 											  .addOptions(new OptionData(OptionType.USER, "user", "Mention another user (optional)").setRequired(false));
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/level:help");
 	}
 	
 	public File renderLevelcard(User iuser, Guild guild) {

@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import base.Bot;
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -41,7 +41,7 @@ public class Embed implements Command{
 		guild = event.getGuild();
 		channel = event.getTextChannel();
 		if (!member.hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/embed:nopermission").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/embed:nopermission").convert()).queue();
 			return;
 		}
 		eb = new EmbedBuilder();
@@ -56,13 +56,8 @@ public class Embed implements Command{
 		return command;
 	}
 	
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/embed:help");
-	}
-	
 	private void definetitle() {
-		oevent.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/embed:definetitle").convert()).queue();
+		oevent.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/embed:definetitle").convert()).queue();
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -71,11 +66,11 @@ public class Embed implements Command{
 								  this.definedescr();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void definedescr() {
-		messages.add(channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/embed:definedescr").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/embed:definedescr").convert()).complete());
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -84,11 +79,11 @@ public class Embed implements Command{
 								  this.definefooter();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definefooter() {
-		messages.add(channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/embed:definefooter").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/embed:definefooter").convert()).complete());
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -97,11 +92,11 @@ public class Embed implements Command{
 								  this.defineTNail();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineTNail() {
-		messages.add(channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/embed:defineTNail").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/embed:defineTNail").convert()).complete());
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -110,11 +105,11 @@ public class Embed implements Command{
 								  this.defineImag();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineImag() {
-		messages.add(channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/embed:defineImag").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/embed:defineImag").convert()).complete());
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -123,11 +118,11 @@ public class Embed implements Command{
 								  this.wantnewfield();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void wantnewfield() {
-		messages.add(channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/embed:wantnewfield").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/embed:wantnewfield").convert()).complete());
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -135,11 +130,11 @@ public class Embed implements Command{
 								  if(e.getMessage().getContentRaw().contains("no")) {this.sendMessage(eb.build());} else {this.addnewfield();}},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addnewfield() {
-		messages.add(channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/embed:addnewfield").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/embed:addnewfield").convert()).complete());
 		waiter.waitForEvent(MessageReceivedEvent.class,
 							e -> {if(!e.getChannel().getId().equals(channel.getId())) {return false;} 
 							  	  return e.getAuthor().getIdLong() == user.getIdLong();},
@@ -149,7 +144,7 @@ public class Embed implements Command{
 								  this.wantnewfield();},
 							1, TimeUnit.MINUTES,
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(AnswerEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user,"general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void sendMessage(MessageEmbed embed) {

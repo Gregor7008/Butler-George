@@ -5,8 +5,8 @@ import java.util.LinkedList;
 
 import org.json.JSONArray;
 
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import components.base.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -25,18 +25,18 @@ public class CreateChannel implements Command{
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
 		if (ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles").isEmpty()) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/utilities/createchannel:norole").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/utilities/createchannel:norole").convert()).queue();
 			return;
 		}
 		JSONArray cccroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles");
 		for (int i = 0; i < cccroles.length(); i++) {
 			if (!event.getMember().getRoles().contains(guild.getRoleById(cccroles.getLong(i))) && !guild.getRoleById(cccroles.getLong(i)).isPublicRole()) {
-				event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/utilities/createchannel:nopermission").convert()).queue();
 				return;
 			}
 		}
 		this.createTextChannel(guild, user, name);
-		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/createchannel:success").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/createchannel:success").convert()).queue();
 	}
 
 	@Override
@@ -44,11 +44,6 @@ public class CreateChannel implements Command{
 		CommandData command = Commands.slash("createchannel", "Creates a custom channel for you and your friends!")
 				.addOption(OptionType.STRING, "name", "The name of the new channel", true);
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/createchannel:help");
 	}
 	
 	private void createTextChannel(Guild guild, User user, String name) {

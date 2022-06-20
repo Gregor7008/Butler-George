@@ -5,10 +5,10 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import components.base.ConfigLoader;
-import components.base.assets.ConfigManager;
+import components.base.ConfigManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -29,16 +29,16 @@ public class Suggest implements Command{
 		final Guild guild = event.getGuild();
 		Long channelid = ConfigLoader.getGuildConfig(guild).getLong("suggest");
 		if (channelid == 0) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/suggest:nochannelset").convert()).queue();
 			return;
 		}
 		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.getMemberConfig(guild, user).getString("lastsuggestion"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
-			event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/suggest:nospam").convert()).queue();
 			return;
 		}
 		this.sendsuggestion(guild, event.getMember(), event.getOption("suggestion").getAsString());
-		event.replyEmbeds(AnswerEngine.fetchMessage(guild, user,"/commands/utilities/suggest:success").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/utilities/suggest:success").convert()).queue();
 	}
 
 	@Override
@@ -46,11 +46,6 @@ public class Suggest implements Command{
 		CommandData command = Commands.slash("suggest", "Suggest an idea!")
 										.addOptions(new OptionData(OptionType.STRING, "suggestion", "Write down your suggestions!", true));	
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/suggest:help");
 	}
 	
 	public void sendsuggestion(Guild guild, Member member, String idea) {

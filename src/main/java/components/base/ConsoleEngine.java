@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
 
 import base.Bot;
 import base.GUI;
-import components.base.assets.ConfigManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 

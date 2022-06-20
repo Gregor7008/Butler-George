@@ -10,16 +10,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import commands.Command;
 import commands.CommandList;
 import commands.music.Stop;
 import commands.utilities.Suggest;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
+import components.commands.moderation.ModMail;
+import components.commands.moderation.ServerUtilities;
+import components.commands.utilities.LevelEngine;
 import components.base.ConfigLoader;
 import components.base.ConfigVerifier;
-import components.moderation.ModMail;
-import components.moderation.ServerUtilities;
-import components.utilities.LevelEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Category;
@@ -67,25 +67,11 @@ public class Processor extends ListenerAdapter {
 			}
 		}
 		CommandListUpdateAction clua = event.getJDA().updateCommands();
-		CommandList utilitycmdList = new CommandList();
-		List<String> utilitycmdnames = new ArrayList<>();
-		utilitycmdnames.addAll(utilitycmdList.utilitycmds.keySet());
-		for (int e = 0; e < utilitycmdnames.size(); e++) {
-			Command cmd = utilitycmdList.utilitycmds.get(utilitycmdnames.get(e));
-			clua.addCommands(cmd.initialize());
-		}
-		CommandList modcmdList = new CommandList();
-		List<String> modcmdnames = new ArrayList<>();
-		modcmdnames.addAll(modcmdList.moderationcmds.keySet());
-		for (int e = 0; e < modcmdnames.size(); e++) {
-			Command cmd = modcmdList.moderationcmds.get(modcmdnames.get(e));
-			clua.addCommands(cmd.initialize().setDefaultEnabled(false));
-		}
-		CommandList musiccmdList = new CommandList();
-		List<String> musiccmdnames = new ArrayList<>();
-		musiccmdnames.addAll(musiccmdList.musiccmds.keySet());
-		for (int e = 0; e < musiccmdnames.size(); e++) {
-			Command cmd = musiccmdList.musiccmds.get(musiccmdnames.get(e));
+		CommandList commandList = new CommandList();
+		List<String> commandNames = new ArrayList<>();
+		commandNames.addAll(commandList.commands.keySet());
+		for (int e = 0; e < commandNames.size(); e++) {
+			Command cmd = commandList.commands.get(commandNames.get(e));
 			clua.addCommands(cmd.initialize());
 		}
 		clua.queue();
@@ -97,24 +83,10 @@ public class Processor extends ListenerAdapter {
 			return;
 		}
 		GUI.get.increaseExecutionsCounter();
-		final Guild guild = event.getGuild();
-		final User user = event.getUser();
 		CommandList commandList = new CommandList();
-		Command utilitycmd;
-		if ((utilitycmd = commandList.utilitycmds.get(event.getName())) != null) {
-			utilitycmd.perform(event);
-		}
-		Command modcmd;
-		if ((modcmd = commandList.moderationcmds.get(event.getName())) != null) {
-			if (this.checkCategory(event.getTextChannel().getParentCategory(), guild) == null) {
-				modcmd.perform(event);
-			} else {
-				event.replyEmbeds(AnswerEngine.fetchMessage(guild, user, "/base/processor:userchannel").convert()).queue();
-			}
-		}
-		Command musiccmd;
-		if ((musiccmd = commandList.musiccmds.get(event.getName())) != null) {
-			musiccmd.perform(event);
+		Command command;
+		if ((command = commandList.commands.get(event.getName())) != null) {
+			command.perform(event);
 		}
 		LevelEngine.getInstance().slashcommand(event);
 	}
@@ -190,7 +162,7 @@ public class Processor extends ListenerAdapter {
 				welcomemsg[0].replace("{server}", guild.getName());
 				welcomemsg[0].replace("{member}", event.getMember().getAsMention());
 				welcomemsg[0].replace("{membercount}", Integer.toString(guild.getMemberCount()));
-				welcomemsg[0].replace("{date}", OffsetDateTime.now().format(AnswerEngine.formatter));
+				welcomemsg[0].replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
 				guild.getTextChannelById(welcomemsg[1]).sendMessage(welcomemsg[0]).queue();
 			}
 		}
@@ -210,8 +182,8 @@ public class Processor extends ListenerAdapter {
 			goodbyemsg[0].replace("{server}", guild.getName());
 			goodbyemsg[0].replace("{member}", user.getName());
 			goodbyemsg[0].replace("{membercount}", Integer.toString(guild.getMemberCount()));
-			goodbyemsg[0].replace("{date}", OffsetDateTime.now().format(AnswerEngine.formatter));
-			goodbyemsg[0].replace("{timejoined}", event.getMember().getTimeJoined().format(AnswerEngine.formatter));
+			goodbyemsg[0].replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
+			goodbyemsg[0].replace("{timejoined}", event.getMember().getTimeJoined().format(LanguageEngine.formatter));
 			event.getGuild().getTextChannelById(goodbyemsg[1]).sendMessage(goodbyemsg[0]).queue();
 		}
 		if (ConfigLoader.getMemberConfig(guild, user).getLong("customchannelcategory") != 0) {

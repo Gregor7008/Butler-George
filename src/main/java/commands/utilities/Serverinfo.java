@@ -3,11 +3,10 @@ package commands.utilities;
 
 import java.time.format.DateTimeFormatter;
 
-import commands.Command;
-import components.base.AnswerEngine;
+import components.base.LanguageEngine;
+import components.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -19,11 +18,11 @@ public class Serverinfo implements Command{
 		EmbedBuilder eb = new EmbedBuilder();
 		Guild guild = event.getGuild();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
-		String[] titles = AnswerEngine.getRaw(guild, event.getUser(), "/commands/utilities/serverinfo:titles").split(",");
+		String[] titles = LanguageEngine.getRaw(guild, event.getUser(), "/commands/utilities/serverinfo:titles").split(",");
 		eb.setTitle(titles[0] + "\s" + guild.getName());
 		eb.setThumbnail(guild.getIconUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(AnswerEngine.footer);
+		eb.setFooter(LanguageEngine.footer);
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[1], "`" + guild.getName() + "`", true);
@@ -43,10 +42,5 @@ public class Serverinfo implements Command{
 	public CommandData initialize() {
 		CommandData command = Commands.slash("serverinfo", "Lists information about this server");
 		return command;
-	}
-
-	@Override
-	public String getHelp(Guild guild, User user) {
-		return AnswerEngine.getRaw(guild, user, "/commands/utilities/serverinfo:help");
 	}
 }
