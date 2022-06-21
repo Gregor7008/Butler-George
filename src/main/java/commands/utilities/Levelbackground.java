@@ -22,10 +22,10 @@ public class Levelbackground implements Command {
 		if (event.getSubcommandName().equals("set")) {
 			Level lv = new Level();
 			if (Integer.parseInt(event.getOption("number").getAsString()) > 4 || Integer.parseInt(event.getOption("number").getAsString()) < 0) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/levelbackground:wrongarg").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "wrongarg").convert()).queue();
 			} else {
 				ConfigLoader.getMemberConfig(guild, user).put("levelbackground", event.getOption("number").getAsInt());
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/levelbackground:success").convert()).addFile(lv.renderLevelcard(user, guild)).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).addFile(lv.renderLevelcard(user, guild)).queue();
 			}
 			return;
 		}

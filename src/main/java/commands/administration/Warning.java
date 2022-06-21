@@ -34,11 +34,11 @@ public class Warning implements Command {
 				reason = event.getOption("reason").getAsString();
 			}
 			ConfigLoader.getMemberConfig(guild, iuser).getJSONArray("warnings").put(reason);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/warning:success").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
 			try {
 				final String repl = reason;
 				iuser.openPrivateChannel().queue(channel -> {
-					channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, iuser, this, "/commands/moderation/warning:pm")
+					channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, iuser, this, "pm")
 							.replaceDescription("{guild}", guild.getName())
 							.replaceDescription("{reason}", repl).convert()).queue();
 				});
@@ -49,7 +49,7 @@ public class Warning implements Command {
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			if (this.listwarnings(event)) {
-				event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/warning:remsel").convert()).queue();
+				event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsel").convert()).queue();
 				TextChannel channel = event.getTextChannel();
 				ResponseDetector.waitForMessage(guild, user, channel,
 						e -> {try {
@@ -58,11 +58,11 @@ public class Warning implements Command {
 							  } catch (NumberFormatException ex) {return false;}},
 						e -> {JSONArray warnings = ConfigLoader.getMemberConfig(guild, iuser).getJSONArray("warnings");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
-							  channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/warning:remsuccess")
+							  channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
 									  .replaceDescription("{warning}", "`" + warnings.getString(w-1) + "`")
 									  .replaceDescription("{user}", guild.getMember(iuser).getEffectiveName()).convert()).queue();
 							  warnings.remove(w-1);},
-						() -> {channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/warning:timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+						() -> {channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			}
 		}
 		ModEngine.run.guildPenaltyCheck(guild);
@@ -97,7 +97,7 @@ public class Warning implements Command {
 		final User iuser = event.getOption("user").getAsUser();
 		JSONArray warnings = ConfigLoader.getMemberConfig(guild, iuser).getJSONArray("warnings");
 		if (warnings.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/warning:nowarnings").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nowarnings").convert()).queue();
 			return false;
 		}
 		StringBuilder sB = new StringBuilder();
@@ -110,7 +110,7 @@ public class Warning implements Command {
 				sB.append("\n");
 			} else {}
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/warning:list")
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list")
 				.replaceTitle("{user}", guild.getMemberById(iuser.getId()).getEffectiveName())
 				.replaceDescription("{list}", sB.toString()).convert()).queue();
 		return true;

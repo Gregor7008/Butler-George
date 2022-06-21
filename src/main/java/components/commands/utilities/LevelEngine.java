@@ -65,7 +65,7 @@ public class LevelEngine {
 			if (newcount > 20) {
 				userconfig.getJSONArray("warnings").put("Spamming for Levels");
 				user.openPrivateChannel().complete()
-						.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/components/utilities/levelengine:levelspam")
+						.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "levelspam")
 								.replaceDescription("{guild}", guild.getName()).convert()).queue();
 			}
 		}
@@ -90,7 +90,7 @@ public class LevelEngine {
 			}
 			TextChannel channel = guild.getTextChannelById(id);
 			if (channel != null) {
-				channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/components/utilities/levelengine:levelup")
+				channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "levelup")
 						.replaceTitle("{user}", guild.getMember(user).getEffectiveName())
 						.replaceDescription("{level}", String.valueOf(currentlevel+1)).convert()).queue();
 			} else {

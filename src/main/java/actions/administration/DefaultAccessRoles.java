@@ -24,22 +24,22 @@ public class DefaultAccessRoles implements ActionRequest {
 		if (event.getSubAction().getName().equals("set")) {
 			ccdefroles.clear();
 			ccdefroles.put(roleID);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/defaultaccessroles:setsuccess")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("add")) {
 			ccdefroles.put(roleID);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/defaultaccessroles:addsuccess")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("remove")) {
 			ConfigLoader.removeValueFromArray(ccdefroles, roleID);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/defaultaccessroles:remsuccess")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("clear")) {
 			ccdefroles.clear();
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/defaultaccessroles:clearsuccess")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "clearsuccess")).queue();
 			return;
 		}
 	}

@@ -42,7 +42,7 @@ public class Penalty implements ActionRequest {
 		if (event.getSubAction().getName().equals("list")) {
 			String response = this.listpenalties(event);
 			if (response != null) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:list").replaceDescription("{list}", response)).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list").replaceDescription("{list}", response)).queue();
 			}
 		}
 		
@@ -65,16 +65,16 @@ public class Penalty implements ActionRequest {
 	private void removepenalties(Action event) {
 		String response = this.listpenalties(event);
 		if (response != null) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:remlist").replaceDescription("{list}", response)).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remlist").replaceDescription("{list}", response)).queue();
 			JSONObject penalties = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
 			ResponseDetector.waitForMessage(guild, user, message.getChannel(),
 					e -> {try {
 							  penalties.getJSONArray(e.getMessage().getContentRaw());
 							  penalties.remove(e.getMessage().getContentRaw());
 					      } catch (JSONException ex) {
-					      event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:norem")).queue();
+					      event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "norem")).queue();
 					      }},
-				   () -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+				   () -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 		}
 	}
 	
@@ -87,77 +87,77 @@ public class Penalty implements ActionRequest {
 				.addOption("Temporary ban", "tb")
 				.addOption("Permanent ban", "pm")
 				.build();
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:add1")).complete()
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add1")).complete()
 			 .editMessageComponents(ActionRow.of(menu)).queue();
 		ResponseDetector.waitForMenuSelection(guild, user, message, menu.getId(),
 				e -> {String plannedpunish = e.getSelectedOptions().get(0).getValue();
 					  this.addpenalties2(plannedpunish);},
-				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addpenalties2(String plannedpunish) {
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:add2")).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add2")).queue();
 		ResponseDetector.waitForMessage(guild, user, message.getChannel(),
 				e -> {try {
 					      Integer.valueOf(e.getMessage().getContentRaw());
 					      return true;
 					  } catch (NumberFormatException ex) {return false;}},
 				e -> {this.addpenalties3(plannedpunish, e.getMessage().getContentRaw());},
-				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addpenalties3(String plannedpunish, String warnings) {
 		JSONObject penalties = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
 		try {
 			penalties.getJSONArray(warnings);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:error")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).queue();
 			return;
 		} catch (JSONException e) {}
 		switch (plannedpunish) {
 		case "rr":
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:add3role")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3role")).queue();
 			ResponseDetector.waitForMessage(guild, user, message.getChannel(),
 					e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getMentions().getRoles().get(0).getId()));
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:successrole")).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successrole")).queue();},
+					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "tm":
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:add3time")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3time")).queue();
 			ResponseDetector.waitForMessage(guild, user, message.getChannel(),
 					e -> {try {
 							  Integer.valueOf(e.getMessage().getContentRaw());
 							  return true;
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:successtempmute")).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempmute")).queue();},
+					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pm":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:successmute")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successmute")).queue();
 			break;
 		case "ki":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:successkick")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successkick")).queue();
 			break;
 		case "tb":
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:add3time")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3time")).queue();
 			ResponseDetector.waitForMessage(guild, user, message.getChannel(),
 					e -> {try {
 							  Integer.valueOf(e.getMessage().getContentRaw());
 							  return true;
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:successtempban")).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempban")).queue();},
+					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pb":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:successban")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successban")).queue();
 			break;
 		default:
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:fatal")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal")).queue();
 		}
 	}
 	
@@ -165,7 +165,7 @@ public class Penalty implements ActionRequest {
 		StringBuilder sB = new StringBuilder();
 		JSONObject current = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
 		if (current.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/penalty:nopenalties"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopenalties"));
 			return null;
 		}
 		current.keySet().forEach(e -> {
@@ -191,7 +191,7 @@ public class Penalty implements ActionRequest {
 					sB.append("Permanent ban from server");
 					break;
 				default:
-					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:fatal")).queue();
+					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal")).queue();
 			}
 			sB.append("\n");
 		});

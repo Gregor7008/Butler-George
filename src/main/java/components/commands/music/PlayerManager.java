@@ -57,7 +57,7 @@ public class PlayerManager {
 			@Override
 			public void trackLoaded(AudioTrack track) {
 				musicManager.scheduler.queue(track);
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/components/music/playermanager:track")
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "track")
 						.replaceDescription("{track}", track.getInfo().title)
 						.replaceDescription("{author}", track.getInfo().author).convert()).queue();
 				System.out.println("trackLoaded1");
@@ -70,14 +70,14 @@ public class PlayerManager {
 					for (final AudioTrack track : tracks) {
 						musicManager.scheduler.queue.add(track);
 					}
-					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/components/music/playermanager:list")
+					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list")
 							.replaceDescription("{name}", playlist.getName())
 							.replaceDescription("{author}", String.valueOf(playlist.getTracks().size())).convert()).queue();
 					System.out.println("playlistLoaded");
 				} else {
 					AudioTrack track = tracks.get(0);
 					musicManager.scheduler.queue(track);
-					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/components/music/playermanager:track")
+					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "track")
 							.replaceDescription("{track}", track.getInfo().title)
 							.replaceDescription("{author}", track.getInfo().author).convert()).queue();
 					System.out.println("trackLoaded2");
@@ -86,14 +86,14 @@ public class PlayerManager {
 			
 			@Override
 			public void noMatches() {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/components/music/playermanager:nomatch").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nomatch").convert()).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 				System.out.println("noMatches");
 			}
 			
 			@Override
 			public void loadFailed(FriendlyException exception) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/components/music/playermanager:fail").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fail").convert()).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 				System.out.println("loadFailed");
 			}

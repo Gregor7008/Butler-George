@@ -24,33 +24,33 @@ public class PingAndMove implements Command {
 		final User user = event.getUser();
 		final Member omember = guild.getMember(event.getOption("user").getAsUser());
 		if (omember.equals(guild.getMember(user))) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/eastereggs:4").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "4").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (omember.equals(guild.getSelfMember())) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/eastereggs:5").convert()).queue(r -> r.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "5").convert()).queue(r -> r.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
 			return;
 		}
 		if (!omember.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/pingandmove:memnoncon").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "memnoncon").convert()).queue();
 			return;
 		}
 		if (!guild.getMember(user).getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/pingandmove:notcon").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notcon").convert()).queue();
 			return;
 		}
-		InteractionHook ih = event.reply(omember.getAsMention()).addEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/pingandmove:request")
+		InteractionHook ih = event.reply(omember.getAsMention()).addEmbeds(LanguageEngine.fetchMessage(guild, user, this, "request")
 				.replaceDescription("{user}", guild.getMember(user).getAsMention()).convert())
 								.addActionRow(Button.primary("accept", Emoji.fromUnicode("U+2705")),
 											  Button.primary("deny", Emoji.fromUnicode("U+274C"))).complete();
 		ResponseDetector.waitForButtonClick(guild, user, ih.retrieveOriginal().complete(), null,
 				e -> {if (e.getButton().getId().equals("accept")) {
 						 guild.moveVoiceMember(guild.getMember(user), omember.getVoiceState().getChannel()).queue();
-						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/pingandmove:accepted").convert()).queue();
+						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "accepted").convert()).queue();
 						 return;}
 					  if (e.getButton().getId().equals("deny")) {
-						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/pingandmove:denied").convert()).queue();}},
-				() -> {ih.editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/pingandmove:denied").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "denied").convert()).queue();}},
+				() -> {ih.editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "denied").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override

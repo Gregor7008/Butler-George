@@ -21,20 +21,20 @@ public class Stop implements Command {
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/stop:notconnected").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected").convert()).queue();
 			return;
 		}
 		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/stop:nopermission").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/stop:nopermission").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
 			return;
 		}
 		this.stopandleave(guild);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/stop:stopped").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "stopped").convert()).queue();
 	}
 
 	@Override

@@ -23,25 +23,25 @@ public class Join2Create implements ActionRequest {
 		final String id = event.getSubAction().getOptionAsChannel(0).getId();
 		JSONObject join2createchannels = ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels");
 		if (guild.getVoiceChannelById(id) == null) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/join2create:invalid")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("add")) {
 			try {
 				join2createchannels.get(id);
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/join2create:adderror")).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "adderror")).queue();
 			} catch (JSONException e) {
 				join2createchannels.put(id, new JSONObject());
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/join2create:addsuccess")).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
 			}
 		}
 		if (event.getSubAction().getName().equals("remove")) {
 			try {
 				join2createchannels.get(id);
 				join2createchannels.remove(id);
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/join2create:remsuccess")).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
 			} catch (JSONException e) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/join2create:remerror")).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remerror")).queue();
 			}
 		}
 	}

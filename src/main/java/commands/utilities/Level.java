@@ -41,13 +41,13 @@ public class Level implements Command {
 			user = event.getOption("user").getAsUser();
 		}
 		if (guild.getMember(user).equals(guild.getSelfMember())) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/eastereggs:3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		event.deferReply().queue();
 		File finalimage = this.renderLevelcard(user, guild);
         if (finalimage == null) {
-        	event.getHook().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/general:fatal").convert()).queue();
+        	event.getHook().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal").convert()).queue();
         } else {
         	event.getHook().sendMessage("").addFile(finalimage).queue();
         }

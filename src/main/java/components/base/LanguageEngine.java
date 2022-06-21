@@ -48,8 +48,11 @@ public class LanguageEngine {
 		if (user != null && guild != null) {
 			//lang = ConfigLoader.getUserConfig(guild, user).getString("language"); <= Deactivated as translations are not ready
 		}
-		String path = requester.getClass().getName().replace('.', '/').toLowerCase();
-		String fullpath = "languages" + lang + "/" + path + ".properties";
+		String path = "general";
+		if (requester != null) {
+			path = requester.getClass().getName().replace('.', '/').toLowerCase();
+		}
+		String fullpath = "languages/" + lang + "/" + path + ".properties";
 		Properties properties = new Properties();
 		try {
 			properties.load(LanguageEngine.class.getClassLoader().getResourceAsStream(fullpath));

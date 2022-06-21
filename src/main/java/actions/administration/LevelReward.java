@@ -26,7 +26,7 @@ public class LevelReward implements ActionRequest {
 		JSONObject levelrewards = ConfigLoader.getGuildConfig(guild).getJSONObject("levelrewards");
 		if (event.getSubAction().getName().equals("add")) {
 			levelrewards.put(String.valueOf(event.getSubAction().getOptionAsInt(1)), event.getOptionAsRole(0).getIdLong());
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/levelreward:addsuccess")
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")
 					.replaceDescription("{role}", event.getOptionAsRole(0).getAsMention())
 					.replaceDescription("{level}", String.valueOf(event.getSubAction().getOptionAsInt(1)))).queue();
 			return;
@@ -36,11 +36,11 @@ public class LevelReward implements ActionRequest {
 			try {
 				levelrewards.getLong(String.valueOf(level));
 			} catch (JSONException e) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/levelreward:noreward")).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noreward")).queue();
 				return;
 			}
 			long roleID = levelrewards.getLong(String.valueOf(level));
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/levelreward:remsuccess")
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
 					.replaceDescription("{role}", guild.getRoleById(roleID).getAsMention())
 					.replaceDescription("{level}", String.valueOf(level))).queue();
 			levelrewards.remove(String.valueOf(level));
@@ -68,7 +68,7 @@ public class LevelReward implements ActionRequest {
 	private void listrewards(Action event, JSONObject levelrewards) {
 		StringBuilder sB = new StringBuilder();
 		if (levelrewards.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/levelreward:norewards")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "norewards")).queue();
 			return;
 		}
 		Object[] rewards = levelrewards.keySet().toArray();
@@ -81,6 +81,6 @@ public class LevelReward implements ActionRequest {
 				sB.append(guild.getRoleById(levelrewards.getLong((String) rewards[i])).getAsMention() + "\s->\s" + rewards[i] + "\n");
 			}
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/levelreward:list").replaceDescription("{list}", sB.toString())).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list").replaceDescription("{list}", sB.toString())).queue();
 	}
 }

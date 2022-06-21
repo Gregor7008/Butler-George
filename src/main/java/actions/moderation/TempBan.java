@@ -23,7 +23,7 @@ public class TempBan implements ActionRequest {
 		ConfigLoader.getMemberConfig(guild, user).put("tempbanned", true);
 		guild.getMember(user).ban(0).queue();
 		ModEngine.run.guildModCheck(guild);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/tempban:success")
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
 				.replaceDescription("{user}", user.getName())
 				.replaceDescription("{time}", String.valueOf(event.getOptionAsLong(1)))).queue();
 	}

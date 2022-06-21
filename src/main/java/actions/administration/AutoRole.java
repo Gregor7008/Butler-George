@@ -2,17 +2,15 @@ package actions.administration;
 
 import org.json.JSONArray;
 
-import components.actions.ActionRequest;
-import components.actions.ActionData;
 import components.actions.Action;
-import components.actions.SubActionData;
+import components.actions.ActionData;
+import components.actions.ActionRequest;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class AutoRole implements ActionRequest {
 
@@ -21,34 +19,30 @@ public class AutoRole implements ActionRequest {
 	
 	@Override
 	public void execute(Action event) {
-		if (event.getSubAction().getName().equals("add")) {
+		if (event.getSubAction().equals("add")) {
 			Role role = event.getSubAction().getOptionAsRole(0);
 			ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles").put(role.getIdLong());
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
 			return;
 		}
-		if (event.getSubAction().getName().equals("remove")) {
+		if (event.getSubAction().equals("remove")) {
 			Role role = event.getSubAction().getOptionAsRole(0);
 			ConfigLoader.removeValueFromArray(ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles"), role.getIdLong());
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "removesuccess")).queue();
 			return;
 		}
-		if (event.getSubAction().getName().equals("list")) {
+		if (event.getSubAction().equals("list")) {
 			this.listroles(event);
 		}
 	}
 
 	@Override
 	public ActionData initialize() {
-		ActionData actionData = new ActionData(this).setName("AutoRoles")
+		ActionData actionData = new ActionData(this).setName("Auto Roles")
 												    .setInfo("Configure roles that should be given to every new user joining")
 													.setMinimumPermission(Permission.MANAGE_ROLES)
 													.setCategory(ActionData.ADMINISTRATION)
-													.setSubActions(new SubActionData[] {
-															 new SubActionData("add", OptionType.ROLE),
-															 new SubActionData("remove", OptionType.ROLE),
-															 new SubActionData("list")
-													});
+													.setSubActions(new String[] {"add", "remove", "list"});
 		return actionData;
 	}
 	

@@ -19,7 +19,7 @@ public class Serverinfo implements Command {
 		EmbedBuilder eb = new EmbedBuilder();
 		Guild guild = event.getGuild();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
-		String[] titles = LanguageEngine.getRaw(guild, event.getUser(), "/commands/utilities/serverinfo:titles").split(",");
+		String[] titles = LanguageEngine.getRaw(guild, event.getUser(), this, "titles").split(",");
 		eb.setTitle(titles[0] + "\s" + guild.getName());
 		eb.setThumbnail(guild.getIconUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());

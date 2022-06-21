@@ -37,7 +37,7 @@ public class Channelpermission implements Command {
 		final Guild guild = event.getGuild();
 		Long ctgid = ConfigLoader.getMemberConfig(guild, user).getLong("customchannelcategory");
 		if (ctgid == 0 || !event.getTextChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/channelpermission:nopermission").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		SelectMenu menu = SelectMenu.create("permselection")
@@ -58,7 +58,7 @@ public class Channelpermission implements Command {
 				.addOption("Use Slash-Commands", "usc")
 				.addOption("All Permissions", "apm")
 				.build();
-		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/channelpermission:selperm").convert())
+		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selperm").convert())
 				.addActionRow(menu)
 				.complete();
 		ResponseDetector.waitForMenuSelection(guild, user, reply.retrieveOriginal().complete(), menu.getId(),
@@ -67,7 +67,7 @@ public class Channelpermission implements Command {
 					  } else {
 						  this.defineEdit(e.getSelectedOptions().get(0).getValue(), event, e, false);
 					  }},
-				() -> {event.getHook().editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});	
+				() -> {event.getHook().editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});	
 	}
 	
 	@Override
@@ -94,7 +94,7 @@ public class Channelpermission implements Command {
 		GuildChannel channel = guild.getGuildChannelById(event.getOption("channel_or_category").getAsLong());
 		Category category = guild.getCategoryById(event.getOption("channel_or_category").getAsLong());
 		if (pholder.equals(guild.getSelfMember()) && !action) {
-			sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/eastereggs:1").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "1").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (category != null) {
@@ -104,22 +104,22 @@ public class Channelpermission implements Command {
 			}
 			this.updateCategoryPerms(pholder, category, selected, action);
 			if (action) {
-				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/channelpermission:addsuccess").convert()).queue();
+				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess").convert()).queue();
 			} else {
-				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/channelpermission:remsuccess").convert()).queue();
+				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess").convert()).queue();
 			}
 			return;
 		}
 		if (channel != null) {
 			this.updateChannelPerms(pholder, channel, selected, action);
 			if (action) {
-				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/channelpermission:addsuccess").convert()).queue();
+				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess").convert()).queue();
 			} else {
-				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/channelpermission:remsuccess").convert()).queue();
+				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess").convert()).queue();
 			}
 			return;
 		}
-		sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:fatal").convert()).queue();
+		sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal").convert()).queue();
 	}
 	
 	private void updateChannelPerms(IPermissionHolder pholder, GuildChannel channel, String selected, boolean action) {

@@ -13,33 +13,31 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
 
-public class Action extends IOptionHolder {
+public class Action {
 	
 	private Guild guild = null;
 	private User user = null;
 	private Member member = null;
 	private Message message = null;
 	private TextChannel channel = null;
-	private SubAction subAction = null;
+	private String subAction = null;
 
-	public Action(Guild guild, User user, Message message, @Nullable SubAction subAction, @Nullable Object[] options) {
+	public Action(Guild guild, User user, Message message, @Nullable String subAction) {
 		this.guild = guild;
 		this.user = user;
 		this.member = guild.getMember(user);
 		this.message = message;
 		this.channel = message.getTextChannel();
 		this.subAction = subAction;
-		this.options = options;
 	}
 	
-	public Action(Member member, Message message, @Nullable SubAction subAction, @Nullable Object[] options) {
+	public Action(Member member, Message message, @Nullable String subAction) {
 		this.guild = member.getGuild();
 		this.user = member.getUser();
 		this.member = member;
 		this.message = message;
 		this.channel = message.getTextChannel();
 		this.subAction = subAction;
-		this.options = options;
 	}
 	
 	public Guild getGuild() {
@@ -62,12 +60,8 @@ public class Action extends IOptionHolder {
 		return this.channel;
 	}
 	
-	public SubAction getSubAction() {
+	public String getSubAction() {
 		return this.subAction;
-	}
-	
-	public Object[] getOptions() {
-		return this.options;
 	}
 	
 	public RestAction<Message> replyEmbeds(MessageEmbed embed) {

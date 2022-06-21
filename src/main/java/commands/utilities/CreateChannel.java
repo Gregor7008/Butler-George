@@ -29,12 +29,12 @@ public class CreateChannel implements Command {
 		JSONArray cccroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles");
 		for (int i = 0; i < cccroles.length(); i++) {
 			if (!event.getMember().getRoles().contains(guild.getRoleById(cccroles.getLong(i))) && !guild.getRoleById(cccroles.getLong(i)).isPublicRole()) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/createchannel:nopermission").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
 				return;
 			}
 		}
 		this.createTextChannel(guild, user, name);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/createchannel:success").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
 	}
 
 	@Override

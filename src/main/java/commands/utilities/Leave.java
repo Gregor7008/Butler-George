@@ -68,7 +68,7 @@ public class Leave implements Command {
 				}
 			}
 		} catch (ClassCastException e) {}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/leave:invalid").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid").convert()).queue();
 	}
 
 	@Override

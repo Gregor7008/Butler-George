@@ -22,16 +22,16 @@ public class Webhook implements Command {
 		User user = event.getUser();
 		Guild guild = event.getGuild();
 		if (!event.getMember().hasPermission(Permission.MANAGE_WEBHOOKS)) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/webhook:nopermission").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		WebhookEngine we = new WebhookEngine(event.getOption("link").getAsString());
 		we.setContent(event.getOption("message").getAsString());
 		try {
 			we.execute();
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/webhook:success").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 		} catch (IOException | IllegalArgumentException e) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/webhook:elink").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "elink").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 		}
 	}
 

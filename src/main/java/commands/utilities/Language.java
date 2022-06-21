@@ -31,7 +31,7 @@ public class Language implements Command {
 				.addOption("Français", "fr")
 				.addOption("Dutch", "nl")
 				.build();
-		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/language:chooselang").convert())
+		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "chooselang").convert())
 				.addActionRow(menu)
 				.complete();
 		ResponseDetector.waitForMenuSelection(guild, user, reply.retrieveOriginal().complete(), menu.getId(),
@@ -40,31 +40,31 @@ public class Language implements Command {
 					  switch (e.getSelectedOptions().get(0).getValue()) {
 				      	case "en":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "en");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/language:successen").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successen").convert()).queue();
 				      		break;
 				      	case "de":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "de");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/language:successde").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successde").convert()).queue();
 				      		break;
 				      	case "es":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "es");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/language:successes").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successes").convert()).queue();
 				      		break;
 				      	case "fr":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "fr");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/language:successfr").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successfr").convert()).queue();
 				      		break;
 				      	case "nl":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "nl");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/language:successnl").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successnl").convert()).queue();
 				      		break;
 				      	default:
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:fatal").convert()).queue();
+				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal").convert()).queue();
 						}
 					},
 				() -> {ActionRow newRow = ActionRow.of(menu.asDisabled());
 				  	   reply.editOriginalComponents(newRow).queue();
-					   event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+					   event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override

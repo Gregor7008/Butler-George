@@ -1,7 +1,6 @@
 package components.actions;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class ActionData {
 	
@@ -16,9 +15,8 @@ public class ActionData {
 	private String info = null;
 	private String category = null;
 	private String subCategory = null;
-	private SubActionData[] subActions = null;
+	private String[] subActions = null;
 	private Permission minimumPermission = null;
-	private OptionType[] optionTypes = null;
 	
 	public ActionData(ActionRequest actionRequest) {
 		this.actionRequest = actionRequest;
@@ -57,27 +55,17 @@ public class ActionData {
 		return this;
 	}
 	
-	public ActionData setSubActions(SubActionData[] subActions) {
+	public ActionData setSubActions(String[] subActions) {
 		this.subActions = subActions;
 		return this;
 	}
 	
-	public ActionData setSubAction(SubActionData subAction) {
-		this.subActions = new SubActionData[] {subAction};
+	public ActionData setSubAction(String subAction) {
+		this.subActions = new String[] {subAction};
 		return this;
 	}
 	
-	public ActionData setOptions(OptionType[] optionTypes) {
-		this.optionTypes = optionTypes;
-		return this;
-	}
-	
-	public ActionData setOption(OptionType optionType) {
-		this.optionTypes = new OptionType[] {optionType};
-		return this;
-	}
-	
-	public ActionRequest getAction() {
+	public ActionRequest getActionRequest() {
 		return this.actionRequest;
 	}
 	
@@ -97,19 +85,11 @@ public class ActionData {
 		return this.subCategory;
 	}
 	
-	public SubActionData[] getSubActions() {
+	public String[] getSubActions() {
 		return this.subActions;
 	}
 	
 	public Permission getMinimumPermission() {
 		return this.minimumPermission;
-	}
-	
-	public OptionType[] getOptionTypes() {
-		return this.optionTypes;
-	}
-	
-	public OptionType getOptionTypeAt(int index) {
-		return this.optionTypes[index];
 	}
  }

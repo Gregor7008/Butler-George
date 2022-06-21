@@ -18,7 +18,7 @@ public class Mute implements ActionRequest {
 		final Guild guild = event.getGuild();
 		final User user = event.getOptionAsUser(0);
 		ConfigLoader.getMemberConfig(guild, user).put("muted", true);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/mute:success").replaceDescription("{user}", user.getName())).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").replaceDescription("{user}", user.getName())).queue();
 		ModEngine.run.guildModCheck(guild);
 	}
 

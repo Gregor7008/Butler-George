@@ -20,12 +20,12 @@ public class ReportChannel implements ActionRequest {
 		final User user = event.getUser();
 		if (event.getSubAction().getName().equals("set")) {
 			ConfigLoader.getGuildConfig(guild).put("reportchannel", event.getSubAction().getOptionAsChannel(0).getIdLong());
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/reportchannel:setsuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess"));
 			return;
 		}
 		if (event.getSubAction().getName().equals("clear")) {
 			ConfigLoader.getGuildConfig(guild).put("reportchannel", 0L);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/reportchannel:clearsuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "clearsuccess"));
 		}
 	}
 

@@ -42,14 +42,14 @@ public class Userinfo implements Command {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster;
 		Member member;
-		String[] titles = LanguageEngine.getRaw(event.getGuild(), event.getUser(), "/commands/utilities/userinfo:titles").split(",");
+		String[] titles = LanguageEngine.getRaw(event.getGuild(), event.getUser(), this, "titles").split(",");
 		if (event.getOption("user") == null) {
 			member = event.getMember();
 		} else {
 			member = event.getGuild().getMember(event.getOption("user").getAsUser());
 		}
 		if (member.equals(event.getGuild().getSelfMember())) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), "/eastereggs:6").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), this, "6").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (member.getTimeBoosted() == null) {

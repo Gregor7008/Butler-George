@@ -37,7 +37,7 @@ public class Embed implements Command {
 		guild = event.getGuild();
 		channel = event.getTextChannel();
 		if (!member.hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/embed:nopermission").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
 			return;
 		}
 		eb = new EmbedBuilder();
@@ -58,73 +58,73 @@ public class Embed implements Command {
 	}
 	
 	private void definetitle() {
-		oevent.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/embed:definetitle").convert()).queue();
+		oevent.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definetitle").convert()).queue();
 		ResponseDetector.waitForMessage(guild, user, channel,
 							e -> {eb.setTitle(e.getMessage().getContentRaw());
 								  messages.add(e.getMessage());
 								  this.definedescr();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void definedescr() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/embed:definedescr").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definedescr").convert()).complete());
 		ResponseDetector.waitForMessage(guild, user, channel,
 							e -> {eb.setDescription(e.getMessage().getContentRaw());
 								  messages.add(e.getMessage());
 								  this.definefooter();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definefooter() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/embed:definefooter").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definefooter").convert()).complete());
 		ResponseDetector.waitForMessage(guild, user, channel,
 							e -> {if (e.getMessage().getContentRaw()=="none"){} else {eb.setFooter(e.getMessage().getContentRaw());}
 							  	  messages.add(e.getMessage());
 								  this.defineTNail();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void defineTNail() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/embed:defineTNail").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineTNail").convert()).complete());
 		ResponseDetector.waitForMessage(guild, user, channel,
 							e -> {if (e.getMessage().getContentRaw().contains("none")){} else {eb.setThumbnail(e.getMessage().getContentRaw());}
 								  messages.add(e.getMessage());
 								  this.defineImag();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineImag() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/embed:defineImag").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineImag").convert()).complete());
 		ResponseDetector.waitForMessage(guild, user, channel,
 							e -> {if (e.getMessage().getContentRaw().contains("none")){} else {eb.setImage(e.getMessage().getContentRaw());}
 								  messages.add(e.getMessage());
 								  this.wantnewfield();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void wantnewfield() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/embed:wantnewfield").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "wantnewfield").convert()).complete());
 		ResponseDetector.waitForMessage(guild, user, channel,
 							e -> {messages.add(e.getMessage());
 								  if(e.getMessage().getContentRaw().contains("no")) {this.sendMessage(eb.build());} else {this.addnewfield();}},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addnewfield() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/utilities/embed:addnewfield").convert()).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addnewfield").convert()).complete());
 		ResponseDetector.waitForMessage(guild, user, channel,
 							e -> {messages.add(e.getMessage());
 								  String[] temp1 = e.getMessage().getContentRaw().split("\\+");
 								  eb.addField(temp1[0], temp1[1], true);
 								  this.wantnewfield();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "general:timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void sendMessage(MessageEmbed embed) {
