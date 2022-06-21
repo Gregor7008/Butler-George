@@ -9,15 +9,14 @@ import javax.security.auth.login.LoginException;
 
 import org.json.JSONObject;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
-import components.base.ConfigVerifier;
 import components.base.ConsoleEngine;
 import components.base.LanguageEngine;
 import components.commands.moderation.ModEngine;
-import components.commands.moderation.ServerUtilities;
+import components.utilities.ConfigVerifier;
+import components.utilities.ResponseDetector;
+import components.utilities.ServerUtilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -34,7 +33,6 @@ public class Bot {
 	public static String id = "853887837823959041";
 	public static String homeID = "708381749826289666";
 	public JDA jda;
-	private EventWaiter eventWaiter = new EventWaiter();
 	private Timer timer = new Timer();
 	public int timerCount = 0;
 	public boolean noErrorOccured = true;
@@ -43,7 +41,7 @@ public class Bot {
 		run = this;
 	    //Create Bot
 		JDABuilder builder = JDABuilder.createDefault(token);
-		builder.addEventListeners(eventWaiter);
+		builder.addEventListeners(ResponseDetector.eventWaiter);
 		builder.addEventListeners(new Processor());
 		builder.setRawEventsEnabled(true);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_PRESENCES);
@@ -75,7 +73,7 @@ public class Bot {
     			}
     			if (ConfigLoader.getGuildConfig(guild).getLong("communityinbox") != 0) {
     				long chid = ConfigLoader.getGuildConfig(guild).getLong("communityinbox");
-    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.fetchMessage(guild, null, "/base/bot:offline").convert()).complete().getIdLong();
+    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.fetchMessage(guild, null, this, "/base/bot:offline").convert()).complete().getIdLong();
         			ConfigLoader.getGuildConfig(guild).put("offlinemsg", msgid);
         		}
     		}
@@ -117,9 +115,5 @@ public class Bot {
 				GUI.get.increaseCyclesCounter();
 			}
 		}, 0, 5*60*1000);
-	}
-	
-	public EventWaiter getWaiter() {
-		return eventWaiter;
 	}
 }

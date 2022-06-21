@@ -21,15 +21,15 @@ public class Nowplaying implements Command {
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/nowplaying:notconnected").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/nowplaying:notconnected").convert()).queue();
 			return;
 		}
 		if(member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/nowplaying:nopermission").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/nowplaying:nopermission").convert()).queue();
 			return;
 		}
 		final AudioTrackInfo info = PlayerManager.getInstance().getMusicManager(guild).audioPlayer.getPlayingTrack().getInfo();
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/music/nowplaying:success").replaceDescription("{track}",  ":arrow_right: | `" + info.title + "` by `" + info.author + "`!").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/nowplaying:success").replaceDescription("{track}",  ":arrow_right: | `" + info.title + "` by `" + info.author + "`!").convert()).queue();
 	}
 
 	@Override

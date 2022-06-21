@@ -18,7 +18,7 @@ public class TempMute implements ActionRequest {
 		final Guild guild = event.getGuild();
 		final User user = event.getOptionAsUser(0);
 		this.tempmute(event.getOptionAsInt(1), guild, user);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/tempmute:success")
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/tempmute:success")
 				.replaceDescription("{user}", user.getName())
 				.replaceDescription("{time}", String.valueOf(event.getOptionAsInt(1))).convert()).queue();
 	}

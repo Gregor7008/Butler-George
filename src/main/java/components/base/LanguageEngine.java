@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
+import components.utilities.CustomMessageEmbed;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -14,8 +15,8 @@ public class LanguageEngine {
 	public static String footer = "Made with ❤️ by Gregor7008";
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 	
-	public static CustomMessageEmbed fetchMessage(Guild guild, User user, String path)  {
-		return LanguageEngine.buildMessage(LanguageEngine.getTitle(guild, user, path), LanguageEngine.getDescription(guild, user, path));
+	public static CustomMessageEmbed fetchMessage(Guild guild, User user, Object requester, String key)  {
+		return LanguageEngine.buildMessage(LanguageEngine.getTitle(guild, user, requester, key), LanguageEngine.getDescription(guild, user, requester, key));
 	}
 	
 	public static MessageEmbed createMessage(String title, String description) {
@@ -32,33 +33,28 @@ public class LanguageEngine {
 		return new CustomMessageEmbed(embed);
 	}
 	
-	private static String getTitle(Guild guild, User user, String input) {
-		String[] temp1 = LanguageEngine.getRaw(guild, user, input).split("; ");
+	private static String getTitle(Guild guild, User user, Object requester, String key) {
+		String[] temp1 = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
 		return temp1[0];
 	}
 
-	private static String getDescription(Guild guild, User user, String input) {
-		String[] temp1 = LanguageEngine.getRaw(guild, user, input).split("; ");
+	private static String getDescription(Guild guild, User user, Object requester, String key) {
+		String[] temp1 = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
 		return temp1[1];
 	}
 	
-	public static String getRaw(Guild guild, User user, String input) {
+	public static String getRaw(Guild guild, User user, Object requester, String key) {
 		String lang = "en";
 		if (user != null && guild != null) {
 			//lang = ConfigLoader.getUserConfig(guild, user).getString("language"); <= Deactivated as translations are not ready
 		}
-		String[] temp1 = input.split(":");
-		String path = temp1[0];
-		String key = temp1[1];
+		String path = requester.getClass().getName().replace('.', '/').toLowerCase();
+		String fullpath = "languages" + lang + "/" + path + ".properties";
 		Properties properties = new Properties();
-		if (!path.startsWith("/")) {
-			ConsoleEngine.out.info(LanguageEngine.class, "Path error for path \"" + path + "\"");
-			path = "/" + path;
-		}
 		try {
-			properties.load(LanguageEngine.class.getClassLoader().getResourceAsStream("languages/" + lang + path + ".properties"));
+			properties.load(LanguageEngine.class.getClassLoader().getResourceAsStream(fullpath));
 		} catch (NullPointerException | IOException e) {
-			ConsoleEngine.out.error(LanguageEngine.class, "Couldn't find language files!");
+			ConsoleEngine.out.error(LanguageEngine.class, "Couldn't find language file for " + fullpath + ":" + key);
 			return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
 		}
 		String temp2 = properties.getProperty(key);

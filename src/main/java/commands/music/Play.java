@@ -30,15 +30,15 @@ public class Play implements Command {
 		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/play:wrongusage").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/play:wrongusage").convert()).queue();
 			return;
 		}
 		if (!member.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/play:noVCdefined").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/play:noVCdefined").convert()).queue();
 			return;
 		}
 		if (self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/music/play:alreadyinuse").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/music/play:alreadyinuse").convert()).queue();
 			return;
 		}
 		this.load(event, argument, musicManager, channel, member);

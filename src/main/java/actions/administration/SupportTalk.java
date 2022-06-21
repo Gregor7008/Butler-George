@@ -16,12 +16,12 @@ public class SupportTalk implements ActionRequest {
 		User user = event.getUser();
 		if (event.getSubAction().getName().equals("set")) {
 			ConfigLoader.getGuildConfig(guild).put("supporttalk", event.getOptionAsChannel(0).getIdLong());
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/supporttalk:setsuccess").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/supporttalk:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("clear")) {
 			ConfigLoader.getGuildConfig(guild).put("supporttalk", 0L);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/supporttalk:clearsuccess").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/supporttalk:clearsuccess").convert()).queue();
 		}
 	}
 

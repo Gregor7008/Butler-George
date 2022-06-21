@@ -21,12 +21,12 @@ public class Welcome implements ActionRequest {
 			String message = event.getSubAction().getOptionAsString(1);
 			String channelid = event.getSubAction().getOptionAsChannel(0).getId();
 			ConfigLoader.getGuildConfig(guild).put("welcomemsg", message + ";" + channelid);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/welcome:setsuccess").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/welcome:setsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("off")) {
 			ConfigLoader.getGuildConfig(guild).put("welcomemsg", "");
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/welcome:offsuccess").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/welcome:offsuccess").convert()).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("test")) {
@@ -39,9 +39,9 @@ public class Welcome implements ActionRequest {
 				String msg = welcomemsg[0].replace("{server}", guild.getName()).replace("{member}", event.getMember().getAsMention())
 							.replace("{membercount}", Integer.toString(guild.getMemberCount())).replace("{date}", currentdate);
 				guild.getTextChannelById(welcomemsg[1]).sendMessage(msg).queue();
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/welcome:testsuccess").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/welcome:testsuccess").convert()).queue();
 			} else {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,"/commands/moderation/welcome:nonedefined").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/welcome:nonedefined").convert()).queue();
 			}
 		}
 	}

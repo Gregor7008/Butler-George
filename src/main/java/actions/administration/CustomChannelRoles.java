@@ -24,22 +24,22 @@ public class CustomChannelRoles implements ActionRequest {
 		if (event.getSubAction().getName().equals("set")) {
 			ccroles.clear();
 			ccroles.put(roleID);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/customchannelroles:setsuccess")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/customchannelroles:setsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("add")) {
 			ccroles.put(roleID);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/customchannelroles:addsuccess")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/customchannelroles:addsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("remove")) {
 			ConfigLoader.removeValueFromArray(ccroles, roleID);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/customchannelroles:remsuccess")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/customchannelroles:remsuccess")).queue();
 			return;
 		}
 		if (event.getSubAction().getName().equals("clear")) {
 			ccroles.clear();
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/customchannelroles:clearsuccess")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/customchannelroles:clearsuccess")).queue();
 			return;
 		}
 	}

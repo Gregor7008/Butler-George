@@ -20,12 +20,12 @@ public class Unmute implements ActionRequest {
 		final User cuser = event.getOptionAsUser(0);
 		JSONObject userconfig = ConfigLoader.getMemberConfig(guild, cuser);
 		if (!userconfig.getBoolean("muted") && !userconfig.getBoolean("tempmuted")) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/unmute:nomute").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/unmute:nomute").convert()).queue();
 			return;
 		}
 		userconfig.put("muted", false);
 		userconfig.put("tempmuted", false);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/unmute:success").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/unmute:success").convert()).queue();
 		ModEngine.run.guildModCheck(guild);
 	}
 

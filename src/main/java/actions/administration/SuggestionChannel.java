@@ -19,12 +19,12 @@ public class SuggestionChannel implements ActionRequest {
 		final User user = event.getUser();
 		if (event.getSubAction().getName().equals("set")) {
 			ConfigLoader.getGuildConfig(guild).put("suggestionchannel", event.getSubAction().getOptionAsChannel(0).getIdLong());
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/suggestionchannel:setsuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/suggestionchannel:setsuccess"));
 			return;
 		}
 		if (event.getSubAction().getName().equals("clear")) {
 			ConfigLoader.getGuildConfig(guild).put("suggestionchannel", 0L);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, "/commands/moderation/suggestionchannel:clearsuccess"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/commands/moderation/suggestionchannel:clearsuccess"));
 		}
 	}
 

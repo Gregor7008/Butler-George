@@ -66,12 +66,12 @@ public class ModMail {
 		}
 		OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.getMemberConfig(guild, user).getString("lastmail"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 300) {
-			event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, "/components/moderation/modmail:success").convert()).queue();
+			event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/components/moderation/modmail:success").convert()).queue();
 			ConfigLoader.getMemberConfig(guild, user).put("lastmail", OffsetDateTime.now().format(ConfigManager.dateTimeFormatter));
 			this.processMessage(event);
 		} else {
 			int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
-			event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, "/components/moderation/modmail:timelimit")
+			event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "/components/moderation/modmail:timelimit")
 					.replaceDescription("{timeleft}", String.valueOf(timeleft)).convert()).queue();
 		}
 	}

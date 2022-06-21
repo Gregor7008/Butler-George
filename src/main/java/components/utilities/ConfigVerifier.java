@@ -1,10 +1,11 @@
-package components.base;
+package components.utilities;
 
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import components.base.ConfigLoader;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;

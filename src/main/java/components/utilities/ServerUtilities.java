@@ -1,4 +1,4 @@
-package components.commands.moderation;
+package components.utilities;
 
 import java.util.List;
 

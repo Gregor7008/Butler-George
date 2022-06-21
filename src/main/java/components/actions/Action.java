@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import javax.annotation.Nullable;
 
-import components.base.CustomMessageEmbed;
+import components.utilities.CustomMessageEmbed;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
