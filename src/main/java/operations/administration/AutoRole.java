@@ -1,24 +1,24 @@
-package actions.administration;
+package operations.administration;
 
 import org.json.JSONArray;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 
-public class AutoRole implements ActionRequest {
+public class AutoRole implements OperationRequest {
 
 	private Guild guild;
 	private User user;
 	
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		if (event.getSubAction().equals("add")) {
 			Role role = event.getSubAction().getOptionAsRole(0);
 			ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles").put(role.getIdLong());
@@ -37,16 +37,16 @@ public class AutoRole implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
-		ActionData actionData = new ActionData(this).setName("Auto Roles")
+	public OperationData initialize() {
+		OperationData operationData = new OperationData(this).setName("Auto Roles")
 												    .setInfo("Configure roles that should be given to every new user joining")
 													.setMinimumPermission(Permission.MANAGE_ROLES)
-													.setCategory(ActionData.ADMINISTRATION)
+													.setCategory(OperationData.ADMINISTRATION)
 													.setSubActions(new String[] {"add", "remove", "list"});
-		return actionData;
+		return operationData;
 	}
 	
-	private void listroles(Action event) {
+	private void listroles(OperationEvent event) {
 		StringBuilder sB = new StringBuilder();
 		JSONArray autoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles");
 		if (autoroles.isEmpty()) {

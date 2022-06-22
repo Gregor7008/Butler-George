@@ -44,17 +44,18 @@ public class Move implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = Commands.slash("move", "Move a member into the support talk").addOption(OptionType.USER, "member", "The member you want to move", true);
+		CommandData command = Commands.slash("move", "Move a member into the support talk")
+									  .addOption(OptionType.USER, "member", "The member you want to move", true);
 		return command;
 	}
 
 	@Override
 	public boolean canBeAccessedBy(Member member) {
-		Role supportRole = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("supportrole"));
-		if (supportRole == null) {
-			return false;
+		Role role = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("supportrole"));
+		if (role != null) {
+			return member.getRoles().contains(role);
 		} else {
-			return member.getRoles().contains(supportRole);
+			return false;
 		}
 	}
 }

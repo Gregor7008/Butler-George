@@ -1,4 +1,4 @@
-package actions.administration;
+package operations.administration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -6,12 +6,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
-import components.actions.SubActionData;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
+import components.operation.SubActionData;
 import components.utilities.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,15 +20,15 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
-public class Penalty implements ActionRequest {
+public class Penalty implements OperationRequest {
 
-	private Action event;
+	private OperationEvent event;
 	private Message message;
 	private User user;
 	private Guild guild;
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		this.message = event.getMessage();
 		this.user = event.getUser();
 		this.guild = event.getGuild();
@@ -49,20 +49,20 @@ public class Penalty implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
-		ActionData actionData = new ActionData(this).setName("Penalty")
+	public OperationData initialize() {
+		OperationData operationData = new OperationData(this).setName("Penalty")
 													.setInfo("Configure penalties for reaching a certain warning limit")
 													.setMinimumPermission(Permission.BAN_MEMBERS)
-													.setCategory(ActionData.ADMINISTRATION)
+													.setCategory(OperationData.ADMINISTRATION)
 													.setSubActions(new SubActionData[] {
 															new SubActionData("add"),
 															new SubActionData("remove"),
 															new SubActionData("list")
 													});
-		return actionData;
+		return operationData;
 	}
 	
-	private void removepenalties(Action event) {
+	private void removepenalties(OperationEvent event) {
 		String response = this.listpenalties(event);
 		if (response != null) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remlist").replaceDescription("{list}", response)).queue();
@@ -78,7 +78,7 @@ public class Penalty implements ActionRequest {
 		}
 	}
 	
-	private void addpenalties1(Action event) {
+	private void addpenalties1(OperationEvent event) {
 		SelectMenu menu = SelectMenu.create("selpen")
 				.addOption("Removal of role", "rr")
 				.addOption("Temporary mute", "tm")
@@ -161,7 +161,7 @@ public class Penalty implements ActionRequest {
 		}
 	}
 	
-	private String listpenalties(Action event) {
+	private String listpenalties(OperationEvent event) {
 		StringBuilder sB = new StringBuilder();
 		JSONObject current = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
 		if (current.isEmpty()) {

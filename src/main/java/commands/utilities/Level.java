@@ -56,7 +56,7 @@ public class Level implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("level", "Check your current level or the one of another user!")
-											  .addOptions(new OptionData(OptionType.USER, "user", "Mention another user (optional)").setRequired(false));
+									  .addOptions(new OptionData(OptionType.USER, "user", "Mention another user (optional)").setRequired(false));
 		return command;
 	}
 

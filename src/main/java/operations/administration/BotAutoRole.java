@@ -1,26 +1,26 @@
-package actions.administration;
+package operations.administration;
 
 import org.json.JSONArray;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
-import components.actions.SubActionData;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
+import components.operation.SubActionData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class BotAutoRole implements ActionRequest {
+public class BotAutoRole implements OperationRequest {
 
 	private Guild guild;
 	private User user;
 	
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		guild = event.getGuild();
 		user = event.getUser();
 		if (event.getSubAction().getName().equals("add")) {
@@ -41,20 +41,20 @@ public class BotAutoRole implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
-		ActionData actionData = new ActionData(this).setName("BotAutoRoles")
+	public OperationData initialize() {
+		OperationData operationData = new OperationData(this).setName("BotAutoRoles")
 				  									.setInfo("Configure roles that should be given to every new bot joining")
 				  									.setMinimumPermission(Permission.MANAGE_ROLES)
-				  									.setCategory(ActionData.ADMINISTRATION)
+				  									.setCategory(OperationData.ADMINISTRATION)
 				  									.setSubActions(new SubActionData[] {
 				  											new SubActionData("add", OptionType.ROLE),
 				  											new SubActionData("remove", OptionType.ROLE),
 				  											 new SubActionData("list")
 				  									});
-		return actionData;
+		return operationData;
 	}
 	
-	private void listroles(Action event) {
+	private void listroles(OperationEvent event) {
 		StringBuilder sB = new StringBuilder();
 		JSONArray botautoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("botautoroles");
 		if (botautoroles.isEmpty()) {

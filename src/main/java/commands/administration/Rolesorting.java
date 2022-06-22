@@ -43,7 +43,7 @@ public class Rolesorting implements Command {
 		CommandData command = Commands.slash("rolesort", "Adds and removes roles by other roles (If member has a role, give him another role)");
 		return command;
 	}
-	
+
 	@Override
 	public boolean canBeAccessedBy(Member member) {
 		return member.hasPermission(Permission.MANAGE_ROLES);

@@ -1,4 +1,4 @@
-package components.actions;
+package components.operation;
 
 import java.util.Collection;
 
@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
 
-public class Action {
+public class OperationEvent {
 	
 	private Guild guild = null;
 	private User user = null;
@@ -22,7 +22,7 @@ public class Action {
 	private TextChannel channel = null;
 	private String subAction = null;
 
-	public Action(Guild guild, User user, Message message, @Nullable String subAction) {
+	public OperationEvent(Guild guild, User user, Message message, @Nullable String subAction) {
 		this.guild = guild;
 		this.user = user;
 		this.member = guild.getMember(user);
@@ -31,7 +31,7 @@ public class Action {
 		this.subAction = subAction;
 	}
 	
-	public Action(Member member, Message message, @Nullable String subAction) {
+	public OperationEvent(Member member, Message message, @Nullable String subAction) {
 		this.guild = member.getGuild();
 		this.user = member.getUser();
 		this.member = member;

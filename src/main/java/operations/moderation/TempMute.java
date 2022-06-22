@@ -1,20 +1,20 @@
-package actions.moderation;
+package operations.moderation;
 
 import java.util.concurrent.TimeUnit;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.moderation.ModEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class TempMute implements ActionRequest {
+public class TempMute implements OperationRequest {
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getOptionAsUser(0);
 		this.tempmute(event.getOptionAsInt(1), guild, user);
@@ -24,7 +24,7 @@ public class TempMute implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
+	public OperationData initialize() {
 		//TODO Initialize TempMute
 		return null;
 	}

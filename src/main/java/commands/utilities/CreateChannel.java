@@ -40,7 +40,7 @@ public class CreateChannel implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("createchannel", "Creates a custom channel for you and your friends!")
-				.addOption(OptionType.STRING, "name", "The name of the new channel", true);
+									  .addOption(OptionType.STRING, "name", "The name of the new channel", true);
 		return command;
 	}
 

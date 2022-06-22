@@ -36,10 +36,6 @@ public class Embed implements Command {
 		user = event.getUser();
 		guild = event.getGuild();
 		channel = event.getTextChannel();
-		if (!member.hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
-			return;
-		}
 		eb = new EmbedBuilder();
 		eb.setAuthor(member.getEffectiveName(), null, user.getAvatarUrl());	
 		eb.setColor(56575);
@@ -54,7 +50,7 @@ public class Embed implements Command {
 
 	@Override
 	public boolean canBeAccessedBy(Member member) {
-		return true;
+		return member.hasPermission(Permission.MESSAGE_EMBED_LINKS);
 	}
 	
 	private void definetitle() {

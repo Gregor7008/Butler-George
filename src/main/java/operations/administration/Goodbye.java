@@ -1,23 +1,23 @@
-package actions.administration;
+package operations.administration;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
-import components.actions.SubActionData;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
+import components.operation.SubActionData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class Goodbye implements ActionRequest {
+public class Goodbye implements OperationRequest {
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (event.getSubAction().getName().equals("set")) {
@@ -51,16 +51,16 @@ public class Goodbye implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
-		ActionData actionData = new ActionData(this).setName("Goodbye")
+	public OperationData initialize() {
+		OperationData operationData = new OperationData(this).setName("Goodbye")
 													.setInfo("Configure a message sent on a member leaving")
 													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(ActionData.ADMINISTRATION)
+													.setCategory(OperationData.ADMINISTRATION)
 													.setSubActions(new SubActionData[] {
 															new SubActionData("set", new OptionType[] {OptionType.STRING, OptionType.CHANNEL}),
 															new SubActionData("off"),
 															new SubActionData("off")
 													});
-		return actionData;
+		return operationData;
 	}
 }

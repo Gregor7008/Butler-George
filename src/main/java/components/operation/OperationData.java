@@ -1,8 +1,8 @@
-package components.actions;
+package components.operation;
 
 import net.dv8tion.jda.api.Permission;
 
-public class ActionData {
+public class OperationData {
 	
 	public static String ADMINISTRATION = "admin";
 	public static String MODERATION = "mod";
@@ -10,7 +10,7 @@ public class ActionData {
 	public static String SETCHANNEL = "setch";
 	public static String SETROLE = "setrl";
 	
-	private ActionRequest actionRequest = null;
+	private OperationRequest operationRequest = null;
 	private String name = null;
 	private String info = null;
 	private String category = null;
@@ -18,27 +18,27 @@ public class ActionData {
 	private String[] subActions = null;
 	private Permission minimumPermission = null;
 	
-	public ActionData(ActionRequest actionRequest) {
-		this.actionRequest = actionRequest;
+	public OperationData(OperationRequest operationRequest) {
+		this.operationRequest = operationRequest;
 	}
 
-	public ActionData setName(String name) {
+	public OperationData setName(String name) {
 		this.name = name;
 		return this;
 	}
 	
-	public ActionData setInfo(String info) {
+	public OperationData setInfo(String info) {
 		this.info = info;
 		return this;
 	}
 	
-	public ActionData setMinimumPermission(Permission permission) {
+	public OperationData setMinimumPermission(Permission permission) {
 		this.minimumPermission = permission;
 		return this;
 	}
 	
-	public ActionData setCategory(String categoryConstant) {
-		if (!categoryConstant.equals(ActionData.ADMINISTRATION) || !categoryConstant.equals(ActionData.MODERATION)) {
+	public OperationData setCategory(String categoryConstant) {
+		if (!categoryConstant.equals(OperationData.ADMINISTRATION) || !categoryConstant.equals(OperationData.MODERATION)) {
 			throw new IllegalArgumentException("Category constant provided is not a valid category");
 		} else {
 			this.category = categoryConstant;
@@ -46,8 +46,8 @@ public class ActionData {
 		return this;
 	}
 	
-	public ActionData setSubCategory(String subCategoryConstant) {
-		if (!subCategoryConstant.equals(ActionData.SETCHANNEL) || !subCategoryConstant.equals(ActionData.SETROLE)) {
+	public OperationData setSubCategory(String subCategoryConstant) {
+		if (!subCategoryConstant.equals(OperationData.SETCHANNEL) || !subCategoryConstant.equals(OperationData.SETROLE)) {
 			throw new IllegalArgumentException("Subcategory constant provided is not a valid category");
 		} else {
 			this.category = subCategoryConstant;
@@ -55,18 +55,18 @@ public class ActionData {
 		return this;
 	}
 	
-	public ActionData setSubActions(String[] subActions) {
+	public OperationData setSubActions(String[] subActions) {
 		this.subActions = subActions;
 		return this;
 	}
 	
-	public ActionData setSubAction(String subAction) {
+	public OperationData setSubAction(String subAction) {
 		this.subActions = new String[] {subAction};
 		return this;
 	}
 	
-	public ActionRequest getActionRequest() {
-		return this.actionRequest;
+	public OperationRequest getActionRequest() {
+		return this.operationRequest;
 	}
 	
 	public String getName() {

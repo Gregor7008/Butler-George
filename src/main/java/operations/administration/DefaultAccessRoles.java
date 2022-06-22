@@ -1,22 +1,22 @@
-package actions.administration;
+package operations.administration;
 
 import org.json.JSONArray;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
-import components.actions.SubActionData;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
+import components.operation.SubActionData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class DefaultAccessRoles implements ActionRequest {
+public class DefaultAccessRoles implements OperationRequest {
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		JSONArray ccdefroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelaccessroles");
@@ -45,17 +45,17 @@ public class DefaultAccessRoles implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
-		ActionData actionData = new ActionData(this).setName("DefaultAccessRoles")
+	public OperationData initialize() {
+		OperationData operationData = new OperationData(this).setName("DefaultAccessRoles")
 													.setInfo("Configure the roles that should have access to channels of users by default")
 													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(ActionData.ADMINISTRATION)
+													.setCategory(OperationData.ADMINISTRATION)
 													.setSubActions(new SubActionData[] {
 															new SubActionData("set", OptionType.ROLE),
 															new SubActionData("add", OptionType.ROLE),
 															new SubActionData("remove", OptionType.ROLE),
 															new SubActionData("clear")
 													});
-		return actionData;
+		return operationData;
 	}
 }

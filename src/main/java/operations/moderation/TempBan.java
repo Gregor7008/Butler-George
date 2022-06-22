@@ -1,21 +1,21 @@
-package actions.moderation;
+package operations.moderation;
 
 import java.time.OffsetDateTime;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
 import components.base.LanguageEngine;
 import components.commands.moderation.ModEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class TempBan implements ActionRequest {
+public class TempBan implements OperationRequest {
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getOptionAsUser(0);
 		OffsetDateTime until = OffsetDateTime.now().plusDays(event.getOptionAsLong(1));
@@ -29,7 +29,7 @@ public class TempBan implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
+	public OperationData initialize() {
 		//TODO Initialize TempBan
 		return null;
 	}	

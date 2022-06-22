@@ -46,7 +46,8 @@ public class Play implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = Commands.slash("play", "Adds a new track to your music queue!").addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!", true));
+		CommandData command = Commands.slash("play", "Adds a new track to your music queue!")
+									  .addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!", true));
 		return command;
 	}
 

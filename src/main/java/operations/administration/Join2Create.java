@@ -1,23 +1,23 @@
-package actions.administration;
+package operations.administration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
-import components.actions.SubActionData;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
+import components.operation.SubActionData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class Join2Create implements ActionRequest {
+public class Join2Create implements OperationRequest {
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final String id = event.getSubAction().getOptionAsChannel(0).getId();
@@ -47,15 +47,15 @@ public class Join2Create implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
-		ActionData actionData = new ActionData(this).setName("Join2Create")
+	public OperationData initialize() {
+		OperationData operationData = new OperationData(this).setName("Join2Create")
 													.setInfo("Configure Join2Create channels for your server")
 													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(ActionData.ADMINISTRATION)
+													.setCategory(OperationData.ADMINISTRATION)
 													.setSubActions(new SubActionData[] {
 															new SubActionData("add", OptionType.CHANNEL),
 															new SubActionData("remove", OptionType.CHANNEL)
 													});
-		return actionData;
+		return operationData;
 	}
 }

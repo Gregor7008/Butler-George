@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import commands.administration.Clear;
 import commands.administration.Move;
 import commands.administration.Rolesorting;
+import commands.administration.Configure;
+import commands.administration.Warning;
 import commands.music.Nowplaying;
 import commands.music.Play;
 import commands.music.Queue;
@@ -30,6 +32,20 @@ public class CommandList {
 	public ConcurrentHashMap<String, Command> commands = new ConcurrentHashMap<>();
 	
 	public CommandList() {
+		//Administration
+		this.commands.put("clear", new Clear());
+		this.commands.put("rolesort", new Rolesorting());
+		this.commands.put("move", new Move());
+		this.commands.put("warning", new Warning());
+		this.commands.put("configure", new Configure());
+		
+		//Music
+		this.commands.put("nowplaying", new Nowplaying());
+		this.commands.put("play", new Play());
+		this.commands.put("queue", new Queue());
+		this.commands.put("skip", new Skip());
+		this.commands.put("stop", new Stop());
+		
 		//Utilities
 		this.commands.put("embed", new Embed());
 		this.commands.put("level", new Level());
@@ -44,15 +60,5 @@ public class CommandList {
 		this.commands.put("channelpermission", new Channelpermission());
 		this.commands.put("pingandmove", new PingAndMove());
 		this.commands.put("leave", new Leave());
-		this.commands.put("clear", new Clear());
-		this.commands.put("rolesort", new Rolesorting());
-		this.commands.put("move", new Move());
-		
-		//Music
-		this.commands.put("nowplaying", new Nowplaying());
-		this.commands.put("play", new Play());
-		this.commands.put("queue", new Queue());
-		this.commands.put("skip", new Skip());
-		this.commands.put("stop", new Stop());
 	}
 }

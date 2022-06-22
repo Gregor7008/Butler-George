@@ -73,12 +73,12 @@ public class Channelpermission implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("channelpermission", "Edits permission in user channels")
-				.addSubcommands(new SubcommandData("grant", "Grants permission in a user channel")
-						.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
-						.addOption(OptionType.USER, "user", "The wanted user", true))
-				.addSubcommands(new SubcommandData("remove", "Removes a permission in a user channel")
-						.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
-						.addOption(OptionType.USER, "user", "The wanted user", true));
+									  .addSubcommands(new SubcommandData("grant", "Grants permission in a user channel")
+											  					.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
+											  					.addOption(OptionType.USER, "user", "The wanted user", true),
+									  new SubcommandData("remove", "Removes a permission in a user channel")
+									  							.addOption(OptionType.CHANNEL, "channel_or_category", "The channel or category", true)
+									  							.addOption(OptionType.USER, "user", "The wanted user", true));
 		return command;
 	}
 

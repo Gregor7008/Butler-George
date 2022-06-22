@@ -37,9 +37,9 @@ public class Levelbackground implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("levelbackground", "Configure your personal levelbackground")
-									.addSubcommands(new SubcommandData("set", "Set your new levelbackground")
-											.addOption(OptionType.INTEGER, "number", "The number of your new levelbackground", true))
-									.addSubcommands(new SubcommandData("list", "List all possible backgrounds"));
+									  .addSubcommands(new SubcommandData("set", "Set your new levelbackground")
+											  					.addOption(OptionType.INTEGER, "number", "The number of your new levelbackground", true),
+													  new SubcommandData("list", "List all possible backgrounds"));
 		return command;
 	}
 	

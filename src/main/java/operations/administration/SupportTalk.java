@@ -1,17 +1,17 @@
-package actions.administration;
+package operations.administration;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class SupportTalk implements ActionRequest {
+public class SupportTalk implements OperationRequest {
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (event.getSubAction().getName().equals("set")) {
@@ -26,7 +26,7 @@ public class SupportTalk implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
+	public OperationData initialize() {
 		//TODO Initialize SupportTalk
 		return null;
 	}

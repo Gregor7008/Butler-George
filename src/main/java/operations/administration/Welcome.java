@@ -1,20 +1,20 @@
-package actions.administration;
+package operations.administration;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class Welcome implements ActionRequest {
+public class Welcome implements OperationRequest {
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (event.getSubAction().getName().equals("set")) {
@@ -47,7 +47,7 @@ public class Welcome implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
+	public OperationData initialize() {
 		//TODO Initialize Welcome
 		return null;
 	}

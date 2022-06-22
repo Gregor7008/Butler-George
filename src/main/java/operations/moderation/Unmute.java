@@ -1,20 +1,20 @@
-package actions.moderation;
+package operations.moderation;
 
 import org.json.JSONObject;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.moderation.ModEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class Unmute implements ActionRequest {
+public class Unmute implements OperationRequest {
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user =  event.getUser();
 		final User cuser = event.getOptionAsUser(0);
@@ -30,7 +30,7 @@ public class Unmute implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
+	public OperationData initialize() {
 		//TODO Initialize Unmute
 		return null;
 	}

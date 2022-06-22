@@ -1,4 +1,4 @@
-package actions.administration;
+package operations.administration;
 
 import java.util.List;
 import java.util.Set;
@@ -6,12 +6,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
-import components.actions.SubActionData;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
+import components.operation.SubActionData;
 import components.utilities.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,9 +20,9 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class ReactionRole implements ActionRequest {
+public class ReactionRole implements OperationRequest {
 	
-	private Action event;
+	private OperationEvent event;
 	private Guild guild;
 	private User user;
 	private Message message;
@@ -30,7 +30,7 @@ public class ReactionRole implements ActionRequest {
 	int progress = 0;
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		this.event = event;
 		this.guild = event.getGuild();
 		this.user = event.getUser();
@@ -65,17 +65,17 @@ public class ReactionRole implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
-		ActionData actionData = new ActionData(this).setName("ReactionRole")
+	public OperationData initialize() {
+		OperationData operationData = new OperationData(this).setName("ReactionRole")
 													.setInfo("Configure a reaction to give or remove a role")
 													.setMinimumPermission(Permission.MANAGE_ROLES)
-													.setCategory(ActionData.ADMINISTRATION)
+													.setCategory(OperationData.ADMINISTRATION)
 													.setSubActions(new SubActionData[] {
 														new SubActionData("add", new OptionType[] {OptionType.CHANNEL, OptionType.STRING}),
 														new SubActionData("delete", new OptionType[] {OptionType.CHANNEL, OptionType.STRING}),
 														new SubActionData("remove", new OptionType[] {OptionType.CHANNEL, OptionType.STRING})
 													});
-		return actionData;
+		return operationData;
 	}
 
 	private void defineAddRoles() {

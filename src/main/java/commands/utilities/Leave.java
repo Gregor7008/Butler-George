@@ -74,7 +74,7 @@ public class Leave implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("leave", "Leave this (or another) channel")
-				.addOption(OptionType.CHANNEL, "channel", "If it's a channel you can't run commands in");
+									  .addOption(OptionType.CHANNEL, "channel", "If it's a channel you can't run commands in");
 		return command;
 	}
 

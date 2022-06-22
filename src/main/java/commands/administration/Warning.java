@@ -11,7 +11,6 @@ import components.commands.moderation.ModEngine;
 import components.utilities.ResponseDetector;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -72,23 +71,18 @@ public class Warning implements Command {
 	public CommandData initialize() {
 		CommandData command = Commands.slash("warning", "0")
 								  .addSubcommands(new SubcommandData("add", "Warns a user and adds a warning to their warnings-list")
-											  .addOptions(new OptionData(OptionType.USER, "user", "The user you want to warn", true))
-											  .addOptions(new OptionData(OptionType.STRING, "reason", "The reason why you warn the member", false)))
-								  .addSubcommands(new SubcommandData("list", "Shows you the number of warnings a member already has")
-										  	  .addOptions(new OptionData(OptionType.USER, "user", "The user you want to check", true)))
-								  .addSubcommands(new SubcommandData("remove", "Removes a warning of a user")
-										  	  .addOptions(new OptionData(OptionType.USER, "user", "The user you want to remove the warning from", true)));
+											  			.addOptions(new OptionData(OptionType.USER, "user", "The user you want to warn", true))
+											  			.addOptions(new OptionData(OptionType.STRING, "reason", "The reason why you warn the member", false)),
+											  	  new SubcommandData("list", "Shows you the number of warnings a member already has")
+											  	  		.addOptions(new OptionData(OptionType.USER, "user", "The user you want to check", true)),
+											  	  new SubcommandData("remove", "Removes a warning of a user")
+											  	  		.addOptions(new OptionData(OptionType.USER, "user", "The user you want to remove the warning from", true)));
 		return command;
 	}
 
 	@Override
 	public boolean canBeAccessedBy(Member member) {
-		Role modRole = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("modrole"));
-		if (modRole == null) {
-			return false;
-		} else {
-			return member.getRoles().contains(modRole);
-		}
+		return true;
 	}
 	
 	private boolean listwarnings(SlashCommandInteractionEvent event) {

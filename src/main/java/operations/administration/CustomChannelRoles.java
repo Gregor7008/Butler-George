@@ -1,22 +1,22 @@
-package actions.administration;
+package operations.administration;
 
 import org.json.JSONArray;
 
-import components.actions.Action;
-import components.actions.ActionData;
-import components.actions.ActionRequest;
-import components.actions.SubActionData;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
+import components.operation.OperationEvent;
+import components.operation.OperationRequest;
+import components.operation.OperationData;
+import components.operation.SubActionData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class CustomChannelRoles implements ActionRequest {
+public class CustomChannelRoles implements OperationRequest {
 
 	@Override
-	public void execute(Action event) {
+	public void execute(OperationEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		JSONArray ccroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles");
@@ -45,17 +45,17 @@ public class CustomChannelRoles implements ActionRequest {
 	}
 
 	@Override
-	public ActionData initialize() {
-		ActionData actionData = new ActionData(this).setName("CustomChannelRoles")
+	public OperationData initialize() {
+		OperationData operationData = new OperationData(this).setName("CustomChannelRoles")
 													.setInfo("Configure the roles that should be able to create custom channels")
 													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(ActionData.ADMINISTRATION)
+													.setCategory(OperationData.ADMINISTRATION)
 													.setSubActions(new SubActionData[] {
 															new SubActionData("set", OptionType.ROLE),
 															new SubActionData("add", OptionType.ROLE),
 															new SubActionData("remove", OptionType.ROLE),
 															new SubActionData("clear", OptionType.ROLE)
 													});
-		return actionData;
+		return operationData;
 	}
 }

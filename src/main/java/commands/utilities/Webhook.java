@@ -21,10 +21,6 @@ public class Webhook implements Command {
 	public void perform(SlashCommandInteractionEvent event) {
 		User user = event.getUser();
 		Guild guild = event.getGuild();
-		if (!event.getMember().hasPermission(Permission.MANAGE_WEBHOOKS)) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-			return;
-		}
 		WebhookEngine we = new WebhookEngine(event.getOption("link").getAsString());
 		we.setContent(event.getOption("message").getAsString());
 		try {
@@ -45,6 +41,6 @@ public class Webhook implements Command {
 
 	@Override
 	public boolean canBeAccessedBy(Member member) {
-		return true;
+		return member.hasPermission(Permission.MANAGE_WEBHOOKS);
 	}
 }

@@ -3,12 +3,13 @@ package commands.administration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -36,12 +37,17 @@ public class Clear implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("clear", "Deletes a specific number of messages from this channel!")
-				.addOptions(new OptionData(OptionType.INTEGER, "count", "Hand over the number of messages you want to delete!", true));
+								      .addOptions(new OptionData(OptionType.INTEGER, "count", "Hand over the number of messages you want to delete!", true));
 		return command;
 	}
 
 	@Override
 	public boolean canBeAccessedBy(Member member) {
-		return member.hasPermission(Permission.MESSAGE_MANAGE);
+		Role role = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("modrole"));
+		if (role != null) {
+			return member.getRoles().contains(role);
+		} else {
+			return false;
+		}
 	}
 }

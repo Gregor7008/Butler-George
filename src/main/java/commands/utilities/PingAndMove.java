@@ -55,7 +55,8 @@ public class PingAndMove implements Command {
 
 	@Override
 	public CommandData initialize() {
-		CommandData command = Commands.slash("pingandmove", "Join a user in a full voice channel!").addOption(OptionType.USER, "user", "The user whoms channel you want to join", true);
+		CommandData command = Commands.slash("pingandmove", "Join a user in a full voice channel!")
+									  .addOption(OptionType.USER, "user", "The user whoms channel you want to join", true);
 		return command;
 	}
 
