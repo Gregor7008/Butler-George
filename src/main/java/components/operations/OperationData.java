@@ -1,4 +1,7 @@
-package components.operation;
+package components.operations;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import net.dv8tion.jda.api.Permission;
 
@@ -7,19 +10,15 @@ public class OperationData {
 	public static String ADMINISTRATION = "admin";
 	public static String MODERATION = "mod";
 	
-	public static String SETCHANNEL = "setch";
-	public static String SETROLE = "setrl";
-	
-	private OperationRequest operationRequest = null;
+	private OperationEventHandler operationEventHandler = null;
 	private String name = null;
 	private String info = null;
 	private String category = null;
-	private String subCategory = null;
-	private String[] subActions = null;
+	private SubOperationData[] subOperations = null;
 	private Permission minimumPermission = null;
 	
-	public OperationData(OperationRequest operationRequest) {
-		this.operationRequest = operationRequest;
+	public OperationData(OperationEventHandler operationEventHandler) {
+		this.operationEventHandler = operationEventHandler;
 	}
 
 	public OperationData setName(String name) {
@@ -46,27 +45,34 @@ public class OperationData {
 		return this;
 	}
 	
-	public OperationData setSubCategory(String subCategoryConstant) {
-		if (!subCategoryConstant.equals(OperationData.SETCHANNEL) || !subCategoryConstant.equals(OperationData.SETROLE)) {
-			throw new IllegalArgumentException("Subcategory constant provided is not a valid category");
-		} else {
-			this.category = subCategoryConstant;
+	public OperationData setSubOperations(String ... subOpData) {
+		List<SubOperationData> subOperationsList = new ArrayList<>();
+		int i = 1;
+		String tempSavedName = null;
+		for (String subOperation : subOpData) {
+			if (i % 2 == 0) {
+				subOperationsList.add(new SubOperationData(tempSavedName, subOperation));
+				i++;
+			} else {
+				tempSavedName = subOperation;
+			}
 		}
+		this.subOperations = (SubOperationData[]) subOperationsList.toArray();
 		return this;
 	}
 	
-	public OperationData setSubActions(String[] subActions) {
-		this.subActions = subActions;
+	public OperationData setSubOperations(SubOperationData[] subOperations) {
+		this.subOperations = subOperations;
 		return this;
 	}
 	
-	public OperationData setSubAction(String subAction) {
-		this.subActions = new String[] {subAction};
+	public OperationData setSubOperation(SubOperationData subOperation) {
+		this.subOperations = new SubOperationData[] {subOperation};
 		return this;
 	}
 	
-	public OperationRequest getActionRequest() {
-		return this.operationRequest;
+	public OperationEventHandler getOperationEventHandler() {
+		return this.operationEventHandler;
 	}
 	
 	public String getName() {
@@ -81,12 +87,8 @@ public class OperationData {
 		return this.category;
 	}
 	
-	public String getSubCategory() {
-		return this.subCategory;
-	}
-	
-	public String[] getSubActions() {
-		return this.subActions;
+	public SubOperationData[] getSubOperations() {
+		return this.subOperations;
 	}
 	
 	public Permission getMinimumPermission() {

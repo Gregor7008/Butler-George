@@ -19,6 +19,7 @@ import components.commands.moderation.ModMail;
 import components.commands.utilities.LevelEngine;
 import components.utilities.ConfigVerifier;
 import components.utilities.ServerUtilities;
+import components.utilities.Toolbox;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Category;
@@ -285,8 +286,8 @@ public class Processor extends ListenerAdapter {
 		ConfigVerifier.run.guildCheck(guild);
 		if (event.isFromType(ChannelType.CATEGORY)) {
 			Category ctg = (Category) event.getChannel();
-			if (this.checkCategory(ctg, guild) != null) {
-				ConfigVerifier.run.userCheck(guild, this.checkCategory(ctg, guild));
+			if (Toolbox.checkCategory(ctg, guild) != null) {
+				ConfigVerifier.run.userCheck(guild, Toolbox.checkCategory(ctg, guild));
 			}
 		}
 	}
@@ -350,14 +351,6 @@ public class Processor extends ListenerAdapter {
 				createdchannels.put(audioChannel.getId(), newowner.getUser().getIdLong());
 				audioChannel.getPermissionContainer().getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(guild.getMember(user)).setName(newowner.getEffectiveName() + "'s channel").queue();
 			}
-		}
-	}
-	
-	private User checkCategory(Category category, Guild guild) {
-		try {
-			return Bot.run.jda.getUserById(ConfigLoader.getFirstGuildLayerConfig(guild, "customchannelcategories").getLong(category.getId()));
-		} catch (JSONException e) {
-			return null;
 		}
 	}
 }

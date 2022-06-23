@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class CustomChannelRoles implements OperationEventHandler {
+public class BotAutoRoles implements OperationEventHandler {
 
 	private Guild guild;
 	private User user;
@@ -31,7 +31,7 @@ public class CustomChannelRoles implements OperationEventHandler {
 			return;
 		}
 		if (event.getSubOperation().equals("remove")) {
-			ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles").clear();
+			ConfigLoader.getGuildConfig(guild).getJSONArray("botautoroles").clear();
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
 			return;
 		}
@@ -40,20 +40,20 @@ public class CustomChannelRoles implements OperationEventHandler {
 				e -> {return !e.getMessage().getMentions().getRoles().isEmpty();
 				},
 				e -> {
-					JSONArray customchannelroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles");
+					JSONArray botautoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("botautoroles");
 					List<Long> roleIDs = new ArrayList<Long>();
 					e.getMessage().getMentions().getRoles().forEach(r -> roleIDs.add(r.getIdLong()));
 					if (event.getSubOperation().equals("add")) {
 						for (int i = 0; i < roleIDs.size(); i++) {
-							if (!customchannelroles.toList().contains(roleIDs.get(i))) {
-								customchannelroles.put(roleIDs.get(i));
+							if (!botautoroles.toList().contains(roleIDs.get(i))) {
+								botautoroles.put(roleIDs.get(i));
 							}
 						}
 						event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
 					}
 					if (event.getSubOperation().equals("delete")) {
 						for (int i = 0; i < roleIDs.size(); i++) {
-							Toolbox.removeValueFromArray(customchannelroles, roleIDs.get(i));
+							Toolbox.removeValueFromArray(botautoroles, roleIDs.get(i));
 						}
 						event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue();
 					}
@@ -62,11 +62,11 @@ public class CustomChannelRoles implements OperationEventHandler {
 
 	@Override
 	public OperationData initialize() {
-		OperationData operationData = new OperationData(this).setName("CustomChannelRoles")
-													.setInfo("Configure the roles that should be able to create custom user channels")
-													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(OperationData.ADMINISTRATION)
-													.setSubOperations(new SubOperationData[] {
+		OperationData operationData = new OperationData(this).setName("BotAutoRoles")
+				  									.setInfo("Configure roles that should be given to every new bot joining")
+				  									.setMinimumPermission(Permission.MANAGE_ROLES)
+				  									.setCategory(OperationData.ADMINISTRATION)
+				  									.setSubOperations(new SubOperationData[] {
 				  											new SubOperationData("add", "Add one or more roles"),
 				  											new SubOperationData("delete", "Delete one role from the active ones"),
 				  											new SubOperationData("remove", "Remove all roles"),
@@ -77,9 +77,9 @@ public class CustomChannelRoles implements OperationEventHandler {
 	
 	private void listroles(OperationEvent event) {
 		StringBuilder sB = new StringBuilder();
-		JSONArray botautoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles");
+		JSONArray botautoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("botautoroles");
 		if (botautoroles.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noccroles")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nobotautoroles")).queue();
 			return;
 		}
 		for (int i = 0; i < botautoroles.length(); i++) {

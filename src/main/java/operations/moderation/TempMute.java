@@ -5,13 +5,13 @@ import java.util.concurrent.TimeUnit;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.moderation.ModEngine;
-import components.operation.OperationEvent;
-import components.operation.OperationRequest;
-import components.operation.OperationData;
+import components.operations.OperationData;
+import components.operations.OperationEvent;
+import components.operations.OperationEventHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class TempMute implements OperationRequest {
+public class TempMute implements OperationEventHandler {
 
 	@Override
 	public void execute(OperationEvent event) {

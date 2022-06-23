@@ -2,9 +2,9 @@ package operations;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import components.operation.OperationRequest;
-import operations.administration.AutoRole;
-import operations.administration.BotAutoRole;
+import components.operations.OperationEventHandler;
+import operations.administration.AutoRoles;
+import operations.administration.BotAutoRoles;
 import operations.administration.CustomChannelRoles;
 import operations.administration.DefaultAccessRoles;
 import operations.administration.Goodbye;
@@ -24,12 +24,12 @@ import operations.moderation.Unmute;
 
 public class OperationList {
 	
-	public ConcurrentHashMap<String, OperationRequest> operations = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<String, OperationEventHandler> operations = new ConcurrentHashMap<>();
 
 	public OperationList() {
 		//Administration
-		this.operations.put("AutoRole", new AutoRole());
-		this.operations.put("BotAutoRole", new BotAutoRole());
+		this.operations.put("AutoRole", new AutoRoles());
+		this.operations.put("BotAutoRole", new BotAutoRoles());
 		this.operations.put("CustomChannelRoles", new CustomChannelRoles());
 		this.operations.put("DefaultAccessRoles", new DefaultAccessRoles());
 		this.operations.put("Goodbye", new Goodbye());

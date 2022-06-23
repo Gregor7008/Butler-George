@@ -8,10 +8,10 @@ import org.json.JSONObject;
 
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
-import components.operation.OperationEvent;
-import components.operation.OperationRequest;
-import components.operation.OperationData;
-import components.operation.SubActionData;
+import components.operations.OperationData;
+import components.operations.OperationEvent;
+import components.operations.OperationEventHandler;
+import components.operations.SubActionData;
 import components.utilities.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
-public class Penalty implements OperationRequest {
+public class Penalty implements OperationEventHandler {
 
 	private OperationEvent event;
 	private Message message;
@@ -33,13 +33,13 @@ public class Penalty implements OperationRequest {
 		this.user = event.getUser();
 		this.guild = event.getGuild();
 		this.event = event;
-		if (event.getSubAction().getName().equals("add")) {
+		if (event.getSubOperation().getName().equals("add")) {
 			this.addpenalties1(event);
 		}
-		if (event.getSubAction().getName().equals("remove")) {
+		if (event.getSubOperation().getName().equals("remove")) {
 			this.removepenalties(event);
 		}
-		if (event.getSubAction().getName().equals("list")) {
+		if (event.getSubOperation().getName().equals("list")) {
 			String response = this.listpenalties(event);
 			if (response != null) {
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list").replaceDescription("{list}", response)).queue();

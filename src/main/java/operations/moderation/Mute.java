@@ -3,15 +3,15 @@ package operations.moderation;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.moderation.ModEngine;
-import components.operation.OperationEvent;
-import components.operation.OperationRequest;
-import components.operation.OperationData;
+import components.operations.OperationData;
+import components.operations.OperationEvent;
+import components.operations.OperationEventHandler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class Mute implements OperationRequest {
+public class Mute implements OperationEventHandler {
 
 	@Override
 	public void execute(OperationEvent event) {
@@ -27,8 +27,7 @@ public class Mute implements OperationRequest {
 		OperationData operationData = new OperationData(this).setName("Mute")
 													.setInfo("Mute a member permanently")
 													.setMinimumPermission(Permission.MESSAGE_MANAGE)
-													.setCategory(OperationData.MODERATION)
-													.setOption(OptionType.USER);
+													.setCategory(OperationData.MODERATION);
 		return operationData;
 	}
 }

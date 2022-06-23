@@ -2,24 +2,24 @@ package operations.administration;
 
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
-import components.operation.OperationEvent;
-import components.operation.OperationRequest;
-import components.operation.OperationData;
+import components.operations.OperationData;
+import components.operations.OperationEvent;
+import components.operations.OperationEventHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class SupportTalk implements OperationRequest {
+public class SupportTalk implements OperationEventHandler {
 
 	@Override
 	public void execute(OperationEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		if (event.getSubAction().getName().equals("set")) {
+		if (event.getSubOperation().getName().equals("set")) {
 			ConfigLoader.getGuildConfig(guild).put("supporttalk", event.getOptionAsChannel(0).getIdLong());
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess").convert()).queue();
 			return;
 		}
-		if (event.getSubAction().getName().equals("clear")) {
+		if (event.getSubOperation().getName().equals("clear")) {
 			ConfigLoader.getGuildConfig(guild).put("supporttalk", 0L);
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "clearsuccess").convert()).queue();
 		}

@@ -5,16 +5,16 @@ import org.json.JSONObject;
 
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
-import components.operation.OperationEvent;
-import components.operation.OperationRequest;
-import components.operation.OperationData;
-import components.operation.SubActionData;
+import components.operations.OperationData;
+import components.operations.OperationEvent;
+import components.operations.OperationEventHandler;
+import components.operations.SubActionData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class LevelReward implements OperationRequest {
+public class LevelReward implements OperationEventHandler {
 
 	private Guild guild;
 	private User user;
@@ -24,15 +24,15 @@ public class LevelReward implements OperationRequest {
 		guild = event.getGuild();
 		user = event.getUser();
 		JSONObject levelrewards = ConfigLoader.getGuildConfig(guild).getJSONObject("levelrewards");
-		if (event.getSubAction().getName().equals("add")) {
-			levelrewards.put(String.valueOf(event.getSubAction().getOptionAsInt(1)), event.getOptionAsRole(0).getIdLong());
+		if (event.getSubOperation().getName().equals("add")) {
+			levelrewards.put(String.valueOf(event.getSubOperation().getOptionAsInt(1)), event.getOptionAsRole(0).getIdLong());
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")
 					.replaceDescription("{role}", event.getOptionAsRole(0).getAsMention())
-					.replaceDescription("{level}", String.valueOf(event.getSubAction().getOptionAsInt(1)))).queue();
+					.replaceDescription("{level}", String.valueOf(event.getSubOperation().getOptionAsInt(1)))).queue();
 			return;
 		}
-		if (event.getSubAction().getName().equals("remove")) {
-			int level = event.getSubAction().getOptionAsInt(0);
+		if (event.getSubOperation().getName().equals("remove")) {
+			int level = event.getSubOperation().getOptionAsInt(0);
 			try {
 				levelrewards.getLong(String.valueOf(level));
 			} catch (JSONException e) {
@@ -46,7 +46,7 @@ public class LevelReward implements OperationRequest {
 			levelrewards.remove(String.valueOf(level));
 			return;
 		}
-		if (event.getSubAction().getName().equals("list")) {
+		if (event.getSubOperation().getName().equals("list")) {
 			this.listrewards(event, levelrewards);
 		}
 	}

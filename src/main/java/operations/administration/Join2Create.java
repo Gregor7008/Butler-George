@@ -5,28 +5,28 @@ import org.json.JSONObject;
 
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
-import components.operation.OperationEvent;
-import components.operation.OperationRequest;
-import components.operation.OperationData;
-import components.operation.SubActionData;
+import components.operations.OperationData;
+import components.operations.OperationEvent;
+import components.operations.OperationEventHandler;
+import components.operations.SubActionData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class Join2Create implements OperationRequest {
+public class Join2Create implements OperationEventHandler {
 
 	@Override
 	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		final String id = event.getSubAction().getOptionAsChannel(0).getId();
+		final String id = event.getSubOperation().getOptionAsChannel(0).getId();
 		JSONObject join2createchannels = ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels");
 		if (guild.getVoiceChannelById(id) == null) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
 			return;
 		}
-		if (event.getSubAction().getName().equals("add")) {
+		if (event.getSubOperation().getName().equals("add")) {
 			try {
 				join2createchannels.get(id);
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "adderror")).queue();
@@ -35,7 +35,7 @@ public class Join2Create implements OperationRequest {
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
 			}
 		}
-		if (event.getSubAction().getName().equals("remove")) {
+		if (event.getSubOperation().getName().equals("remove")) {
 			try {
 				join2createchannels.get(id);
 				join2createchannels.remove(id);

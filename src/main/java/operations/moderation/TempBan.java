@@ -6,13 +6,13 @@ import components.base.ConfigLoader;
 import components.base.ConfigManager;
 import components.base.LanguageEngine;
 import components.commands.moderation.ModEngine;
-import components.operation.OperationEvent;
-import components.operation.OperationRequest;
-import components.operation.OperationData;
+import components.operations.OperationData;
+import components.operations.OperationEvent;
+import components.operations.OperationEventHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class TempBan implements OperationRequest {
+public class TempBan implements OperationEventHandler {
 
 	@Override
 	public void execute(OperationEvent event) {

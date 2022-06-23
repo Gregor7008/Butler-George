@@ -1,6 +1,6 @@
-package components.operation;
+package components.operations;
 
-public interface OperationRequest {
+public interface OperationEventHandler {
 	
 	public void execute(OperationEvent event);
 	public OperationData initialize();

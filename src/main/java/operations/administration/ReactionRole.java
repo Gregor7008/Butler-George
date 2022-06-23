@@ -8,10 +8,10 @@ import org.json.JSONObject;
 
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
-import components.operation.OperationEvent;
-import components.operation.OperationRequest;
-import components.operation.OperationData;
-import components.operation.SubActionData;
+import components.operations.OperationData;
+import components.operations.OperationEvent;
+import components.operations.OperationEventHandler;
+import components.operations.SubActionData;
 import components.utilities.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-public class ReactionRole implements OperationRequest {
+public class ReactionRole implements OperationEventHandler {
 	
 	private OperationEvent event;
 	private Guild guild;
@@ -34,24 +34,24 @@ public class ReactionRole implements OperationRequest {
 		this.event = event;
 		this.guild = event.getGuild();
 		this.user = event.getUser();
-		this.msgid = event.getSubAction().getOptionAsString(1);
-		this.chid = event.getSubAction().getOptionAsChannel(0).getId();
+		this.msgid = event.getSubOperation().getOptionAsString(1);
+		this.chid = event.getSubOperation().getOptionAsChannel(0).getId();
 		if (guild.getTextChannelById(chid).retrieveMessageById(msgid).complete() == null) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nomessage")).queue();
 			return;
 		}
-		if (event.getSubAction().getName().equals("add")) {
+		if (event.getSubOperation().getName().equals("add")) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddRoles")).complete();
 			this.defineAddRoles();
 			return;
 		}
-		if (event.getSubAction().getName().equals("delete")) {
+		if (event.getSubOperation().getName().equals("delete")) {
 			ConfigLoader.getReactionChannelConfig(guild, chid).remove(msgid);
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
 			guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions().queue();
 			return;
 		}
-		if (event.getSubAction().getName().equals("remove")) {
+		if (event.getSubOperation().getName().equals("remove")) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineRemoveEmoji")).queue();
 			ResponseDetector.waitForReaction(guild, user, message,
 					e -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")

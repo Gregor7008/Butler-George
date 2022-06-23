@@ -1,6 +1,5 @@
 package components.base;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -111,40 +110,5 @@ public class ConfigLoader {
 	
 	private static JSONObject getModMailConfig(Guild guild) {
 		return ConfigLoader.getFirstGuildLayerConfig(guild, "modmails");
-	}
-	
-	//Tool methods
-	public static void clearValue(JSONObject jObject, String key) {
-		try {
-			jObject.getString(key);
-			jObject.put(key, "");
-			return;
-		} catch (JSONException e) {}
-		try {
-			jObject.getJSONArray(key);
-			jObject.put(key, new JSONArray());
-			return;
-		} catch (JSONException e) {}
-		try {
-			jObject.getInt(key);
-			jObject.put(key, 0);
-			return;
-		} catch (JSONException e) {}
-		try {
-			jObject.getLong(key);
-			jObject.put(key, 0L);
-			return;
-		} catch (JSONException e) {}
-	}
-	
-	public static boolean removeValueFromArray(JSONArray current, Object value) {
-		for (int i = 0; i < current.length(); i++) {
-			if (current.get(i).equals(value)) {
-				current.remove(i);
-				i = current.length();
-				return true;
-			}
-		}
-		return false;
 	}
  }

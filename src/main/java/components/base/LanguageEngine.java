@@ -19,11 +19,7 @@ public class LanguageEngine {
 		return LanguageEngine.buildMessage(LanguageEngine.getTitle(guild, user, requester, key), LanguageEngine.getDescription(guild, user, requester, key));
 	}
 	
-	public static MessageEmbed createMessage(String title, String description) {
-		return LanguageEngine.buildMessage(title, description).convert();
-	}
-	
-	private static CustomMessageEmbed buildMessage(String title, String description) {
+	public static CustomMessageEmbed buildMessage(String title, String description) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setTitle(title);
 		eb.setColor(56575);
@@ -33,12 +29,12 @@ public class LanguageEngine {
 		return new CustomMessageEmbed(embed);
 	}
 	
-	private static String getTitle(Guild guild, User user, Object requester, String key) {
+	public static String getTitle(Guild guild, User user, Object requester, String key) {
 		String[] temp1 = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
 		return temp1[0];
 	}
 
-	private static String getDescription(Guild guild, User user, Object requester, String key) {
+	public static String getDescription(Guild guild, User user, Object requester, String key) {
 		String[] temp1 = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
 		return temp1[1];
 	}
