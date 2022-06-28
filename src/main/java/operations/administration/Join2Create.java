@@ -1,6 +1,7 @@
 package operations.administration;
 
-import org.json.JSONException;
+import java.util.List;
+
 import org.json.JSONObject;
 
 import components.base.ConfigLoader;
@@ -8,11 +9,15 @@ import components.base.LanguageEngine;
 import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
-import components.operations.SubActionData;
+import components.operations.SubOperationData;
+import components.utilities.ResponseDetector;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class Join2Create implements OperationEventHandler {
 
@@ -20,30 +25,30 @@ public class Join2Create implements OperationEventHandler {
 	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		final String id = event.getSubOperation().getOptionAsChannel(0).getId();
 		JSONObject join2createchannels = ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels");
-		if (guild.getVoiceChannelById(id) == null) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
+		if (event.getSubOperation().equals("remove")) {
+			join2createchannels.clear();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
 			return;
 		}
-		if (event.getSubOperation().getName().equals("add")) {
-			try {
-				join2createchannels.get(id);
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "adderror")).queue();
-			} catch (JSONException e) {
-				join2createchannels.put(id, new JSONObject());
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
-			}
+		if (event.getSubOperation().equals("list")) {
+			this.listJoin2Creates(event);
+			return;
 		}
-		if (event.getSubOperation().getName().equals("remove")) {
-			try {
-				join2createchannels.get(id);
-				join2createchannels.remove(id);
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
-			} catch (JSONException e) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remerror")).queue();
-			}
-		}
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannels")).queue();
+		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+				e -> {return e.getMessage().getMentions().getChannels().isEmpty();},
+				e -> {List<GuildChannel> channels = e.getMessage().getMentions().getChannels();
+					  if (event.getSubOperation().equals("add")) {
+						 this.configNewChannels(event, channels);
+						 return;
+					  }
+					  if (event.getSubOperation().equals("delete")) {
+						 channels.forEach(c -> join2createchannels.remove(c.getId()));
+						 event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue();
+						 return;
+					  }
+				});
 	}
 
 	@Override
@@ -52,10 +57,59 @@ public class Join2Create implements OperationEventHandler {
 													.setInfo("Configure Join2Create channels for your server")
 													.setMinimumPermission(Permission.MANAGE_SERVER)
 													.setCategory(OperationData.ADMINISTRATION)
-													.setSubActions(new SubActionData[] {
-															new SubActionData("add", OptionType.CHANNEL),
-															new SubActionData("remove", OptionType.CHANNEL)
+													.setSubOperations(new SubOperationData[] {
+															new SubOperationData("add", "Activate one or more channels as Join2Create channels"),
+				  											new SubOperationData("delete", "Deactivate one channel from the active ones"),
+				  											new SubOperationData("remove", "Deactivate all channels"),
+				  											new SubOperationData("list", "List all active channels")
 													});
 		return operationData;
+	}
+	
+	private void listJoin2Creates(OperationEvent event) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		EmbedBuilder eb = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "list").convert());
+		JSONObject j2cs = ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels");
+		j2cs.keySet().forEach(e -> {
+			JSONObject channelConfig = j2cs.getJSONObject(e);
+			String description = "Name:" + channelConfig.getString("name") 
+							 + "\nLimit:" + String.valueOf(channelConfig.getInt("limit"))
+							 + "\nConfigurable:" + String.valueOf(channelConfig.getBoolean("configurable"));
+			eb.addField(guild.getGuildChannelById(e) + " (" + e + "):", description, false);
+		});
+		event.replyEmbeds(eb.build());
+	}
+	
+	private void configNewChannels(OperationEvent event, List<GuildChannel> channels) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		for (int i = 0; i < channels.size(); i++) {
+			GuildChannel channel = channels.get(i);
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defname").replaceDescription("{channel}", channel.getName() + " (" + channel.getId() + ")")).queue();
+			ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+					n -> {String name = n.getMessage().getContentDisplay();
+						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflimit").replaceDescription("{channel}", channel.getName() + " (" + channel.getId() + ")")).queue();
+						  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+								  l -> {try {Integer.parseInt(l.getMessage().getContentRaw());
+									  	     return true;
+								  	    } catch (NumberFormatException ex) {
+									  		return false;
+								  	    }},
+								  l -> {
+									  int limit = Integer.parseInt(l.getMessage().getContentRaw());
+									  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defconfigurable").replaceDescription("{channel}", channel.getName() + " (" + channel.getId() + ")")).setActionRow(
+											  Button.primary("true", Emoji.fromMarkdown(":white_check_mark")),
+											  Button.primary("false", Emoji.fromMarkdown(":x:"))).queue();
+									  ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
+											  e -> {
+												  ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels")
+												  					.put(channel.getId(), new JSONObject().put("name", name)
+														  												  .put("limit", limit)
+														  												  .put("configurable", Boolean.valueOf(e.getButton().getId())));
+											  });
+								  });
+					});
+		}
 	}
 }

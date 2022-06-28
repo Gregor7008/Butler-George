@@ -1,8 +1,5 @@
 package components.operations;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.dv8tion.jda.api.Permission;
 
 public class OperationData {
@@ -42,22 +39,6 @@ public class OperationData {
 		} else {
 			this.category = categoryConstant;
 		}
-		return this;
-	}
-	
-	public OperationData setSubOperations(String ... subOpData) {
-		List<SubOperationData> subOperationsList = new ArrayList<>();
-		int i = 1;
-		String tempSavedName = null;
-		for (String subOperation : subOpData) {
-			if (i % 2 == 0) {
-				subOperationsList.add(new SubOperationData(tempSavedName, subOperation));
-				i++;
-			} else {
-				tempSavedName = subOperation;
-			}
-		}
-		this.subOperations = (SubOperationData[]) subOperationsList.toArray();
 		return this;
 	}
 	

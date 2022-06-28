@@ -21,11 +21,18 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 public class ResponseDetector {
 
 	public static EventWaiter eventWaiter = new EventWaiter();
+	private static boolean invalidMessageGiven = false;
 	
 	public static void waitForMessage(Guild guild, User user, MessageChannel channel, Predicate<MessageReceivedEvent> additionalCondition,
 	   	      					      Consumer<MessageReceivedEvent> onSuccess) {
 		ResponseDetector.waitForMessage(guild, user, channel, additionalCondition, onSuccess,
-				() -> {channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "timeout").convert()).queue();});
+				() -> {if (invalidMessageGiven) {
+						   invalidMessageGiven = false;
+						   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "invalid").convert()).queue();
+					   } else {
+						   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "timeout").convert()).queue();
+					   }
+					   });
 	}
 	
 	public static void waitForMessage(Guild guild, User user, MessageChannel channel, Predicate<MessageReceivedEvent> additionalCondition,
@@ -41,7 +48,12 @@ public class ResponseDetector {
 						  return false;
 					  }
 					  if (additionalCondition != null) {
-						  return additionalCondition.test(e);
+ 						  if (additionalCondition.test(e)) {
+ 							  return true;
+ 						  } else {
+ 							  invalidMessageGiven = true;
+ 							  return false;
+ 						  }
 					  } else {
 						  return true;
 					  }

@@ -37,8 +37,7 @@ public class CustomChannelRoles implements OperationEventHandler {
 		}
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).queue();
 		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
-				e -> {return !e.getMessage().getMentions().getRoles().isEmpty();
-				},
+				e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 				e -> {
 					JSONArray customchannelroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles");
 					List<Long> roleIDs = new ArrayList<Long>();

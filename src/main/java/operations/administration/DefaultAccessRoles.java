@@ -37,8 +37,7 @@ public class DefaultAccessRoles implements OperationEventHandler {
 		}
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).queue();
 		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
-				e -> {return !e.getMessage().getMentions().getRoles().isEmpty();
-				},
+				e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 				e -> {
 					JSONArray ccdefaccessroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelaccessroles");
 					List<Long> roleIDs = new ArrayList<Long>();
