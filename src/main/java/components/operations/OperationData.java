@@ -34,7 +34,7 @@ public class OperationData {
 	}
 	
 	public OperationData setCategory(String categoryConstant) {
-		if (!categoryConstant.equals(OperationData.ADMINISTRATION) || !categoryConstant.equals(OperationData.MODERATION)) {
+		if (!categoryConstant.equals(OperationData.ADMINISTRATION) && !categoryConstant.equals(OperationData.MODERATION)) {
 			throw new IllegalArgumentException("Category constant provided is not a valid category");
 		} else {
 			this.category = categoryConstant;

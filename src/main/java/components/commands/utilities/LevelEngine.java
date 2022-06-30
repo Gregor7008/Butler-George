@@ -84,7 +84,7 @@ public class LevelEngine {
 		int currentlevel = ConfigLoader.getMemberConfig(guild, user).getInt("level");
 		if (this.xpleftfornextlevel(guild, user) < 1) {
 			userconfig.put("level", currentlevel + 1);
-			Long id = ConfigLoader.getGuildConfig(guild).getLong("levelmsgchannel");
+			Long id = ConfigLoader.getGuildConfig(guild).getLong("communityinbox");
 			if (id == 0) {
 				return;
 			}
@@ -94,7 +94,7 @@ public class LevelEngine {
 						.replaceTitle("{user}", guild.getMember(user).getEffectiveName())
 						.replaceDescription("{level}", String.valueOf(currentlevel+1)).convert()).queue();
 			} else {
-				ConfigLoader.getGuildConfig(guild).put("levelmsgchannel",0L);
+				ConfigLoader.getGuildConfig(guild).put("communityinbox",0L);
 			}
 		}
 	}

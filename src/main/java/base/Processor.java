@@ -58,11 +58,13 @@ public class Processor extends ListenerAdapter {
 	    List<Guild> guilds = event.getJDA().getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
 			Guild guild = guilds.get(i);
-			long msgid = ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(0);
-			if (msgid != 0) {
-				guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(1)).retrieveMessageById(msgid).complete().delete().queue();
-				ConfigLoader.getGuildConfig(guild).put("offlinemsg", new JSONArray());
-			}
+			try {
+				long msgid = ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(0);
+				if (msgid != 0) {
+					guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(1)).retrieveMessageById(msgid).complete().delete().queue();
+					ConfigLoader.getGuildConfig(guild).put("offlinemsg", new JSONArray());
+				}
+			} catch (JSONException e) {}
 		}
 		CommandListUpdateAction clua = event.getJDA().updateCommands();
 		new CommandList().commands.forEach((name, cmd) -> {
@@ -147,13 +149,15 @@ public class Processor extends ListenerAdapter {
 				}
 			}
 			JSONArray welcomemsg = ConfigLoader.getGuildConfig(guild).getJSONArray("welcomemsg");
-			if (welcomemsg.getBoolean(3)) {
-				String msg = welcomemsg.getString(1);
-				msg.replace("{server}", guild.getName());
-				msg.replace("{user}", event.getMember().getAsMention());
-				msg.replace("{membercount}", Integer.toString(guild.getMemberCount()));
-				msg.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
-				guild.getTextChannelById(welcomemsg.getLong(1)).sendMessage(msg).queue();
+			if (!welcomemsg.isEmpty()) {
+				if (welcomemsg.getBoolean(3)) {
+					String msg = welcomemsg.getString(1);
+					msg.replace("{server}", guild.getName());
+					msg.replace("{user}", event.getMember().getAsMention());
+					msg.replace("{membercount}", Integer.toString(guild.getMemberCount()));
+					msg.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
+					guild.getTextChannelById(welcomemsg.getLong(1)).sendMessage(msg).queue();
+				}
 			}
 		}
 	}
@@ -167,13 +171,15 @@ public class Processor extends ListenerAdapter {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		JSONArray goodbyemsg = ConfigLoader.getGuildConfig(guild).getJSONArray("goodbyemsg");
-		if (goodbyemsg.getBoolean(3)) {
-			String msg = goodbyemsg.getString(1);
-			msg.replace("{server}", guild.getName());
-			msg.replace("{member}", event.getMember().getAsMention());
-			msg.replace("{membercount}", Integer.toString(guild.getMemberCount()));
-			msg.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
-			guild.getTextChannelById(goodbyemsg.getLong(1)).sendMessage(msg).queue();
+		if (!goodbyemsg.isEmpty()) {
+			if (goodbyemsg.getBoolean(3)) {
+				String msg = goodbyemsg.getString(1);
+				msg.replace("{server}", guild.getName());
+				msg.replace("{member}", event.getMember().getAsMention());
+				msg.replace("{membercount}", Integer.toString(guild.getMemberCount()));
+				msg.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
+				guild.getTextChannelById(goodbyemsg.getLong(1)).sendMessage(msg).queue();
+			}
 		}
 		if (ConfigLoader.getMemberConfig(guild, user).getLong("customchannelcategory") != 0) {
 			Category ctg = guild.getCategoryById(ConfigLoader.getMemberConfig(guild, user).getLong("customchannelcategory"));

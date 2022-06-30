@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,12 +28,25 @@ public class Clear implements Command {
 		TextChannel channel = event.getTextChannel();
 		int count = Integer.parseInt(event.getOption("count").getAsString());
 		List<Message> messages = channel.getHistory().retrievePast(count).complete();
-		try {channel.deleteMessages(messages).queue();} catch (Exception e) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+//										.stream().filter(e -> {long duration =  Duration.between(e.getTimeCreated(), OffsetDateTime.now()).toDays();
+//															   System.out.println(duration);
+//															   return duration < 14;}).toList();
+		if (messages.isEmpty()) {
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid").convert()).queue();
 			return;
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "done").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-	}
+		if (messages.size() == 1) {
+			messages.get(0).delete().queue();
+			
+		}
+		try {
+			channel.deleteMessages(messages).queue();
+		} catch (IllegalArgumentException e) {
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid").convert()).queue();
+			return;
+		}
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "done").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+}
 
 	@Override
 	public CommandData initialize() {
@@ -43,11 +57,15 @@ public class Clear implements Command {
 
 	@Override
 	public boolean canBeAccessedBy(Member member) {
-		Role role = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("modrole"));
-		if (role != null) {
-			return member.getRoles().contains(role);
+		Role role = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("moderationrole"));
+		if (member.hasPermission(Permission.MESSAGE_MANAGE)) {
+			return true;
 		} else {
-			return false;
+			if (role != null) {
+				return member.getRoles().contains(role);
+			} else {
+				return false;
+			}
 		}
 	}
 }

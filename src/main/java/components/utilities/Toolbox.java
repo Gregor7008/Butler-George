@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import base.Bot;
 import components.base.ConfigLoader;
-import components.base.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -65,13 +64,5 @@ public class Toolbox {
 		List<ActionRow> newActionRows = new ArrayList<ActionRow>();
 		actionRows.forEach(a -> newActionRows.add(a.asDisabled()));
 		message.editMessageComponents(newActionRows).queue();
-	}
-	
-	public static void deleteActionRows(Message message) {
-		try {
-			message.editMessageEmbeds(message.getEmbeds()).setActionRows().queue();
-		} catch (IllegalArgumentException e) {
-			ConsoleEngine.out.error(Toolbox.class, "Couldn't delete action rows of message " + message.getJumpUrl() + "!");
-		}
 	}
 }

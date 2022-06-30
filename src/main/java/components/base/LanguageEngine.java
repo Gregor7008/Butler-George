@@ -52,11 +52,15 @@ public class LanguageEngine {
 		Properties properties = new Properties();
 		try {
 			properties.load(LanguageEngine.class.getClassLoader().getResourceAsStream(fullpath));
+			String temp2 = properties.getProperty(key);
+			if (temp2 == null) {
+				throw new NullPointerException();
+			} else {
+				return temp2;
+			}
 		} catch (NullPointerException | IOException e) {
 			ConsoleEngine.out.error(LanguageEngine.class, "Couldn't find language file for " + fullpath + ":" + key);
 			return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
 		}
-		String temp2 = properties.getProperty(key);
-		return temp2;
 	}
 }

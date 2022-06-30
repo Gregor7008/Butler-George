@@ -130,8 +130,10 @@ public class ResponseDetector {
 					  if (!e.getMessage().getId().equals(message.getId())) {
 						  return false;
 					  }
-					  if (buttonID != null && !e.getButton().getId().equals(buttonID)) {
-						  return false;
+					  if (buttonID != null) {
+						  if (!e.getButton().getId().equals(buttonID)) {
+							  return false;
+						  }
 					  }
 					  return e.getUser().getIdLong() == user.getIdLong();
 				},

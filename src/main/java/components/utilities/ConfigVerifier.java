@@ -21,7 +21,7 @@ public class ConfigVerifier {
 	}
 	
 	public void guildCheck(Guild guild) {
-		this.autoRolesCheck(guild);
+		this.userAutoRolesCheck(guild);
 		this.botAutoRolesCheck(guild);
 		this.createdChannelsCheck(guild);
 		this.customChannelAccessRolesCheck(guild);
@@ -29,26 +29,22 @@ public class ConfigVerifier {
 		this.customChannelRolesCheck(guild);
 		this.goodbyeMsgCheck(guild);
 		this.join2CreateChannelsCheck(guild);
-		this.levelMsgChannelCheck(guild);
 		this.levelrewardsCheck(guild);
 		this.modMailsCheck(guild);
 		//Modrole Check
-		this.offlineMsgCheck(guild);
 		this.penaltiesCheck(guild);
 		this.pollsCheck(guild);
 		this.reactionRolesCheck(guild);
-		this.reportChannelCheck(guild);
-		this.suggestionChannelCheck(guild);
-		this.supportCategoryCheck(guild);
-		this.supportChatCheck(guild);
+		this.communityInboxChannelCheck(guild);
+		this.suggestionInboxCheck(guild);
 		//Supportrole Check
 		this.supportTalkCheck(guild);
-		this.systeminfoChannelCheck(guild);
+		this.modInboxChannelCheck(guild);
 		this.ticketChannelsCheck(guild);
 	}
-	public void autoRolesCheck(Guild guild) {
+	public void userAutoRolesCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		JSONArray autoroles = guildConfig.getJSONArray("autoroles");
+		JSONArray autoroles = guildConfig.getJSONArray("userautoroles");
 		for (int i = 0; i < autoroles.length(); i++) {
 			if (guild.getRoleById(autoroles.getLong(i)) == null) {
 				autoroles.remove(i);
@@ -62,6 +58,13 @@ public class ConfigVerifier {
 			if (guild.getRoleById(botautoroles.getLong(i)) == null) {
 				botautoroles.remove(i);
 			}
+		}
+	}
+	public void communityInboxChannelCheck(Guild guild) {
+		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
+		long communityInbox = guildConfig.getLong("communityinbox");
+		if (guild.getTextChannelById(communityInbox) == null) {
+			guildConfig.put("communityinbox", 0L);
 		}
 	}
 	public void customChannelCategoriesCheck(Guild guild, boolean userCalled) {
@@ -88,13 +91,7 @@ public class ConfigVerifier {
 		});
 	}
 	public void customChannelAccessRolesCheck(Guild guild) {
-		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		JSONArray customchannelaccessroles = guildConfig.getJSONArray("customchannelaccessroles");
-		for (int i = 0; i < customchannelaccessroles.length(); i++) {
-			if (guild.getRoleById(customchannelaccessroles.getLong(i)) == null) {
-				customchannelaccessroles.remove(i);
-			}
-		}
+		
 	}
 	public void customChannelRolesCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
@@ -102,16 +99,6 @@ public class ConfigVerifier {
 		for (int i = 0; i < customchannelroles.length(); i++) {
 			if (guild.getRoleById(customchannelroles.getLong(i)) == null) {
 				customchannelroles.remove(i);
-			}
-		}
-	}
-	public void goodbyeMsgCheck(Guild guild) {
-		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		String goodbyemsg = guildConfig.getString("goodbyemsg");
-		if (goodbyemsg != "") {
-			String[] goodbyeSplit = goodbyemsg.split(";");
-			if (guild.getTextChannelById(goodbyeSplit[1]) == null) {
-				guildConfig.put("goodbyemsg", "");
 			}
 		}
 	}
@@ -132,6 +119,15 @@ public class ConfigVerifier {
 			}
 		});
 	}
+	public void goodbyeMsgCheck(Guild guild) {
+		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
+		JSONArray goodbyemsg = guildConfig.getJSONArray("goodbyemsg");
+		if (!goodbyemsg.isEmpty()) {
+			if (guild.getTextChannelById(goodbyemsg.getLong(1)) == null) {
+				guildConfig.put("goodbyemsg", new JSONArray());
+			}
+		}
+	}
 	public void join2CreateChannelsCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject join2createchannels = guildConfig.getJSONObject("join2createchannels");
@@ -140,13 +136,6 @@ public class ConfigVerifier {
 				join2createchannels.remove(e);
 			}
 		});
-	}
-	public void levelMsgChannelCheck(Guild guild) {
-		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		long levelmsgchannel = guildConfig.getLong("levelmsgchannel");
-		if (guild.getTextChannelById(levelmsgchannel) == null) {
-			guildConfig.put("levelmsgchannel", 0L);
-		}
 	}
 	public void levelrewardsCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
@@ -157,17 +146,14 @@ public class ConfigVerifier {
 			}
 		});
 	}
-	public void offlineMsgCheck(Guild guild) {
+	public void modRoleCheck(Guild guild) {
+		
+	}
+	public void modInboxChannelCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		long offlinemsg = guildConfig.getLong("offlinemsg");
-		if (offlinemsg != 0) {
-			if (guildConfig.getLong("systeminfochannel") != 0) {
-				if (guild.getTextChannelById(guildConfig.getLong("systeminfochannel")).retrieveMessageById(offlinemsg).complete() == null) {
-					guildConfig.put("offlinemsg", 0L);
-				}
-			} else {
-				guildConfig.put("offlinemsg", 0L);
-			}
+		long modInbox = guildConfig.getLong("moderationinbox");
+		if (guild.getTextChannelById(modInbox) == null) {
+			guildConfig.put("moderationinbox", 0L);
 		}
 	}
 	public void penaltiesCheck(Guild guild) {
@@ -180,32 +166,11 @@ public class ConfigVerifier {
 			}
 		});
 	}
-	public void reportChannelCheck(Guild guild) {
+	public void suggestionInboxCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		long reportchannel = guildConfig.getLong("reportchannel");
-		if (guild.getTextChannelById(reportchannel) == null) {
-			guildConfig.put("reportchannel", 0L);
-		}
-	}
-	public void suggestionChannelCheck(Guild guild) {
-		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		long suggestionchannel = guildConfig.getLong("suggestionchannel");
-		if (guild.getTextChannelById(suggestionchannel) == null) {
-			guildConfig.put("suggestionchannel", 0L);
-		}
-	}
-	public void supportCategoryCheck(Guild guild) {
-		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		long supportcategory = guildConfig.getLong("supportcategory");
-		if (guild.getCategoryById(supportcategory) == null) {
-			guildConfig.put("supportcategory", 0L);
-		}
-	}
-	public void supportChatCheck(Guild guild) {
-		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		long supportchat = guildConfig.getLong("supportchat");
-		if (guild.getTextChannelById(supportchat) == null) {
-			guildConfig.put("supportchat", 0L);
+		long suggestionInbox = guildConfig.getLong("suggestioninbox");
+		if (guild.getTextChannelById(suggestionInbox) == null) {
+			guildConfig.put("suggestioninbox", 0L);
 		}
 	}
 	public void supportTalkCheck(Guild guild) {
@@ -213,13 +178,6 @@ public class ConfigVerifier {
 		long supporttalk = guildConfig.getLong("supporttalk");
 		if (guild.getVoiceChannelById(supporttalk) == null) {
 			guildConfig.put("supporttalk", 0L);
-		}
-	}
-	public void systeminfoChannelCheck(Guild guild) {
-		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		long systeminfochannel = guildConfig.getLong("systeminfochannel");
-		if (guild.getTextChannelById(systeminfochannel) == null) {
-			guildConfig.put("systeminfochannel", 0L);
 		}
 	}
 	public void ticketChannelsCheck(Guild guild) {
@@ -233,11 +191,10 @@ public class ConfigVerifier {
 	}
 	public void welcomeMsgCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		String welcomemsg = guildConfig.getString("welcomemsg");
-		if (welcomemsg != "") {
-			String[] welcomeSplit = welcomemsg.split(";");
-			if (guild.getTextChannelById(welcomeSplit[1]) == null) {
-				guildConfig.put("welcomemsg", "");
+		JSONArray welcomemsg = guildConfig.getJSONArray("welcomemsg");
+		if (!welcomemsg.isEmpty()) {
+			if (guild.getTextChannelById(welcomemsg.getLong(1)) == null) {
+				guildConfig.put("welcomemsg", new JSONArray());
 			}
 		}
 	}

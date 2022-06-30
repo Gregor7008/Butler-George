@@ -35,7 +35,7 @@ public class Configure implements Command {
 		
 		ConcurrentHashMap<String, OperationData> operations = new ConcurrentHashMap<String, OperationData>();
 		SelectMenu.Builder menuBuilder1 = SelectMenu.create("selVal").setRequiredRange(1, 1).setPlaceholder("Select a value");
-		EmbedBuilder eb1 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selop").convert());
+		EmbedBuilder eb1 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selval").convert());
 		
 		if (event.getSubcommandName().equals("server")) {
 			if (event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
@@ -64,17 +64,16 @@ public class Configure implements Command {
 		
 		Message msg = event.replyEmbeds(eb1.build()).addActionRow(menuBuilder1.build()).complete().retrieveOriginal().complete();
 		ResponseDetector.waitForMenuSelection(guild, user, msg, menuBuilder1.getId(),
-				e -> {
-					OperationData data = operations.get(e.getSelectedOptions().get(0).getValue());
-					SubOperationData[] subOperations = data.getSubOperations();
-					if (subOperations != null) {
+				e -> {OperationData data = operations.get(e.getSelectedOptions().get(0).getValue());
+					  SubOperationData[] subOperations = data.getSubOperations();
+					  if (subOperations != null) {
 						List<Button> buttons = new ArrayList<>();
 						EmbedBuilder eb2 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selsub").convert());
 						for (int i = 0; i < subOperations.length; i++) {
 							buttons.add(Button.primary(String.valueOf(i), subOperations[i].getName()));
-							eb2.addField("`" + subOperations[i].getName() + "`", subOperations[i].getInfo(), true);
+								eb2.addField("`" + subOperations[i].getName() + "`", subOperations[i].getInfo(), true);
 						}
-						msg.editMessageEmbeds(eb2.build()).setActionRow(buttons).queue();
+						e.editMessageEmbeds(eb2.build()).setActionRow(buttons).queue();
 						ResponseDetector.waitForButtonClick(guild, user, msg, null,
 								s -> {
 									data.getOperationEventHandler().execute(new OperationEvent(event.getMember(), msg, subOperations[Integer.valueOf(s.getButton().getId())]));
@@ -95,7 +94,7 @@ public class Configure implements Command {
 
 	@Override
 	public boolean canBeAccessedBy(Member member) {
-		Role role = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("modrole"));
+		Role role = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("moderationrole"));
 		if (member.hasPermission(Permission.MANAGE_SERVER)) {
 			return true;
 		} else if (role != null) {

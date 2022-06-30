@@ -6,6 +6,7 @@ import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
 import components.utilities.ResponseDetector;
+import components.utilities.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -13,7 +14,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class Language implements Command {
@@ -35,8 +35,7 @@ public class Language implements Command {
 				.addActionRow(menu)
 				.complete();
 		ResponseDetector.waitForMenuSelection(guild, user, reply.retrieveOriginal().complete(), menu.getId(),
-				e -> {ActionRow newRow = ActionRow.of(menu.asDisabled());
-					  reply.editOriginalComponents(newRow).queue();
+				e -> {e.editSelectMenu(menu.asDisabled()).queue();
 					  switch (e.getSelectedOptions().get(0).getValue()) {
 				      	case "en":
 				      		ConfigLoader.getMemberConfig(guild, user).put("language", "en");
@@ -62,8 +61,7 @@ public class Language implements Command {
 				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal").convert()).queue();
 						}
 					},
-				() -> {ActionRow newRow = ActionRow.of(menu.asDisabled());
-				  	   reply.editOriginalComponents(newRow).queue();
+				() -> {Toolbox.disableActionRows(reply.retrieveOriginal().complete());
 					   event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 

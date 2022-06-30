@@ -50,7 +50,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 	}
 	
 	public void userInput(String input) {
-		
+		this.print("input", null, input, true);
 	}
 	
 	private void print(@Nullable String prefix, @Nullable Object object, @Nullable String message, boolean timeCode) {
@@ -98,6 +98,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String input = GUI.consoleIn.getText();
+		this.userInput(input);
 		GUI.consoleIn.setText("");
 		if (Bot.run != null && Bot.run.jda != null) {
 			this.commandListener(input);
@@ -111,7 +112,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		e.printStackTrace();
 		Bot.run.noErrorOccured = false;
 		GUI.get.increaseErrorCounter();
-		GUI.get.setTableValue(7, true);
+		GUI.get.setTableValue(8, true);
 	}
 	
 	private void commandListener(String line) {

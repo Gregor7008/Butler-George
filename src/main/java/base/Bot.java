@@ -35,7 +35,7 @@ public class Bot {
 	public JDA jda;
 	private Timer timer = new Timer();
 	public int timerCount = 0;
-	public boolean noErrorOccured = true;
+	public boolean noErrorOccured = false;
 	
 	public Bot(String token) throws LoginException, InterruptedException, IOException {
 		run = this;
