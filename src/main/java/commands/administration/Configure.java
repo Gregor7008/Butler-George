@@ -4,13 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import components.ResponseDetector;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
 import components.operations.OperationData;
 import components.operations.OperationEvent;
+import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import components.utilities.ResponseDetector;
+import context.Mute;
+import context.TempBan;
+import context.TempMute;
+import context.Unmute;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,7 +29,17 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
-import operations.OperationList;
+import operations.AutoRoles;
+import operations.CustomChannelRoles;
+import operations.DefaultAccessRoles;
+import operations.Goodbye;
+import operations.Inbox;
+import operations.Join2Create;
+import operations.LevelReward;
+import operations.Penalty;
+import operations.ReactionRole;
+import operations.SupportTalk;
+import operations.Welcome;
 
 public class Configure implements Command {
 	
@@ -74,12 +89,14 @@ public class Configure implements Command {
 								eb2.addField("`" + subOperations[i].getName() + "`", subOperations[i].getInfo(), true);
 						}
 						e.editMessageEmbeds(eb2.build()).setActionRow(buttons).queue();
+						//TODO Rework of Replyable.java needed, as message instance contains ActionRows saved which will be reloaded when using this instance.
+						//Also the below handed over Message instance "msg" has to be changed to the new Message instance created in line 91!
 						ResponseDetector.waitForButtonClick(guild, user, msg, null,
 								s -> {
 									data.getOperationEventHandler().execute(new OperationEvent(event.getMember(), msg, subOperations[Integer.valueOf(s.getButton().getId())]));
 								});
 					} else {
-						data.getOperationEventHandler().execute(new OperationEvent(event.getMember(), msg, null));
+						data.getOperationEventHandler().execute(new OperationEvent(event.getMember(), e.getMessage(), null));
 					}
 				});
 	}
@@ -101,6 +118,31 @@ public class Configure implements Command {
 			return member.getRoles().contains(role);
 		} else {
 			return false;
+		}
+	}
+	
+	private static class OperationList {
+			
+		public ConcurrentHashMap<String, OperationEventHandler> operations = new ConcurrentHashMap<>();
+		
+		public OperationList() {
+			//Administration
+			this.operations.put("AutoRole", new AutoRoles());
+			this.operations.put("CustomChannelRoles", new CustomChannelRoles());
+			this.operations.put("DefaultAccessRoles", new DefaultAccessRoles());
+			this.operations.put("Goodbye", new Goodbye());
+			this.operations.put("Join2Create", new Join2Create());
+			this.operations.put("CommunityInbox", new Inbox());
+			this.operations.put("LevelRewards", new LevelReward());
+			this.operations.put("Penalty", new Penalty());
+			this.operations.put("ReactionRole", new ReactionRole());
+			this.operations.put("SupportTalk", new SupportTalk());
+			this.operations.put("Welcome", new Welcome());
+			//Moderation
+			this.operations.put("Mute", new Mute());
+			this.operations.put("TempBan", new TempBan());
+			this.operations.put("TempMute", new TempMute());
+			this.operations.put("Unmute", new Unmute());
 		}
 	}
 }

@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import components.ResponseDetector;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.utilities.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;

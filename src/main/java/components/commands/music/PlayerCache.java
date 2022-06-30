@@ -11,10 +11,6 @@ public class PlayerCache {
 	private ConcurrentHashMap<AudioPlayer, Guild> pc = new ConcurrentHashMap<>();
 	private static PlayerCache INSTANCE;
 	
-	public PlayerCache() {
-		
-	}
-	
 	public static PlayerCache getInstance() {
 		if (INSTANCE == null) {
 			INSTANCE = new PlayerCache();

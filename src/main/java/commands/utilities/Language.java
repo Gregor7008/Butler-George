@@ -2,11 +2,11 @@ package commands.utilities;
 
 import java.util.concurrent.TimeUnit;
 
+import components.ResponseDetector;
+import components.Toolbox;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.utilities.ResponseDetector;
-import components.utilities.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;

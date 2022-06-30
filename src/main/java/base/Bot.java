@@ -9,14 +9,14 @@ import javax.security.auth.login.LoginException;
 
 import org.json.JSONObject;
 
+import components.ResponseDetector;
+import components.ServerUtilities;
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
+import components.base.ConfigVerifier;
 import components.base.ConsoleEngine;
 import components.base.LanguageEngine;
-import components.commands.moderation.ModEngine;
-import components.utilities.ConfigVerifier;
-import components.utilities.ResponseDetector;
-import components.utilities.ServerUtilities;
+import components.commands.moderation.ModController;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -53,7 +53,7 @@ public class Bot {
 	    //Startup engines
 	    Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.out);
 	    new ConfigVerifier();
-	    new ModEngine();
+	    new ModController();
 	    ServerUtilities.controlChannels(true);
     	this.checkConfigs();
     	this.startTimer();
@@ -105,8 +105,8 @@ public class Bot {
 				List<Guild> guilds = jda.getGuilds();
 				for (int i = 0; i < guilds.size(); i++) {
 					Guild guild = guilds.get(i);
-					ModEngine.run.guildPenaltyCheck(guild);
-					ModEngine.run.guildModCheck(guild);
+					ModController.run.guildPenaltyCheck(guild);
+					ModController.run.guildModCheck(guild);
 				}
 				if (timerCount > 0 && noErrorOccured) {
 					ConfigManager.pushCache();

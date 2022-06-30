@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -57,8 +58,8 @@ public class Suggest implements Command {
 		eb.setFooter(OffsetDateTime.now().format(formatter));
 		eb.setDescription(idea);
 		Message message = channel.sendMessageEmbeds(eb.build()).complete();
-		message.addReaction("U+1F44D").queue();
-		message.addReaction("U+1F44E").queue();
+		message.addReaction(Emoji.fromUnicode("U+1F44D")).queue();
+		message.addReaction(Emoji.fromUnicode("U+1F44E")).queue();
 	}
 
 	@Override

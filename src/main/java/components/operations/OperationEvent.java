@@ -2,7 +2,6 @@ package components.operations;
 
 import javax.annotation.Nullable;
 
-import components.utilities.Replyable;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;

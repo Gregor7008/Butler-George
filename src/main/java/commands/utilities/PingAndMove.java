@@ -2,13 +2,13 @@ package commands.utilities;
 
 import java.util.concurrent.TimeUnit;
 
+import components.ResponseDetector;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.utilities.ResponseDetector;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

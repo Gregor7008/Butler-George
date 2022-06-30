@@ -2,11 +2,12 @@ package commands;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import commands.administration.Clear;
-import commands.administration.Move;
 import commands.administration.Rolesorting;
+import commands.administration.Webhook;
+import commands.moderation.Clear;
+import commands.moderation.Move;
+import commands.moderation.Warning;
 import commands.administration.Configure;
-import commands.administration.Warning;
 import commands.music.Nowplaying;
 import commands.music.Play;
 import commands.music.Queue;
@@ -24,7 +25,6 @@ import commands.utilities.Report;
 import commands.utilities.Serverinfo;
 import commands.utilities.Suggest;
 import commands.utilities.Userinfo;
-import commands.utilities.Webhook;
 import components.commands.Command;
 
 public class CommandList {

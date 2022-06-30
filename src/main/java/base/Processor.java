@@ -11,14 +11,14 @@ import org.json.JSONObject;
 
 import commands.CommandList;
 import commands.music.Stop;
+import components.ServerUtilities;
+import components.Toolbox;
 import components.base.ConfigLoader;
+import components.base.ConfigVerifier;
 import components.base.LanguageEngine;
 import components.commands.Command;
-import components.commands.moderation.ModMail;
 import components.commands.utilities.LevelEngine;
-import components.utilities.ConfigVerifier;
-import components.utilities.ServerUtilities;
-import components.utilities.Toolbox;
+import components.commands.utilities.ModMail;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Category;
@@ -243,7 +243,7 @@ public class Processor extends ListenerAdapter {
 		if (ConfigLoader.getReactionMessageConfig(guild, channelID, msgID) != null) {
 			JSONObject actions = ConfigLoader.getReactionMessageConfig(guild, channelID, msgID);
 			try {
-				guild.addRoleToMember(user, guild.getRoleById(actions.getString(event.getReactionEmote().getAsCodepoints()))).queue();
+				guild.addRoleToMember(user, guild.getRoleById(actions.getString(event.getReaction().getEmoji().getAsReactionCode()))).queue();
 			} catch (JSONException e) {}
 		}
 	}
@@ -260,7 +260,7 @@ public class Processor extends ListenerAdapter {
 		if (ConfigLoader.getReactionMessageConfig(guild, channelID, msgID) != null) {
 			JSONObject actions = ConfigLoader.getReactionMessageConfig(guild, channelID, msgID);
 			try {
-				guild.removeRoleFromMember(user, guild.getRoleById(actions.getLong(event.getReactionEmote().getAsCodepoints()))).queue();
+				guild.removeRoleFromMember(user, guild.getRoleById(actions.getLong(event.getReaction().getEmoji().getAsReactionCode()))).queue();
 			} catch (JSONException e) {}
 		}
 	}

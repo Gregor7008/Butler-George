@@ -92,7 +92,7 @@ public class LevelEngine {
 			if (channel != null) {
 				channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "levelup")
 						.replaceTitle("{user}", guild.getMember(user).getEffectiveName())
-						.replaceDescription("{level}", String.valueOf(currentlevel+1)).convert()).queue();
+						.replaceDescription("{level}", String.valueOf(currentlevel + 1)).convert()).queue();
 			} else {
 				ConfigLoader.getGuildConfig(guild).put("communityinbox",0L);
 			}

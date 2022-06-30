@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
-import components.utilities.CustomMessageEmbed;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
