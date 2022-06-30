@@ -55,7 +55,7 @@ public class OperationEvent extends Replyable {
 		return this.channel;
 	}
 	
-	public SubOperationData getSubOperation() {
-		return this.subOperation;
+	public String getSubOperation() {
+		return this.subOperation.getName();
 	}
 }

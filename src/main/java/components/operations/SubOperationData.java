@@ -17,8 +17,4 @@ public class SubOperationData {
 	public String getInfo() {
 		return this.info;
 	}
-	
-	public boolean equals(String name) {
-		return name.equalsIgnoreCase(this.name);
-	}
 }

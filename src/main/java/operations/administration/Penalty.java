@@ -11,7 +11,7 @@ import components.base.LanguageEngine;
 import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
-import components.operations.SubActionData;
+import components.operations.SubOperationData;
 import components.utilities.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -33,13 +33,13 @@ public class Penalty implements OperationEventHandler {
 		this.user = event.getUser();
 		this.guild = event.getGuild();
 		this.event = event;
-		if (event.getSubOperation().getName().equals("add")) {
+		if (event.getSubOperation().equals("add")) {
 			this.addpenalties1(event);
 		}
-		if (event.getSubOperation().getName().equals("remove")) {
+		if (event.getSubOperation().equals("remove")) {
 			this.removepenalties(event);
 		}
-		if (event.getSubOperation().getName().equals("list")) {
+		if (event.getSubOperation().equals("list")) {
 			String response = this.listpenalties(event);
 			if (response != null) {
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list").replaceDescription("{list}", response)).queue();
@@ -54,10 +54,11 @@ public class Penalty implements OperationEventHandler {
 													.setInfo("Configure penalties for reaching a certain warning limit")
 													.setMinimumPermission(Permission.BAN_MEMBERS)
 													.setCategory(OperationData.ADMINISTRATION)
-													.setSubActions(new SubActionData[] {
-															new SubActionData("add"),
-															new SubActionData("remove"),
-															new SubActionData("list")
+													.setSubOperations(new SubOperationData[] {
+															new SubOperationData("add", "Add a new penalty for a specific amount of warnings"),
+															new SubOperationData("delete", "Deactivate and delete one penalty"),
+															new SubOperationData("remove", "Remove all active penalties"),
+															new SubOperationData("list", "List all active penalties")
 													});
 		return operationData;
 	}

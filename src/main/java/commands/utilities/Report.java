@@ -22,7 +22,7 @@ public class Report implements Command {
 	public void perform(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		if (ConfigLoader.getGuildConfig(guild).getLong("reportchannel") == 0) {
+		if (ConfigLoader.getGuildConfig(guild).getLong("modinbox") == 0) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
@@ -37,7 +37,7 @@ public class Report implements Command {
 			eb.setTitle("Report of the user \"" + event.getOption("user").getAsUser().getName() + "\"", event.getOption("link").getAsString());
 		}
 		eb.setDescription(event.getOption("reason").getAsString());
-		guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("reportchannel")).sendMessageEmbeds(eb.build()).queue();
+		guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("modinbox")).sendMessageEmbeds(eb.build()).queue();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 

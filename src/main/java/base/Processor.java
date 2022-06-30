@@ -11,7 +11,6 @@ import org.json.JSONObject;
 
 import commands.CommandList;
 import commands.music.Stop;
-import commands.utilities.Suggest;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.commands.Command;
@@ -59,10 +58,10 @@ public class Processor extends ListenerAdapter {
 	    List<Guild> guilds = event.getJDA().getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
 			Guild guild = guilds.get(i);
-			long msgid = ConfigLoader.getGuildConfig(guild).getLong("offlinemsg");
+			long msgid = ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(0);
 			if (msgid != 0) {
-				guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getLong("communityinbox")).retrieveMessageById(msgid).complete().delete().queue();
-				ConfigLoader.getGuildConfig(guild).put("offlinemsg", 0L);
+				guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(1)).retrieveMessageById(msgid).complete().delete().queue();
+				ConfigLoader.getGuildConfig(guild).put("offlinemsg", new JSONArray());
 			}
 		}
 		CommandListUpdateAction clua = event.getJDA().updateCommands();
@@ -93,15 +92,9 @@ public class Processor extends ListenerAdapter {
 		if (event.getAuthor().isBot()) {
 			return;
 		}
-		final User user = event.getAuthor();
+		//final User user = event.getAuthor();
 		if (event.getChannelType().isGuild()) {
-			final Guild guild = event.getGuild();
-			long suggestchid = ConfigLoader.getGuildConfig(guild).getLong("suggestionchannel");
-			if (suggestchid != 0 && event.getChannel().getIdLong() == suggestchid && !user.isBot()) {
-				new Suggest().sendsuggestion(guild, event.getMember(), event.getMessage().getContentRaw());
-				event.getMessage().delete().queue();
-				return;
-			}
+			//final Guild guild = event.getGuild();
 //			long supportchid = ConfigLoader.getGuildConfig(guild).getLong("supportchat");
 //			if (supportchid != 0 && event.getChannel().getIdLong() == supportchid && !user.isBot() && ConfigLoader.getGuildConfig(guild).getLong("supportrole") != 0) {
 //				if (ConfigLoader.getGuildConfig(guild).getLong("supportcategory") == 0) {
@@ -157,7 +150,7 @@ public class Processor extends ListenerAdapter {
 			if (welcomemsg.getBoolean(3)) {
 				String msg = welcomemsg.getString(1);
 				msg.replace("{server}", guild.getName());
-				msg.replace("{member}", event.getMember().getAsMention());
+				msg.replace("{user}", event.getMember().getAsMention());
 				msg.replace("{membercount}", Integer.toString(guild.getMemberCount()));
 				msg.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
 				guild.getTextChannelById(welcomemsg.getLong(1)).sendMessage(msg).queue();

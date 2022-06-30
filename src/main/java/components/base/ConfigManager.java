@@ -158,28 +158,25 @@ public class ConfigManager {
 		JSONObject newConfig = new JSONObject();
 		//Simple values
 		newConfig.put("id",							guild.getIdLong());
-		newConfig.put("autoroles",					new JSONArray());
+		newConfig.put("userautoroles",					new JSONArray());
 		newConfig.put("botautoroles",				new JSONArray());
 		newConfig.put("communityinbox",				0L);
 		newConfig.put("customchannelcategories",	new JSONObject());
-		newConfig.put("customchannelaccessroles",	new JSONArray());
 		newConfig.put("customchannelroles",			new JSONArray());
-		newConfig.put("forbiddenwords",				new JSONArray());
-		newConfig.put("goodbyemsg",					"");
+		newConfig.put("goodbyemsg",					new JSONArray());
 		newConfig.put("createdchannels",			new JSONObject());
 		newConfig.put("join2createchannels",		new JSONObject());
 		newConfig.put("levelrewards",				new JSONObject());
-		newConfig.put("modrole",					0L);
-		newConfig.put("modinbox",					0L);
-		newConfig.put("offlinemsg",					0L);
+		newConfig.put("moderationrole",				0L);
+		newConfig.put("moderationinbox",			0L);
+		newConfig.put("offlinemsg",					new JSONArray());
 		newConfig.put("penalties",					new JSONObject());
-		newConfig.put("reportchannel",				0L);
-		newConfig.put("suggestionchannel",			0L);
+		newConfig.put("suggestioninbox",			0L);
 		newConfig.put("supportrole",				0L);
 		newConfig.put("supporttalk",				0L);
 		newConfig.put("ticketchannels",				new JSONArray());
 		newConfig.put("ticketcount",				1);
-		newConfig.put("welcomemsg",					"");
+		newConfig.put("welcomemsg",					new JSONArray());
 		//Deep-nested values (2 layers or more)
 		newConfig.put("modmails",					new JSONObject());
 		newConfig.put("polls",						new JSONObject());

@@ -11,14 +11,13 @@ import components.base.LanguageEngine;
 import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
-import components.operations.SubActionData;
+import components.operations.SubOperationData;
 import components.utilities.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class ReactionRole implements OperationEventHandler {
 	
@@ -34,34 +33,38 @@ public class ReactionRole implements OperationEventHandler {
 		this.event = event;
 		this.guild = event.getGuild();
 		this.user = event.getUser();
-		this.msgid = event.getSubOperation().getOptionAsString(1);
-		this.chid = event.getSubOperation().getOptionAsChannel(0).getId();
-		if (guild.getTextChannelById(chid).retrieveMessageById(msgid).complete() == null) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nomessage")).queue();
-			return;
-		}
-		if (event.getSubOperation().getName().equals("add")) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddRoles")).complete();
-			this.defineAddRoles();
-			return;
-		}
-		if (event.getSubOperation().getName().equals("delete")) {
-			ConfigLoader.getReactionChannelConfig(guild, chid).remove(msgid);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
-			guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions().queue();
-			return;
-		}
-		if (event.getSubOperation().getName().equals("remove")) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineRemoveEmoji")).queue();
-			ResponseDetector.waitForReaction(guild, user, message,
-					e -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
-							   .replaceDescription("{emoji}", e.getReactionEmote().getEmoji())).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
-						  JSONObject actions = ConfigLoader.getReactionMessageConfig(guild, chid, msgid);
-						  actions.remove(e.getReactionEmote().getAsCodepoints());
-						  guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().removeReaction(e.getReactionEmote().getAsCodepoints()).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
-			return;
-		}
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel")).queue();
+		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+				e -> {return !e.getMessage().getMentions().getChannels().isEmpty();},
+				e -> {this.chid = e.getMessage().getMentions().getChannels().get(0).getId();
+					  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defmessage")).queue();
+					  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+							  m -> {return guild.getTextChannelById(chid).retrieveMessageById(e.getMessage().getContentRaw()).complete() != null;},
+							  m -> {this.msgid = e.getMessage().getContentRaw();
+							  	    if (event.getSubOperation().equals("add")) {
+							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddRoles")).complete();
+							  	    	this.defineAddRoles();
+							  	    	return;
+							  	    }
+							  	    if (event.getSubOperation().equals("remove")) {
+							  	    	ConfigLoader.getReactionChannelConfig(guild, chid).remove(msgid);
+							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
+							  	    	guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions().queue();
+							  	    	return;
+							  	    }
+							  	    if (event.getSubOperation().equals("delete")) {
+							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineDelEmoji")).queue();
+							  	    	ResponseDetector.waitForReaction(guild, user, message,
+							  	    			r -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
+							  	    					.replaceDescription("{emoji}", r.getReactionEmote().getEmoji())).queue(a -> a.delete().queueAfter(3, TimeUnit.SECONDS));
+							  	    				  JSONObject actions = ConfigLoader.getReactionMessageConfig(guild, chid, msgid);
+							  	    				  actions.remove(r.getReactionEmote().getAsCodepoints());
+							  	    				  guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions(r.getReactionEmote().getAsCodepoints()).queue();},
+							  	    			() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+							  	    	return;
+							  	    }
+							  });
+				});
 	}
 
 	@Override
@@ -70,10 +73,11 @@ public class ReactionRole implements OperationEventHandler {
 													.setInfo("Configure a reaction to give or remove a role")
 													.setMinimumPermission(Permission.MANAGE_ROLES)
 													.setCategory(OperationData.ADMINISTRATION)
-													.setSubActions(new SubActionData[] {
-														new SubActionData("add", new OptionType[] {OptionType.CHANNEL, OptionType.STRING}),
-														new SubActionData("delete", new OptionType[] {OptionType.CHANNEL, OptionType.STRING}),
-														new SubActionData("remove", new OptionType[] {OptionType.CHANNEL, OptionType.STRING})
+													.setSubOperations(new SubOperationData[] {
+														new SubOperationData("add", "Add a new reactionrole to a message"),
+														new SubOperationData("delete", "Deactivate and delete a reactionrole from a message"),
+														new SubOperationData("remove", "Remove all reactionroles from a message"),
+														new SubOperationData("list", "List all active reactionroles")
 													});
 		return operationData;
 	}

@@ -8,6 +8,8 @@ import components.commands.moderation.ModEngine;
 import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
+import components.utilities.ResponseDetector;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -16,17 +18,33 @@ public class TempMute implements OperationEventHandler {
 	@Override
 	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
-		final User user = event.getOptionAsUser(0);
-		this.tempmute(event.getOptionAsInt(1), guild, user);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
-				.replaceDescription("{user}", user.getName())
-				.replaceDescription("{time}", String.valueOf(event.getOptionAsInt(1))).convert()).queue();
+		final User ruser = event.getUser();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, ruser, this, "defuser")).queue();
+		ResponseDetector.waitForMessage(guild, ruser, event.getChannel(),
+				e -> {return !e.getMessage().getMentions().getUsers().isEmpty();},
+				e -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, ruser, this, "defdays")).queue();
+					  User user = e.getMessage().getMentions().getUsers().get(0);
+					  ResponseDetector.waitForMessage(guild, ruser, event.getChannel(),
+							  d -> {try {Integer.parseInt(d.getMessage().getContentRaw());
+							  			 return true;
+							  		} catch (NumberFormatException ex) {return false;}},
+							  d -> {int days = Integer.parseInt(d.getMessage().getContentRaw());
+							  	    this.tempmute(days, guild, user);
+							  	    event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
+										 .replaceDescription("{user}", user.getName())
+										 .replaceDescription("{time}", String.valueOf(days)).convert()).queue();
+							  });
+					
+				});
 	}
 
 	@Override
 	public OperationData initialize() {
-		//TODO Initialize TempMute
-		return null;
+		OperationData operationData = new OperationData(this).setName("TempMute")
+															 .setInfo("Mute a member temporarily")
+															 .setMinimumPermission(Permission.MESSAGE_MANAGE)
+															 .setCategory(OperationData.MODERATION);
+		return operationData;
 	}
 	
 	private void tempmute(int days, Guild guild, User user) {

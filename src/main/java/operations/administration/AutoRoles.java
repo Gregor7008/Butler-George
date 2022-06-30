@@ -14,8 +14,10 @@ import components.operations.SubOperationData;
 import components.utilities.ResponseDetector;
 import components.utilities.Toolbox;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class AutoRoles implements OperationEventHandler {
 
@@ -26,43 +28,49 @@ public class AutoRoles implements OperationEventHandler {
 	public void execute(OperationEvent event) {
 		guild = event.getGuild();
 		user = event.getUser();
-		if (event.getSubOperation().equals("list")) {
-			this.listroles(event);
-			return;
-		}
-		if (event.getSubOperation().equals("remove")) {
-			ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles").clear();
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
-			return;
-		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).queue();
-		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
-				e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
-				e -> {
-					JSONArray autoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles");
-					List<Long> roleIDs = new ArrayList<Long>();
-					e.getMessage().getMentions().getRoles().forEach(r -> roleIDs.add(r.getIdLong()));
-					if (event.getSubOperation().equals("add")) {
-						for (int i = 0; i < roleIDs.size(); i++) {
-							if (!autoroles.toList().contains(roleIDs.get(i))) {
-								autoroles.put(roleIDs.get(i));
-							}
-						}
-						event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
-					}
-					if (event.getSubOperation().equals("delete")) {
-						for (int i = 0; i < roleIDs.size(); i++) {
-							Toolbox.removeValueFromArray(autoroles, roleIDs.get(i));
-						}
-						event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue();
-					}
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selacc"))
+						  .setActionRow(Button.primary("user", Emoji.fromMarkdown(":mens:")),
+								  	    Button.primary("bot", Emoji.fromMarkdown(":robot:"))).queue();
+		ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
+				b -> {String selection = b.getId();
+					  if (event.getSubOperation().equals("list")) {
+						  this.listroles(event, selection);
+						  return;
+					  }
+					  if (event.getSubOperation().equals("remove")) {
+						  ConfigLoader.getGuildConfig(guild).getJSONArray(selection + "autoroles").clear();
+						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
+						  return;
+					  }
+					  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).queue();
+					  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+							  e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
+							  e -> {JSONArray autoroles = ConfigLoader.getGuildConfig(guild).getJSONArray(selection + "autoroles");
+							  	    List<Long> roleIDs = new ArrayList<Long>();
+							  	    e.getMessage().getMentions().getRoles().forEach(r -> roleIDs.add(r.getIdLong()));
+							  	    if (event.getSubOperation().equals("add")) {
+							  	    	for (int i = 0; i < roleIDs.size(); i++) {
+							  	    		if (!autoroles.toList().contains(roleIDs.get(i))) {
+							  	    			autoroles.put(roleIDs.get(i));
+							  	    		}
+							  	    	}
+							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "addsuccess")).queue();
+							  	    }
+							  	    if (event.getSubOperation().equals("delete")) {
+							  	    	for (int i = 0; i < roleIDs.size(); i++) {
+							  	    		Toolbox.removeValueFromArray(autoroles, roleIDs.get(i));
+							  	    	}
+							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "delsuccess")).queue();
+							  	    }
+							  });
+					
 				});
 	}
 
 	@Override
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("Auto Roles")
-												    .setInfo("Configure roles that should be given to every new user joining")
+												    .setInfo("Configure roles that should be given to every new account joining")
 												    .setMinimumPermission(Permission.MANAGE_ROLES)
 				  									.setCategory(OperationData.ADMINISTRATION)
 				  									.setSubOperations(new SubOperationData[] {
@@ -74,11 +82,11 @@ public class AutoRoles implements OperationEventHandler {
 		return operationData;
 	}
 	
-	private void listroles(OperationEvent event) {
+	private void listroles(OperationEvent event, String selection) {
 		StringBuilder sB = new StringBuilder();
-		JSONArray autoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("autoroles");
+		JSONArray autoroles = ConfigLoader.getGuildConfig(guild).getJSONArray(selection + "autoroles");
 		if (autoroles.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noautoroles")).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "noautoroles")).queue();
 			return;
 		}
 		for (int i = 0; i < autoroles.length(); i++) {
@@ -90,6 +98,6 @@ public class AutoRoles implements OperationEventHandler {
 				sB.append(guild.getRoleById(autoroles.getLong(i)).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,  this, "list").replaceDescription("{list}", sB.toString())).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,  this, selection + "list").replaceDescription("{list}", sB.toString())).queue();
 	}
 }

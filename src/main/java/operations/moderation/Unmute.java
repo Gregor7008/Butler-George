@@ -8,6 +8,8 @@ import components.commands.moderation.ModEngine;
 import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
+import components.utilities.ResponseDetector;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -16,22 +18,30 @@ public class Unmute implements OperationEventHandler {
 	@Override
 	public void execute(OperationEvent event) {
 		final Guild guild = event.getGuild();
-		final User user =  event.getUser();
-		final User cuser = event.getOptionAsUser(0);
-		JSONObject userconfig = ConfigLoader.getMemberConfig(guild, cuser);
-		if (!userconfig.getBoolean("muted") && !userconfig.getBoolean("tempmuted")) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nomute").convert()).queue();
-			return;
-		}
-		userconfig.put("muted", false);
-		userconfig.put("tempmuted", false);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
-		ModEngine.run.guildModCheck(guild);
+		final User ruser = event.getUser();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, ruser, this, "defuser")).queue();
+		ResponseDetector.waitForMessage(guild, ruser, event.getChannel(),
+				e -> {return !e.getMessage().getMentions().getUsers().isEmpty();},
+				e -> {User user = e.getMessage().getMentions().getUsers().get(0);
+					  JSONObject userconfig = ConfigLoader.getMemberConfig(guild, user);
+					  if (!userconfig.getBoolean("muted") && !userconfig.getBoolean("tempmuted")) {
+						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nomute").convert()).queue();
+						  return;
+					  }
+					  userconfig.put("muted", false);
+					  userconfig.put("tempmuted", false);
+					  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
+					  ModEngine.run.guildModCheck(guild);
+				});
+		
 	}
 
 	@Override
 	public OperationData initialize() {
-		//TODO Initialize Unmute
-		return null;
+		OperationData operationData = new OperationData(this).setName("Unmute")
+															 .setInfo("Unmute a member")
+															 .setMinimumPermission(Permission.MESSAGE_MANAGE)
+															 .setCategory(OperationData.MODERATION);
+		return operationData;
 	}
 }

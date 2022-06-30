@@ -26,7 +26,7 @@ public class Goodbye implements OperationEventHandler {
 		if (event.getSubOperation().equals("set")) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setrequest1")).queue();
 			ResponseDetector.waitForMessage(guild, user, event.getChannel(),
-					e -> {return e.getMessage().getMentions().getChannels().isEmpty();},
+					e -> {return !e.getMessage().getMentions().getChannels().isEmpty();},
 					e -> {goodbyemsg.put(1, e.getMessage().getMentions().getChannels().get(0).getIdLong());
 						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setrequest2")).queue();
 						  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
@@ -36,16 +36,15 @@ public class Goodbye implements OperationEventHandler {
 								  });
 					});
 		}
+		if (!defined) {
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nonedefined")).queue();
+			return;
+		}
 		if (event.getSubOperation().equals("on")) {
 			if (!goodbyemsg.getBoolean(2)) {
-				if (defined) {
-					goodbyemsg.put(2, true);
-					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onsuccess")).queue();
-					return;
-				} else {
-					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nonedefined")).queue();
-					return;
-				}
+				goodbyemsg.put(2, true);
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onsuccess")).queue();
+				return;
 			} else {
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onfail")).queue();
 				return;
@@ -62,17 +61,13 @@ public class Goodbye implements OperationEventHandler {
 			}
 		}
 		if (event.getSubOperation().equals("test")) {
-			if (defined) {
-				String msg = goodbyemsg.getString(1);
-				msg.replace("{server}", guild.getName());
-				msg.replace("{member}", event.getMember().getAsMention());
-				msg.replace("{membercount}", Integer.toString(guild.getMemberCount()));
-				msg.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
-				guild.getTextChannelById(goodbyemsg.getLong(1)).sendMessage(msg).queue();
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "testsuccess")).queue();
-			} else {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nonedefined")).queue();
-			}
+			String msg = goodbyemsg.getString(1);
+			msg.replace("{server}", guild.getName());
+			msg.replace("{user}", event.getMember().getAsMention());
+			msg.replace("{membercount}", Integer.toString(guild.getMemberCount()));
+			msg.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
+			guild.getTextChannelById(goodbyemsg.getLong(1)).sendMessage(msg).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "testsuccess")).queue();
 		}
 	}
 
@@ -83,7 +78,7 @@ public class Goodbye implements OperationEventHandler {
 													.setMinimumPermission(Permission.MANAGE_SERVER)
 													.setCategory(OperationData.ADMINISTRATION)
 													.setSubOperations(new SubOperationData[] {
-															new SubOperationData("set", "Set a goodbye message for new members"),
+															new SubOperationData("set", "Set a goodbye message for leaving members"),
 															new SubOperationData("on", "Activate (and set if not already done) the goodbye message"),
 															new SubOperationData("off", "Deactivate the goodbye message"),
 															new SubOperationData("test", "Test the currently set goodbye message")

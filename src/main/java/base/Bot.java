@@ -74,7 +74,7 @@ public class Bot {
     			if (ConfigLoader.getGuildConfig(guild).getLong("communityinbox") != 0) {
     				long chid = ConfigLoader.getGuildConfig(guild).getLong("communityinbox");
     				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.fetchMessage(guild, null, this, "offline").convert()).complete().getIdLong();
-        			ConfigLoader.getGuildConfig(guild).put("offlinemsg", msgid);
+        			ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").put(msgid).put(chid);
         		}
     		}
     	}
