@@ -1,21 +1,25 @@
 package commands.music;
 
+import java.util.List;
+
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import components.base.LanguageEngine;
-import components.commands.Command;
-import components.commands.music.PlayerManager;
+import components.commands.CommandEventHandler;
+import components.commands.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Nowplaying implements Command {
+public class Nowplaying implements CommandEventHandler {
 
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
 		final Member self = guild.getSelfMember();
@@ -35,11 +39,13 @@ public class Nowplaying implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("nowplaying", "Shows you information about the currently playing track!");
+		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+		   .setGuildOnly(true);
 		return command;
 	}
 
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		return true;
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		return null;
 	}
 }

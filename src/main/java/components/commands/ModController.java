@@ -1,4 +1,4 @@
-package components.commands.moderation;
+package components.commands;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -35,7 +35,6 @@ public class ModController {
 			usersCached.forEach((id, obj) -> {
 				User user = Bot.run.jda.retrieveUserById(id).complete();
 				try {
-					obj.getJSONObject(guild.getIconId());
 					this.userModCheck(guild, user);
 				} catch (JSONException e) {}
 			});

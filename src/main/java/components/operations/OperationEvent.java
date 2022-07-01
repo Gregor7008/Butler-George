@@ -2,36 +2,44 @@ package components.operations;
 
 import javax.annotation.Nullable;
 
+import components.base.CustomMessageEmbed;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
+import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 
-public class OperationEvent extends Replyable {
+public class OperationEvent {
 	
 	private Guild guild = null;
 	private User user = null;
 	private Member member = null;
-	private TextChannel channel = null;
+	private Message message = null;
+	private MessageChannel channel = null;
+	private GenericComponentInteractionCreateEvent event = null;
 	private SubOperationData subOperation = null;
 
-	public OperationEvent(Guild guild, User user, Message message, @Nullable SubOperationData subOperation) {
+	public OperationEvent(Guild guild, User user, GenericComponentInteractionCreateEvent event, @Nullable SubOperationData subOperation) {
 		this.guild = guild;
 		this.user = user;
 		this.member = guild.getMember(user);
-		this.message = message;
-		this.channel = message.getTextChannel();
+		this.event = event;
 		this.subOperation = subOperation;
 	}
 	
-	public OperationEvent(Member member, Message message, @Nullable SubOperationData subOperation) {
+	public OperationEvent(Member member, GenericComponentInteractionCreateEvent event, @Nullable SubOperationData subOperation) {
 		this.guild = member.getGuild();
 		this.user = member.getUser();
 		this.member = member;
-		this.message = message;
-		this.channel = message.getTextChannel();
+		this.event = event;
 		this.subOperation = subOperation;
+	}
+	
+	public void setSource(GenericComponentInteractionCreateEvent event) {
+		this.event = event;
 	}
 	
 	public Guild getGuild() {
@@ -46,15 +54,29 @@ public class OperationEvent extends Replyable {
 		return this.member;
 	}
 	
+	public GenericComponentInteractionCreateEvent getSource() {
+		return this.event;
+	}
+	
+	public MessageChannel getChannel() {
+		return this.channel;
+	}
+	
 	public Message getMessage() {
 		return this.message;
 	}
 	
-	public TextChannel getChannel() {
-		return this.channel;
-	}
-	
 	public String getSubOperation() {
 		return this.subOperation.getName();
+	}
+	
+	public MessageEditCallbackAction replyEmbeds(CustomMessageEmbed embed) {
+		return this.replyEmbeds(embed.convert());
+	}
+	
+	public MessageEditCallbackAction replyEmbeds(MessageEmbed embed) {
+		channel = event.getChannel();
+		message = event.getMessage();
+		return event.editMessageEmbeds(embed);
 	}
 }

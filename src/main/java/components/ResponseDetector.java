@@ -137,12 +137,9 @@ public class ResponseDetector {
 					  }
 					  return e.getUser().getIdLong() == user.getIdLong();
 				},
-				e -> {onSuccess.accept(e);
-					  Toolbox.disableActionRows(message);
-				},
+				e -> {onSuccess.accept(e);},
 				1, TimeUnit.MINUTES,
-				() -> {onTimeout.run();
-					   Toolbox.disableActionRows(message);});
+				() -> {onTimeout.run();});
 	}
 
 	public static void waitForMenuSelection(Guild guild, User user, Message message, @Nullable String menuID,
@@ -168,11 +165,8 @@ public class ResponseDetector {
 					  }
 					  return e.getUser().getIdLong() == user.getIdLong();
 				},
-				e -> {onSuccess.accept(e);
-					  Toolbox.disableActionRows(message);
-				},
+				e -> {onSuccess.accept(e);},
 				1, TimeUnit.MINUTES,
-				() -> {onTimeout.run();
-					   Toolbox.disableActionRows(message);});
+				() -> {onTimeout.run();});
 	}
 }

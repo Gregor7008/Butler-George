@@ -1,21 +1,25 @@
 package commands.music;
 
+import java.util.List;
+
 import components.base.LanguageEngine;
-import components.commands.Command;
-import components.commands.music.GuildMusicManager;
-import components.commands.music.PlayerManager;
+import components.commands.CommandEventHandler;
+import components.commands.GuildMusicManager;
+import components.commands.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Stop implements Command {
+public class Stop implements CommandEventHandler {
 
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		final Member member = event.getMember();
 		final Guild guild = event.getGuild();
 		final Member self = guild.getSelfMember();
@@ -40,12 +44,14 @@ public class Stop implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("stop", "Stops the currently playing music!");
+		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+		   .setGuildOnly(true);
 		return command;
 	}
 
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		return true;
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		return null;
 	}
 	
 	public void stopandleave(Guild guild) {

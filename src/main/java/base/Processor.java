@@ -11,14 +11,16 @@ import org.json.JSONObject;
 
 import commands.CommandList;
 import commands.music.Stop;
-import components.ServerUtilities;
 import components.Toolbox;
 import components.base.ConfigLoader;
 import components.base.ConfigVerifier;
 import components.base.LanguageEngine;
-import components.commands.Command;
-import components.commands.utilities.LevelEngine;
-import components.commands.utilities.ModMail;
+import components.commands.CommandEventHandler;
+import components.commands.LevelEngine;
+import components.commands.ServerUtilities;
+import components.context.MessageContextEventHandler;
+import components.context.UserContextEventHandler;
+import context.ContextList;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Category;
@@ -42,35 +44,47 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.role.RoleCreateEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 public class Processor extends ListenerAdapter {
 	
+	private CommandList commandList = new CommandList();
+	private ContextList contextList = new ContextList();
+	
 	@Override
 	public void onReady(ReadyEvent event) {
+		CommandListUpdateAction clua = event.getJDA().updateCommands();
+		commandList.commandEventHandlers.forEach((name, cmd) -> {
+			clua.addCommands(cmd.initialize());
+		});
+		contextList.messageContextEventHandlers.forEach((name, cmd) -> {
+			clua.addCommands(cmd.initialize());
+		});
+		contextList.userContextEventHandlers.forEach((name, cmd) -> {
+			clua.addCommands(cmd.initialize());
+		});
+		clua.queue();
 	    List<Guild> guilds = event.getJDA().getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
 			Guild guild = guilds.get(i);
 			try {
 				long msgid = ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(0);
-				if (msgid != 0) {
+				if (msgid != 0L) {
 					guild.getTextChannelById(ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(1)).retrieveMessageById(msgid).complete().delete().queue();
-					ConfigLoader.getGuildConfig(guild).put("offlinemsg", new JSONArray());
 				}
-			} catch (JSONException e) {}
+			} catch (JSONException | ErrorResponseException e) {}
+			ConfigLoader.getGuildConfig(guild).put("offlinemsg", new JSONArray());
 		}
-		CommandListUpdateAction clua = event.getJDA().updateCommands();
-		new CommandList().commands.forEach((name, cmd) -> {
-			clua.addCommands(cmd.initialize());
-		});
-		clua.queue();
 	}
 	
 	@Override
@@ -78,15 +92,48 @@ public class Processor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
-		GUI.get.increaseExecutionsCounter();
-		CommandList commandList = new CommandList();
-		Command command = null;
-		if ((command = commandList.commands.get(event.getName())) != null) {
-			if (command.canBeAccessedBy(event.getMember()) || event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-				command.perform(event);
+		if (event.isFromGuild()) {
+			GUI.get.increaseExecutionsCounter();
+			CommandEventHandler commandEventHandler = null;
+			if ((commandEventHandler = commandList.commandEventHandlers.get(event.getName().toLowerCase())) != null) {
+				commandEventHandler.execute(event);
 			}
+			LevelEngine.getInstance().slashcommand(event);
+		} else {
+			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported").convert()).queue();	
 		}
-		LevelEngine.getInstance().slashcommand(event);
+	}
+	
+	@Override
+	public void onUserContextInteraction(UserContextInteractionEvent event) {
+		if (event.getUser().isBot()) {
+			return;
+		}
+		if (event.isFromGuild()) {
+			GUI.get.increaseExecutionsCounter();
+			UserContextEventHandler contextEventHandler = null;
+			if ((contextEventHandler = contextList.userContextEventHandlers.get(event.getName().toLowerCase())) != null) {
+				contextEventHandler.execute(event);
+			}
+		} else {
+			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported").convert()).queue();	
+		}
+	}
+	
+	@Override
+	public void onMessageContextInteraction(MessageContextInteractionEvent event) {
+		if (event.getUser().isBot()) {
+			return;
+		}
+		if (event.isFromGuild()) {
+			GUI.get.increaseExecutionsCounter();
+			MessageContextEventHandler contextEventHandler = null;
+			if ((contextEventHandler = contextList.messageContextEventHandlers.get(event.getName().toLowerCase())) != null) {
+				contextEventHandler.execute(event);
+			}
+		} else {
+			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported").convert()).queue();	
+		}
 	}
 	
 	@Override
@@ -94,43 +141,12 @@ public class Processor extends ListenerAdapter {
 		if (event.getAuthor().isBot()) {
 			return;
 		}
-		//final User user = event.getAuthor();
-		if (event.getChannelType().isGuild()) {
-			//final Guild guild = event.getGuild();
-//			long supportchid = ConfigLoader.getGuildConfig(guild).getLong("supportchat");
-//			if (supportchid != 0 && event.getChannel().getIdLong() == supportchid && !user.isBot() && ConfigLoader.getGuildConfig(guild).getLong("supportrole") != 0) {
-//				if (ConfigLoader.getGuildConfig(guild).getLong("supportcategory") == 0) {
-//					Category cat = guild.createCategory("----------📝 Tickets ------------").complete();
-//					cat.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-//					cat.upsertPermissionOverride(guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole"))).setAllowed(Permission.VIEW_CHANNEL).queue();
-//					ConfigLoader.getGuildConfig(guild).put("supportcategory", cat.getIdLong());
-//				}
-//				int curcount = ConfigLoader.getGuildConfig(guild).getInt("ticketcount");
-//				int newcount = curcount + 1;
-//				TextChannel ntc = guild.createTextChannel(
-//						"Ticket #" + String.format("%05d", curcount),
-//						guild.getCategoryById(ConfigLoader.getGuildConfig(guild).getLong("supportcategory"))).complete();
-//				ntc.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
-//				ntc.upsertPermissionOverride(guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole"))).grant(Permission.VIEW_CHANNEL).queue();
-//				ntc.upsertPermissionOverride(event.getMember()).grant(Permission.VIEW_CHANNEL).queue();
-//				ntc.sendMessage(event.getMember().getAsMention() + ":\n" + event.getMessage().getContentDisplay() + "\n" 
-//						+ guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole")).getAsMention()).queue();
-//				ConfigLoader.getGuildConfig(guild).put("ticketcount", newcount);
-//				ConfigLoader.getGuildConfig(guild).getJSONArray("ticketchannels").put(ntc.getIdLong());
-//				event.getMessage().delete().queue();
-//				event.getTextChannel().getManager().setSlowmode(120).queue();
-//				return;
-//			}
-			new ModMail(event, true);
-			LevelEngine.getInstance().messagereceived(event);
-		} else {
-			new ModMail(event, false);
-		}		
+		//TODO Implement Modmail
 	}
 	
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		GUI.get.updateStatistics();
+		GUI.get.increaseMemberCounter();
 		final Guild guild = event.getGuild();
 		if (event.getMember().getUser().isBot()) {
 			JSONArray botautoroles = ConfigLoader.getGuildConfig(guild).getJSONArray("botautoroles");
@@ -164,7 +180,7 @@ public class Processor extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
-		GUI.get.updateStatistics();
+		GUI.get.decreaseMemberCounter();
 		if (event.getUser().isBot()) {
 			return;
 		}

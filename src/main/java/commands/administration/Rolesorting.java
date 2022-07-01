@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import components.ResponseDetector;
 import components.base.LanguageEngine;
-import components.commands.Command;
+import components.commands.CommandEventHandler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,10 +15,11 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Rolesorting implements Command {
+public class Rolesorting implements CommandEventHandler {
 	
 	private SlashCommandInteractionEvent oevent;
 	private Role grouprole;
@@ -30,7 +31,7 @@ public class Rolesorting implements Command {
 	private List<Message> messages = new ArrayList<>();
 	
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		oevent = event;
 		guild = event.getGuild();
 		user = event.getUser();
@@ -41,12 +42,14 @@ public class Rolesorting implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("rolesort", "Adds and removes roles by other roles (If member has a role, give him another role)");
+		command.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES))
+		   	   .setGuildOnly(true);
 		return command;
 	}
-
+	
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		return member.hasPermission(Permission.MANAGE_ROLES);
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		return null;
 	}
 
 	private void definegroup() {

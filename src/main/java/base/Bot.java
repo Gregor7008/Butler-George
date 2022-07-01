@@ -10,16 +10,17 @@ import javax.security.auth.login.LoginException;
 import org.json.JSONObject;
 
 import components.ResponseDetector;
-import components.ServerUtilities;
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
 import components.base.ConfigVerifier;
 import components.base.ConsoleEngine;
 import components.base.LanguageEngine;
-import components.commands.moderation.ModController;
+import components.commands.ModController;
+import components.commands.ServerUtilities;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -35,7 +36,7 @@ public class Bot {
 	public JDA jda;
 	private Timer timer = new Timer();
 	public int timerCount = 0;
-	public boolean noErrorOccured = false;
+	public boolean noErrorOccured = true;
 	
 	public Bot(String token) throws LoginException, InterruptedException, IOException {
 		run = this;
@@ -70,12 +71,14 @@ public class Bot {
     			JSONObject createdchannels = ConfigLoader.getFirstGuildLayerConfig(guild, "createdchannels");
     			if (!createdchannels.isEmpty()) {
     				createdchannels.keySet().forEach(e -> guild.getVoiceChannelById(e).delete().queue());
+    				createdchannels.clear();
     			}
+    			long chid = guild.getTextChannels().stream().filter(c -> {return guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND);}).toList().get(0).getIdLong();
     			if (ConfigLoader.getGuildConfig(guild).getLong("communityinbox") != 0) {
-    				long chid = ConfigLoader.getGuildConfig(guild).getLong("communityinbox");
-    				long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.fetchMessage(guild, null, this, "offline").convert()).complete().getIdLong();
-        			ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").put(msgid).put(chid);
+    				chid = ConfigLoader.getGuildConfig(guild).getLong("communityinbox");
         		}
+    			long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.fetchMessage(guild, null, this, "offline").convert()).complete().getIdLong();
+    			ConfigLoader.getGuildConfig(guild).getJSONArray("offlinemsg").put(0, msgid).put(1, chid);
     		}
     	}
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);

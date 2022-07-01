@@ -252,7 +252,10 @@ public class ConfigVerifier {
 		new Thread(() -> {
 			List<Member> members = guild.loadMembers().get();
 			for (int i = 0; i < members.size(); i++) {
-				this.userCheck(guild, members.get(i).getUser());
+				User user = members.get(i).getUser();
+				if (!user.isBot()) {
+					this.userCheck(guild, user);
+				}
 			}
 		}).start();
 	}

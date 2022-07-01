@@ -12,7 +12,6 @@ import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -55,8 +54,6 @@ public class Join2Create implements OperationEventHandler {
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("Join2Create")
 													.setInfo("Configure Join2Create channels for your server")
-													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(OperationData.ADMINISTRATION)
 													.setSubOperations(new SubOperationData[] {
 															new SubOperationData("add", "Activate one or more channels as Join2Create channels"),
 				  											new SubOperationData("delete", "Deactivate one channel from the active ones"),

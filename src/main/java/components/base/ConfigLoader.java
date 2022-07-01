@@ -16,7 +16,11 @@ public class ConfigLoader {
 	}
 	
 	public static JSONObject getMemberConfig(Guild guild, User user) {
-		return ConfigManager.getMemberConfig(guild, user);
+		if (user.isBot()) {
+			return null;
+		} else {
+			return ConfigManager.getMemberConfig(guild, user);
+		}
 	}
 	
 	public static JSONObject getFirstMemberLayerConfig(Guild guild, User user, String key) {

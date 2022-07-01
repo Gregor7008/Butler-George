@@ -1,22 +1,26 @@
 package commands.moderation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
-import components.commands.Command;
+import components.commands.CommandEventHandler;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Move implements Command {
+public class Move implements CommandEventHandler {
 
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (ConfigLoader.getGuildConfig(guild).getLong("supporttalk") == 0) {
@@ -46,16 +50,16 @@ public class Move implements Command {
 	public CommandData initialize() {
 		CommandData command = Commands.slash("move", "Move a member into the support talk")
 									  .addOption(OptionType.USER, "member", "The member you want to move", true);
+		command.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.VOICE_MOVE_OTHERS))
+		   	   .setGuildOnly(true);
 		return command;
 	}
-
+	
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		Role role = member.getGuild().getRoleById(ConfigLoader.getGuildConfig(member.getGuild()).getLong("supportrole"));
-		if (role != null) {
-			return member.getRoles().contains(role);
-		} else {
-			return false;
-		}
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		List<Role> roles = new ArrayList<>();
+		Role supportrole = guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("supportrole"));
+		roles.add(supportrole);
+		return roles;
 	}
 }

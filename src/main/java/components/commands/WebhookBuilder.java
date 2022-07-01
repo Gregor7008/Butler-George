@@ -1,4 +1,4 @@
-package components.commands.administration;
+package components.commands;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.Color;

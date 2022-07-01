@@ -6,20 +6,22 @@ import java.util.concurrent.TimeUnit;
 
 import components.ResponseDetector;
 import components.base.LanguageEngine;
-import components.commands.Command;
+import components.commands.CommandEventHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Embed implements Command {
+public class Embed implements CommandEventHandler {
 
 	private SlashCommandInteractionEvent oevent;
 	private EmbedBuilder eb;
@@ -30,7 +32,7 @@ public class Embed implements Command {
 	private List<Message> messages = new ArrayList<>();
 	
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		oevent = event;
 		member = event.getMember();
 		user = event.getUser();
@@ -45,12 +47,14 @@ public class Embed implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("embed", "Creates a custom embedded message!");
+		command.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_EMBED_LINKS))
+		   .setGuildOnly(true);
 		return command;
 	}
 
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		return member.hasPermission(Permission.MESSAGE_EMBED_LINKS);
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		return null;
 	}
 	
 	private void definetitle() {

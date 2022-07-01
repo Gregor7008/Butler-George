@@ -13,7 +13,6 @@ import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -71,8 +70,6 @@ public class AutoRoles implements OperationEventHandler {
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("Auto Roles")
 												    .setInfo("Configure roles that should be given to every new account joining")
-												    .setMinimumPermission(Permission.MANAGE_ROLES)
-				  									.setCategory(OperationData.ADMINISTRATION)
 				  									.setSubOperations(new SubOperationData[] {
 				  											new SubOperationData("add", "Add one or more roles"),
 				  											new SubOperationData("delete", "Delete one role from the active ones"),

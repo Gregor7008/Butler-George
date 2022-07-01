@@ -13,7 +13,6 @@ import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -52,8 +51,6 @@ public class Penalty implements OperationEventHandler {
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("Penalty")
 													.setInfo("Configure penalties for reaching a certain warning limit")
-													.setMinimumPermission(Permission.BAN_MEMBERS)
-													.setCategory(OperationData.ADMINISTRATION)
 													.setSubOperations(new SubOperationData[] {
 															new SubOperationData("add", "Add a new penalty for a specific amount of warnings"),
 															new SubOperationData("delete", "Deactivate and delete one penalty"),
@@ -75,7 +72,7 @@ public class Penalty implements OperationEventHandler {
 					      } catch (JSONException ex) {
 					      event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "norem")).queue();
 					      }},
-				   () -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+				   () -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
 		}
 	}
 	
@@ -88,12 +85,11 @@ public class Penalty implements OperationEventHandler {
 				.addOption("Temporary ban", "tb")
 				.addOption("Permanent ban", "pm")
 				.build();
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add1")).complete()
-			 .editMessageComponents(ActionRow.of(menu)).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add1")).setActionRows(ActionRow.of(menu)).queue();
 		ResponseDetector.waitForMenuSelection(guild, user, message, menu.getId(),
 				e -> {String plannedpunish = e.getSelectedOptions().get(0).getValue();
 					  this.addpenalties2(plannedpunish);},
-				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addpenalties2(String plannedpunish) {
@@ -104,7 +100,7 @@ public class Penalty implements OperationEventHandler {
 					      return true;
 					  } catch (NumberFormatException ex) {return false;}},
 				e -> {this.addpenalties3(plannedpunish, e.getMessage().getContentRaw());},
-				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void addpenalties3(String plannedpunish, String warnings) {
@@ -121,7 +117,7 @@ public class Penalty implements OperationEventHandler {
 					e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getMentions().getRoles().get(0).getId()));
 						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successrole")).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "tm":
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3time")).queue();
@@ -132,7 +128,7 @@ public class Penalty implements OperationEventHandler {
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
 						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempmute")).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pm":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
@@ -151,7 +147,7 @@ public class Penalty implements OperationEventHandler {
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
 						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempban")).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
 			break;
 		case "pb":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));

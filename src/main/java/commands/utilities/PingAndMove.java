@@ -1,25 +1,28 @@
 package commands.utilities;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import components.ResponseDetector;
 import components.base.LanguageEngine;
-import components.commands.Command;
+import components.commands.CommandEventHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public class PingAndMove implements Command {
+public class PingAndMove implements CommandEventHandler {
 
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final Member omember = guild.getMember(event.getOption("user").getAsUser());
@@ -57,11 +60,13 @@ public class PingAndMove implements Command {
 	public CommandData initialize() {
 		CommandData command = Commands.slash("pingandmove", "Join a user in a full voice channel!")
 									  .addOption(OptionType.USER, "user", "The user whoms channel you want to join", true);
+		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+		   .setGuildOnly(true);
 		return command;
 	}
 
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		return true;
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		return null;
 	}
 }

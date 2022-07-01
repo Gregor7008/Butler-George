@@ -112,7 +112,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		e.printStackTrace();
 		Bot.run.noErrorOccured = false;
 		GUI.get.increaseErrorCounter();
-		GUI.get.setTableValue(8, true);
+		GUI.get.updateBotBoolean();
 	}
 	
 	private void commandListener(String line) {

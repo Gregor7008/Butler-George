@@ -10,7 +10,6 @@ import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -78,8 +77,6 @@ public class LevelReward implements OperationEventHandler {
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("LevelRewards")
 													.setInfo("Configure rewards for leveling up")
-													.setMinimumPermission(Permission.MANAGE_ROLES)
-													.setCategory(OperationData.ADMINISTRATION)
 													.setSubOperations(new SubOperationData[] {
 															new SubOperationData("add", "Add a level reward"),
 															new SubOperationData("delete", "Deactivate one level reward"),

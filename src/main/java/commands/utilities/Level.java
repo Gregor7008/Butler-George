@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -20,21 +21,22 @@ import org.apache.commons.io.FileUtils;
 import components.base.ConfigLoader;
 import components.base.ConsoleEngine;
 import components.base.LanguageEngine;
-import components.commands.Command;
-import components.commands.utilities.LevelEngine;
+import components.commands.CommandEventHandler;
+import components.commands.LevelEngine;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class Level implements Command {
+public class Level implements CommandEventHandler {
 
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (event.getOption("user") != null) {
@@ -56,13 +58,15 @@ public class Level implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("level", "Check your current level or the one of another user!")
-									  .addOptions(new OptionData(OptionType.USER, "user", "Mention another user (optional)").setRequired(false));
+									  .addOptions(new OptionData(OptionType.USER, "user", "Mention another user", false));
+		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+		   .setGuildOnly(true);
 		return command;
 	}
 
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		return true;
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		return null;
 	}
 	
 	public File renderLevelcard(User iuser, Guild guild) {

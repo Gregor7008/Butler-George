@@ -2,20 +2,22 @@
 package commands.utilities;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import components.base.LanguageEngine;
-import components.commands.Command;
+import components.commands.CommandEventHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class Serverinfo implements Command {
+public class Serverinfo implements CommandEventHandler {
 
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		EmbedBuilder eb = new EmbedBuilder();
 		Guild guild = event.getGuild();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
@@ -42,11 +44,13 @@ public class Serverinfo implements Command {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("serverinfo", "Lists information about this server");
+		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+		   .setGuildOnly(true);
 		return command;
 	}
 
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		return true;
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		return null;
 	}
 }

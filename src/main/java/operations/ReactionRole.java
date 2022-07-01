@@ -13,7 +13,6 @@ import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -49,7 +48,7 @@ public class ReactionRole implements OperationEventHandler {
 							  	    }
 							  	    if (event.getSubOperation().equals("remove")) {
 							  	    	ConfigLoader.getReactionChannelConfig(guild, chid).remove(msgid);
-							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
+							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 							  	    	guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions().queue();
 							  	    	return;
 							  	    }
@@ -57,11 +56,11 @@ public class ReactionRole implements OperationEventHandler {
 							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineDelEmoji")).queue();
 							  	    	ResponseDetector.waitForReaction(guild, user, message,
 							  	    			r -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
-							  	    					.replaceDescription("{emoji}", r.getReaction().getEmoji().getFormatted())).queue(a -> a.delete().queueAfter(3, TimeUnit.SECONDS));
+							  	    					.replaceDescription("{emoji}", r.getReaction().getEmoji().getFormatted())).queue(a -> a.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 							  	    				  JSONObject actions = ConfigLoader.getReactionMessageConfig(guild, chid, msgid);
 							  	    				  actions.remove(r.getReaction().getEmoji().getAsReactionCode());
 							  	    				  guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions(r.getReaction().getEmoji()).queue();},
-							  	    			() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+							  	    			() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
 							  	    	return;
 							  	    }
 							  });
@@ -72,8 +71,6 @@ public class ReactionRole implements OperationEventHandler {
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("ReactionRole")
 													.setInfo("Configure a reaction to give or remove a role")
-													.setMinimumPermission(Permission.MANAGE_ROLES)
-													.setCategory(OperationData.ADMINISTRATION)
 													.setSubOperations(new SubOperationData[] {
 														new SubOperationData("add", "Add a new reactionrole to a message"),
 														new SubOperationData("delete", "Deactivate and delete a reactionrole from a message"),
@@ -89,7 +86,7 @@ public class ReactionRole implements OperationEventHandler {
 							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 							e -> {List<Role> roles = e.getMessage().getMentions().getRoles();
 								  this.defineAddEmojis(roles);},
-							() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+							() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void defineAddEmojis(List<Role> roles) {
@@ -103,7 +100,7 @@ public class ReactionRole implements OperationEventHandler {
 					  } else {
 						  this.addReactions();
 					  }},
-				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});		
+				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});		
 	}
 	
 	private void addReactions() {

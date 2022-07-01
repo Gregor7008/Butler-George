@@ -208,9 +208,21 @@ public class GUI extends JFrame implements WindowListener{
 		this.setTableValue(9, (int) this.getTableValue(9) + 1);
 	}
 	
+	public void increaseMemberCounter() {
+		this.setTableValue(7, (int) this.getTableValue(7) + 1);
+	}
+	
+	public void decreaseMemberCounter() {
+		this.setTableValue(7, (int) this.getTableValue(7) - 1);
+	}
+	
+	public void updateBotBoolean() {
+		this.setTableValue(8, !Bot.run.noErrorOccured);
+	}
+	
 	public void updateStatistics() {
-		GUI.get.setTableValue(6, Bot.run.jda.getGuilds().size());
-		GUI.get.setTableValue(7, Bot.run.jda.getUsers().size());
+		this.setTableValue(6, Bot.run.jda.getGuilds().size());
+		this.setTableValue(7, Bot.run.jda.getUsers().size());
 	}
 	
 	public void startRuntimeMeasuring() {

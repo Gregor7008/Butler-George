@@ -1,28 +1,30 @@
 package commands.utilities;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.json.JSONArray;
 
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
-import components.commands.Command;
+import components.commands.CommandEventHandler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class CreateChannel implements Command {
+public class CreateChannel implements CommandEventHandler {
 	
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
@@ -41,23 +43,23 @@ public class CreateChannel implements Command {
 	public CommandData initialize() {
 		CommandData command = Commands.slash("createchannel", "Creates a custom channel for you and your friends!")
 									  .addOption(OptionType.STRING, "name", "The name of the new channel", true);
+		command.setDefaultPermissions(DefaultMemberPermissions.DISABLED)
+		   .setGuildOnly(true);
 		return command;
 	}
 
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		Guild guild = member.getGuild();
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
 		JSONArray cccroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles");
 		if (cccroles.isEmpty()) {
-			return false;
+			return null;
 		}
+		List<Role> roles = new ArrayList<>();
 		for (int i = 0; i < cccroles.length(); i++) {
 			Role role = guild.getRoleById(cccroles.getLong(i));
-			if (member.getRoles().contains(role) && !role.isPublicRole()) {
-				return true;
-			}
+			roles.add(role);
 		}
-		return false;
+		return roles;
 	}
 	
 	private void createTextChannel(Guild guild, User user, String name) {

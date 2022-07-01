@@ -1,4 +1,4 @@
-package components.commands.utilities;
+package components.commands;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import base.Bot;
-import components.base.LanguageEngine;
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
+import components.base.LanguageEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;

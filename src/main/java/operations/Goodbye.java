@@ -11,7 +11,6 @@ import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -75,8 +74,6 @@ public class Goodbye implements OperationEventHandler {
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("Goodbye")
 													.setInfo("Configure a message sent on a member leaving")
-													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(OperationData.ADMINISTRATION)
 													.setSubOperations(new SubOperationData[] {
 															new SubOperationData("set", "Set a goodbye message for leaving members"),
 															new SubOperationData("on", "Activate (and set if not already done) the goodbye message"),

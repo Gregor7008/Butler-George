@@ -2,26 +2,29 @@ package commands.music;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import components.base.LanguageEngine;
-import components.commands.Command;
-import components.commands.music.GuildMusicManager;
-import components.commands.music.PlayerManager;
+import components.commands.CommandEventHandler;
+import components.commands.GuildMusicManager;
+import components.commands.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class Play implements Command {
+public class Play implements CommandEventHandler {
 
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
 		final TextChannel channel = event.getTextChannel();
@@ -48,12 +51,14 @@ public class Play implements Command {
 	public CommandData initialize() {
 		CommandData command = Commands.slash("play", "Adds a new track to your music queue!")
 									  .addOptions(new OptionData(OptionType.STRING, "title", "Hand over the title or the direct URL of your track!", true));
+		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
+		   .setGuildOnly(true);
 		return command;
 	}
 
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		return true;
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		return null;
 	}
 	
 	private void load(SlashCommandInteractionEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {

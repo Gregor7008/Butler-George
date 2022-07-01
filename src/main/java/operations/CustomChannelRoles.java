@@ -13,7 +13,6 @@ import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -63,8 +62,6 @@ public class CustomChannelRoles implements OperationEventHandler {
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("CustomChannelRoles")
 													.setInfo("Configure the roles that should be able to create custom user channels")
-													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(OperationData.ADMINISTRATION)
 													.setSubOperations(new SubOperationData[] {
 				  											new SubOperationData("add", "Add one or more roles"),
 				  											new SubOperationData("delete", "Delete one role from the active ones"),

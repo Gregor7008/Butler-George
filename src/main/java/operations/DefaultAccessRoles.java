@@ -13,7 +13,6 @@ import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -22,6 +21,7 @@ public class DefaultAccessRoles implements OperationEventHandler {
 	private Guild guild;
 	private User user;
 	
+	//TODO Extend Operation so it also covers Modrole and the supportrole
 	@Override
 	public void execute(OperationEvent event) {
 		guild = event.getGuild();
@@ -62,9 +62,7 @@ public class DefaultAccessRoles implements OperationEventHandler {
 	@Override
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("DefaultAccessRoles")
-													.setInfo("Configure the roles that should have access to channels of users by default")
-													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(OperationData.ADMINISTRATION)
+													.setInfo("Configure the roles that should have access to different channels")
 													.setSubOperations(new SubOperationData[] {
 				  											new SubOperationData("add", "Add one or more roles"),
 				  											new SubOperationData("delete", "Delete one role from the active ones"),

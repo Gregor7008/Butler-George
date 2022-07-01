@@ -1,4 +1,4 @@
-package components.commands.music;
+package components.commands;
 
 import java.util.concurrent.ConcurrentHashMap;
 

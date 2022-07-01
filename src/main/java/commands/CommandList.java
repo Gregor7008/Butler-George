@@ -25,40 +25,40 @@ import commands.utilities.Report;
 import commands.utilities.Serverinfo;
 import commands.utilities.Suggest;
 import commands.utilities.Userinfo;
-import components.commands.Command;
+import components.commands.CommandEventHandler;
 
 public class CommandList {
 
-	public ConcurrentHashMap<String, Command> commands = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<String, CommandEventHandler> commandEventHandlers = new ConcurrentHashMap<String, CommandEventHandler>();
 	
 	public CommandList() {
 		//Administration
-		this.commands.put("clear", new Clear());
-		this.commands.put("rolesort", new Rolesorting());
-		this.commands.put("move", new Move());
-		this.commands.put("warning", new Warning());
-		this.commands.put("configure", new Configure());
+		this.commandEventHandlers.put("clear", new Clear());
+		this.commandEventHandlers.put("rolesort", new Rolesorting());
+		this.commandEventHandlers.put("move", new Move());
+		this.commandEventHandlers.put("warning", new Warning());
+		this.commandEventHandlers.put("configure", new Configure());
 		
 		//Music
-		this.commands.put("nowplaying", new Nowplaying());
-		this.commands.put("play", new Play());
-		this.commands.put("queue", new Queue());
-		this.commands.put("skip", new Skip());
-		this.commands.put("stop", new Stop());
+		this.commandEventHandlers.put("nowplaying", new Nowplaying());
+		this.commandEventHandlers.put("play", new Play());
+		this.commandEventHandlers.put("queue", new Queue());
+		this.commandEventHandlers.put("skip", new Skip());
+		this.commandEventHandlers.put("stop", new Stop());
 		
 		//Utilities
-		this.commands.put("embed", new Embed());
-		this.commands.put("level", new Level());
-		this.commands.put("levelbackground", new Levelbackground());
-		this.commands.put("suggest", new Suggest());
-		this.commands.put("userinfo", new Userinfo());
-		this.commands.put("report", new Report());
-		this.commands.put("serverinfo", new Serverinfo());
-		this.commands.put("language", new Language());
-		this.commands.put("webhook", new Webhook());
-		this.commands.put("createchannel", new CreateChannel());
-		this.commands.put("channelpermission", new Channelpermission());
-		this.commands.put("pingandmove", new PingAndMove());
-		this.commands.put("leave", new Leave());
+		this.commandEventHandlers.put("embed", new Embed());
+		this.commandEventHandlers.put("level", new Level());
+		this.commandEventHandlers.put("levelbackground", new Levelbackground());
+		this.commandEventHandlers.put("suggest", new Suggest());
+		this.commandEventHandlers.put("userinfo", new Userinfo());
+		this.commandEventHandlers.put("report", new Report());
+		this.commandEventHandlers.put("serverinfo", new Serverinfo());
+		this.commandEventHandlers.put("language", new Language());
+		this.commandEventHandlers.put("webhook", new Webhook());
+		this.commandEventHandlers.put("createchannel", new CreateChannel());
+		this.commandEventHandlers.put("channelpermission", new Channelpermission());
+		this.commandEventHandlers.put("pingandmove", new PingAndMove());
+		this.commandEventHandlers.put("leave", new Leave());
 	}
 }

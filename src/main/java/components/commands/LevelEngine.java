@@ -1,4 +1,4 @@
-package components.commands.utilities;
+package components.commands;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -6,9 +6,9 @@ import java.time.OffsetDateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import components.base.LanguageEngine;
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
+import components.base.LanguageEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;

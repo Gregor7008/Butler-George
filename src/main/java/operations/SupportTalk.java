@@ -7,8 +7,8 @@ import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.User;
 
 public class SupportTalk implements OperationEventHandler {
@@ -24,8 +24,10 @@ public class SupportTalk implements OperationEventHandler {
 						 	 return e.getMessage().getMentions().getChannels().get(0).getType().isAudio();
 					} else {return false;}}, 
 					e -> {
-						ConfigLoader.getGuildConfig(guild).put("supporttalk", e.getMessage().getMentions().getChannels().get(0).getIdLong());
-						event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess").convert()).queue();
+						e.getMessage().delete().queue();
+						GuildChannel channel = e.getMessage().getMentions().getChannels().get(0);
+						ConfigLoader.getGuildConfig(guild).put("supporttalk", channel.getIdLong());
+						event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess").replaceDescription("{channel}", channel.getAsMention()).convert()).queue();
 						return;
 					});
 		}
@@ -39,8 +41,6 @@ public class SupportTalk implements OperationEventHandler {
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("SupportTalk")
 															 .setInfo("Configure a voice channel for voice support")
-															 .setMinimumPermission(Permission.MANAGE_SERVER)
-															 .setCategory(OperationData.ADMINISTRATION)
 															 .setSubOperations(new SubOperationData[] {
 																	 new SubOperationData("set", "Set a voice channel as the support talk"),
 																	 new SubOperationData("clear", "Undefine the support talk")

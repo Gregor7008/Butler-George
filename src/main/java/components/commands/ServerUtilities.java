@@ -1,4 +1,4 @@
-package components;
+package components.commands;
 
 import java.util.List;
 

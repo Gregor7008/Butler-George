@@ -1,5 +1,7 @@
 package commands.moderation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
@@ -7,23 +9,25 @@ import org.json.JSONArray;
 import components.ResponseDetector;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
-import components.commands.Command;
-import components.commands.moderation.ModController;
+import components.commands.CommandEventHandler;
+import components.commands.ModController;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-public class Warning implements Command {
+public class Warning implements CommandEventHandler {
 
 	@Override
-	public void perform(SlashCommandInteractionEvent event) {
+	public void execute(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		final User iuser = event.getOption("user").getAsUser();
@@ -77,12 +81,17 @@ public class Warning implements Command {
 											  	  		.addOptions(new OptionData(OptionType.USER, "user", "The user you want to check", true)),
 											  	  new SubcommandData("remove", "Removes a warning of a user")
 											  	  		.addOptions(new OptionData(OptionType.USER, "user", "The user you want to remove the warning from", true)));
+		command.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE))
+		   	   .setGuildOnly(true);
 		return command;
 	}
-
+	
 	@Override
-	public boolean canBeAccessedBy(Member member) {
-		return true;
+	public List<Role> additionalWhitelistedRoles(Guild guild) {
+		List<Role> roles = new ArrayList<>();
+		Role moderationrole = guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("moderationrole"));
+		roles.add(moderationrole);
+		return roles;
 	}
 	
 	private boolean listwarnings(SlashCommandInteractionEvent event) {

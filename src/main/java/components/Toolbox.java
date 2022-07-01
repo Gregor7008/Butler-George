@@ -65,4 +65,19 @@ public class Toolbox {
 		actionRows.forEach(a -> newActionRows.add(a.asDisabled()));
 		message.editMessageComponents(newActionRows).queue();
 	}
+	
+	public static void disableActionRows(Message message, Runnable followUp) {
+		List<ActionRow> actionRows = message.getActionRows();
+		List<ActionRow> newActionRows = new ArrayList<ActionRow>();
+		actionRows.forEach(a -> newActionRows.add(a.asDisabled()));
+		message.editMessageComponents(newActionRows).queue(e -> followUp.run());
+	}
+	
+	public static void deleteActionRows(Message message) {
+		message.editMessageEmbeds(message.getEmbeds()).setActionRows().queue();
+	}
+	
+	public static void deleteActionRows(Message message, Runnable followUp) {
+		message.editMessageEmbeds(message.getEmbeds()).setActionRows().queue(e -> followUp.run());
+	}
 }

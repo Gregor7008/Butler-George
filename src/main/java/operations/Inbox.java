@@ -7,7 +7,6 @@ import components.operations.OperationData;
 import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -46,8 +45,6 @@ public class Inbox implements OperationEventHandler {
 	public OperationData initialize() {
 		OperationData operationData = new OperationData(this).setName("Inbox")
 													.setInfo("Configure inbox channels for different receivers/purposes")
-													.setMinimumPermission(Permission.MANAGE_SERVER)
-													.setCategory(OperationData.ADMINISTRATION)
 													.setSubOperations(new SubOperationData[] {
 															new SubOperationData("set", "Set an inbox channel for a selected use case"),
 															new SubOperationData("clear", "Undefine an inbox channel")
