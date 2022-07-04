@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
+import javax.annotation.Nullable;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,27 +17,45 @@ public class LanguageEngine {
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 	
 	public static CustomMessageEmbed fetchMessage(Guild guild, User user, Object requester, String key)  {
-		return LanguageEngine.buildMessage(LanguageEngine.getTitle(guild, user, requester, key), LanguageEngine.getDescription(guild, user, requester, key));
+		String[] raw = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
+		return LanguageEngine.buildMessage(raw[0], raw[1], LanguageEngine.getFooter(raw));
 	}
 	
-	public static CustomMessageEmbed buildMessage(String title, String description) {
+	public static CustomMessageEmbed buildMessage(String title, String description, @Nullable String opFooter) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setTitle(title);
 		eb.setColor(56575);
 		eb.setDescription(description);
-		eb.setFooter(footer);
+		if (opFooter == null) {
+			eb.setFooter(footer);
+		} else {
+			eb.setFooter(opFooter);
+		}
 		MessageEmbed embed = eb.build();
 		return new CustomMessageEmbed(embed);
 	}
 	
 	public static String getTitle(Guild guild, User user, Object requester, String key) {
-		String[] temp1 = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
-		return temp1[0];
+		String[] raw = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
+		return raw[0];
 	}
 
 	public static String getDescription(Guild guild, User user, Object requester, String key) {
-		String[] temp1 = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
-		return temp1[1];
+		String[] raw = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
+		return raw[1];
+	}
+	
+	public static String getFooter(Guild guild, User user, Object requester, String key) {
+		String[] raw = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
+		return LanguageEngine.getFooter(raw);
+	}
+	
+	public static String getFooter(String[] raw) {
+		try {
+			return raw[2];
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 	
 	public static String getRaw(Guild guild, User user, Object requester, String key) {

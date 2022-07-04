@@ -78,7 +78,9 @@ public class ModController {
 			List<Member> members = guild.loadMembers().get();
 			for (int e = 0; e < members.size(); e++) {
 				Member member = members.get(e);
-				this.userPenaltyCheck(guild, member);
+				if (!member.getUser().isBot()) {
+					this.userPenaltyCheck(guild, member);
+				}
 			}
 		}).start();
 	}

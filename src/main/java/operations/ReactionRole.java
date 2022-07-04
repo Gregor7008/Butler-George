@@ -37,30 +37,29 @@ public class ReactionRole implements OperationEventHandler {
 		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 				e -> {return !e.getMessage().getMentions().getChannels().isEmpty();},
 				e -> {this.chid = e.getMessage().getMentions().getChannels().get(0).getId();
-					  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defmessage")).queue();
+					  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defmessage").convert()).queue();
 					  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 							  m -> {return guild.getTextChannelById(chid).retrieveMessageById(e.getMessage().getContentRaw()).complete() != null;},
 							  m -> {this.msgid = e.getMessage().getContentRaw();
 							  	    if (event.getSubOperation().equals("add")) {
-							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddRoles")).complete();
+							  	    	event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddRoles").convert()).complete();
 							  	    	this.defineAddRoles();
 							  	    	return;
 							  	    }
 							  	    if (event.getSubOperation().equals("remove")) {
 							  	    	ConfigLoader.getReactionChannelConfig(guild, chid).remove(msgid);
-							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+							  	    	event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
 							  	    	guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions().queue();
 							  	    	return;
 							  	    }
 							  	    if (event.getSubOperation().equals("delete")) {
-							  	    	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineDelEmoji")).queue();
+							  	    	event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineDelEmoji").convert()).queue();
 							  	    	ResponseDetector.waitForReaction(guild, user, message,
-							  	    			r -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
-							  	    					.replaceDescription("{emoji}", r.getReaction().getEmoji().getFormatted())).queue(a -> a.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+							  	    			r -> {event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
+							  	    					.replaceDescription("{emoji}", r.getReaction().getEmoji().getFormatted()).convert()).queue(a -> a.delete().queueAfter(3, TimeUnit.SECONDS));
 							  	    				  JSONObject actions = ConfigLoader.getReactionMessageConfig(guild, chid, msgid);
 							  	    				  actions.remove(r.getReaction().getEmoji().getAsReactionCode());
-							  	    				  guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions(r.getReaction().getEmoji()).queue();},
-							  	    			() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
+							  	    				  guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions(r.getReaction().getEmoji()).queue();});
 							  	    	return;
 							  	    }
 							  });
@@ -85,29 +84,28 @@ public class ReactionRole implements OperationEventHandler {
 		ResponseDetector.waitForMessage(guild, user, message.getChannel(),
 							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 							e -> {List<Role> roles = e.getMessage().getMentions().getRoles();
-								  this.defineAddEmojis(roles);},
-							() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
+								  this.defineAddEmojis(roles);});
 	}
 	
 	private void defineAddEmojis(List<Role> roles) {
 		Role role = roles.get(progress);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddEmojis").replaceDescription("{role}", role.getAsMention())).queue();
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddEmojis").replaceDescription("{role}", role.getAsMention()).convert()).queue();
 		ResponseDetector.waitForReaction(guild, user, message,
 				e -> {ConfigLoader.getReactionMessageConfig(guild, chid, msgid).put(e.getReaction().getEmoji().getAsReactionCode(), role.getId());
 					  progress++;
 					  if (progress < roles.size()) {
+						  event.getMessage().clearReactions().queue();
 						  this.defineAddEmojis(roles);
 					  } else {
 						  this.addReactions();
-					  }},
-				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});		
+					  }});		
 	}
 	
 	private void addReactions() {
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "adding").convert()).complete();
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "adding").convert()).complete();
 		Set<String> actions = ConfigLoader.getReactionMessageConfig(guild, chid, msgid).keySet();
 		actions.forEach(e -> guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().addReaction(Emoji.fromUnicode(e)).queue());
 		try {Thread.sleep(1000);} catch (InterruptedException e) {}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
 	}
 }

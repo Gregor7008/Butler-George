@@ -38,10 +38,6 @@ public class OperationEvent {
 		this.subOperation = subOperation;
 	}
 	
-	public void setSource(GenericComponentInteractionCreateEvent event) {
-		this.event = event;
-	}
-	
 	public Guild getGuild() {
 		return this.guild;
 	}

@@ -1,12 +1,11 @@
 package operations;
 
-import java.util.concurrent.TimeUnit;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import components.ResponseDetector;
+import components.Toolbox;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.operations.OperationData;
@@ -14,29 +13,34 @@ import components.operations.OperationEvent;
 import components.operations.OperationEventHandler;
 import components.operations.SubOperationData;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class Penalty implements OperationEventHandler {
 
 	private OperationEvent event;
-	private Message message;
 	private User user;
 	private Guild guild;
 
 	@Override
 	public void execute(OperationEvent event) {
-		this.message = event.getMessage();
 		this.user = event.getUser();
 		this.guild = event.getGuild();
 		this.event = event;
 		if (event.getSubOperation().equals("add")) {
 			this.addpenalties1(event);
+			return;
 		}
 		if (event.getSubOperation().equals("remove")) {
-			this.removepenalties(event);
+			ConfigLoader.getGuildConfig(guild).getJSONObject("penalties").clear();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
+			return;
+		}
+		if (event.getSubOperation().equals("delete")) {
+			this.deletepenalties(event);
+			return;
 		}
 		if (event.getSubOperation().equals("list")) {
 			String response = this.listpenalties(event);
@@ -60,19 +64,19 @@ public class Penalty implements OperationEventHandler {
 		return operationData;
 	}
 	
-	private void removepenalties(OperationEvent event) {
+	private void deletepenalties(OperationEvent event) {
 		String response = this.listpenalties(event);
 		if (response != null) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remlist").replaceDescription("{list}", response)).queue();
 			JSONObject penalties = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
-			ResponseDetector.waitForMessage(guild, user, message.getChannel(),
+			ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 					e -> {try {
 							  penalties.getJSONArray(e.getMessage().getContentRaw());
 							  penalties.remove(e.getMessage().getContentRaw());
+							  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").convert()).queue();
 					      } catch (JSONException ex) {
-					      event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "norem")).queue();
-					      }},
-				   () -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
+					    	  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nodelval").convert()).queue();
+					      }});
 		}
 	}
 	
@@ -83,78 +87,75 @@ public class Penalty implements OperationEventHandler {
 				.addOption("Permanent mute", "pm")
 				.addOption("Kick", "ki")
 				.addOption("Temporary ban", "tb")
-				.addOption("Permanent ban", "pm")
+				.addOption("Permanent ban", "pb")
 				.build();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add1")).setActionRows(ActionRow.of(menu)).queue();
-		ResponseDetector.waitForMenuSelection(guild, user, message, menu.getId(),
+		ResponseDetector.waitForMenuSelection(guild, user, event.getMessage(), menu.getId(),
 				e -> {String plannedpunish = e.getSelectedOptions().get(0).getValue();
-					  this.addpenalties2(plannedpunish);},
-				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
+					  this.addpenalties2(plannedpunish, e, event);});
 	}
 	
-	private void addpenalties2(String plannedpunish) {
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add2")).queue();
-		ResponseDetector.waitForMessage(guild, user, message.getChannel(),
-				e -> {try {
-					      Integer.valueOf(e.getMessage().getContentRaw());
-					      return true;
-					  } catch (NumberFormatException ex) {return false;}},
-				e -> {this.addpenalties3(plannedpunish, e.getMessage().getContentRaw());},
-				() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
+	private void addpenalties2(String plannedpunish, SelectMenuInteractionEvent event, OperationEvent op) {
+		Toolbox.deleteActionRows(event.getMessage(), () -> {
+			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add2").convert()).queue();
+			ResponseDetector.waitForMessage(guild, user, op.getMessage(),
+					e -> {try {
+						      Integer.valueOf(e.getMessage().getContentRaw());
+						      return true;
+						  } catch (NumberFormatException ex) {return false;}},
+					e -> {this.addpenalties3(plannedpunish, e.getMessage().getContentRaw(), op);});
+		});
 	}
 	
-	private void addpenalties3(String plannedpunish, String warnings) {
+	private void addpenalties3(String plannedpunish, String warnings, OperationEvent op) {
 		JSONObject penalties = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
 		try {
 			penalties.getJSONArray(warnings);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error").convert()).queue();
 			return;
 		} catch (JSONException e) {}
 		switch (plannedpunish) {
 		case "rr":
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3role")).queue();
-			ResponseDetector.waitForMessage(guild, user, message.getChannel(),
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3role").convert()).queue();
+			ResponseDetector.waitForMessage(guild, user, op.getMessage(),
 					e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getMentions().getRoles().get(0).getId()));
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successrole")).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successrole").convert()).queue();});
 			break;
 		case "tm":
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3time")).queue();
-			ResponseDetector.waitForMessage(guild, user, message.getChannel(),
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3time").convert()).queue();
+			ResponseDetector.waitForMessage(guild, user, op.getMessage(),
 					e -> {try {
 							  Integer.valueOf(e.getMessage().getContentRaw());
 							  return true;
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempmute")).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempmute").convert()).queue();});
 			break;
 		case "pm":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successmute")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successmute").convert()).queue();
 			break;
 		case "ki":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successkick")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successkick").convert()).queue();
 			break;
 		case "tb":
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3time")).queue();
-			ResponseDetector.waitForMessage(guild, user, message.getChannel(),
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3time").convert()).queue();
+			ResponseDetector.waitForMessage(guild, user, op.getMessage(),
 					e -> {try {
 							  Integer.valueOf(e.getMessage().getContentRaw());
 							  return true;
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempban")).queue();},
-					() -> {event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));});
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempban").convert()).queue();});
 			break;
 		case "pb":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successban")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successban").convert()).queue();
 			break;
 		default:
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal").convert()).queue();
 		}
 	}
 	
@@ -162,11 +163,11 @@ public class Penalty implements OperationEventHandler {
 		StringBuilder sB = new StringBuilder();
 		JSONObject current = ConfigLoader.getGuildConfig(guild).getJSONObject("penalties");
 		if (current.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopenalties"));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopenalties")).queue();
 			return null;
 		}
 		current.keySet().forEach(e -> {
-			sB.append("• " + e + ": ");
+			sB.append("#" + e + ": ");
 			JSONArray penalty = current.getJSONArray(e);
 			switch (penalty.getString(0)) {
 				case "rr":

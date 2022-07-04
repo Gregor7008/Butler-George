@@ -5,6 +5,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 import components.ResponseDetector;
+import components.Toolbox;
 import components.base.ConfigLoader;
 import components.base.LanguageEngine;
 import components.operations.OperationData;
@@ -36,7 +37,9 @@ public class Join2Create implements OperationEventHandler {
 		}
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannels")).queue();
 		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
-				e -> {return e.getMessage().getMentions().getChannels().isEmpty();},
+				e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
+			  			  return guild.getVoiceChannelById(e.getMessage().getMentions().getChannels().get(0).getIdLong()) != null;
+			  		  } else {return false;}},
 				e -> {List<GuildChannel> channels = e.getMessage().getMentions().getChannels();
 					  if (event.getSubOperation().equals("add")) {
 						 this.configNewChannels(event, channels);
@@ -44,7 +47,7 @@ public class Join2Create implements OperationEventHandler {
 					  }
 					  if (event.getSubOperation().equals("delete")) {
 						 channels.forEach(c -> join2createchannels.remove(c.getId()));
-						 event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue();
+						 event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").convert()).queue();
 						 return;
 					  }
 				});
@@ -68,14 +71,18 @@ public class Join2Create implements OperationEventHandler {
 		final User user = event.getUser();
 		EmbedBuilder eb = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "list").convert());
 		JSONObject j2cs = ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels");
-		j2cs.keySet().forEach(e -> {
-			JSONObject channelConfig = j2cs.getJSONObject(e);
-			String description = "Name:" + channelConfig.getString("name") 
-							 + "\nLimit:" + String.valueOf(channelConfig.getInt("limit"))
-							 + "\nConfigurable:" + String.valueOf(channelConfig.getBoolean("configurable"));
-			eb.addField(guild.getGuildChannelById(e) + " (" + e + "):", description, false);
-		});
-		event.replyEmbeds(eb.build());
+		if (j2cs.isEmpty()) {
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nonedefined")).queue();
+		} else {
+			j2cs.keySet().forEach(e -> {
+				JSONObject channelConfig = j2cs.getJSONObject(e);
+				String description = "Name: " + channelConfig.getString("name") 
+								 + "\nLimit: " + String.valueOf(channelConfig.getInt("limit"))
+								 + "\nConfigurable: " + String.valueOf(channelConfig.getBoolean("configurable"));
+				eb.addField(guild.getGuildChannelById(e).getName() + " (" + e + "):", description, false);
+			});
+			event.replyEmbeds(eb.build()).queue();
+		}
 	}
 	
 	private void configNewChannels(OperationEvent event, List<GuildChannel> channels) {
@@ -83,10 +90,10 @@ public class Join2Create implements OperationEventHandler {
 		final User user = event.getUser();
 		for (int i = 0; i < channels.size(); i++) {
 			GuildChannel channel = channels.get(i);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defname").replaceDescription("{channel}", channel.getName() + " (" + channel.getId() + ")")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defname").replaceDescription("{channel}", channel.getName() + " (" + channel.getId() + ")").convert()).queue();
 			ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 					n -> {String name = n.getMessage().getContentDisplay();
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflimit").replaceDescription("{channel}", channel.getName() + " (" + channel.getId() + ")")).queue();
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflimit").replaceDescription("{channel}", channel.getName() + " (" + channel.getId() + ")").convert()).queue();
 						  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 								  l -> {try {Integer.parseInt(l.getMessage().getContentRaw());
 									  	     return true;
@@ -95,15 +102,18 @@ public class Join2Create implements OperationEventHandler {
 								  	    }},
 								  l -> {
 									  int limit = Integer.parseInt(l.getMessage().getContentRaw());
-									  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defconfigurable").replaceDescription("{channel}", channel.getName() + " (" + channel.getId() + ")")).setActionRow(
-											  Button.primary("true", Emoji.fromFormatted(":white_check_mark")),
-											  Button.primary("false", Emoji.fromFormatted(":x:"))).queue();
+									  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defconfigurable").replaceDescription("{channel}", channel.getName() + " (" + channel.getId() + ")").convert()).setActionRow(
+											  Button.primary("true", Emoji.fromUnicode("\u2705")),
+											  Button.primary("false", Emoji.fromUnicode("\u274C"))).queue();
 									  ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
 											  e -> {
-												  ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels")
-												  					.put(channel.getId(), new JSONObject().put("name", name)
-														  												  .put("limit", limit)
-														  												  .put("configurable", Boolean.valueOf(e.getButton().getId())));
+												  Toolbox.deleteActionRows(e.getMessage(), () -> {
+													  ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels")
+									  					.put(channel.getId(), new JSONObject().put("name", name)
+											  												  .put("limit", limit)
+											  												  .put("configurable", Boolean.valueOf(e.getButton().getId())));
+													  e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defsuccess").convert()).queue();
+												  });
 											  });
 								  });
 					});

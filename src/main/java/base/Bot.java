@@ -9,7 +9,8 @@ import javax.security.auth.login.LoginException;
 
 import org.json.JSONObject;
 
-import components.ResponseDetector;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
 import components.base.ConfigVerifier;
@@ -35,6 +36,7 @@ public class Bot {
 	public static String homeID = "708381749826289666";
 	public JDA jda;
 	private Timer timer = new Timer();
+	public static EventWaiter eventWaiter = new EventWaiter();
 	public int timerCount = 0;
 	public boolean noErrorOccured = true;
 	
@@ -42,7 +44,7 @@ public class Bot {
 		run = this;
 	    //Create Bot
 		JDABuilder builder = JDABuilder.createDefault(token);
-		builder.addEventListeners(ResponseDetector.eventWaiter);
+		builder.addEventListeners(eventWaiter);
 		builder.addEventListeners(new Processor());
 		builder.setRawEventsEnabled(true);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_PRESENCES);
@@ -70,7 +72,7 @@ public class Bot {
     		if (handleManagedChannels) {
     			JSONObject createdchannels = ConfigLoader.getFirstGuildLayerConfig(guild, "createdchannels");
     			if (!createdchannels.isEmpty()) {
-    				createdchannels.keySet().forEach(e -> guild.getVoiceChannelById(e).delete().queue());
+    				createdchannels.keySet().forEach(e -> createdchannels.getJSONObject(e).keySet().forEach(a ->  guild.getVoiceChannelById(a).delete().queue()));
     				createdchannels.clear();
     			}
     			long chid = guild.getTextChannels().stream().filter(c -> {return guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND);}).toList().get(0).getIdLong();
@@ -85,6 +87,7 @@ public class Bot {
 		jda.shutdown();
 		GUI.get.setBotRunning(false);
 		GUI.get.stopRuntimeMeasuring();
+		timer.cancel();
 		if (noErrorOccured) {
 			ConfigManager.pushCache();
 		}

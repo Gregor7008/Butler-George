@@ -154,7 +154,8 @@ public class GUI extends JFrame implements WindowListener{
 				{"unban", "[Guild ID]  [User ID]"},
 				{"warn", "[Guild ID]  [User ID]"},
 				{"pushCache", ""},
-				{"printCache", ""}
+				{"printCache", ""},
+				{"clearCache", ""}
 			},
 			new String[] {
 				"key", "value"

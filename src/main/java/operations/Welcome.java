@@ -29,12 +29,14 @@ public class Welcome implements OperationEventHandler {
 		if (event.getSubOperation().equals("set")) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setrequest1")).queue();
 			ResponseDetector.waitForMessage(guild, user, event.getChannel(),
-					e -> {return !e.getMessage().getMentions().getChannels().isEmpty();},
+					e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
+				  			  return guild.getTextChannelById(e.getMessage().getMentions().getChannels().get(0).getIdLong()) != null;
+				  		  } else {return false;}},
 					e -> {welcomemsg.put(1, e.getMessage().getMentions().getChannels().get(0).getIdLong());
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setrequest2")).queue();
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setrequest2").convert()).queue();
 						  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
-								  a -> {welcomemsg.put(0, a.getMessage().getContentRaw());
-									  	event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess")).queue();
+								  a -> {welcomemsg.put(0, a.getMessage().getContentRaw()).put(2, true);
+									  	event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess").convert()).queue();
 									  	return;
 								  });
 					});
@@ -64,11 +66,11 @@ public class Welcome implements OperationEventHandler {
 			}
 		}
 		if (event.getSubOperation().equals("test")) {
-			String msg = welcomemsg.getString(1);
-			msg.replace("{server}", guild.getName());
-			msg.replace("{member}", event.getMember().getAsMention());
-			msg.replace("{membercount}", Integer.toString(guild.getMemberCount()));
-			msg.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
+			String msg = welcomemsg.getString(0)
+			   .replace("{server}", guild.getName())
+			   .replace("{member}", event.getMember().getAsMention())
+			   .replace("{membercount}", Integer.toString(guild.getMemberCount()))
+			   .replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
 			guild.getTextChannelById(welcomemsg.getLong(1)).sendMessage(msg).queue();
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "testsuccess")).queue();
 		}

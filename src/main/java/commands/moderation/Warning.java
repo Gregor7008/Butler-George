@@ -2,7 +2,6 @@ package commands.moderation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 
@@ -64,8 +63,7 @@ public class Warning implements CommandEventHandler {
 							  channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
 									  .replaceDescription("{warning}", "`" + warnings.getString(w-1) + "`")
 									  .replaceDescription("{user}", guild.getMember(iuser).getEffectiveName()).convert()).queue();
-							  warnings.remove(w-1);},
-						() -> {channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
+							  warnings.remove(w-1);});
 			}
 		}
 		ModController.run.guildPenaltyCheck(guild);

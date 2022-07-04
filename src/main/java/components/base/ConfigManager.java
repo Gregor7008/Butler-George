@@ -161,6 +161,7 @@ public class ConfigManager {
 		newConfig.put("userautoroles",				new JSONArray());
 		newConfig.put("botautoroles",				new JSONArray());
 		newConfig.put("communityinbox",				0L);
+		newConfig.put("customchannelaccessroles",	new JSONArray());
 		newConfig.put("customchannelcategories",	new JSONObject());
 		newConfig.put("customchannelroles",			new JSONArray());
 		newConfig.put("createdchannels",			new JSONObject());

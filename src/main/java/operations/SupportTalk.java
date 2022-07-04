@@ -24,7 +24,6 @@ public class SupportTalk implements OperationEventHandler {
 						 	 return e.getMessage().getMentions().getChannels().get(0).getType().isAudio();
 					} else {return false;}}, 
 					e -> {
-						e.getMessage().delete().queue();
 						GuildChannel channel = e.getMessage().getMentions().getChannels().get(0);
 						ConfigLoader.getGuildConfig(guild).put("supporttalk", channel.getIdLong());
 						event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess").replaceDescription("{channel}", channel.getAsMention()).convert()).queue();

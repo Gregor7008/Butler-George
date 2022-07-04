@@ -201,6 +201,11 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 					this.info(null, "EMPTY");
 				}
 				break;
+			case "clearCache":
+				ConfigManager.getGuildCache().clear();
+				ConfigManager.getUserCache().clear();
+				this.info(null, "Cache cleared successfully!");
+				break;
 			default:
 				this.error(this, "Unknown command!");
 		}

@@ -103,7 +103,7 @@ public class Configure implements CommandEventHandler {
 			this.operations.put("DefaultAccessRoles", new DefaultAccessRoles());
 			this.operations.put("Goodbye", new Goodbye());
 			this.operations.put("Join2Create", new Join2Create());
-			this.operations.put("CommunityInbox", new Inbox());
+			this.operations.put("Inbox", new Inbox());
 			this.operations.put("LevelRewards", new LevelReward());
 			this.operations.put("Penalty", new Penalty());
 			this.operations.put("ReactionRole", new ReactionRole());

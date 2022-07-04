@@ -30,14 +30,14 @@ public class LevelReward implements OperationEventHandler {
 							   return true;
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {int neededLevel = Integer.parseInt(e.getMessage().getContentRaw());
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defrole")).queue();
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defrole").convert()).queue();
 						  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 								  r -> {return !r.getMessage().getMentions().getRoles().isEmpty();},
 								  r -> {long roleID = r.getMessage().getMentions().getRoles().get(0).getIdLong();
 								  	    levelrewards.put(String.valueOf(neededLevel), roleID);
-								  	    event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")
+								  	    event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")
 								  	    		.replaceDescription("{role}", guild.getRoleById(roleID).getAsMention())
-								  	    		.replaceDescription("{level}", String.valueOf(neededLevel))).queue();
+								  	    		.replaceDescription("{level}", String.valueOf(neededLevel)).convert()).queue();
 								  	    return;
 								  });
 					});
@@ -52,13 +52,13 @@ public class LevelReward implements OperationEventHandler {
 						  try {
 							  levelrewards.getLong(String.valueOf(level));
 						  } catch (JSONException ex) {
-							  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noreward")).queue();
+							  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noreward").convert()).queue();
 							  return;
 						  }
 						  long roleID = levelrewards.getLong(String.valueOf(level));
-						  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")
 								  .replaceDescription("{role}", guild.getRoleById(roleID).getAsMention())
-								  .replaceDescription("{level}", String.valueOf(level))).queue();
+								  .replaceDescription("{level}", String.valueOf(level)).convert()).queue();
 						  levelrewards.remove(String.valueOf(level));
 						  return;
 					});

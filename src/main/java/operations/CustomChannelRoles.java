@@ -47,13 +47,13 @@ public class CustomChannelRoles implements OperationEventHandler {
 								customchannelroles.put(roleIDs.get(i));
 							}
 						}
-						event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
+						event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess").convert()).queue();
 					}
 					if (event.getSubOperation().equals("delete")) {
 						for (int i = 0; i < roleIDs.size(); i++) {
 							Toolbox.removeValueFromArray(customchannelroles, roleIDs.get(i));
 						}
-						event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue();
+						event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").convert()).queue();
 					}
 				});
 	}

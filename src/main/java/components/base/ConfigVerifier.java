@@ -105,16 +105,22 @@ public class ConfigVerifier {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject createdchannels = guildConfig.getJSONObject("createdchannels");
 		createdchannels.keySet().forEach(e -> {
-			if (guild.getVoiceChannelById(e) == null) {
-				createdchannels.remove(e);
-			} else if (guild.getVoiceChannelById(e).getMembers().size() == 0) {
-				guild.getVoiceChannelById(e).delete().queue();
-				createdchannels.remove(e);
-			} else {
-				if (guild.getMemberById(createdchannels.getLong(e)) == null) {
-					guild.getVoiceChannelById(e).delete().queue();
-					createdchannels.remove(e);
+			JSONObject parent = createdchannels.getJSONObject(e);
+			parent.keySet().forEach(a -> {
+				if (guild.getVoiceChannelById(a) == null) {
+					parent.remove(a);
+				} else if (guild.getVoiceChannelById(a).getMembers().size() == 0) {
+					guild.getVoiceChannelById(a).delete().queue();
+					parent.remove(a);
+				} else {
+					if (guild.getMemberById(parent.getLong(a)) == null) {
+						guild.getVoiceChannelById(a).delete().queue();
+						parent.remove(a);
+					}
 				}
+			});
+			if (parent.isEmpty()) {
+				createdchannels.remove(e);
 			}
 		});
 	}
