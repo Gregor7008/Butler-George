@@ -71,7 +71,7 @@ public class AutoRoles implements OperationEventHandler {
 
 	@Override
 	public OperationData initialize() {
-		OperationData operationData = new OperationData(this).setName("Auto Roles")
+		OperationData operationData = new OperationData(this).setName("AutoRoles")
 												    .setInfo("Configure roles that should be given to every new account joining")
 				  									.setSubOperations(new SubOperationData[] {
 				  											new SubOperationData("add", "Add one or more roles"),

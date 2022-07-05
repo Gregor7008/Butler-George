@@ -13,7 +13,7 @@ import components.operations.SubOperationData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class LevelReward implements OperationEventHandler {
+public class LevelRewards implements OperationEventHandler {
 
 	private Guild guild;
 	private User user;

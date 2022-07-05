@@ -1,5 +1,6 @@
 package components.base;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -20,12 +21,12 @@ public class ConfigVerifier {
 	}
 	
 	public void guildCheck(Guild guild) {
+		this.adminRoleCheck(guild);
 		this.userAutoRolesCheck(guild);
 		this.botAutoRolesCheck(guild);
 		this.createdChannelsCheck(guild);
 		//Customchannelaccessroles Check
 		this.customChannelCategoriesCheck(guild, false);
-		this.customChannelRolesCheck(guild);
 		this.goodbyeMsgCheck(guild);
 		this.join2CreateChannelsCheck(guild);
 		this.levelrewardsCheck(guild);
@@ -40,6 +41,15 @@ public class ConfigVerifier {
 		this.supportTalkCheck(guild);
 		this.modInboxChannelCheck(guild);
 		this.ticketChannelsCheck(guild);
+	}
+	public void adminRoleCheck(Guild guild) {
+		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
+		JSONArray adminroles = guildConfig.getJSONArray("adminroles");
+		for (int i = 0; i < adminroles.length(); i++) {
+			if (guild.getRoleById(adminroles.getLong(i)) == null) {
+				adminroles.remove(i);
+			}
+		}
 	}
 	public void userAutoRolesCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
@@ -69,11 +79,12 @@ public class ConfigVerifier {
 	public void customChannelCategoriesCheck(Guild guild, boolean userCalled) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject customchannelcategories = guildConfig.getJSONObject("customchannelcategories");
+		List<String> keysToRemove = new ArrayList<>();
 		customchannelcategories.keySet().forEach(e -> {
 			if (guild.getCategoryById(e) == null) {
 				this.customChannelCategoryCheck(guild, guild.getMemberById(customchannelcategories.getLong(e)).getUser());
 				if (!userCalled) {
-					customchannelcategories.remove(e); 
+					keysToRemove.add(e);
 				}
 			} else if (guild.getMemberById(customchannelcategories.getLong(e)) == null || guild.getCategoryById(e).getChannels().size() == 0) {
 				Category ctg = guild.getCategoryById(e);
@@ -85,44 +96,52 @@ public class ConfigVerifier {
 				if (!userCalled) {
 					this.customChannelCategoryCheck(guild, guild.getMemberById(customchannelcategories.getLong(e)).getUser());
 				}
-				customchannelcategories.remove(e);
+				keysToRemove.add(e);
 			}
 		});
+		for (int i = 0; i < keysToRemove.size(); i++) {
+			customchannelcategories.remove(keysToRemove.get(i));
+		}
 	}
-	public void customChannelAccessRolesCheck(Guild guild) {
-		
-	}
-	public void customChannelRolesCheck(Guild guild) {
+	public void customChannelPolicingRolesCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
-		JSONArray customchannelroles = guildConfig.getJSONArray("customchannelroles");
-		for (int i = 0; i < customchannelroles.length(); i++) {
-			if (guild.getRoleById(customchannelroles.getLong(i)) == null) {
-				customchannelroles.remove(i);
+		JSONArray customchannelpolicingroles = guildConfig.getJSONArray("customchannelpolicingroles");
+		for (int i = 0; i < customchannelpolicingroles.length(); i++) {
+			if (guild.getRoleById(customchannelpolicingroles.getLong(i)) == null) {
+				customchannelpolicingroles.remove(i);
 			}
 		}
 	}
 	public void createdChannelsCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject createdchannels = guildConfig.getJSONObject("createdchannels");
+		List<String> keysToRemove1 = new ArrayList<>();
 		createdchannels.keySet().forEach(e -> {
 			JSONObject parent = createdchannels.getJSONObject(e);
+			List<String> keysToRemove2 = new ArrayList<>();
 			parent.keySet().forEach(a -> {
 				if (guild.getVoiceChannelById(a) == null) {
-					parent.remove(a);
+					keysToRemove2.add(a);
 				} else if (guild.getVoiceChannelById(a).getMembers().size() == 0) {
 					guild.getVoiceChannelById(a).delete().queue();
-					parent.remove(a);
+					keysToRemove2.add(a);
 				} else {
-					if (guild.getMemberById(parent.getLong(a)) == null) {
+					if (guild.getMemberById(parent.getJSONArray(a).getLong(0)) == null) {
 						guild.getVoiceChannelById(a).delete().queue();
-						parent.remove(a);
+						keysToRemove2.add(a);
 					}
 				}
 			});
+			for (int i = 0; i < keysToRemove2.size(); i++) {
+				parent.remove(keysToRemove2.get(i));
+			}
 			if (parent.isEmpty()) {
-				createdchannels.remove(e);
+				keysToRemove1.add(e);
 			}
 		});
+		for (int i = 0; i < keysToRemove1.size(); i++) {
+			createdchannels.remove(keysToRemove1.get(i));
+		}
 	}
 	public void goodbyeMsgCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
@@ -136,23 +155,37 @@ public class ConfigVerifier {
 	public void join2CreateChannelsCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject join2createchannels = guildConfig.getJSONObject("join2createchannels");
+		List<String> keysToRemove = new ArrayList<>();
 		join2createchannels.keySet().forEach(e -> {
 			if (guild.getVoiceChannelById(e) == null) {
-				join2createchannels.remove(e);
+				keysToRemove.add(e);
 			}
 		});
+		for (int i = 0; i < keysToRemove.size(); i++) {
+			join2createchannels.remove(keysToRemove.get(i));
+		}
 	}
 	public void levelrewardsCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject levelrewards = guildConfig.getJSONObject("levelrewards");
+		List<String> keysToRemove = new ArrayList<>();
 		levelrewards.keySet().forEach(e -> {
 			if (guild.getRoleById(levelrewards.getLong(e)) == null) {
-				levelrewards.remove(e);
+				keysToRemove.add(e);
 			}
 		});
+		for (int i = 0; i < keysToRemove.size(); i++) {
+			levelrewards.remove(keysToRemove.get(i));
+		}
 	}
 	public void modRoleCheck(Guild guild) {
-		
+		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
+		JSONArray moderationroles = guildConfig.getJSONArray("moderationroles");
+		for (int i = 0; i < moderationroles.length(); i++) {
+			if (guild.getRoleById(moderationroles.getLong(i)) == null) {
+				moderationroles.remove(i);
+			}
+		}
 	}
 	public void modInboxChannelCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
@@ -164,12 +197,16 @@ public class ConfigVerifier {
 	public void penaltiesCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject penalties = guildConfig.getJSONObject("penalties");
+		List<String> keysToRemove = new ArrayList<>();
 		penalties.keySet().forEach(e -> {
 			JSONArray penalty = penalties.getJSONArray(e);
 			if (penalty.getString(0).equals("rr") && guild.getRoleById(penalty.getString(1)) == null) {
-				penalties.remove(e);
+				keysToRemove.add(e);
 			}
 		});
+		for (int i = 0; i < keysToRemove.size(); i++) {
+			penalties.remove(keysToRemove.get(i));
+		}
 	}
 	public void suggestionInboxCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
@@ -179,7 +216,13 @@ public class ConfigVerifier {
 		}
 	}
 	public void supportRoleCheck(Guild guild) {
-		
+		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
+		JSONArray supportroles = guildConfig.getJSONArray("supportroles");
+		for (int i = 0; i < supportroles.length(); i++) {
+			if (guild.getRoleById(supportroles.getLong(i)) == null) {
+				supportroles.remove(i);
+			}
+		}
 	}
 	public void supportTalkCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
@@ -209,49 +252,69 @@ public class ConfigVerifier {
 	public void modMailsCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject modmails = guildConfig.getJSONObject("modmails");
+		List<String> keysToRemove = new ArrayList<>();
 		modmails.keySet().forEach(e -> {
 			if (guild.getTextChannelById(e) == null) {
-				modmails.remove(e);
+				keysToRemove.add(e);
 			}
 		});
+		for (int i = 0; i < keysToRemove.size(); i++) {
+			modmails.remove(keysToRemove.get(i));
+		}
 	}
 	public void pollsCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject polls = guildConfig.getJSONObject("polls");
+		List<String> keysToRemove1 = new ArrayList<>();
 		polls.keySet().forEach(e -> {
 			if (guild.getTextChannelById(e) == null || polls.getJSONObject(e).isEmpty()) {
-				polls.remove(e);
+				keysToRemove1.add(e);
 			} else {
 				JSONObject channelConfig = polls.getJSONObject(e);
+				List<String> keysToRemove2 = new ArrayList<>();
 				channelConfig.keySet().forEach(o -> {
 					if (guild.getTextChannelById(e).retrieveMessageById(o) == null || channelConfig.getJSONObject(o).isEmpty()) {
-						channelConfig.remove(o);
+						keysToRemove2.add(o);
 					}
 				});
+				for (int i = 0; i < keysToRemove2.size(); i++) {
+					channelConfig.remove(keysToRemove2.get(i));
+				}
 				if (polls.getJSONObject(e).isEmpty()) {
-					polls.remove(e);
+					keysToRemove1.add(e);
 				}
 			}
 		});
+		for (int i = 0; i < keysToRemove1.size(); i++) {
+			polls.remove(keysToRemove1.get(i));
+		}
 	}
 	public void reactionRolesCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.getGuildConfig(guild);
 		JSONObject reactionroles = guildConfig.getJSONObject("reactionroles");
+		List<String> keysToRemove1 = new ArrayList<>();
 		reactionroles.keySet().forEach(e -> {
 			if (guild.getTextChannelById(e) == null || reactionroles.getJSONObject(e).isEmpty()) {
-				reactionroles.remove(e);
+				keysToRemove1.add(e);
 			} else {
 				JSONObject channelConfig = reactionroles.getJSONObject(e);
+				List<String> keysToRemove2 = new ArrayList<>();
 				channelConfig.keySet().forEach(o -> {
 					if (guild.getTextChannelById(e).retrieveMessageById(o) == null || channelConfig.getJSONObject(o).isEmpty()) {
-						channelConfig.remove(o);
+						keysToRemove2.add(o);
 					}
 				});
+				for (int i = 0; i < keysToRemove2.size(); i++) {
+					channelConfig.remove(keysToRemove2.get(i));
+				}
 				if (reactionroles.getJSONObject(e).isEmpty()) {
-					reactionroles.remove(e);
+					keysToRemove1.add(e);
 				}
 			}
 		});
+		for (int i = 0; i < keysToRemove1.size(); i++) {
+			reactionroles.remove(keysToRemove1.get(i));
+		}
 	}
 	
 	public void usersCheck(Guild guild) {

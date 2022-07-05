@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEve
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
-public class Penalty implements OperationEventHandler {
+public class Penalties implements OperationEventHandler {
 
 	private OperationEvent event;
 	private User user;
@@ -53,7 +53,7 @@ public class Penalty implements OperationEventHandler {
 
 	@Override
 	public OperationData initialize() {
-		OperationData operationData = new OperationData(this).setName("Penalty")
+		OperationData operationData = new OperationData(this).setName("Penalties")
 													.setInfo("Configure penalties for reaching a certain warning limit")
 													.setSubOperations(new SubOperationData[] {
 															new SubOperationData("add", "Add a new penalty for a specific amount of warnings"),

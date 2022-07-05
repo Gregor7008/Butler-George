@@ -25,17 +25,15 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import operations.AutoMessages;
 import operations.AutoRoles;
-import operations.CustomChannelRoles;
-import operations.DefaultAccessRoles;
-import operations.Goodbye;
-import operations.Inbox;
-import operations.Join2Create;
-import operations.LevelReward;
-import operations.Penalty;
-import operations.ReactionRole;
+import operations.InboxChannels;
+import operations.Join2CreateChannels;
+import operations.LevelRewards;
+import operations.Penalties;
+import operations.ReactionRoles;
+import operations.StaticRoles;
 import operations.SupportTalk;
-import operations.Welcome;
 
 public class Configure implements CommandEventHandler {
 	
@@ -98,17 +96,15 @@ public class Configure implements CommandEventHandler {
 		
 		public OperationList() {
 			//Administration
-			this.operations.put("AutoRole", new AutoRoles());
-			this.operations.put("CustomChannelRoles", new CustomChannelRoles());
-			this.operations.put("DefaultAccessRoles", new DefaultAccessRoles());
-			this.operations.put("Goodbye", new Goodbye());
-			this.operations.put("Join2Create", new Join2Create());
-			this.operations.put("Inbox", new Inbox());
-			this.operations.put("LevelRewards", new LevelReward());
-			this.operations.put("Penalty", new Penalty());
-			this.operations.put("ReactionRole", new ReactionRole());
+			this.operations.put("AutoRoles", new AutoRoles());
+			this.operations.put("StaticRoles", new StaticRoles());
+			this.operations.put("AutoMessages", new AutoMessages());
+			this.operations.put("Join2CreateChannels", new Join2CreateChannels());
+			this.operations.put("InboxChannels", new InboxChannels());
+			this.operations.put("LevelRewards", new LevelRewards());
+			this.operations.put("Penalties", new Penalties());
+			this.operations.put("ReactionRoles", new ReactionRoles());
 			this.operations.put("SupportTalk", new SupportTalk());
-			this.operations.put("Welcome", new Welcome());
 		}
 	}
 }

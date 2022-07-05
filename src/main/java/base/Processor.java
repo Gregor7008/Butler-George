@@ -1,6 +1,7 @@
 package base;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -191,7 +192,7 @@ public class Processor extends ListenerAdapter {
 			if (goodbyemsg.getBoolean(3)) {
 				String msg = goodbyemsg.getString(1)
 				   .replace("{server}", guild.getName())
-				   .replace("{member}", event.getMember().getAsMention())
+				   .replace("{user}", event.getMember().getAsMention())
 				   .replace("{membercount}", Integer.toString(guild.getMemberCount()))
 				   .replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
 				guild.getTextChannelById(goodbyemsg.getLong(1)).sendMessage(msg).queue();
@@ -339,9 +340,16 @@ public class Processor extends ListenerAdapter {
 				ICategorizableChannel temp = (ICategorizableChannel) audioChannel;
 				ctg = temp.getParentCategory();
 			} catch (ClassCastException ex) {};
+			JSONObject createdChannels = ConfigLoader.getGuildConfig(guild).getJSONObject("createdchannels");
+			try {
+				createdChannels.getJSONObject(audioChannel.getId());
+			} catch (JSONException ex) {
+				createdChannels.put(audioChannel.getId(), new JSONObject());
+			}
+			int index = createdChannels.getJSONObject(audioChannel.getId()).keySet().size() + 1;
 			String name = channelConfig.getString("name")
-			    .replace("{member}", member.getEffectiveName());
-//			    .replace("{number}", String.valueOf(ConfigLoader.getGuildConfig(guild).getJSONObject("createdchannels").getJSONObject(audioChannel.getId()).keySet().size() + 1));
+			    .replace("{member}", member.getEffectiveName())
+			    .replace("{number}", String.valueOf(index));
 			VoiceChannel nc = guild.createVoiceChannel(name, ctg).complete();
 			nc.upsertPermissionOverride(guild.getPublicRole()).setAllowed(defperms).complete();
 			nc.upsertPermissionOverride(member).setAllowed(perms).complete();
@@ -349,12 +357,7 @@ public class Processor extends ListenerAdapter {
 				nc.getManager().setUserLimit(channelConfig.getInt("limit")).queue();
 			}
 			guild.moveVoiceMember(member, nc).queue();
-			JSONObject createdChannels = ConfigLoader.getGuildConfig(guild).getJSONObject("createdchannels");
-			try {
-				createdChannels.getJSONObject(audioChannel.getId()).put(nc.getId(), member.getUser().getIdLong());
-			} catch (JSONException ex) {
-				createdChannels.put(audioChannel.getId(), new JSONObject().put(nc.getId(), member.getUser().getIdLong()));
-			}
+			createdChannels.getJSONObject(audioChannel.getId()).put(nc.getId(), new JSONArray().put(0, member.getUser().getIdLong()).put(1, index));
 		}
 	}
 	
@@ -362,49 +365,57 @@ public class Processor extends ListenerAdapter {
 		int conmemb = audioChannel.getMembers().size();
 		if (conmemb == 1) {
 			if (audioChannel.getMembers().get(0).equals(guild.getSelfMember())) {
-				new Stop().stopandleave(guild);
+				Stop.stopandleave(guild);
 				conmemb--;
 			}
 		}
 		JSONObject createdchannels = ConfigLoader.getGuildConfig(guild).getJSONObject("createdchannels");
-		createdchannels.keySet().forEach(e -> {
+		List<String> parentChannels = new ArrayList<>();
+		parentChannels.addAll(createdchannels.keySet());
+		for (int i = 0; i < parentChannels.size(); i++) {
 			try {
-				String parentID = e;
-				long ownerID = createdchannels.getJSONObject(e).getLong(audioChannel.getId());
-				if (audioChannel.getMembers().size() == 0) {
-					ConfigLoader.getGuildConfig(guild).getJSONObject("createdchannels").getJSONObject(e).remove(audioChannel.getId());
+				JSONObject parentChannelData = createdchannels.getJSONObject(parentChannels.get(i));
+				JSONArray channelData = parentChannelData.getJSONArray(audioChannel.getId());
+				JSONObject parentChannelConfig = ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels").getJSONObject(parentChannels.get(i));
+				long ownerID = channelData.getLong(0);
+				if (conmemb == 0) {
 					audioChannel.delete().queue();
-					createdchannels.getJSONObject(parentID).remove(audioChannel.getId());
+					parentChannelData.remove(audioChannel.getId());
+					int index = channelData.getInt(1);
+					//Update index numbers
+					List<String> subChannels = new ArrayList<>();
+					subChannels.addAll(parentChannelData.keySet());
+					for (int a = 0; a < subChannels.size(); a++) {
+						JSONArray subChannelData = parentChannelData.getJSONArray(subChannels.get(a));
+						VoiceChannel target = guild.getVoiceChannelById(subChannels.get(a));
+						int currentIndex = subChannelData.getInt(1);
+						if (subChannelData.getInt(1) > index
+								&& parentChannelConfig.getString("name").contains("{number}")
+								&& target.getName().contains(String.valueOf(currentIndex))) {
+							target.getManager().setName(target.getName().replaceFirst(String.valueOf(currentIndex), String.valueOf(currentIndex - 1))).queue();
+							subChannelData.put(1, currentIndex + 1);
+						}
+					}				
 				} else {
 					if (ownerID == user.getIdLong()) {
-						JSONObject channelConfig = ConfigLoader.getGuildConfig(guild).getJSONObject("join2createchannels").getJSONObject(parentID);
-						Collection<Permission> defperms = new LinkedList<Permission>();
-						defperms.add(Permission.VIEW_CHANNEL);
-						defperms.add(Permission.VOICE_SPEAK);
 						Collection<Permission> perms = new LinkedList<Permission>();
-						if (channelConfig.getBoolean("configurable")) {
+						if (parentChannelConfig.getBoolean("configurable")) {
 							perms.add(Permission.MANAGE_CHANNEL);
 							perms.add(Permission.MANAGE_PERMISSIONS);
 							perms.add(Permission.CREATE_INSTANT_INVITE);
 							perms.add(Permission.VOICE_MUTE_OTHERS);
 						}
-						Category ctg = null;
-						try {
-							ICategorizableChannel temp = (ICategorizableChannel) audioChannel;
-							ctg = temp.getParentCategory();
-						} catch (ClassCastException ex) {};
 						Member newowner =  audioChannel.getMembers().get(0);
-						String name = channelConfig.getString("name");
-						name.replace("{member}", newowner.getEffectiveName());
-						//name.replace("{number}", String.valueOf(ConfigLoader.getGuildConfig(guild).getJSONObject("createdchannels").getJSONObject(audioChannel.getId()).keySet().size() + 1));
-						VoiceChannel nc = guild.createVoiceChannel(name, ctg).complete();
-						nc.upsertPermissionOverride(guild.getPublicRole()).setAllowed(defperms).complete();
-						nc.upsertPermissionOverride(newowner).setAllowed(perms).complete();
-						createdchannels.getJSONObject(parentID).put(audioChannel.getId(), newowner.getUser().getIdLong());
+						String name = audioChannel.getName().replace(guild.getMember(user).getEffectiveName(), newowner.getEffectiveName());
+						audioChannel.getManager().setName(name).queue();
+						audioChannel.getPermissionContainer().upsertPermissionOverride(newowner).setAllowed(perms).queue();
+						audioChannel.getPermissionContainer().getPermissionOverride(guild.getMember(user)).delete().queue();
+						channelData.put(0, newowner.getIdLong());
 						audioChannel.getPermissionContainer().getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(guild.getMember(user)).setName(name).queue();
 					}
 				}
+				i = parentChannels.size();
 			} catch (JSONException ex) {}
-		});
+		}
 	}
 }

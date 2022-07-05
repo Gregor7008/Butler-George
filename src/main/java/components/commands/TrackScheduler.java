@@ -30,7 +30,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		if (this.queue.poll() != null) {
 			this.player.startTrack(this.queue.poll(), false);
 		} else {
-			new Stop().stopandleave(PlayerCache.getInstance().getGuild(player));
+			Stop.stopandleave(PlayerCache.getInstance().getGuild(player));
 		}
 	}
 	

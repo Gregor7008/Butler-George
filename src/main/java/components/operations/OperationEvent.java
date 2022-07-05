@@ -38,6 +38,11 @@ public class OperationEvent {
 		this.subOperation = subOperation;
 	}
 	
+	public OperationEvent setMessage(Message message) {
+		this.message = message;
+		return this;
+	}
+	
 	public Guild getGuild() {
 		return this.guild;
 	}

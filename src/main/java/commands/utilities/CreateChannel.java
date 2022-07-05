@@ -28,13 +28,6 @@ public class CreateChannel implements CommandEventHandler {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
-		JSONArray cccroles = ConfigLoader.getGuildConfig(guild).getJSONArray("customchannelroles");
-		for (int i = 0; i < cccroles.length(); i++) {
-			if (!event.getMember().getRoles().contains(guild.getRoleById(cccroles.getLong(i))) && !guild.getRoleById(cccroles.getLong(i)).isPublicRole()) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
-				return;
-			}
-		}
 		this.createTextChannel(guild, user, name);
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
 	}
@@ -44,7 +37,7 @@ public class CreateChannel implements CommandEventHandler {
 		CommandData command = Commands.slash("createchannel", "Creates a custom channel for you and your friends!")
 									  .addOption(OptionType.STRING, "name", "The name of the new channel", true);
 		command.setDefaultPermissions(DefaultMemberPermissions.DISABLED)
-		   .setGuildOnly(true);
+		   	   .setGuildOnly(true);
 		return command;
 	}
 

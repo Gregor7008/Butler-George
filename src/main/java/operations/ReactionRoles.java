@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
-public class ReactionRole implements OperationEventHandler {
+public class ReactionRoles implements OperationEventHandler {
 	
 	private OperationEvent event;
 	private Guild guild;
@@ -68,10 +68,10 @@ public class ReactionRole implements OperationEventHandler {
 
 	@Override
 	public OperationData initialize() {
-		OperationData operationData = new OperationData(this).setName("ReactionRole")
-													.setInfo("Configure a reaction to give or remove a role")
+		OperationData operationData = new OperationData(this).setName("ReactionRoles")
+													.setInfo("Configure reactions to give or remove a role")
 													.setSubOperations(new SubOperationData[] {
-														new SubOperationData("add", "Add a new reactionrole to a message"),
+														new SubOperationData("add", "Add new reactionroles to a message"),
 														new SubOperationData("delete", "Deactivate and delete a reactionrole from a message"),
 														new SubOperationData("remove", "Remove all reactionroles from a message"),
 														new SubOperationData("list", "List all active reactionroles")

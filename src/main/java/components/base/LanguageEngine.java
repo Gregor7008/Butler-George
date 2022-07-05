@@ -58,6 +58,10 @@ public class LanguageEngine {
 		}
 	}
 	
+	public static String getRaw(Object requester, String key) {
+		return LanguageEngine.getRaw(null, null, requester, key);
+	}
+	
 	public static String getRaw(Guild guild, User user, Object requester, String key) {
 		String lang = "en";
 		if (user != null && guild != null) {

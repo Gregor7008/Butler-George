@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public class Inbox implements OperationEventHandler {
+public class InboxChannels implements OperationEventHandler {
 
 	@Override
 	public void execute(OperationEvent event) {
@@ -54,7 +54,7 @@ public class Inbox implements OperationEventHandler {
 
 	@Override
 	public OperationData initialize() {
-		OperationData operationData = new OperationData(this).setName("Inbox")
+		OperationData operationData = new OperationData(this).setName("InboxChannels")
 													.setInfo("Configure inbox channels for different receivers/purposes")
 													.setSubOperations(new SubOperationData[] {
 															new SubOperationData("set", "Set an inbox channel for a selected use case"),

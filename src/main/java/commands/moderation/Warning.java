@@ -87,8 +87,10 @@ public class Warning implements CommandEventHandler {
 	@Override
 	public List<Role> additionalWhitelistedRoles(Guild guild) {
 		List<Role> roles = new ArrayList<>();
-		Role moderationrole = guild.getRoleById(ConfigLoader.getGuildConfig(guild).getLong("moderationrole"));
-		roles.add(moderationrole);
+		JSONArray moderationroles = ConfigLoader.getGuildConfig(guild).getJSONArray("moderationroles");
+		moderationroles.forEach(e -> {
+			roles.add(guild.getRoleById((long) e));
+		});
 		return roles;
 	}
 	

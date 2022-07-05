@@ -158,22 +158,22 @@ public class ConfigManager {
 		JSONObject newConfig = new JSONObject();
 		//Simple values
 		newConfig.put("id",							guild.getIdLong());
+		newConfig.put("adminroles",					new JSONArray());
 		newConfig.put("userautoroles",				new JSONArray());
 		newConfig.put("botautoroles",				new JSONArray());
 		newConfig.put("communityinbox",				0L);
-		newConfig.put("customchannelaccessroles",	new JSONArray());
+		newConfig.put("customchannelpolicingroles",	new JSONArray());
 		newConfig.put("customchannelcategories",	new JSONObject());
-		newConfig.put("customchannelroles",			new JSONArray());
 		newConfig.put("createdchannels",			new JSONObject());
 		newConfig.put("goodbyemsg",					new JSONArray());
 		newConfig.put("join2createchannels",		new JSONObject());
 		newConfig.put("levelrewards",				new JSONObject());
-		newConfig.put("moderationrole",				0L);
+		newConfig.put("moderationroles",			new JSONArray());
 		newConfig.put("moderationinbox",			0L);
 		newConfig.put("offlinemsg",					new JSONArray());
 		newConfig.put("penalties",					new JSONObject());
 		newConfig.put("suggestioninbox",			0L);
-		newConfig.put("supportrole",				0L);
+		newConfig.put("supportroles",				new JSONArray());
 		newConfig.put("supporttalk",				0L);
 		newConfig.put("ticketchannels",				new JSONArray());
 		newConfig.put("ticketcount",				1);

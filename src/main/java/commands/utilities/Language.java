@@ -71,7 +71,7 @@ public class Language implements CommandEventHandler {
 	public CommandData initialize() {
 		CommandData command = Commands.slash("language", "Sets your preferred language in which the bot should answer you in on this server");
 		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
-		   .setGuildOnly(true);
+		   	   .setGuildOnly(true);
 		return command;
 	}
 

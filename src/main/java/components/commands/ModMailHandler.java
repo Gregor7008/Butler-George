@@ -24,11 +24,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
-public class ModMail {
+public class ModMailHandler {
 	
 	public static final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
 
-	public ModMail(MessageReceivedEvent event, boolean direction) {
+	public ModMailHandler(MessageReceivedEvent event, boolean direction) {
 		new Thread(() -> {
 			this.processEvent(event, direction);
 		}).start();

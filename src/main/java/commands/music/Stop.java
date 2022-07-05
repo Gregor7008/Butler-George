@@ -37,7 +37,7 @@ public class Stop implements CommandEventHandler {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
 			return;
 		}
-		this.stopandleave(guild);
+		Stop.stopandleave(guild);
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "stopped").convert()).queue();
 	}
 
@@ -54,7 +54,7 @@ public class Stop implements CommandEventHandler {
 		return null;
 	}
 	
-	public void stopandleave(Guild guild) {
+	public static  void stopandleave(Guild guild) {
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		musicManager.scheduler.player.stopTrack();
 		musicManager.scheduler.queue.clear();
