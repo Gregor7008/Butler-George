@@ -46,12 +46,14 @@ public class Configure implements CommandEventHandler {
 		SelectMenu.Builder menuBuilder1 = SelectMenu.create("selVal").setRequiredRange(1, 1).setPlaceholder("Select a value");
 		EmbedBuilder eb1 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selval").convert());
 		
-		new OperationList().operations.forEach((name, operationRequest) -> {
-			OperationData data = operationRequest.initialize();
-			operations.put(name, data);
-			menuBuilder1.addOption(name, name);
-			eb1.addField("`" + name + "`", data.getInfo(), true);
-		});
+		if (event.getSubcommandName().equals("server")) {
+			new OperationList().serverOperations.forEach((name, operationRequest) -> {
+				OperationData data = operationRequest.initialize();
+				operations.put(name, data);
+				menuBuilder1.addOption(name, name);
+				eb1.addField("`" + name + "`", data.getInfo(), true);
+			});
+		}
 		
 		Message msg = event.replyEmbeds(eb1.build()).addActionRow(menuBuilder1.build()).complete().retrieveOriginal().complete();
 		ResponseDetector.waitForMenuSelection(guild, user, msg, menuBuilder1.getId(),
@@ -92,19 +94,19 @@ public class Configure implements CommandEventHandler {
 	
 	private static class OperationList {
 			
-		public ConcurrentHashMap<String, OperationEventHandler> operations = new ConcurrentHashMap<>();
+		public ConcurrentHashMap<String, OperationEventHandler> serverOperations = new ConcurrentHashMap<>();
 		
 		public OperationList() {
 			//Administration
-			this.operations.put("AutoRoles", new AutoRoles());
-			this.operations.put("StaticRoles", new StaticRoles());
-			this.operations.put("AutoMessages", new AutoMessages());
-			this.operations.put("Join2CreateChannels", new Join2CreateChannels());
-			this.operations.put("InboxChannels", new InboxChannels());
-			this.operations.put("LevelRewards", new LevelRewards());
-			this.operations.put("Penalties", new Penalties());
-			this.operations.put("ReactionRoles", new ReactionRoles());
-			this.operations.put("SupportTalk", new SupportTalk());
+			this.serverOperations.put("AutoRoles", new AutoRoles());
+			this.serverOperations.put("StaticRoles", new StaticRoles());
+			this.serverOperations.put("AutoMessages", new AutoMessages());
+			this.serverOperations.put("Join2CreateChannels", new Join2CreateChannels());
+			this.serverOperations.put("InboxChannels", new InboxChannels());
+			this.serverOperations.put("LevelRewards", new LevelRewards());
+			this.serverOperations.put("Penalties", new Penalties());
+			this.serverOperations.put("ReactionRoles", new ReactionRoles());
+			this.serverOperations.put("SupportTalk", new SupportTalk());
 		}
 	}
 }
