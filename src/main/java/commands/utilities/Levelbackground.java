@@ -1,5 +1,6 @@
 package commands.utilities;
 
+import java.io.File;
 import java.util.List;
 
 import components.base.ConfigLoader;
@@ -62,14 +63,27 @@ public class Levelbackground implements CommandEventHandler {
 		eb4.setTitle("Levelbackground 4");
 		
 		try {
-			eb0.setImage("https://i.ibb.co/J72srcG/image.png");
-			eb1.setImage("https://i.ibb.co/HNgMsQT/1.png");
-			eb2.setImage("https://i.ibb.co/GttGfPZ/2.png");
-			eb3.setImage("https://i.ibb.co/r3rHJzV/3.png");
-			eb4.setImage("https://i.ibb.co/jDwc9PG/4.png");
-		} catch (IllegalArgumentException e) {}
-		
-		event.replyEmbeds(eb0.build(), eb1.build(), eb2.build(), eb3.build(), eb4.build()).queue();
+			File file0 = new File(this.getClass().getClassLoader().getResource("levelcards/0.png").toURI());
+			File file1 = new File(this.getClass().getClassLoader().getResource("levelcards/1.png").toURI());
+			File file2 = new File(this.getClass().getClassLoader().getResource("levelcards/2.png").toURI());
+			File file3 = new File(this.getClass().getClassLoader().getResource("levelcards/3.png").toURI());
+			File file4 = new File(this.getClass().getClassLoader().getResource("levelcards/4.png").toURI());
+			
+			eb0.setImage("attachment://0.png");
+			eb1.setImage("attachment://1.png");
+			eb2.setImage("attachment://2.png");
+			eb3.setImage("attachment://3.png");
+			eb4.setImage("attachment://4.png");
+			event.replyEmbeds(eb0.build(), eb1.build(), eb2.build(), eb3.build(), eb4.build())
+				.addFile(file0, "0.png")
+				.addFile(file1, "1.png")
+				.addFile(file2, "2.png")
+				.addFile(file3, "3.png")
+				.addFile(file4, "4.png")
+				.queue();
+			return;
+		} catch (Exception e) {}
+		event.replyEmbeds(LanguageEngine.fetchMessage(null, null, null, "fatal").convert()).queue();
 	}
 
 	@Override

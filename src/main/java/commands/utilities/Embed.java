@@ -31,6 +31,7 @@ public class Embed implements CommandEventHandler {
 	private TextChannel channel;
 	private List<Message> messages = new ArrayList<>();
 	
+	//TODO /embed rework for stability, reliability and more customizability (For a way to manage images, look at Levelbackground.java#>66)!
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		oevent = event;
