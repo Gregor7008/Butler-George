@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
-public class ConfigLoader {
+public abstract class ConfigLoader {
 	
 	//User configs
 	public static JSONObject getUserConfig(User user) {
@@ -89,19 +89,19 @@ public class ConfigLoader {
 	//Modmail configs
 	public static TextChannel getModMailOfUser(String userID) {
 		try {
-			return Bot.run.jda.getGuildById(Bot.homeID).getTextChannelById(ConfigLoader.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID)).getLong(userID));
+			return Bot.INSTANCE.jda.getGuildById(Bot.homeID).getTextChannelById(ConfigLoader.getModMailConfig(Bot.INSTANCE.jda.getGuildById(Bot.homeID)).getLong(userID));
 		} catch (JSONException e) {
 			return null;
 		}
 	}
 	
 	public static User getModMailOfChannel(String channelID) {
-		JSONObject modmailConfig = ConfigLoader.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID));
+		JSONObject modmailConfig = ConfigLoader.getModMailConfig(Bot.INSTANCE.jda.getGuildById(Bot.homeID));
 		String[] keys = (String[]) modmailConfig.keySet().toArray();
 		User returnValue = null;
 		for (int i = 0; i < keys.length; i++) {
 			if (modmailConfig.getLong(keys[i]) == Long.valueOf(channelID)) {
-				returnValue = Bot.run.jda.getUserById(Long.valueOf(keys[i]));
+				returnValue = Bot.INSTANCE.jda.getUserById(Long.valueOf(keys[i]));
 				i = keys.length;
 			}
 		}
@@ -109,7 +109,7 @@ public class ConfigLoader {
 	}
 	
 	public static void setModMailConfig(String channelID, String userID) {
-		ConfigLoader.getModMailConfig(Bot.run.jda.getGuildById(Bot.homeID)).put(userID, channelID);
+		ConfigLoader.getModMailConfig(Bot.INSTANCE.jda.getGuildById(Bot.homeID)).put(userID, channelID);
 	}
 	
 	private static JSONObject getModMailConfig(Guild guild) {

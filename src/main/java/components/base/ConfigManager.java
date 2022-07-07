@@ -18,12 +18,12 @@ import com.mongodb.lang.NonNull;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class ConfigManager {
+public abstract class ConfigManager {
 
-	private static MongoClient client = MongoClients.create("mongodb://192.168.178.104:17389");
-	private static MongoDatabase database = client.getDatabase("butler-george");
-	private static MongoCollection<Document> userconfigs = database.getCollection("user");
-	private static MongoCollection<Document> guildconfigs = database.getCollection("guild");
+	private static MongoClient client = null;
+	private static MongoDatabase database = null;
+	private static MongoCollection<Document> userconfigs = null;
+	private static MongoCollection<Document> guildconfigs = null;
 	private static ConcurrentHashMap<Long, JSONObject> userConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	private static ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
@@ -54,6 +54,36 @@ public class ConfigManager {
 			ConsoleEngine.out.error(ConfigManager.class, "Push failed!");
 			return false;
 		}
+	}
+	
+	public static boolean setDatabaseConnection(String clientIP, String databaseName) {
+		if (clientIP.equals("Enter database IP") || databaseName.equals("Enter database name")) {
+			return false;
+		}
+		try {
+			client = MongoClients.create(clientIP);
+			client.listDatabases();
+			database = client.getDatabase(databaseName);
+		} catch (Exception e) {
+			client = null;
+			database = null;
+			userconfigs = null;
+			guildconfigs = null;
+			return false;
+		}
+		try {
+			userconfigs = database.getCollection("user");
+		} catch (IllegalArgumentException e) {
+			 database.createCollection("user");
+			 userconfigs = database.getCollection("user");
+		}
+		try {
+			guildconfigs = database.getCollection("guild");
+		} catch (IllegalArgumentException e) {
+			 database.createCollection("guild");
+			 guildconfigs = database.getCollection("guild");
+		}
+		return true;
 	}
 	
 	//Get Cache

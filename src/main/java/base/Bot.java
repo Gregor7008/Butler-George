@@ -29,19 +29,19 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 public class Bot {
 	
-	public static Bot run;
+	public static Bot INSTANCE;
 	public static String version = "V2.0-dev";
 	public static String name = "Butler George";
 	public static String id = "853887837823959041";
 	public static String homeID = "708381749826289666";
 	public JDA jda;
 	private Timer timer = new Timer();
-	public static EventWaiter eventWaiter = new EventWaiter();
+	public EventWaiter eventWaiter = new EventWaiter();
 	public int timerCount = 0;
 	public boolean noErrorOccured = true;
 	
 	public Bot(String token) throws LoginException, InterruptedException, IOException {
-		run = this;
+		INSTANCE = this;
 	    //Create Bot
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(eventWaiter);
@@ -92,7 +92,7 @@ public class Bot {
 			ConfigManager.pushCache();
 		}
 		ConsoleEngine.out.info(this, "Bot offline");
-		run = null;
+		INSTANCE = null;
 		jda = null;
 	}
 	

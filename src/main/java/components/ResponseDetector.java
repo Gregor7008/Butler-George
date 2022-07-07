@@ -1,5 +1,6 @@
 package components;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -13,12 +14,14 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.interactions.components.Modal;
 
-public class ResponseDetector {
+public abstract class ResponseDetector {
 	
 	public static void waitForMessage(Guild guild, User user, MessageChannel channel,
 			  						  Consumer<MessageReceivedEvent> onSuccess) {
@@ -64,7 +67,7 @@ public class ResponseDetector {
 	public static void waitForMessage(Guild guild, User user, MessageChannel channel, Predicate<MessageReceivedEvent> additionalCondition,
 							   	      Consumer<MessageReceivedEvent> onSuccess, Consumer<Boolean> onTimeout) {
 		AtomicReference<Boolean> invalidMessageGiven = new AtomicReference<>(false);
-		Bot.eventWaiter.waitForEvent(MessageReceivedEvent.class,
+		Bot.INSTANCE.eventWaiter.waitForEvent(MessageReceivedEvent.class,
 				e -> {if (!e.getGuild().getId().equals(guild.getId())) {
 						  return false;
 					  }
@@ -85,8 +88,7 @@ public class ResponseDetector {
 						  return true;
 					  }
 				},
-				e -> {onSuccess.accept(e);
-				},
+				onSuccess,
 				1, TimeUnit.MINUTES,
 				() -> {onTimeout.accept(invalidMessageGiven.get());});
 	}
@@ -100,7 +102,7 @@ public class ResponseDetector {
 	
 	public static void waitForReaction(Guild guild, User user, Message message,
 			   				    	   Consumer<MessageReactionAddEvent> onSuccess, Runnable onTimeout) {
-		Bot.eventWaiter.waitForEvent(MessageReactionAddEvent.class,
+		Bot.INSTANCE.eventWaiter.waitForEvent(MessageReactionAddEvent.class,
 				e -> {if (!e.getGuild().getId().equals(guild.getId())) {
 					  	  return false;
 				  	  }
@@ -112,21 +114,20 @@ public class ResponseDetector {
 					  }
 					  return e.getUser().getIdLong() == user.getIdLong();
 				},
-				e -> {onSuccess.accept(e);
-				},
+				onSuccess,
 				1, TimeUnit.MINUTES,
-				() -> {onTimeout.run();});
+				onTimeout);
 	}
 	
-	public static void waitForButtonClick(Guild guild, User user, Message message, @Nullable String buttonID,
+	public static void waitForButtonClick(Guild guild, User user, Message message, @Nullable List<String> buttonIDs,
 			  					       Consumer<ButtonInteractionEvent> onSuccess) {
-		ResponseDetector.waitForButtonClick(guild, user, message, buttonID, onSuccess,
+		ResponseDetector.waitForButtonClick(guild, user, message, buttonIDs, onSuccess,
 				() -> {message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "timeout").convert()).queue();});
 	}
 	
-	public static void waitForButtonClick(Guild guild, User user, Message message, @Nullable String buttonID,
+	public static void waitForButtonClick(Guild guild, User user, Message message, @Nullable  List<String> buttonIDs,
 			   					   		  Consumer<ButtonInteractionEvent> onSuccess, Runnable onTimeout) {
-		Bot.eventWaiter.waitForEvent(ButtonInteractionEvent.class,
+		Bot.INSTANCE.eventWaiter.waitForEvent(ButtonInteractionEvent.class,
 				e -> {if (!e.getGuild().getId().equals(guild.getId())) {
 					  	  return false;
 				  	  }
@@ -136,16 +137,16 @@ public class ResponseDetector {
 					  if (!e.getMessage().getId().equals(message.getId())) {
 						  return false;
 					  }
-					  if (buttonID != null) {
-						  if (!e.getButton().getId().equals(buttonID)) {
+					  if (buttonIDs != null) {
+						  if (!buttonIDs.contains(e.getButton().getId())) {
 							  return false;
 						  }
 					  }
 					  return e.getUser().getIdLong() == user.getIdLong();
 				},
-				e -> {onSuccess.accept(e);},
+				onSuccess,
 				1, TimeUnit.MINUTES,
-				() -> {onTimeout.run();});
+				onTimeout);
 	}
 
 	public static void waitForMenuSelection(Guild guild, User user, Message message, @Nullable String menuID,
@@ -156,7 +157,7 @@ public class ResponseDetector {
 	
 	public static void waitForMenuSelection(Guild guild, User user, Message message, @Nullable String menuID,
 											Consumer<SelectMenuInteractionEvent> onSuccess, Runnable onTimeout) {
-		Bot.eventWaiter.waitForEvent(SelectMenuInteractionEvent.class,
+		Bot.INSTANCE.eventWaiter.waitForEvent(SelectMenuInteractionEvent.class,
 				e -> {if (!e.getGuild().getId().equals(guild.getId())) {
 					  	  return false;
 				  	  }
@@ -171,8 +172,33 @@ public class ResponseDetector {
 					  }
 					  return e.getUser().getIdLong() == user.getIdLong();
 				},
-				e -> {onSuccess.accept(e);},
+				onSuccess,
 				1, TimeUnit.MINUTES,
-				() -> {onTimeout.run();});
+				onTimeout);
+	}
+	
+	public static void waitForModalInput(Guild guild, User user, Message message, Modal modal,
+										 Consumer<ModalInteractionEvent> onSuccess) {
+		ResponseDetector.waitForModalInput(guild, user, message.getChannel(), modal, onSuccess,
+				() -> {message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "timeout").convert()).queue();});
+	}
+	
+	public static void waitForModalInput(Guild guild, User user, MessageChannel channel, Modal modal,
+										 Consumer<ModalInteractionEvent> onSuccess, Runnable onTimeout) {
+	Bot.INSTANCE.eventWaiter.waitForEvent(ModalInteractionEvent.class,
+			e -> {if (!e.getGuild().getId().equals(guild.getId())) {
+			  	  	  return false;
+		  	  	  }
+			  	  if (!e.getMessageChannel().getId().equals(channel.getId())) {
+			  		  return false;
+			  	  }
+			  	  if (!e.getModalId().equals(modal.getId())) {
+			  		  return false;
+			  	  }
+			  	  return e.getUser().getIdLong() == user.getIdLong();
+			},
+			onSuccess,
+			1, TimeUnit.MINUTES,
+			onTimeout);
 	}
 }

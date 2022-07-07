@@ -62,12 +62,20 @@ public class Levelbackground implements CommandEventHandler {
 		eb3.setTitle("Levelbackground 3");
 		eb4.setTitle("Levelbackground 4");
 		
+		eb0.setColor(LanguageEngine.color);
+		eb1.setColor(LanguageEngine.color);
+		eb2.setColor(LanguageEngine.color);
+		eb3.setColor(LanguageEngine.color);
+		eb4.setColor(LanguageEngine.color);
+		
 		try {
 			File file0 = new File(this.getClass().getClassLoader().getResource("levelcards/0.png").toURI());
 			File file1 = new File(this.getClass().getClassLoader().getResource("levelcards/1.png").toURI());
 			File file2 = new File(this.getClass().getClassLoader().getResource("levelcards/2.png").toURI());
 			File file3 = new File(this.getClass().getClassLoader().getResource("levelcards/3.png").toURI());
 			File file4 = new File(this.getClass().getClassLoader().getResource("levelcards/4.png").toURI());
+			
+			System.out.println(file0.getName());
 			
 			eb0.setImage("attachment://0.png");
 			eb1.setImage("attachment://1.png");

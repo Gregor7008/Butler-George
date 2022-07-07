@@ -1,5 +1,7 @@
 package base;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
@@ -23,10 +25,12 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
+import components.base.ConfigManager;
 import components.base.ConsoleEngine;
 import net.miginfocom.swing.MigLayout;
+import java.awt.Color;
 
-public class GUI extends JFrame implements WindowListener{
+public class GUI extends JFrame implements WindowListener, FocusListener{
 	
 	public static GUI get;
 	private static final long serialVersionUID = 5923282583431103590L;
@@ -34,6 +38,8 @@ public class GUI extends JFrame implements WindowListener{
 	public static JTextArea console = new JTextArea();
 	public static JLabel greenLED = new JLabel();
 	public static JLabel redLED = new JLabel();
+	public static JTextField databaseIP = new JTextField();
+	public static JTextField databaseName = new JTextField();
 	public static JTextField token = new JTextField();
 	public static JButton startButton = new JButton("Start");
 	public static JButton stopButton = new JButton("Stop");
@@ -49,6 +55,7 @@ public class GUI extends JFrame implements WindowListener{
 	public ImageIcon greenLEDOff;
 	public ImageIcon redLEDOn;
 	public ImageIcon redLEDOff;
+	
 	
 	
 	public static void main(String[] args) {
@@ -74,7 +81,7 @@ public class GUI extends JFrame implements WindowListener{
 		setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(this);
-		getContentPane().setLayout(new MigLayout("", "[600,grow][200:200:200][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][510][20:n]"));
+		getContentPane().setLayout(new MigLayout("", "[600,grow][200:200:200,grow][140:140:140,grow][30:30:30][30:30:30]", "[30:n][20:n][20:n][510][20:n]"));
 		
 		console.setEditable(false);
 		
@@ -83,33 +90,65 @@ public class GUI extends JFrame implements WindowListener{
 		consoleScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		getContentPane().add(consoleScrollPane, "flowx,cell 0 0 1 4,grow");
 		
+		
+		
 		greenLED.setIcon(greenLEDOff);
 		getContentPane().add(greenLED, "cell 3 0");
 		
 		redLED.setIcon(redLEDOn);
 		getContentPane().add(redLED, "flowx,cell 4 0");
 		
-		token.setText("");
+		token.setForeground(Color.GRAY);
+		token.setName("Enter bot token");
+		token.setText(token.getName());
+		token.addFocusListener(this);
 		try {
 			token.setText(args[0]);
+			token.setForeground(Color.BLACK);
 		} catch (IndexOutOfBoundsException e) {}
 		getContentPane().add(token, "cell 1 1 4 1,grow");
 		token.setColumns(10);
 		
+		databaseName.setForeground(Color.GRAY);
+		databaseName.setName("Enter database name");
+		databaseName.setText(databaseName.getName());
+		databaseName.addFocusListener(this);
+		try {
+			databaseName.setText(args[2]);
+			databaseName.setForeground(Color.BLACK);
+		} catch (IndexOutOfBoundsException e) {}
+		getContentPane().add(databaseName, "cell 2 0,growx");
+		databaseName.setColumns(10);
+		
+		databaseIP.setForeground(Color.GRAY);
+		databaseIP.setName("Enter database IP");
+		databaseIP.setText(databaseIP.getName());
+		databaseIP.addFocusListener(this);
+		try {
+			databaseIP.setText(args[1]);
+			databaseIP.setForeground(Color.BLACK);
+		} catch (IndexOutOfBoundsException e) {}
+		getContentPane().add(databaseIP, "cell 1 0,growx");
+		databaseIP.setColumns(10);
+		
 		startButton.addActionListener(e -> {
-			if (Bot.run == null) {
-				try {
-					new Bot(token.getText());
-				} catch (LoginException | InterruptedException | IOException e1) {
-					e1.printStackTrace();
+			if (Bot.INSTANCE == null) {
+				if (ConfigManager.setDatabaseConnection(databaseIP.getText(), databaseName.getText())) {
+					try {
+						new Bot(token.getText());
+					} catch (LoginException | InterruptedException | IOException e1) {
+						ConsoleEngine.out.error(Bot.INSTANCE, "Bot instanciation failed - Check token validity!");
+					}
+				} else {
+					ConsoleEngine.out.error(this, "Bot instanciation failed - Check database configuration!");
 				}
 			}
 		});
 		getContentPane().add(startButton, "flowx,cell 1 2,growx,aligny center");
 		
 		stopButton.addActionListener(e -> {
-			if (Bot.run != null && Bot.run.jda != null) {
-				Bot.run.shutdown(true);	
+			if (Bot.INSTANCE != null && Bot.INSTANCE.jda != null) {
+				Bot.INSTANCE.shutdown(true);	
 			}
 		});
 		getContentPane().add(stopButton, "cell 2 2 3 1,growx,aligny center");
@@ -218,12 +257,12 @@ public class GUI extends JFrame implements WindowListener{
 	}
 	
 	public void updateBotBoolean() {
-		this.setTableValue(8, !Bot.run.noErrorOccured);
+		this.setTableValue(8, !Bot.INSTANCE.noErrorOccured);
 	}
 	
 	public void updateStatistics() {
-		this.setTableValue(6, Bot.run.jda.getGuilds().size());
-		this.setTableValue(7, Bot.run.jda.getUsers().size());
+		this.setTableValue(6, Bot.INSTANCE.jda.getGuilds().size());
+		this.setTableValue(7, Bot.INSTANCE.jda.getUsers().size());
 	}
 	
 	public void startRuntimeMeasuring() {
@@ -261,8 +300,8 @@ public class GUI extends JFrame implements WindowListener{
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		if (Bot.run != null && Bot.run.jda != null) {
-			Bot.run.shutdown(true);	
+		if (Bot.INSTANCE != null && Bot.INSTANCE.jda != null) {
+			Bot.INSTANCE.shutdown(true);	
 		}
 		e.getWindow().dispose();
 	}
@@ -282,5 +321,23 @@ public class GUI extends JFrame implements WindowListener{
 	public void windowActivated(WindowEvent e) {}
 
 	@Override
-	public void windowDeactivated(WindowEvent e) {}	
+	public void windowDeactivated(WindowEvent e) {}
+	
+	@Override
+	public void focusGained(FocusEvent e) {
+		JTextField textField = (JTextField) e.getComponent();
+		if (textField.getText().equals(textField.getName())) {
+			textField.setForeground(Color.BLACK);
+			textField.setText("");
+		}
+	}
+
+	@Override
+	public void focusLost(FocusEvent e) {
+		JTextField textField = (JTextField) e.getComponent();
+		if (textField.getText().equals(textField.getName()) || textField.getText().equals("")) {
+			textField.setForeground(Color.GRAY);
+			textField.setText(textField.getName());
+		}
+	}	
 }

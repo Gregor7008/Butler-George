@@ -88,7 +88,7 @@ public class Leave implements CommandEventHandler {
 	
 	private User checkCategory(Category category, Guild guild) {
 		try {
-			return Bot.run.jda.getUserById(ConfigLoader.getFirstGuildLayerConfig(guild, "customchannelcategories").getLong(category.getId()));
+			return Bot.INSTANCE.jda.getUserById(ConfigLoader.getFirstGuildLayerConfig(guild, "customchannelcategories").getLong(category.getId()));
 		} catch (JSONException e) {
 			return null;
 		}

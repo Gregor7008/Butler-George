@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.Role;
 public class ServerUtilities {
 	
 	public static void rolecheck() {
-		final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
+		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
 		if (guild == null) {
 			return;
 		}
@@ -54,7 +54,7 @@ public class ServerUtilities {
 	}
 	
 	public static void controlChannels(boolean action) {
-		final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
+		final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
 		if (guild == null) {
 			return;
 		}

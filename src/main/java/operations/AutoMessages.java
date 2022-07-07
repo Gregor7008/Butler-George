@@ -24,8 +24,8 @@ public class AutoMessages implements OperationEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
-				Button.primary("welcome", Emoji.fromUnicode("\uD83C\uDF89")),
-				Button.primary("goodbye", Emoji.fromUnicode("\uD83D\uDC4B"))).queue();
+				Button.secondary("welcome", Emoji.fromUnicode("\uD83C\uDF89")),
+				Button.secondary("goodbye", Emoji.fromUnicode("\uD83D\uDC4B"))).queue();
 		ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
 				b -> {
 					String type = b.getComponentId();

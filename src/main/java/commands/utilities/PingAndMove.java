@@ -44,8 +44,8 @@ public class PingAndMove implements CommandEventHandler {
 		}
 		InteractionHook ih = event.reply(omember.getAsMention()).addEmbeds(LanguageEngine.fetchMessage(guild, user, this, "request")
 				.replaceDescription("{user}", guild.getMember(user).getAsMention()).convert())
-								.addActionRow(Button.primary("accept", Emoji.fromUnicode("U+2705")),
-											  Button.primary("deny", Emoji.fromUnicode("U+274C"))).complete();
+								.addActionRow(Button.secondary("accept", Emoji.fromUnicode("U+2705")),
+											  Button.secondary("deny", Emoji.fromUnicode("U+274C"))).complete();
 		ResponseDetector.waitForButtonClick(guild, user, ih.retrieveOriginal().complete(), null,
 				e -> {if (e.getButton().getId().equals("accept")) {
 						 guild.moveVoiceMember(guild.getMember(user), omember.getVoiceState().getChannel()).queue();

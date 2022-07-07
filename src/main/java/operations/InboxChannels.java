@@ -20,9 +20,9 @@ public class InboxChannels implements OperationEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype"))
-						  .setActionRow(Button.primary("community", Emoji.fromUnicode("\uD83C\uDF89")),
-								  	    Button.primary("suggestion", Emoji.fromUnicode("\uD83D\uDCA1")),
-								  	    Button.primary("moderation", Emoji.fromUnicode("\uD83D\uDC6E"))).queue();
+						  .setActionRow(Button.secondary("community", Emoji.fromUnicode("\uD83C\uDF89")),
+								  	    Button.secondary("suggestion", Emoji.fromUnicode("\uD83D\uDCA1")),
+								  	    Button.secondary("moderation", Emoji.fromUnicode("\uD83D\uDC6E"))).queue();
 		ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
 				b -> {final String selection = b.getComponentId();
 					  Toolbox.deleteActionRows(b.getMessage(),

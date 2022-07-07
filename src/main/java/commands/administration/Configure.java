@@ -63,7 +63,7 @@ public class Configure implements CommandEventHandler {
 						List<Button> buttons = new ArrayList<>();
 						EmbedBuilder eb2 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selsub").convert());
 						for (int i = 0; i < subOperations.length; i++) {
-							buttons.add(Button.primary(String.valueOf(i), subOperations[i].getName()));
+							buttons.add(Button.secondary(String.valueOf(i), subOperations[i].getName()));
 								eb2.addField("`" + subOperations[i].getName() + "`", subOperations[i].getInfo(), true);
 						}
 						e.editMessageEmbeds(eb2.build()).setActionRow(buttons).queue();

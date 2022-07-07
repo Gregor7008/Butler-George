@@ -15,6 +15,7 @@ public class LanguageEngine {
 	
 	public static String footer = "Made with ❤️ by Gregor7008";
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
+	public static int color = 56575;
 	
 	public static CustomMessageEmbed fetchMessage(Guild guild, User user, Object requester, String key)  {
 		String[] raw = LanguageEngine.getRaw(guild, user, requester, key).split("; ");
@@ -24,7 +25,7 @@ public class LanguageEngine {
 	public static CustomMessageEmbed buildMessage(String title, String description, @Nullable String opFooter) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setTitle(title);
-		eb.setColor(56575);
+		eb.setColor(color);
 		eb.setDescription(description);
 		if (opFooter == null) {
 			eb.setFooter(footer);

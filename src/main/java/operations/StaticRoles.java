@@ -29,10 +29,10 @@ public class StaticRoles implements OperationEventHandler {
 		guild = event.getGuild();
 		user = event.getUser();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
-				Button.primary("adminroles", Emoji.fromUnicode("\u2696")),
-				Button.primary("moderationroles", Emoji.fromUnicode("\uD83D\uDC6E")),
-				Button.primary("supportroles", Emoji.fromUnicode("\uD83D\uDEA8")),
-				Button.primary("customchannelaccessroles", Emoji.fromUnicode("\uD83D\uDD12"))).queue();
+				Button.secondary("adminroles", Emoji.fromUnicode("\u2696")),
+				Button.secondary("moderationroles", Emoji.fromUnicode("\uD83D\uDC6E")),
+				Button.secondary("supportroles", Emoji.fromUnicode("\uD83D\uDEA8")),
+				Button.secondary("customchannelaccessroles", Emoji.fromUnicode("\uD83D\uDD12"))).queue();
 		ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
 				b -> {
 					Toolbox.deleteActionRows(b.getMessage(), () -> {

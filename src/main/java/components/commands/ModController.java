@@ -23,7 +23,7 @@ public class ModController {
 
 	public ModController() {
 		run = this;
-		List<Guild> guilds = Bot.run.jda.getGuilds();
+		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
 		for (int i = 0; i < guilds.size(); i++) {
 			this.guildModCheck(guilds.get(i));
 		}
@@ -33,7 +33,7 @@ public class ModController {
 		new Thread(() -> {
 			ConcurrentHashMap<Long, JSONObject> usersCached = ConfigManager.getUserCache();
 			usersCached.forEach((id, obj) -> {
-				User user = Bot.run.jda.retrieveUserById(id).complete();
+				User user = Bot.INSTANCE.jda.retrieveUserById(id).complete();
 				try {
 					this.userModCheck(guild, user);
 				} catch (JSONException e) {}

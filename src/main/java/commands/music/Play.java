@@ -1,9 +1,8 @@
 package commands.music;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
+import components.Toolbox;
 import components.base.LanguageEngine;
 import components.commands.CommandEventHandler;
 import components.commands.GuildMusicManager;
@@ -69,22 +68,13 @@ public class Play implements CommandEventHandler {
 				vc.getManager().setUserLimit(vc.getUserLimit() + 1).queue();
 			}
 		}
-		if (!this.isURL(argument)) {
+		if (!Toolbox.checkURL(argument)) {
 			String term = "ytsearch:" + argument;
 			musicManager.scheduler.player.setVolume(15);
 			PlayerManager.getInstance().loadAndPlay(event, term);
 		} else {
 			musicManager.scheduler.player.setVolume(15);
 			PlayerManager.getInstance().loadAndPlay(event, argument);
-		}
-	}
-	
-	private boolean isURL(String test) {
-		try {
-			new URL(test);
-			return true;
-		} catch (MalformedURLException e) {
-			return false;
 		}
 	}
 }

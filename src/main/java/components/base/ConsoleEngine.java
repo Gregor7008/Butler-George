@@ -100,7 +100,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		String input = GUI.consoleIn.getText();
 		this.userInput(input);
 		GUI.consoleIn.setText("");
-		if (Bot.run != null && Bot.run.jda != null) {
+		if (Bot.INSTANCE != null && Bot.INSTANCE.jda != null) {
 			this.commandListener(input);
 		} else {
 			this.info(this, "Input ignored as the bot is offline!");
@@ -110,13 +110,13 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
 		e.printStackTrace();
-		Bot.run.noErrorOccured = false;
+		Bot.INSTANCE.noErrorOccured = false;
 		GUI.get.increaseErrorCounter();
 		GUI.get.updateBotBoolean();
 	}
 	
 	private void commandListener(String line) {
-		JDA jda = Bot.run.jda;
+		JDA jda = Bot.INSTANCE.jda;
 		String[] insplit = line.split(" ");
 		String command = insplit[0];
 		switch (command) {
@@ -125,7 +125,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 				try {
 					delete = Boolean.parseBoolean(insplit[1]);
 				} catch (IndexOutOfBoundsException e) {}
-				Bot.run.shutdown(delete);
+				Bot.INSTANCE.shutdown(delete);
 				break;
 			case "exit":
 				jda.shutdown();
@@ -188,14 +188,14 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 			case "printCache":
 				this.title("User-Cache");
 				ConfigManager.getUserCache().forEach((id, obj) -> {
-					this.info(null, "->" + Bot.run.jda.getUserById(id).getName());
+					this.info(null, "->" + Bot.INSTANCE.jda.getUserById(id).getName());
 				});
 				if (ConfigManager.getUserCache().isEmpty()) {
 					this.info(null, "EMPTY");
 				}
 				this.title("Guild-Cache");
 				ConfigManager.getGuildCache().forEach((id, obj) -> {
-					this.info(null, "->" + Bot.run.jda.getGuildById(id).getName());
+					this.info(null, "->" + Bot.INSTANCE.jda.getGuildById(id).getName());
 				});
 				if (ConfigManager.getGuildCache().isEmpty()) {
 					this.info(null, "EMPTY");

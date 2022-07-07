@@ -111,8 +111,8 @@ public class Join2CreateChannels implements OperationEventHandler {
 							  l -> {
 								  int limit = Integer.parseInt(l.getMessage().getContentRaw());
 								  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defconfigurable").replaceDescription("{channel}", "**" + channel.getName() + "**").convert()).setActionRow(
-										  Button.primary("true", Emoji.fromUnicode("\u2705")),
-										  Button.primary("false", Emoji.fromUnicode("\u274C"))).queue();
+										  Button.secondary("true", Emoji.fromUnicode("\u2705")),
+										  Button.secondary("false", Emoji.fromUnicode("\u274C"))).queue();
 								  ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
 										  e -> {
 											  Toolbox.deleteActionRows(e.getMessage(), () -> {

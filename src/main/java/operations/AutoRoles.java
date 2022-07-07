@@ -29,8 +29,8 @@ public class AutoRoles implements OperationEventHandler {
 		guild = event.getGuild();
 		user = event.getUser();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selacc"))
-						  .setActionRow(Button.primary("user", Emoji.fromUnicode("\uD83D\uDEB9")),
-								  	    Button.primary("bot", Emoji.fromUnicode("\uD83E\uDD16"))).queue();
+						  .setActionRow(Button.secondary("user", Emoji.fromUnicode("\uD83D\uDEB9")),
+								  	    Button.secondary("bot", Emoji.fromUnicode("\uD83E\uDD16"))).queue();
 		ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
 				b -> {String selection = b.getComponentId();
 					  Toolbox.deleteActionRows(b.getMessage(),

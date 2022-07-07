@@ -1,23 +1,16 @@
 package components.commands;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import base.Bot;
+import components.Toolbox;
 import components.base.ConfigLoader;
 import components.base.ConfigManager;
 import components.base.LanguageEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Message.Attachment;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -26,7 +19,7 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 public class ModMailHandler {
 	
-	public static final Guild guild = Bot.run.jda.getGuildById(Bot.homeID);
+	public static final Guild guild = Bot.INSTANCE.jda.getGuildById(Bot.homeID);
 
 	public ModMailHandler(MessageReceivedEvent event, boolean direction) {
 		new Thread(() -> {
@@ -45,7 +38,7 @@ public class ModMailHandler {
 		if (direction) {
 			if (ConfigLoader.getModMailOfChannel(event.getChannel().getId()) != null) {
 				PrivateChannel pc = ConfigLoader.getModMailOfChannel(event.getChannel().getId()).openPrivateChannel().complete();
-				this.resendMessage(pc, event.getMessage());
+				Toolbox.resendMessage(pc, event.getMessage());
 			}
 			return;
 		}
@@ -61,7 +54,7 @@ public class ModMailHandler {
 		}
 		if (ConfigLoader.getModMailOfUser(user.getId()) != null) {
 			TextChannel channel = ConfigLoader.getModMailOfUser(user.getId());
-			this.resendMessage(channel, event.getMessage());
+			Toolbox.resendMessage(channel, event.getMessage());
 			return;
 		}
 		OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.getMemberConfig(guild, user).getString("lastmail"), ConfigManager.dateTimeFormatter);
@@ -82,34 +75,9 @@ public class ModMailHandler {
 			ConfigLoader.getGuildConfig(guild).put("modmailcategory", ctg.getIdLong());
 		}
 		TextChannel nc = guild.createTextChannel(event.getAuthor().getName(), guild.getCategoryById(ConfigLoader.getGuildConfig(guild).getLong("supportcategory"))).complete();
-		this.resendMessage(nc, event.getMessage());
+		Toolbox.resendMessage(nc, event.getMessage());
 		nc.sendMessage(guild.getPublicRole().getAsMention());
 		nc.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
 		ConfigLoader.setModMailConfig(nc.getId(), event.getAuthor().getId());
-	}
-	
-	private void resendMessage(MessageChannel channel, Message message) {
-		List<Attachment> attachements = message.getAttachments();
-		List<File> files = new ArrayList<>();
-		for (int i = 0; i < attachements.size(); i++) {
-			File file = null;
-			try {file = File.createTempFile(attachements.get(i).getFileName(), null);
-			} catch (IOException e) {}
-			Boolean deleted = true;
-			if (file.exists()) {
-				deleted = file.delete();
-			}
-			if (deleted) {
-				try {
-					attachements.get(i).getProxy().downloadToFile(file).get();
-				} catch (InterruptedException | ExecutionException e) {}
-				files.add(file);
-			}
-		}
-		channel.sendMessage(message).queue();
-		for (int i = 0; i < files.size(); i++) {
-			File file = files.get(i);
-			channel.sendFile(file).queue(e -> file.delete());
-		}
 	}
 }
