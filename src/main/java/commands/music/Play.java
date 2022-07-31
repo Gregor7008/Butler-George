@@ -26,7 +26,7 @@ public class Play implements CommandEventHandler {
 	public void execute(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final Member member = event.getMember();
-		final TextChannel channel = event.getTextChannel();
+		final TextChannel channel = guild.getTextChannelById(event.getMessageChannel().getIdLong());
 		final String argument = event.getOption("title").getAsString();
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();

@@ -254,7 +254,7 @@ public class Processor extends ListenerAdapter {
 			return;
 		}
 		final User user = event.getUser();
-		final String channelID = event.getTextChannel().getId();
+		final String channelID = event.getChannel().getId();
 		final String msgID = event.getMessageId();
 		final Guild guild = event.getGuild();
 		if (ConfigLoader.getReactionMessageConfig(guild, channelID, msgID) != null) {
@@ -271,7 +271,7 @@ public class Processor extends ListenerAdapter {
 			return;
 		}
 		final User user = event.getUser();
-		final String channelID = event.getTextChannel().getId();
+		final String channelID = event.getChannel().getId();
 		final String msgID = event.getMessageId();
 		final Guild guild = event.getGuild();
 		if (ConfigLoader.getReactionMessageConfig(guild, channelID, msgID) != null) {

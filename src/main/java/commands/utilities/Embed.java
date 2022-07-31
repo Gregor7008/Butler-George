@@ -13,9 +13,9 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -36,7 +36,7 @@ public class Embed implements CommandEventHandler {
 	private Member member;
 	private User user;
 	private Guild guild;
-	private TextChannel channel, target;
+	private MessageChannel channel, target;
 	private List<MessageEmbed> embedCache = new ArrayList<>();
 	
 	//TODO /embed rework for stability, reliability and more customizability (For a way to manage images, look at Levelbackground.java#>66)!
@@ -45,9 +45,9 @@ public class Embed implements CommandEventHandler {
 		this.member = event.getMember();
 		this.user = event.getUser();
 		this.guild = event.getGuild();
-		this.channel = event.getTextChannel();
+		this.channel = event.getMessageChannel();
 		if (event.getOption("channel") != null) {
-			this.target = event.getOption("channel").getAsTextChannel();
+			this.target = event.getOption("channel").getAsChannel().asGuildMessageChannel();
 			if (this.target == null) {
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, null, "invalid").convert()).queue();
 				return;
@@ -56,7 +56,7 @@ public class Embed implements CommandEventHandler {
 			this.target = this.channel;
 		}
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setup").convert()).queue();
-		this.startEmbedConfiguration(event.getHook().retrieveOriginal().complete(), new EmbedBuilder());
+		this.startEmbedConfiguration(event.getHook().retrieveOriginal().complete());
 	}
 
 	@Override
@@ -73,8 +73,8 @@ public class Embed implements CommandEventHandler {
 		return null;
 	}
 	
-	private void startEmbedConfiguration(Message message, EmbedBuilder eb) {
-		eb = new EmbedBuilder();
+	private void startEmbedConfiguration(Message message) {
+		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(LanguageEngine.color);
 		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "author").convert())
 			 .setActionRow(Button.secondary("true", Emoji.fromUnicode("\u2705")),
@@ -139,12 +139,10 @@ public class Embed implements CommandEventHandler {
 										url = null;
 									}
 									eb.setTitle(m.getValue("title").getAsString(), url);
-									Toolbox.deleteActionRows(sm.getMessage(), () -> {
-										sm.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "titlesuccess")
-												.replaceDescription("{title}", eb.build().getTitle()).convert()).queue();
-										try {Thread.sleep(1000);} catch (InterruptedException ex) {}
-										this.continueEmbedConfiguration(sm.getMessage(), menu, false);
-									});
+									sm.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "titlesuccess")
+											.replaceDescription("{title}", eb.build().getTitle()).convert()).setActionRows().queue();
+									try {Thread.sleep(1000);} catch (InterruptedException ex) {}
+									this.continueEmbedConfiguration(sm.getMessage(), menu, false, eb);
 								});
 						break;
 					default:

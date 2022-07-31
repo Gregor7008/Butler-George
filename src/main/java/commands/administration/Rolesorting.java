@@ -35,7 +35,7 @@ public class Rolesorting implements CommandEventHandler {
 		oevent = event;
 		guild = event.getGuild();
 		user = event.getUser();
-		channel = event.getTextChannel();
+		channel = guild.getTextChannelById(event.getMessageChannel().getIdLong());
 		this.definegroup();
 	}
 

@@ -39,7 +39,7 @@ public class Channelpermission implements CommandEventHandler {
 		final User user = event.getUser();
 		final Guild guild = event.getGuild();
 		Long ctgid = ConfigLoader.getMemberConfig(guild, user).getLong("customchannelcategory");
-		if (ctgid == 0 || !event.getTextChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
+		if (ctgid == 0 || !event.getGuildChannel().asStandardGuildMessageChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}

@@ -24,7 +24,7 @@ public class Clear implements CommandEventHandler {
 	public void execute(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		TextChannel channel = event.getTextChannel();
+		TextChannel channel = guild.getTextChannelById(event.getMessageChannel().getIdLong());
 		int count = Integer.parseInt(event.getOption("count").getAsString());
 		List<Message> messages = channel.getHistory().retrievePast(count).complete();
 //										.stream().filter(e -> {long duration =  Duration.between(e.getTimeCreated(), OffsetDateTime.now()).toDays();

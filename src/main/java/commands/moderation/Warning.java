@@ -52,7 +52,7 @@ public class Warning implements CommandEventHandler {
 		if (event.getSubcommandName().equals("remove")) {
 			if (this.listwarnings(event)) {
 				event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsel").convert()).queue();
-				TextChannel channel = event.getTextChannel();
+				TextChannel channel = guild.getTextChannelById(event.getMessageChannel().getIdLong());
 				ResponseDetector.waitForMessage(guild, user, channel,
 						e -> {try {
 								  Integer.parseInt(e.getMessage().getContentRaw());

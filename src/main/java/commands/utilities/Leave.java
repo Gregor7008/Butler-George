@@ -29,7 +29,7 @@ public class Leave implements CommandEventHandler {
 		final Guild guild = event.getGuild();
 		GuildChannel channel = event.getGuildChannel();
 		if (event.getOption("channel") != null) {
-			channel = event.getOption("channel").getAsGuildChannel();
+			channel = event.getOption("channel").getAsChannel();
 		}
 		if (guild.getCategoryById(channel.getId()) != null) {
 			Category ctgy = guild.getCategoryById(channel.getId());

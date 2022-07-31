@@ -50,7 +50,7 @@ public class PlayerManager {
 	public void loadAndPlay(SlashCommandInteractionEvent event, String trackURL ) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		TextChannel channel = event.getTextChannel();
+		TextChannel channel = guild.getTextChannelById(event.getMessageChannel().getIdLong());
 		final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
 		this.audioPlayerManager.loadItemOrdered(musicManager, trackURL, new AudioLoadResultHandler() {
 			
