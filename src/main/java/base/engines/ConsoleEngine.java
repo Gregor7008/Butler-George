@@ -27,7 +27,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		INSTANCE = this;
 		System.setOut(new PrintStream(outStream));
 		System.setErr(new PrintStream(errStream));
-		this.print(null, null, "------------------------------------------------------------------------>| Console Engine V1.0 |<------------------------------------------------------------------------", false);
+		this.print(null, null, "----------------------------->| Console Engine V1.0 |<-----------------------------", false);
 		this.checkStreams();
 	}
 	

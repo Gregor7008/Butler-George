@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.json.JSONArray;
 
+import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
-import base.engines.ResponseDetector;
 import base.engines.Toolbox;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
@@ -33,43 +33,41 @@ public class StaticRoles implements ConfigurationEventHandler {
 				Button.secondary("moderationroles", Emoji.fromUnicode("\uD83D\uDC6E")),
 				Button.secondary("supportroles", Emoji.fromUnicode("\uD83D\uDEA8")),
 				Button.secondary("customchannelaccessroles", Emoji.fromUnicode("\uD83D\uDD12"))).queue();
-		ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
+		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
 				b -> {
-					Toolbox.deleteActionRows(b.getMessage(), () -> {
-						String type = b.getComponentId();
-						if (event.getSubOperation().equals("list")) {
-							this.listroles(b, type);
-							return;
-						}
-						if (event.getSubOperation().equals("remove")) {
-							ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type).clear();
-							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess").replaceDescription("{type}", type).convert()).queue();
-							return;
-						}
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles").convert()).queue();
-						ResponseDetector.waitForMessage(guild, user, event.getChannel(),
-								e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
-								e -> {
-									JSONArray ccdefaccessroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type);
-									List<Long> roleIDs = new ArrayList<Long>();
-									e.getMessage().getMentions().getRoles().forEach(r -> roleIDs.add(r.getIdLong()));
-									if (event.getSubOperation().equals("add")) {
-										for (int i = 0; i < roleIDs.size(); i++) {
-											if (!ccdefaccessroles.toList().contains(roleIDs.get(i))) {
-												ccdefaccessroles.put(roleIDs.get(i));
-											}
+					String type = b.getComponentId();
+					if (event.getSubOperation().equals("list")) {
+						this.listroles(b, type);
+						return;
+					}
+					if (event.getSubOperation().equals("remove")) {
+						ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type).clear();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess").replaceDescription("{type}", type).convert()).setActionRows().queue();
+						return;
+					}
+					b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles").convert()).setActionRows().queue();
+					AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
+							e -> {
+								JSONArray ccdefaccessroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type);
+								List<Long> roleIDs = new ArrayList<Long>();
+								e.getMessage().getMentions().getRoles().forEach(r -> roleIDs.add(r.getIdLong()));
+								if (event.getSubOperation().equals("add")) {
+									for (int i = 0; i < roleIDs.size(); i++) {
+										if (!ccdefaccessroles.toList().contains(roleIDs.get(i))) {
+											ccdefaccessroles.put(roleIDs.get(i));
 										}
-										event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess").replaceDescription("{type}", type).convert()).queue();
 									}
-									if (event.getSubOperation().equals("delete")) {
-										for (int i = 0; i < roleIDs.size(); i++) {
-											Toolbox.removeValueFromArray(ccdefaccessroles, roleIDs.get(i));
-										}
-										event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").replaceDescription("{type}", type).convert()).queue();
+									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess").replaceDescription("{type}", type).convert()).queue();
+								}
+								if (event.getSubOperation().equals("delete")) {
+									for (int i = 0; i < roleIDs.size(); i++) {
+										Toolbox.removeValueFromArray(ccdefaccessroles, roleIDs.get(i));
 									}
-								});
-					});
-				});
+									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").replaceDescription("{type}", type).convert()).queue();
+								}
+							}, null).append();
+				}).append();
 	}
 
 	@Override

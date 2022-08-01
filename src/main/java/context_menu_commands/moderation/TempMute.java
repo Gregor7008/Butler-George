@@ -2,9 +2,9 @@ package context_menu_commands.moderation;
 
 import java.util.concurrent.TimeUnit;
 
+import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
-import base.engines.ResponseDetector;
 import context_menu_commands.assets.UserContextEventHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -22,7 +22,7 @@ public class TempMute implements UserContextEventHandler {
 		final User user = event.getUser();
 		final User target = event.getTarget();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defdays").convert()).queue();
-		ResponseDetector.waitForMessage(guild, user, event.getMessageChannel(),
+		AwaitTask.forMessageReceival(guild, user, event.getMessageChannel(),
 				d -> {try {Integer.parseInt(d.getMessage().getContentRaw());
 						 return true;
 				      } catch (NumberFormatException ex) {return false;}},
@@ -31,7 +31,7 @@ public class TempMute implements UserContextEventHandler {
 					  event.getMessageChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
 							 .replaceDescription("{user}", target.getAsMention())
 							 .replaceDescription("{time}", String.valueOf(days)).convert()).queue();
-				});
+				}, null).append();
 	}
 
 	@Override

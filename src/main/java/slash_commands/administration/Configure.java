@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
-import base.engines.ResponseDetector;
 import base.engines.Toolbox;
 import configuration_options.ConfigurationOptionList;
 import configuration_options.assets.ConfigurationEvent;
@@ -48,7 +48,7 @@ public class Configure implements CommandEventHandler {
 		
 		SelectMenu menu = menuBuilder1.build();
 		Message msg = event.replyEmbeds(eb1.build()).addActionRow(menu).complete().retrieveOriginal().complete();
-		ResponseDetector.waitForMenuSelection(guild, user, msg, menu,
+		AwaitTask.forSelectMenuInteraction(guild, user, msg,
 				e -> {ConfigurationOptionData data = operations.get(e.getSelectedOptions().get(0).getValue());
 					  ConfigurationSubOptionData[] subOperations = data.getSubOperations();
 					  if (subOperations != null) {
@@ -59,15 +59,15 @@ public class Configure implements CommandEventHandler {
 								eb2.addField("`" + subOperations[i].getName() + "`", subOperations[i].getInfo(), true);
 						}
 						e.editMessageEmbeds(eb2.build()).setActionRow(buttons).queue();
-						ResponseDetector.waitForButtonClick(guild, user, msg, null,
+						AwaitTask.forButtonInteraction(guild, user, msg,
 								s -> {
 									Toolbox.deleteActionRows(s.getMessage(),
 											() -> {data.getOperationEventHandler().execute(new ConfigurationEvent(event.getMember(), s, subOperations[Integer.valueOf(s.getButton().getId())]));});
-								});
+								}).append();
 					} else {
 						data.getOperationEventHandler().execute(new ConfigurationEvent(event.getMember(), e, null));
 					}
-				});
+				}).addValidComponents(menu.getId()).append();
 	}
 
 	@Override

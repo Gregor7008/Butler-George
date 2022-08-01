@@ -17,6 +17,7 @@ public class ConfigLoader{
 		manager = new ConfigManager(clientIP, databaseName);
 		INSTANCE = this;
 	}
+	
 	//User configs
 	public JSONObject getUserConfig(User user) {
 		return manager.getUserConfig(user);

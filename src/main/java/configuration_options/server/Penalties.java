@@ -4,10 +4,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
-import base.engines.ResponseDetector;
-import base.engines.Toolbox;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
@@ -69,14 +68,14 @@ public class Penalties implements ConfigurationEventHandler {
 		if (response != null) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remlist").replaceDescription("{list}", response)).queue();
 			JSONObject penalties = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("penalties");
-			ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+			AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 					e -> {try {
 							  penalties.getJSONArray(e.getMessage().getContentRaw());
 							  penalties.remove(e.getMessage().getContentRaw());
 							  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").convert()).queue();
 					      } catch (JSONException ex) {
 					    	  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nodelval").convert()).queue();
-					      }});
+					      }}).append();
 		}
 	}
 	
@@ -90,21 +89,20 @@ public class Penalties implements ConfigurationEventHandler {
 				.addOption("Permanent ban", "pb")
 				.build();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add1")).setActionRows(ActionRow.of(menu)).queue();
-		ResponseDetector.waitForMenuSelection(guild, user, event.getMessage(), menu,
+		AwaitTask.forSelectMenuInteraction(guild, user, event.getMessage(),
 				e -> {String plannedpunish = e.getSelectedOptions().get(0).getValue();
-					  this.addpenalties2(plannedpunish, e, event);});
+					  this.addpenalties2(plannedpunish, e, event);})
+		.addValidComponents(menu.getId()).append();;
 	}
 	
 	private void addpenalties2(String plannedpunish, SelectMenuInteractionEvent event, ConfigurationEvent op) {
-		Toolbox.deleteActionRows(event.getMessage(), () -> {
-			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add2").convert()).queue();
-			ResponseDetector.waitForMessage(guild, user, op.getMessage(),
+			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add2").convert()).setActionRows().queue();
+			AwaitTask.forMessageReceival(guild, user, op.getChannel(),
 					e -> {try {
 						      Integer.valueOf(e.getMessage().getContentRaw());
 						      return true;
 						  } catch (NumberFormatException ex) {return false;}},
-					e -> {this.addpenalties3(plannedpunish, e.getMessage().getContentRaw(), op);});
-		});
+					e -> {this.addpenalties3(plannedpunish, e.getMessage().getContentRaw(), op);}, null).append();;
 	}
 	
 	private void addpenalties3(String plannedpunish, String warnings, ConfigurationEvent op) {
@@ -117,20 +115,20 @@ public class Penalties implements ConfigurationEventHandler {
 		switch (plannedpunish) {
 		case "rr":
 			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3role").convert()).queue();
-			ResponseDetector.waitForMessage(guild, user, op.getMessage(),
+			AwaitTask.forMessageReceival(guild, user, op.getChannel(),
 					e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getMentions().getRoles().get(0).getId()));
-						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successrole").convert()).queue();});
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successrole").convert()).queue();}, null).append();
 			break;
 		case "tm":
 			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3time").convert()).queue();
-			ResponseDetector.waitForMessage(guild, user, op.getMessage(),
+			AwaitTask.forMessageReceival(guild, user, op.getChannel(),
 					e -> {try {
 							  Integer.valueOf(e.getMessage().getContentRaw());
 							  return true;
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
-						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempmute").convert()).queue();});
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempmute").convert()).queue();}, null).append();
 			break;
 		case "pm":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));
@@ -142,13 +140,13 @@ public class Penalties implements ConfigurationEventHandler {
 			break;
 		case "tb":
 			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add3time").convert()).queue();
-			ResponseDetector.waitForMessage(guild, user, op.getMessage(),
+			AwaitTask.forMessageReceival(guild, user, op.getChannel(),
 					e -> {try {
 							  Integer.valueOf(e.getMessage().getContentRaw());
 							  return true;
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {penalties.put(warnings, new JSONArray().put(plannedpunish).put(e.getMessage().getContentRaw()));
-						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempban").convert()).queue();});
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successtempban").convert()).queue();}, null).append();
 			break;
 		case "pb":
 			penalties.put(warnings, new JSONArray().put(plannedpunish).put("0"));

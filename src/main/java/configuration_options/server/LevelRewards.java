@@ -3,9 +3,9 @@ package configuration_options.server;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
-import base.engines.ResponseDetector;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
@@ -25,13 +25,13 @@ public class LevelRewards implements ConfigurationEventHandler {
 		JSONObject levelrewards = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("levelrewards");
 		if (event.getSubOperation().equals("add")) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflevel")).queue();
-			ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+			AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 					e -> {try {Integer.parseInt(e.getMessage().getContentRaw());
 							   return true;
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {int neededLevel = Integer.parseInt(e.getMessage().getContentRaw());
 						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defrole").convert()).queue();
-						  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+						  AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 								  r -> {return !r.getMessage().getMentions().getRoles().isEmpty();},
 								  r -> {long roleID = r.getMessage().getMentions().getRoles().get(0).getIdLong();
 								  	    levelrewards.put(String.valueOf(neededLevel), roleID);
@@ -39,12 +39,12 @@ public class LevelRewards implements ConfigurationEventHandler {
 								  	    		.replaceDescription("{role}", guild.getRoleById(roleID).getAsMention())
 								  	    		.replaceDescription("{level}", String.valueOf(neededLevel)).convert()).queue();
 								  	    return;
-								  });
-					});
+								  }, null).append();
+					}, null).append();
 		}
 		if (event.getSubOperation().equals("delete")) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflevel")).queue();
-			ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+			AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 					e -> {try {Integer.parseInt(e.getMessage().getContentRaw());
 							   return true;
 						  } catch (NumberFormatException ex) {return false;}},
@@ -61,7 +61,7 @@ public class LevelRewards implements ConfigurationEventHandler {
 								  .replaceDescription("{level}", String.valueOf(level)).convert()).queue();
 						  levelrewards.remove(String.valueOf(level));
 						  return;
-					});
+					}, null).append();
 		}
 		if (event.getSubOperation().equals("remove")) {
 			levelrewards.clear();

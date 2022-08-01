@@ -3,8 +3,8 @@ package slash_commands.utilities;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
-import base.engines.ResponseDetector;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -46,14 +46,14 @@ public class PingAndMove implements CommandEventHandler {
 				.replaceDescription("{user}", guild.getMember(user).getAsMention()).convert())
 								.addActionRow(Button.secondary("accept", Emoji.fromUnicode("U+2705")),
 											  Button.secondary("deny", Emoji.fromUnicode("U+274C"))).complete();
-		ResponseDetector.waitForButtonClick(guild, user, ih.retrieveOriginal().complete(), null,
+		AwaitTask.forButtonInteraction(guild, user, ih.retrieveOriginal().complete(), null,
 				e -> {if (e.getButton().getId().equals("accept")) {
 						 guild.moveVoiceMember(guild.getMember(user), omember.getVoiceState().getChannel()).queue();
 						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "accepted").convert()).queue();
 						 return;}
 					  if (e.getButton().getId().equals("deny")) {
 						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "denied").convert()).queue();}},
-				() -> {ih.editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "denied").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
+				() -> {ih.editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "denied").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
 	}
 
 	@Override
