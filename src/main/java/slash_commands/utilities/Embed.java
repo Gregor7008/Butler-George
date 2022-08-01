@@ -3,8 +3,8 @@ package slash_commands.utilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import base.engines.Toolbox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -38,7 +38,7 @@ public class Embed implements CommandEventHandler {
 	private MessageChannel channel, target;
 	private List<MessageEmbed> embedCache = new ArrayList<>();
 	
-//	TODO /embed rework for stability, reliability and more customizability (For a way to manage images, look at Levelbackground.java#>66)!
+	//TODO /embed rework for stability, reliability and more customizability (For a way to manage images, look at Levelbackground.java#>66)!
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		this.member = event.getMember();
@@ -78,7 +78,7 @@ public class Embed implements CommandEventHandler {
 		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "author").convert())
 			 .setActionRow(Button.secondary("true", Emoji.fromUnicode("\u2705")),
 					  	   Button.secondary("false", Emoji.fromUnicode("\u274C"))).queue();
-		AwaitTask.forButtonInteraction(guild, user, message,
+		ResponseDetector.waitForButtonClick(guild, user, message, null,
 				e -> {
 					if (Boolean.parseBoolean(e.getButton().getId())) {
 						eb.setAuthor(member.getEffectiveName(), null, member.getEffectiveAvatarUrl());
@@ -95,7 +95,7 @@ public class Embed implements CommandEventHandler {
 							.build();
 					e.deferEdit().queue();
 					this.continueEmbedConfiguration(e.getMessage(), menu, true, eb);
-				}).append();
+				});
 	}
 	
 	private void continueEmbedConfiguration(Message message, SelectMenu menu, boolean firstCall, EmbedBuilder eb) {	
@@ -162,7 +162,7 @@ public class Embed implements CommandEventHandler {
 				.addActionRows(ActionRow.of(titleInput.build()), ActionRow.of(titleURLInput))
 				.build();
 		event.replyModal(modal).queue();
-		AwaitTask.forModalInteraction(guild, user, event.getChannel(),
+		ResponseDetector.waitForModalInput(guild, user, event.getMessage(), modal,
 				m -> {
 					m.deferEdit().queue();
 					String url = m.getValue("titleURL").getAsString();;
@@ -174,6 +174,6 @@ public class Embed implements CommandEventHandler {
 							.replaceDescription("{title}", eb.build().getTitle()).convert()).setActionRows().queue();
 					try {Thread.sleep(1000);} catch (InterruptedException ex) {}
 					this.continueEmbedConfiguration(event.getMessage(), menu, false, eb);
-				}).addValidComponents(modal.getId()).append();
+				});
 	}
 }

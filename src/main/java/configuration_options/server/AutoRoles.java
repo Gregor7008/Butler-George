@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.json.JSONArray;
 
-import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import base.engines.Toolbox;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
@@ -29,43 +29,44 @@ public class AutoRoles implements ConfigurationEventHandler {
 		guild = event.getGuild();
 		user = event.getUser();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selacc"))
-				.setActionRow(Button.secondary("user", Emoji.fromUnicode("\uD83D\uDEB9")),
-							  Button.secondary("bot", Emoji.fromUnicode("\uD83E\uDD16"))).queue();
-		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
-				b -> {
-					String selection = b.getComponentId();
-					if (event.getSubOperation().equals("list")) {
-						this.listroles(b, selection);
-						return;
-					}
-					if (event.getSubOperation().equals("remove")) {
-						ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(selection + "autoroles").clear();
-						event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
-						return;
-					}
-					b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles").convert()).setActionRows().queue();
-					AwaitTask.forMessageReceival(guild, user, event.getChannel(),
-							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
-							e -> {
-								JSONArray autoroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(selection + "autoroles");
-								List<Long> roleIDs = new ArrayList<Long>();
-								e.getMessage().getMentions().getRoles().forEach(r -> roleIDs.add(r.getIdLong()));
-								if (event.getSubOperation().equals("add")) {
-									for (int i = 0; i < roleIDs.size(); i++) {
-										if (!autoroles.toList().contains(roleIDs.get(i))) {
-											autoroles.put(roleIDs.get(i));
-										}
-									}
-									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "addsuccess").convert()).queue();
-								}
-								if (event.getSubOperation().equals("delete")) {
-									for (int i = 0; i < roleIDs.size(); i++) {
-										Toolbox.removeValueFromArray(autoroles, roleIDs.get(i));
-									}
-									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "delsuccess").convert()).queue();
-								}
-							}, null).append();
-				}).append();
+						  .setActionRow(Button.secondary("user", Emoji.fromUnicode("\uD83D\uDEB9")),
+								  	    Button.secondary("bot", Emoji.fromUnicode("\uD83E\uDD16"))).queue();
+		ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
+				b -> {String selection = b.getComponentId();
+					  Toolbox.deleteActionRows(b.getMessage(),
+							  () -> {
+								  if (event.getSubOperation().equals("list")) {
+									  this.listroles(b, selection);
+									  return;
+								  }
+								  if (event.getSubOperation().equals("remove")) {
+									  ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(selection + "autoroles").clear();
+									  event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
+									  return;
+								  }
+								  b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles").convert()).queue();
+								  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
+										  e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
+										  e -> {JSONArray autoroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(selection + "autoroles");
+										  	    List<Long> roleIDs = new ArrayList<Long>();
+										  	    e.getMessage().getMentions().getRoles().forEach(r -> roleIDs.add(r.getIdLong()));
+										  	    if (event.getSubOperation().equals("add")) {
+										  	    	for (int i = 0; i < roleIDs.size(); i++) {
+										  	    		if (!autoroles.toList().contains(roleIDs.get(i))) {
+										  	    			autoroles.put(roleIDs.get(i));
+										  	    		}
+										  	    	}
+										  	    	event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "addsuccess").convert()).queue();
+										  	    }
+										  	    if (event.getSubOperation().equals("delete")) {
+										  	    	for (int i = 0; i < roleIDs.size(); i++) {
+										  	    		Toolbox.removeValueFromArray(autoroles, roleIDs.get(i));
+										  	    	}
+										  	    	event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "delsuccess").convert()).queue();
+										  	    }
+										  });
+							  });
+				});
 	}
 
 	@Override

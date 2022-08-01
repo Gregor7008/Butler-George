@@ -2,6 +2,7 @@ package base.engines;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,7 +17,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.lang.NonNull;
 
-import base.Bot;
 import base.GUI;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -51,7 +51,7 @@ public class ConfigManager {
 			 database.createCollection("guild");
 			 guildconfigs = database.getCollection("guild");
 		}
-		Bot.INSTANCE.centralTimer.schedule(new TimerTask() {
+		new Timer().schedule(new TimerTask() {
 			private int executions = 0;
 			@Override
 			public void run() {

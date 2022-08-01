@@ -32,12 +32,12 @@ public class Bot {
 	public static String ID = "853887837823959041";
 	public static String HOME = "708381749826289666";
 	public JDA jda;
-	public 	Timer centralTimer = new Timer();
+	public Timer centralTimer;
 	public boolean noErrorOccured = true;
 	
 	public Bot(String token, String databaseIP, String databaseName) throws LoginException, InterruptedException, IOException {
 		INSTANCE = this;
-		new ConfigLoader(databaseIP, databaseName);
+	    //Create Bot
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(new EventProcessor(), new EventAwaiter());
 		builder.setRawEventsEnabled(true);
@@ -46,11 +46,13 @@ public class Bot {
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing(VERSION));
+	    GUI.INSTANCE.setBotRunning(true);
 	    this.startup(databaseIP, databaseName);
 	}
 	
 	public void startup(String databaseIP, String databaseName) {
-		GUI.INSTANCE.setBotRunning(true);
+		centralTimer = new Timer();
+		new ConfigLoader(databaseIP, databaseName);
 		Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.INSTANCE);
 	    new ConfigVerifier();
 	    new ModController();

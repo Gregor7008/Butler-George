@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import base.engines.Toolbox;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
@@ -37,7 +37,7 @@ public class Join2CreateChannels implements ConfigurationEventHandler {
 			return;
 		}
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannels")).queue();
-		AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 				e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
 						  List<GuildChannel> channels = e.getMessage().getMentions().getChannels();
 			  			  boolean noInvalidChannelFound = true;
@@ -56,7 +56,7 @@ public class Join2CreateChannels implements ConfigurationEventHandler {
 						 event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").convert()).queue();
 						 return;
 					  }
-				}, null).append();
+				});
 	}
 
 	@Override
@@ -99,10 +99,10 @@ public class Join2CreateChannels implements ConfigurationEventHandler {
 		final User user = event.getUser();
 		GuildChannel channel = channels.get(progress);
 		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defname").replaceDescription("{channel}", "**" + channel.getName() + "**").convert()).queue();
-		AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 				n -> {String name = n.getMessage().getContentDisplay();
 					  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflimit").replaceDescription("{channel}", "**" + channel.getName() + "**").convert()).queue();
-					  AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+					  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 							  l -> {try {Integer.parseInt(l.getMessage().getContentRaw());
 								  	     return true;
 							  	    } catch (NumberFormatException ex) {
@@ -113,7 +113,7 @@ public class Join2CreateChannels implements ConfigurationEventHandler {
 								  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defconfigurable").replaceDescription("{channel}", "**" + channel.getName() + "**").convert()).setActionRow(
 										  Button.secondary("true", Emoji.fromUnicode("\u2705")),
 										  Button.secondary("false", Emoji.fromUnicode("\u274C"))).queue();
-								  AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
+								  ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
 										  e -> {
 											  Toolbox.deleteActionRows(e.getMessage(), () -> {
 												  ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("join2createchannels")
@@ -132,8 +132,8 @@ public class Join2CreateChannels implements ConfigurationEventHandler {
 													  }
 												  }
 											  });
-										  }).append();
-							  }, null).append();
-				}).append();
+										  });
+							  });
+				});
 	}
 }

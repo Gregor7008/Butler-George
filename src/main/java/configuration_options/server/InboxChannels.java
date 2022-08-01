@@ -1,8 +1,8 @@
 package configuration_options.server;
 
-import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import base.engines.Toolbox;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
@@ -23,13 +23,13 @@ public class InboxChannels implements ConfigurationEventHandler {
 						  .setActionRow(Button.secondary("community", Emoji.fromUnicode("\uD83C\uDF89")),
 								  	    Button.secondary("suggestion", Emoji.fromUnicode("\uD83D\uDCA1")),
 								  	    Button.secondary("moderation", Emoji.fromUnicode("\uD83D\uDC6E"))).queue();
-		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
+		ResponseDetector.waitForButtonClick(guild, user, event.getMessage(), null,
 				b -> {final String selection = b.getComponentId();
 					  Toolbox.deleteActionRows(b.getMessage(),
 							 ()  -> {
 								 if (event.getSubOperation().equals("set")) {
 									  b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel").replaceDescription("{selection}", selection).convert()).queue();
-									  AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+									  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 											  e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
 												  		return guild.getTextChannelById(e.getMessage().getMentions().getChannels().get(0).getIdLong()) != null;
 												  	} else {return false;}
@@ -42,14 +42,14 @@ public class InboxChannels implements ConfigurationEventHandler {
 														  .replaceDescription("{channel}", guild.getTextChannelById(id).getAsMention()).convert()).queue();
 												  e.getMessage().delete().queue();
 												  return;
-											  },null).append();
+											  });
 								  }
 								  if (event.getSubOperation().equals("clear")) {
 									  ConfigLoader.INSTANCE.getGuildConfig(guild).put("communityinbox", 0L);
 									  b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "clearsuccess").replaceDescription("{selection}", selection).convert()).queue();
 								  }
 							 });
-				}).append();
+				});
 	}
 
 	@Override

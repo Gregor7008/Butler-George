@@ -3,9 +3,9 @@ package slash_commands.utilities;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import base.engines.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -36,7 +36,7 @@ public class Language implements CommandEventHandler {
 		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "chooselang").convert())
 				.addActionRow(menu)
 				.complete();
-		AwaitTask.forSelectMenuInteraction(guild, user, reply.retrieveOriginal().complete(), null,
+		ResponseDetector.waitForMenuSelection(guild, user, reply.retrieveOriginal().complete(), menu,
 				e -> {e.editSelectMenu(menu.asDisabled()).queue();
 					  switch (e.getSelectedOptions().get(0).getValue()) {
 				      	case "en":
@@ -64,8 +64,7 @@ public class Language implements CommandEventHandler {
 						}
 					},
 				() -> {Toolbox.disableActionRows(reply.retrieveOriginal().complete());
-					   event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));})
-		.addValidComponents(menu.getId()).append();
+					   event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	@Override

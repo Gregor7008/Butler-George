@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -54,32 +54,32 @@ public class Rolesorting implements CommandEventHandler {
 
 	private void definegroup() {
 		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definegroup").convert()).complete());
-		AwaitTask.forMessageReceival(guild, user, channel, null,
+		ResponseDetector.waitForMessage(guild, user, channel,
 				e -> {messages.add(e.getMessage());
 				      grouprole = e.getMessage().getMentions().getRoles().get(0);
 				      this.definesub();},
 			   () -> {this.cleanup();
-				   	  channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
+				   	  channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void definesub() {
 		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definesub").convert()).complete());
-		AwaitTask.forMessageReceival(guild, user, channel, null,
+		ResponseDetector.waitForMessage(guild, user, channel,
 							e -> {messages.add(e.getMessage());
 								  subroles = e.getMessage().getMentions().getRoles();
 								  this.definemember();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 
 	private void definemember() {
 		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definemember").convert()).complete());
-		AwaitTask.forMessageReceival(guild, user, channel, null,
+		ResponseDetector.waitForMessage(guild, user, channel,
 							e -> {messages.add(e.getMessage());
 								  members = e.getMessage().getMentions().getMembers();
 								  this.rolesorter();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
+								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));});
 	}
 	
 	private void rolesorter() {

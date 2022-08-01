@@ -1,13 +1,16 @@
 package base.assets;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import base.Bot;
 import base.engines.EventAwaiter;
@@ -17,135 +20,99 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 
 public class AwaitTask<T extends GenericEvent> {
 	
-	public AwaitedEvent awaitedEvent;
-	
 	private Guild guild;
 	private User user;
-	private Message message;
+	private Message message = null;
 	private MessageChannel channel;
-	
-	private Predicate<T> additionalPredicate;
-	private Consumer<T> eventConsumer;
-	private Runnable timeoutRunnable;
-	private List<String> componentIds;
-	
+	private Predicate<T> additionalPredicate = null;
+	private Consumer<T> onSuccess = null;
+	private Runnable onTimeout = null;
+	private List<String> componentIds = null;
 	private boolean invalidInputReceived = false;
+	private long timeoutDelay = 1;
+	private TimeUnit timeoutDelayUnit = TimeUnit.MINUTES;
 	private TimerTask timeoutTask = null;
-	private long selfId = 0L;
+	private long selfId = ThreadLocalRandom.current().nextLong(100000, 999999);
+	private HashMap<Long, AwaitTask<T>> selfMap = null;
 	
-	public static AwaitTask<MessageReceivedEvent> forMessageReceival(Guild guild, User user, MessageChannel channel, Consumer<MessageReceivedEvent> onSuccess) {
-		return AwaitTask.forMessageReceival(guild, user, channel, null, onSuccess, null);
-	}
 	
-	public static AwaitTask<MessageReceivedEvent> forMessageReceival(Guild guild, User user, MessageChannel channel,
-			@Nullable Predicate<MessageReceivedEvent> additionalPredicate, Consumer<MessageReceivedEvent> onSuccess, @Nullable Runnable onTimeout) {
-		return new AwaitTask<MessageReceivedEvent>(AwaitedEvent.MESSAGE_RECEIVED_EVENT, guild, user, channel, additionalPredicate, onSuccess, onTimeout);
-	}
-	
-	public static AwaitTask<MessageReactionAddEvent> forReactionAdding(Guild guild, User user, Message message, Consumer<MessageReactionAddEvent> onSuccess) {
-		return AwaitTask.forReactionAdding(guild, user, message, null, onSuccess, null);
-	}
-
-	public static AwaitTask<MessageReactionAddEvent> forReactionAdding(Guild guild, User user, Message message,
-			@Nullable Predicate<MessageReactionAddEvent> additionalPredicate, Consumer<MessageReactionAddEvent> onSuccess, @Nullable Runnable onTimeout) {
-		return new AwaitTask<MessageReactionAddEvent>(AwaitedEvent.MESSAGE_REACTION_ADD_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
-		
-	}
-	
-	public static AwaitTask<MessageReactionRemoveEvent> forReactionRemoval(Guild guild, User user, Message message, Consumer<MessageReactionRemoveEvent> onSuccess) {
-		return AwaitTask.forReactionRemoval(guild, user, message, null, onSuccess, null);
-	}
-	
-	public static AwaitTask<MessageReactionRemoveEvent> forReactionRemoval(Guild guild, User user, Message message,
-			@Nullable Predicate<MessageReactionRemoveEvent> additionalPredicate, Consumer<MessageReactionRemoveEvent> onSuccess, @Nullable Runnable onTimeout) {
-		return new AwaitTask<MessageReactionRemoveEvent>(AwaitedEvent.MESSAGE_REACTION_REMOVE_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
-		
-	}
-	
-	public static AwaitTask<ButtonInteractionEvent> forButtonInteraction(Guild guild, User user, Message message, Consumer<ButtonInteractionEvent> onSuccess) {
-		return AwaitTask.forButtonInteraction(guild, user, message, null, onSuccess, null);
-	}
-	
-	public static AwaitTask<ButtonInteractionEvent> forButtonInteraction(Guild guild, User user, Message message,
-			@Nullable Predicate<ButtonInteractionEvent> additionalPredicate, Consumer<ButtonInteractionEvent> onSuccess, @Nullable Runnable onTimeout) {
-		return new AwaitTask<ButtonInteractionEvent>(AwaitedEvent.BUTTON_INTERACTION_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
-		
-	}
-	
-	public static AwaitTask<SelectMenuInteractionEvent> forSelectMenuInteraction(Guild guild, User user, Message message, Consumer<SelectMenuInteractionEvent> onSuccess) {
-		return AwaitTask.forSelectMenuInteraction(guild, user, message, null, onSuccess, null);
-	}
-	
-	public static AwaitTask<SelectMenuInteractionEvent> forSelectMenuInteraction(Guild guild, User user, Message message,
-			@Nullable Predicate<SelectMenuInteractionEvent> additionalPredicate, Consumer<SelectMenuInteractionEvent> onSuccess, @Nullable Runnable onTimeout) {
-		return new AwaitTask<SelectMenuInteractionEvent>(AwaitedEvent.SELECT_MENU_INTERACTION_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
-		
-	}
-	
-	public static AwaitTask<ModalInteractionEvent> forModalInteraction(Guild guild, User user, MessageChannel channel, Consumer<ModalInteractionEvent> onSuccess) {
-		return AwaitTask.forModalInteraction(guild, user, channel, null, onSuccess, null);
-	}
-	
-	public static AwaitTask<ModalInteractionEvent> forModalInteraction(Guild guild, User user, MessageChannel channel,
-			@Nullable Predicate<ModalInteractionEvent> additionalPredicate, Consumer<ModalInteractionEvent> onSuccess, @Nullable Runnable onTimeout) {
-		return new AwaitTask<ModalInteractionEvent>(AwaitedEvent.MODAL_INTERACTION_EVENT, guild, user, channel, additionalPredicate, onSuccess, onTimeout);
-		
-	}
-	
-	protected AwaitTask(AwaitedEvent awaitedEvent, Guild guild, User user, Message message,
-			@Nullable Predicate<T> additionalPredicate, Consumer<T> onSuccess, @Nullable Runnable onTimeout) {
-		this.awaitedEvent = awaitedEvent;
+	public AwaitTask(Guild guild, User user, Message message,
+			Predicate<T> additionalPredicate, Consumer<T> onSuccess, long timeoutDelay, TimeUnit timeoutDelayUnit, Runnable onTimeout) {
 		this.guild = guild;
 		this.user = user;
 		this.message = message;
 		this.channel = message.getChannel();
 		this.additionalPredicate = additionalPredicate;
-		this.eventConsumer = onSuccess;
-		this.timeoutRunnable = onTimeout;
+		this.onSuccess = onSuccess;
+		this.timeoutDelay = timeoutDelay;
+		this.timeoutDelayUnit = timeoutDelayUnit;
+		this.onTimeout = onTimeout;
 	}
 	
-	protected AwaitTask(AwaitedEvent awaitedEvent, Guild guild, User user, MessageChannel channel,
-			@Nullable Predicate<T> additionalPredicate, Consumer<T> onSuccess, @Nullable Runnable onTimeout) {
-		this.awaitedEvent = awaitedEvent;
+	public AwaitTask(Guild guild, User user, Message message,
+			Predicate<T> additionalPredicate, Consumer<T> onSuccess) {
 		this.guild = guild;
 		this.user = user;
-		this.message = null;
+		this.message = message;
+		this.channel = message.getChannel();
+		this.additionalPredicate = additionalPredicate;
+		this.onSuccess = onSuccess;
+	}
+
+	public AwaitTask(Guild guild, User user, Message message,
+			Consumer<T> onSuccess) {
+		this.guild = guild;
+		this.user = user;
+		this.message = message;
+		this.channel = message.getChannel();
+		this.onSuccess = onSuccess;
+	}
+	
+	public AwaitTask(Guild guild, User user, MessageChannel channel,
+			Predicate<T> additionalPredicate, Consumer<T> onSuccess, long timeoutDelay, TimeUnit timeoutDelayUnit, Runnable onTimeout) {
+		this.guild = guild;
+		this.user = user;
 		this.channel = channel;
 		this.additionalPredicate = additionalPredicate;
-		this.eventConsumer = onSuccess;
-		this.timeoutRunnable = onTimeout;
+		this.onSuccess = onSuccess;
+		this.timeoutDelay = timeoutDelay;
+		this.timeoutDelayUnit = timeoutDelayUnit;
+		this.onTimeout = onTimeout;
 	}
 	
-	public AwaitTask<T> addValidComponents(String ... componentIds) {
-		if (componentIds.length > 0 && this.componentIds == null) {
-			this.componentIds = new ArrayList<>();
-		} else {
-			this.componentIds = null;
-		}
-		for (String id : componentIds) {
-			this.componentIds.add(id);
-		}
-		return this;
+	public AwaitTask(Guild guild, User user, MessageChannel channel,
+			Predicate<T> additionalPredicate, Consumer<T> onSuccess) {
+		this.guild = guild;
+		this.user = user;
+		this.channel = channel;
+		this.additionalPredicate = additionalPredicate;
+		this.onSuccess = onSuccess;
 	}
-	
+
+	public AwaitTask(Guild guild, User user, MessageChannel channel,
+			Consumer<T> onSuccess) {
+		this.guild = guild;
+		this.user = user;
+		this.channel = channel;
+		this.onSuccess = onSuccess;
+	}
+
+	@SuppressWarnings("unchecked")
 	public void append() {
-		AwaitTask<T> self = this;
-		EventAwaiter.INSTANCE.appendTask(self);
-		this.timeoutTask = new TimerTask() {
+		this.selfMap = (HashMap<Long, AwaitTask<T>>) EventAwaiter.INSTANCE.getMapOfType(this.getType());
+		while (selfMap.containsKey(selfId)) {
+			selfId = ThreadLocalRandom.current().nextLong(100000, 999999);
+		}
+		selfMap.put(selfId, this);
+		timeoutTask = new TimerTask() {
 			@Override
 			public void run() {
-				EventAwaiter.INSTANCE.removeTask(self);
-				if (timeoutRunnable != null) {
-					timeoutRunnable.run();
+				selfMap.remove(selfId);
+				if (onTimeout != null) {
+					onTimeout.run();
 				} else {
 					String keyword = "timeout";
 					if (invalidInputReceived) {
@@ -159,27 +126,41 @@ public class AwaitTask<T extends GenericEvent> {
 				}
 			}
 		};
-		Bot.INSTANCE.centralTimer.schedule(timeoutTask, TimeUnit.MINUTES.toMillis(1));
+		Bot.INSTANCE.centralTimer.schedule(timeoutTask, timeoutDelayUnit.toMillis(timeoutDelay));
 	}
 	
-	public void complete(T event) {
-		if (this.additionalPredicate != null) {
-			if (this.additionalPredicate.test(event)) {
-				return;
-			} else {
-				this.invalidInputReceived = true;
-				return;
-			}
-		} else {
-			this.timeoutTask.cancel();
-			this.eventConsumer.accept(event);
-		}
-	}	
+	public AwaitTask<T> setInvalidInputReceived(boolean value) {
+		this.invalidInputReceived = value;
+		return this;
+	}
 	
+	public AwaitTask<T> addComponentId(String ... ids) {
+		if (ids.length > 0 && this.componentIds == null) {
+			this.componentIds = new ArrayList<>();
+		}
+		for (String id : ids) {
+			this.componentIds.add(id);
+		}
+		return this;
+	}
+	
+	public void acceptSuccessConsumer(T event) {
+		selfMap.remove(selfId);
+		onSuccess.accept(event);
+	}
+	
+	public String getType() {
+        ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
+        String[] raw = genericSuperclass.getActualTypeArguments()[0].getTypeName().split("\\.");
+        return raw[raw.length-1];
+    }
+	
+	@NotNull
 	public Guild getGuild() {
 		return this.guild;
 	}
 	
+	@NotNull
 	public User getUser() {
 		return this.user;
 	}
@@ -188,24 +169,30 @@ public class AwaitTask<T extends GenericEvent> {
 		return this.message;
 	}
 	
+	@NotNull
 	public MessageChannel getChannel() {
 		return this.channel;
 	}
 	
+	public Predicate<T> getAdditionalPredicate() {
+		return this.additionalPredicate;
+	}
+	
 	public List<String> getComponentIds() {
-		return componentIds;
+		return this.componentIds;
 	}
 	
-	public long getId() {
+	@NotNull
+	public boolean getInvalidInputReceived() {
+		return this.invalidInputReceived;
+	}
+	
+	public TimerTask getTimeoutTask() {
+		return this.timeoutTask;
+	}
+	
+	@NotNull
+	public long getSelfId() {
 		return this.selfId;
-	}
-	
-	public static enum AwaitedEvent {
-		MESSAGE_RECEIVED_EVENT,
-		MESSAGE_REACTION_ADD_EVENT,
-		MESSAGE_REACTION_REMOVE_EVENT,
-		BUTTON_INTERACTION_EVENT,
-		SELECT_MENU_INTERACTION_EVENT,
-		MODAL_INTERACTION_EVENT;
 	}
 }

@@ -6,9 +6,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
-import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
@@ -34,11 +34,11 @@ public class ReactionRoles implements ConfigurationEventHandler {
 		this.guild = event.getGuild();
 		this.user = event.getUser();
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel")).queue();
-		AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+		ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 				e -> {return !e.getMessage().getMentions().getChannels().isEmpty();},
 				e -> {this.chid = e.getMessage().getMentions().getChannels().get(0).getId();
 					  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defmessage").convert()).queue();
-					  AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+					  ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 							  m -> {return guild.getTextChannelById(chid).retrieveMessageById(e.getMessage().getContentRaw()).complete() != null;},
 							  m -> {this.msgid = e.getMessage().getContentRaw();
 							  	    if (event.getSubOperation().equals("add")) {
@@ -54,17 +54,16 @@ public class ReactionRoles implements ConfigurationEventHandler {
 							  	    }
 							  	    if (event.getSubOperation().equals("delete")) {
 							  	    	event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineDelEmoji").convert()).queue();
-							  	    	AwaitTask.forReactionAdding(guild, user, message,
+							  	    	ResponseDetector.waitForReaction(guild, user, message,
 							  	    			r -> {event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
 							  	    					.replaceDescription("{emoji}", r.getReaction().getEmoji().getFormatted()).convert()).queue(a -> a.delete().queueAfter(3, TimeUnit.SECONDS));
 							  	    				  JSONObject actions = ConfigLoader.INSTANCE.getReactionMessageConfig(guild, chid, msgid);
 							  	    				  actions.remove(r.getReaction().getEmoji().getAsReactionCode());
-							  	    				  guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions(r.getReaction().getEmoji()).queue();
-							  	    				  }).append();
+							  	    				  guild.getTextChannelById(chid).retrieveMessageById(msgid).complete().clearReactions(r.getReaction().getEmoji()).queue();});
 							  	    	return;
 							  	    }
-							  }, null).append();
-				}, null).append();
+							  });
+				});
 	}
 
 	@Override
@@ -82,16 +81,16 @@ public class ReactionRoles implements ConfigurationEventHandler {
 
 	private void defineAddRoles() {
 		ConfigLoader.INSTANCE.createReactionMessageConfig(guild, chid, msgid);
-		AwaitTask.forMessageReceival(guild, user, message.getChannel(),
+		ResponseDetector.waitForMessage(guild, user, message.getChannel(),
 							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 							e -> {List<Role> roles = e.getMessage().getMentions().getRoles();
-								  this.defineAddEmojis(roles);}, null).append();
+								  this.defineAddEmojis(roles);});
 	}
 	
 	private void defineAddEmojis(List<Role> roles) {
 		Role role = roles.get(progress);
 		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddEmojis").replaceDescription("{role}", role.getAsMention()).convert()).queue();
-		AwaitTask.forReactionAdding(guild, user, message,
+		ResponseDetector.waitForReaction(guild, user, message,
 				e -> {ConfigLoader.INSTANCE.getReactionMessageConfig(guild, chid, msgid).put(e.getReaction().getEmoji().getAsReactionCode(), role.getId());
 					  progress++;
 					  if (progress < roles.size()) {
@@ -99,7 +98,7 @@ public class ReactionRoles implements ConfigurationEventHandler {
 						  this.defineAddEmojis(roles);
 					  } else {
 						  this.addReactions();
-					  }}).append();		
+					  }});		
 	}
 	
 	private void addReactions() {

@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.json.JSONArray;
 
-import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -53,7 +53,7 @@ public class Warning implements CommandEventHandler {
 			if (this.listwarnings(event)) {
 				event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsel").convert()).queue();
 				TextChannel channel = guild.getTextChannelById(event.getMessageChannel().getIdLong());
-				AwaitTask.forMessageReceival(guild, user, channel,
+				ResponseDetector.waitForMessage(guild, user, channel,
 						e -> {try {
 								  Integer.parseInt(e.getMessage().getContentRaw());
 								  return true;
@@ -63,7 +63,7 @@ public class Warning implements CommandEventHandler {
 							  channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
 									  .replaceDescription("{warning}", "`" + warnings.getString(w-1) + "`")
 									  .replaceDescription("{user}", guild.getMember(iuser).getEffectiveName()).convert()).queue();
-							  warnings.remove(w-1);}, null).append();
+							  warnings.remove(w-1);});
 			}
 		}
 		ModController.RUN.guildPenaltyCheck(guild);

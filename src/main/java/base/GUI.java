@@ -28,11 +28,10 @@ import javax.swing.table.DefaultTableModel;
 import base.engines.ConsoleEngine;
 import net.miginfocom.swing.MigLayout;
 
-public class GUI extends JFrame implements WindowListener, FocusListener {
+public class GUI extends JFrame implements WindowListener, FocusListener{
 	
 	public static GUI INSTANCE;
 	private static final long serialVersionUID = 5923282583431103590L;
-	private TimerTask runtimeMeasuringTask;
 	
 	public JTextArea console = new JTextArea();
 	public JLabel greenLED = new JLabel();
@@ -53,6 +52,19 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 	public ImageIcon greenLEDOff;
 	public ImageIcon redLEDOn;
 	public ImageIcon redLEDOff;
+	
+	private OffsetDateTime startTime = null;
+	private TimerTask runtimeMeasuringTask = new TimerTask() {
+		@Override
+		public void run() {
+			Duration diff = Duration.between(startTime, OffsetDateTime.now());
+			GUI.INSTANCE.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
+					diff.toDays(),
+                    diff.toHours(), 
+                    diff.toMinutesPart(), 
+                    diff.toSecondsPart()));
+		}
+	};
 	
 	public static void main(String[] args) {
 		try {
@@ -129,14 +141,14 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		
 		startButton.addActionListener(e -> {
 			if (Bot.INSTANCE == null) {
-				try {
-					new Bot(token.getText(), databaseIP.getText(), databaseName.getText());
-				} catch (LoginException | InterruptedException | IOException e1) {
-					ConsoleEngine.INSTANCE.error(Bot.INSTANCE, "Bot instanciation failed - Check token validity!");
-				} catch (IllegalArgumentException e2) {
-					ConsoleEngine.INSTANCE.error(this, "Bot instanciation failed - Check database configuration!");
-				}
-		}
+					try {
+						new Bot(token.getText(), databaseIP.getText(), databaseName.getText());
+					} catch (LoginException | InterruptedException | IOException e1) {
+						ConsoleEngine.INSTANCE.error(Bot.INSTANCE, "Bot instanciation failed - Check token validity!");
+					} catch (IllegalArgumentException e2) {
+						ConsoleEngine.INSTANCE.error(this, "Bot instanciation failed - Check database configuration!");
+					}
+			}
 		});
 		getContentPane().add(startButton, "flowx,cell 1 2,growx,aligny center");
 		
@@ -255,18 +267,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 	}
 	
 	public void startRuntimeMeasuring() {
-		OffsetDateTime startTime = OffsetDateTime.now();
-		runtimeMeasuringTask = new TimerTask() {
-			@Override
-			public void run() {
-				Duration diff = Duration.between(startTime, OffsetDateTime.now());
-				GUI.INSTANCE.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
-						diff.toDays(),
-	                    diff.toHours(), 
-	                    diff.toMinutesPart(), 
-	                    diff.toSecondsPart()));
-			}
-		};
+		startTime = OffsetDateTime.now();
 		Bot.INSTANCE.centralTimer.schedule(runtimeMeasuringTask, 0, 1000);
 	}
 	

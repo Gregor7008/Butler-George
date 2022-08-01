@@ -7,9 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 
-import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
@@ -64,14 +64,13 @@ public class Channelpermission implements CommandEventHandler {
 		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selperm").convert())
 				.addActionRow(menu)
 				.complete();
-		AwaitTask.forSelectMenuInteraction(guild, user, reply.retrieveOriginal().complete(), null,
+		ResponseDetector.waitForMenuSelection(guild, user, reply.retrieveOriginal().complete(), menu,
 				e -> {if (event.getSubcommandName().equals("grant")) {
 						  this.defineEdit(e.getSelectedOptions().get(0).getValue(), event, e, true);
 					  } else {
 						  this.defineEdit(e.getSelectedOptions().get(0).getValue(), event, e, false);
 					  }},
-				() -> {event.getHook().editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));})
-		.addValidComponents(menu.getId()).append();	
+				() -> {event.getHook().editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));});	
 	}
 	
 	@Override

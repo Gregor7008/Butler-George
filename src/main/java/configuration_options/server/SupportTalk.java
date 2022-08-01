@@ -1,8 +1,8 @@
 package configuration_options.server;
 
-import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.ResponseDetector;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
@@ -19,7 +19,7 @@ public class SupportTalk implements ConfigurationEventHandler {
 		User user = event.getUser();
 		if (event.getSubOperation().equals("set")) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel")).queue();
-			AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+			ResponseDetector.waitForMessage(guild, user, event.getChannel(),
 					e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
 						 	 return e.getMessage().getMentions().getChannels().get(0).getType().isAudio();
 					} else {return false;}}, 
@@ -28,7 +28,7 @@ public class SupportTalk implements ConfigurationEventHandler {
 						ConfigLoader.INSTANCE.getGuildConfig(guild).put("supporttalk", channel.getIdLong());
 						event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess").replaceDescription("{channel}", channel.getAsMention()).convert()).queue();
 						return;
-					}, null).append();
+					});
 		}
 		if (event.getSubOperation().equals("clear")) {
 			ConfigLoader.INSTANCE.getGuildConfig(guild).put("supporttalk", 0L);

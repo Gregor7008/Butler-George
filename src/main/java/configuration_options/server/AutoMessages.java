@@ -15,6 +15,8 @@ import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class AutoMessages implements ConfigurationEventHandler {
@@ -26,7 +28,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
 				Button.secondary("welcome", Emoji.fromUnicode("\uD83C\uDF89")),
 				Button.secondary("goodbye", Emoji.fromUnicode("\uD83D\uDC4B"))).queue();
-		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
+		new AwaitTask<ButtonInteractionEvent>(guild, user, event.getMessage(),
 				b -> {
 					String type = b.getComponentId();
 					JSONArray goodbyemsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type + "msg");
@@ -36,17 +38,17 @@ public class AutoMessages implements ConfigurationEventHandler {
 					} catch (JSONException e) {}
 					if (event.getSubOperation().equals("set")) {
 						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setrequest").replaceDescription("{type}", type).convert()).queue();
-						AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+						new AwaitTask<MessageReceivedEvent>(guild, user, event.getChannel(),
 								e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
 							  			  return guild.getTextChannelById(e.getMessage().getMentions().getChannels().get(0).getIdLong()) != null;
 							  		  } else {return false;}},
 								e -> {goodbyemsg.put(1, e.getMessage().getMentions().getChannels().get(0).getIdLong());
 									  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "def" + type + "msg").convert()).queue();
-									  AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+									  new AwaitTask<MessageReceivedEvent>(guild, user, event.getChannel(),
 											  a -> {goodbyemsg.put(0, a.getMessage().getContentRaw()).put(2, true);
 											  	    event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, type + "success").convert()).queue();
 											  }).append();
-								}, null).append();
+								}).append();
 						return;
 					}
 					if (!defined) {
