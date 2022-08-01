@@ -50,6 +50,11 @@ public class Bot {
 	}
 	
 	public void startup(String databaseIP, String databaseName) {
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			if (INSTANCE != null && this.jda != null) {
+				this.shutdown(true);
+			}
+		}));
 		GUI.INSTANCE.setBotRunning(true);
 		Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.INSTANCE);
 	    new ConfigVerifier();
@@ -79,6 +84,7 @@ public class Bot {
     			ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").put(0, msgid).put(1, chid);
     		}
     	}
+		this.centralTimer.cancel();
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
 		GUI.INSTANCE.setBotRunning(false);

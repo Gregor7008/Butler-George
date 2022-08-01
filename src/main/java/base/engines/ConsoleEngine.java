@@ -128,6 +128,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 				break;
 			case "exit":
 				jda.shutdown();
+				Bot.INSTANCE.jda = null;
 				System.exit(0);
 				break;
 			case "warn":

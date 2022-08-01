@@ -53,6 +53,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 	public ImageIcon greenLEDOff;
 	public ImageIcon redLEDOn;
 	public ImageIcon redLEDOff;
+	public ImageIcon icon;
 	
 	public static void main(String[] args) {
 		try {
@@ -70,14 +71,15 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 			greenLEDOff = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/green_off.png").readAllBytes());
 			redLEDOn = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/red_on.png").readAllBytes());
 			redLEDOff = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/red_off.png").readAllBytes());
+			icon = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/window_icon.png").readAllBytes());
 		} catch (IOException e) {}
 		
+		setIconImage(icon.getImage());
 		setSize(1200, 600);
 		setTitle(Bot.NAME + " - " + Bot.VERSION);
-		setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(this);
-		getContentPane().setLayout(new MigLayout("", "[600,grow][200:200:200,grow][140:140:140,grow][30:30:30][30:30:30]", "[30:n][20:n][20:n][510][20:n]"));
+		getContentPane().setLayout(new MigLayout("", "[600,grow][200:200:200,grow][140:140:140,grow][30:30:30][30:30:30]", "[30:n][20:n][20:n][510,grow][20:n]"));
 		
 		console.setEditable(false);
 		
@@ -128,15 +130,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		databaseIP.setColumns(10);
 		
 		startButton.addActionListener(e -> {
-			if (Bot.INSTANCE == null) {
-				try {
-					new Bot(token.getText(), databaseIP.getText(), databaseName.getText());
-				} catch (LoginException | InterruptedException | IOException e1) {
-					ConsoleEngine.INSTANCE.error(Bot.INSTANCE, "Bot instanciation failed - Check token validity!");
-				} catch (IllegalArgumentException e2) {
-					ConsoleEngine.INSTANCE.error(this, "Bot instanciation failed - Check database configuration!");
-				}
-		}
+			this.startBot();
 		});
 		getContentPane().add(startButton, "flowx,cell 1 2,growx,aligny center");
 		
@@ -206,6 +200,24 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		getContentPane().add(progressLabel, "cell 4 4,alignx left");
 		
 		setVisible(true);
+		
+		try {
+			if (Boolean.parseBoolean(args[3])) {
+				this.startBot();
+			}
+		} catch (IndexOutOfBoundsException e) {}
+	}
+
+	private void startBot() {
+		if (Bot.INSTANCE == null) {
+			try {
+				new Bot(token.getText(), databaseIP.getText(), databaseName.getText());
+			} catch (LoginException | InterruptedException | IOException e1) {
+				ConsoleEngine.INSTANCE.error(Bot.INSTANCE, "Bot instanciation failed - Check token validity!");
+			} catch (IllegalArgumentException e2) {
+				ConsoleEngine.INSTANCE.error(this, "Bot instanciation failed - Check database configuration!");
+			}
+		}
 	}
 	
 	public void setBotRunning(boolean status) {
@@ -288,16 +300,11 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		if (Bot.INSTANCE != null && Bot.INSTANCE.jda != null) {
-			Bot.INSTANCE.shutdown(true);	
-		}
-		e.getWindow().dispose();
+		System.exit(0);
 	}
 
 	@Override
-	public void windowClosed(WindowEvent e) {
-		System.exit(0);
-	}
+	public void windowClosed(WindowEvent e) {}
 
 	@Override
 	public void windowIconified(WindowEvent e) {}

@@ -39,6 +39,7 @@ public class AwaitTask<T extends GenericEvent> {
 	private List<String> componentIds;
 	
 	private boolean invalidInputReceived = false;
+	private boolean consumerRun = false;
 	private TimerTask timeoutTask = null;
 	private long selfId = 0L;
 	
@@ -164,14 +165,15 @@ public class AwaitTask<T extends GenericEvent> {
 	
 	public void complete(T event) {
 		if (this.additionalPredicate != null) {
-			if (this.additionalPredicate.test(event)) {
-				return;
-			} else {
+			if (!this.additionalPredicate.test(event)) {
 				this.invalidInputReceived = true;
 				return;
 			}
-		} else {
+		}
+		if (!consumerRun) {
+			EventAwaiter.INSTANCE.removeTask(this);
 			this.timeoutTask.cancel();
+			this.consumerRun = true;
 			this.eventConsumer.accept(event);
 		}
 	}	

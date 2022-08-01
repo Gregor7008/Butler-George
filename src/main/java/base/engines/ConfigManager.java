@@ -55,7 +55,7 @@ public class ConfigManager {
 			private int executions = 0;
 			@Override
 			public void run() {
-				if (executions > 1) {
+				if (executions > 1 && Bot.INSTANCE.noErrorOccured) {
 					pushCache();
 				}
 				GUI.INSTANCE.increasePushCounter();
