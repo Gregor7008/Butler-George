@@ -51,11 +51,11 @@ public class ConfigManager {
 			 database.createCollection("guild");
 			 guildconfigs = database.getCollection("guild");
 		}
-		Bot.INSTANCE.centralTimer.schedule(new TimerTask() {
+		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
 			private int executions = 0;
 			@Override
 			public void run() {
-				if (executions > 1 && Bot.INSTANCE.noErrorOccured) {
+				if (executions > 1 && !Bot.INSTANCE.hasErrorOccurred()) {
 					pushCache();
 				}
 				GUI.INSTANCE.increasePushCounter();

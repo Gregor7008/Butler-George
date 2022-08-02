@@ -109,7 +109,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
 		e.printStackTrace();
-		Bot.INSTANCE.noErrorOccured = false;
+		Bot.INSTANCE.errorOccurred();
 		GUI.INSTANCE.increaseErrorCounter();
 		GUI.INSTANCE.updateBotBoolean();
 	}
@@ -120,15 +120,13 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		String command = insplit[0];
 		switch (command) {
 			case "stop":
-				boolean delete = true;
-				try {
-					delete = Boolean.parseBoolean(insplit[1]);
-				} catch (IndexOutOfBoundsException e) {}
-				Bot.INSTANCE.shutdown(delete);
+				if (!Bot.INSTANCE.isShutdown()) {
+					Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
+					Bot.INSTANCE.getShutdownThread().start();
+				}
 				break;
 			case "exit":
 				jda.shutdown();
-				Bot.INSTANCE.jda = null;
 				System.exit(0);
 				break;
 			case "warn":

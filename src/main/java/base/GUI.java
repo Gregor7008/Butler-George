@@ -135,8 +135,9 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		getContentPane().add(startButton, "flowx,cell 1 2,growx,aligny center");
 		
 		stopButton.addActionListener(e -> {
-			if (Bot.INSTANCE != null && Bot.INSTANCE.jda != null) {
-				Bot.INSTANCE.shutdown(true);	
+			if (!Bot.INSTANCE.isShutdown()) {
+				Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
+				Bot.INSTANCE.getShutdownThread().start();
 			}
 		});
 		getContentPane().add(stopButton, "cell 2 2 3 1,growx,aligny center");
@@ -258,7 +259,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 	}
 	
 	public void updateBotBoolean() {
-		this.setTableValue(8, !Bot.INSTANCE.noErrorOccured);
+		this.setTableValue(8, Bot.INSTANCE.hasErrorOccurred());
 	}
 	
 	public void updateStatistics() {
@@ -279,7 +280,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 	                    diff.toSecondsPart()));
 			}
 		};
-		Bot.INSTANCE.centralTimer.schedule(runtimeMeasuringTask, 0, 1000);
+		Bot.INSTANCE.getTimer().schedule(runtimeMeasuringTask, 0, 1000);
 	}
 	
 	public void stopRuntimeMeasuring() {

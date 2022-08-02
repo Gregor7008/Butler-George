@@ -24,7 +24,7 @@ public class ModController {
 
 	public ModController() {
 		RUN = this;
-		Bot.INSTANCE.centralTimer.schedule(new TimerTask() {
+		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();

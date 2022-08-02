@@ -39,7 +39,8 @@ public class AwaitTask<T extends GenericEvent> {
 	private List<String> componentIds;
 	
 	private boolean invalidInputReceived = false;
-	private boolean consumerRun = false;
+	private boolean executed = false;
+	private boolean cancelled = false;
 	private TimerTask timeoutTask = null;
 	private long selfId = 0L;
 	
@@ -144,7 +145,8 @@ public class AwaitTask<T extends GenericEvent> {
 		this.timeoutTask = new TimerTask() {
 			@Override
 			public void run() {
-				EventAwaiter.INSTANCE.removeTask(self);
+				EventAwaiter.INSTANCE.removeTask(selfId);
+				cancelled = true;
 				if (timeoutRunnable != null) {
 					timeoutRunnable.run();
 				} else {
@@ -160,7 +162,13 @@ public class AwaitTask<T extends GenericEvent> {
 				}
 			}
 		};
-		Bot.INSTANCE.centralTimer.schedule(timeoutTask, TimeUnit.MINUTES.toMillis(1));
+		Bot.INSTANCE.getTimer().schedule(timeoutTask, TimeUnit.MINUTES.toMillis(1));
+	}
+	
+	public void cancel() {
+		EventAwaiter.INSTANCE.removeTask(this.selfId);
+		this.timeoutTask.cancel();
+		this.cancelled = true;
 	}
 	
 	public void complete(T event) {
@@ -170,10 +178,10 @@ public class AwaitTask<T extends GenericEvent> {
 				return;
 			}
 		}
-		if (!consumerRun) {
-			EventAwaiter.INSTANCE.removeTask(this);
+		if (!executed && !cancelled) {
+			EventAwaiter.INSTANCE.removeTask(this.selfId);
 			this.timeoutTask.cancel();
-			this.consumerRun = true;
+			this.executed = true;
 			this.eventConsumer.accept(event);
 		}
 	}	

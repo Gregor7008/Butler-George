@@ -1,6 +1,8 @@
 package base.engines;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import base.assets.AwaitTask;
@@ -23,6 +25,7 @@ public class EventAwaiter extends ListenerAdapter {
 	private HashMap<Long, AwaitTask<ButtonInteractionEvent>> awaitingButtonInteraction = new HashMap<>();
 	private HashMap<Long, AwaitTask<SelectMenuInteractionEvent>> awaitingSelectMenuInteraction = new HashMap<>();
 	private HashMap<Long, AwaitTask<ModalInteractionEvent>> awaitingModalInteraction = new HashMap<>();
+	private List<Long> ids = new ArrayList<>();
 	
 	public EventAwaiter() {
 		INSTANCE = this;
@@ -31,85 +34,53 @@ public class EventAwaiter extends ListenerAdapter {
 	@SuppressWarnings("unchecked")
 	public <T extends GenericEvent> long appendTask(AwaitTask<T> task) {
 		long id = 0L;
+		while (ids.contains(id)) {
+			id = ThreadLocalRandom.current().nextLong(100000, 999999);
+		}
 		switch (task.awaitedEvent) {
 		case BUTTON_INTERACTION_EVENT:
-			while (awaitingButtonInteraction.containsKey(id) || id == 0L) {
-				id = this.newId();
-			}
 			awaitingButtonInteraction.put(id, (AwaitTask<ButtonInteractionEvent>) task);
 			break;
 		case MESSAGE_REACTION_ADD_EVENT:
-			while (awaitingReactionAdding.containsKey(id) || id == 0L) {
-				id = this.newId();
-			}
 			awaitingReactionAdding.put(id, (AwaitTask<MessageReactionAddEvent>) task);
 			break;
 		case MESSAGE_REACTION_REMOVE_EVENT:
-			while (awaitingReactionRemoval.containsKey(id) || id == 0L) {
-				id = this.newId();
-			}
 			awaitingReactionRemoval.put(id, (AwaitTask<MessageReactionRemoveEvent>) task);
 			break;
 		case MESSAGE_RECEIVED_EVENT:
-			while (awaitingMessageReceival.containsKey(id) || id == 0L) {
-				id = this.newId();
-			}
 			awaitingMessageReceival.put(id, (AwaitTask<MessageReceivedEvent>) task);
 			break;
 		case MODAL_INTERACTION_EVENT:
-			while (awaitingModalInteraction.containsKey(id) || id == 0L) {
-				id = this.newId();
-			}
 			awaitingModalInteraction.put(id, (AwaitTask<ModalInteractionEvent>) task);
 			break;
 		case SELECT_MENU_INTERACTION_EVENT:
-			while (awaitingSelectMenuInteraction.containsKey(id) || id == 0L) {
-				id = this.newId();
-			}
 			awaitingSelectMenuInteraction.put(id, (AwaitTask<SelectMenuInteractionEvent>) task);
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid awaited event " + task.awaitedEvent.name() + "!");
 		}
+		ids.add(id);
 		return id;
 	}
 	
-	public <T extends GenericEvent> void removeTask(AwaitTask<T> task) {
-		long id = task.getId();
-		switch (task.awaitedEvent) {
-		case BUTTON_INTERACTION_EVENT:
-			awaitingButtonInteraction.remove(id);
-			break;
-		case MESSAGE_REACTION_ADD_EVENT:
-			awaitingReactionAdding.remove(id);
-			break;
-		case MESSAGE_REACTION_REMOVE_EVENT:
-			awaitingReactionRemoval.remove(id);
-			break;
-		case MESSAGE_RECEIVED_EVENT:
-			awaitingMessageReceival.remove(id);
-			break;
-		case MODAL_INTERACTION_EVENT:
-			awaitingModalInteraction.remove(id);
-			break;
-		case SELECT_MENU_INTERACTION_EVENT:
-			awaitingSelectMenuInteraction.remove(id);
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid awaited event " + task.awaitedEvent.name() + "!");
-		}
-	}
-	
-	private long newId() {
-		return ThreadLocalRandom.current().nextLong(100000, 999999);
+	public void removeTask(long id) {
+		awaitingButtonInteraction.remove(id);
+		awaitingReactionAdding.remove(id);
+		awaitingReactionRemoval.remove(id);
+		awaitingMessageReceival.remove(id);
+		awaitingModalInteraction.remove(id);
+		awaitingSelectMenuInteraction.remove(id);
+		ids.remove(id);
 	}
 	
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
 		for (AwaitTask<MessageReceivedEvent> task : awaitingMessageReceival.values()) {
-			if (event.getGuild().getId().equals(task.getGuild().getId())
+			if (!event.getAuthor().isBot()
+					&& event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getAuthor().getId().equals(task.getUser().getId())
-					&& event.getChannel().getId().equals(task.getChannel().getId())) {
+					&& event.getChannel().getId().equals(task.getChannel().getId())
+					&& ids.contains(task.getId())) {
 				task.complete(event);
 			}
 		}
@@ -121,7 +92,8 @@ public class EventAwaiter extends ListenerAdapter {
 			if (event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& event.getMessageId().equals(task.getMessage().getId())) {
+					&& event.getMessageId().equals(task.getMessage().getId())
+					&& ids.contains(task.getId())) {
 				task.complete(event);
 			}
 		}
@@ -133,7 +105,8 @@ public class EventAwaiter extends ListenerAdapter {
 			if (!event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& event.getMessageId().equals(task.getMessage().getId())) {
+					&& event.getMessageId().equals(task.getMessage().getId())
+					&& ids.contains(task.getId())) {
 				task.complete(event);
 			}
 		}
@@ -145,7 +118,8 @@ public class EventAwaiter extends ListenerAdapter {
 			if (event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& event.getMessageId().equals(task.getMessage().getId())) {
+					&& event.getMessageId().equals(task.getMessage().getId())
+					&& ids.contains(task.getId())) {
 				if (task.getComponentIds() != null) {
 					if (task.getComponentIds().contains(event.getComponentId())) {
 						task.complete(event);
@@ -163,7 +137,8 @@ public class EventAwaiter extends ListenerAdapter {
 			if (event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& event.getMessageId().equals(task.getMessage().getId())) {
+					&& event.getMessageId().equals(task.getMessage().getId())
+					&& ids.contains(task.getId())) {
 				if (task.getComponentIds() != null) {
 					if (task.getComponentIds().contains(event.getComponentId())) {
 						task.complete(event);
@@ -180,7 +155,8 @@ public class EventAwaiter extends ListenerAdapter {
 		for (AwaitTask<ModalInteractionEvent> task : awaitingModalInteraction.values()) {
 			if (event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
-					&& event.getChannel().getId().equals(task.getChannel().getId())) {
+					&& event.getChannel().getId().equals(task.getChannel().getId())
+					&& ids.contains(task.getId())) {
 				if (task.getComponentIds() != null) {
 					if (task.getComponentIds().contains(event.getModalId())) {
 						task.complete(event);
