@@ -91,8 +91,7 @@ public class Level implements CommandEventHandler {
 			URL url = new URL(iuser.getAvatarUrl());
 			FileUtils.copyURLToFile(url, avfile);
 			avatar = ImageIO.read(avfile);
-		} catch (Exception e) {
-			e.printStackTrace();}
+		} catch (Exception e) {}
 		Font font = null;
 		try {
 			font = Font.createFont(Font.TRUETYPE_FONT, this.getClass().getClassLoader().getResourceAsStream("levelcards/font.ttf"));

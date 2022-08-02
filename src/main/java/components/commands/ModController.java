@@ -22,11 +22,16 @@ public class ModController {
 	public static ModController run;
 
 	public ModController() {
-		run = this;
-		List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
-		for (int i = 0; i < guilds.size(); i++) {
-			this.guildModCheck(guilds.get(i));
-		}
+		RUN = this;
+		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
+			@Override
+			public void run() {
+				List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
+				for (int i = 0; i < guilds.size(); i++) {
+					guildModCheck(guilds.get(i));
+				}
+			}
+		}, 5*60*1000);
 	}
 	
 	public void guildModCheck(Guild guild) {

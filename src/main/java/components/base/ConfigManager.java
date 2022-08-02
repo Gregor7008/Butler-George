@@ -19,14 +19,45 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
 public abstract class ConfigManager {
-
-	private static MongoClient client = null;
-	private static MongoDatabase database = null;
-	private static MongoCollection<Document> userconfigs = null;
-	private static MongoCollection<Document> guildconfigs = null;
-	private static ConcurrentHashMap<Long, JSONObject> userConfigCache = new ConcurrentHashMap<Long, JSONObject>();
-	private static ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
+	
+	private MongoClient client;
+	private MongoDatabase database;
+	private MongoCollection<Document> userconfigs;
+	private MongoCollection<Document> guildconfigs;
+	private ConcurrentHashMap<Long, JSONObject> userConfigCache = new ConcurrentHashMap<Long, JSONObject>();
+	private ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
+	
+	public ConfigManager(String clientIP, String databaseName) {
+		if (clientIP.equals("Enter database IP") || databaseName.equals("Enter database name")) {
+			throw new IllegalArgumentException("Invalid client IP!");
+		}
+		client = MongoClients.create("mongodb://" + clientIP.replace("mongodb://", ""));
+		client.listDatabases();
+		database = client.getDatabase(databaseName);
+		try {
+			userconfigs = database.getCollection("user");
+		} catch (IllegalArgumentException e) {
+			 database.createCollection("user");
+			 userconfigs = database.getCollection("user");
+		}
+		try {
+			guildconfigs = database.getCollection("guild");
+		} catch (IllegalArgumentException e) {
+			 database.createCollection("guild");
+			 guildconfigs = database.getCollection("guild");
+		}
+		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
+			private int executions = 0;
+			@Override
+			public void run() {
+				if (executions > 1 && !Bot.INSTANCE.hasErrorOccurred()) {
+					pushCache();
+				}
+				GUI.INSTANCE.increasePushCounter();
+			}
+		}, 5*60*1000);
+	}
 	
 	//Manage cache	
 	public static boolean pushCache() {
