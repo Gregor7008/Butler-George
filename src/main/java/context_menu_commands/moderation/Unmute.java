@@ -36,7 +36,7 @@ public class Unmute implements UserContextEventHandler {
 
 	@Override
 	public CommandData initialize() {
-		CommandData context = Commands.context(Command.Type.USER, "Unmute");
+		CommandData context = Commands.context(Command.Type.USER, "Unmute").setGuildOnly(true);
 		return context;
 	}
 }

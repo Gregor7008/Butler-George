@@ -1,6 +1,5 @@
 package base;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -93,16 +92,12 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
-		if (event.isFromGuild()) {
-			GUI.INSTANCE.increaseExecutionsCounter();
-			CommandEventHandler commandEventHandler = null;
-			if ((commandEventHandler = commandList.commandEventHandlers.get(event.getName().toLowerCase())) != null) {
-				commandEventHandler.execute(event);
-			}
-			LevelEngine.getInstance().slashcommand(event);
-		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported")).queue();	
+		GUI.INSTANCE.increaseExecutionsCounter();
+		CommandEventHandler commandEventHandler = null;
+		if ((commandEventHandler = commandList.commandEventHandlers.get(event.getName().toLowerCase())) != null) {
+			commandEventHandler.execute(event);
 		}
+		LevelEngine.getInstance().slashcommand(event);
 	}
 	
 	@Override
@@ -110,14 +105,10 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
-		if (event.isFromGuild()) {
-			GUI.INSTANCE.increaseExecutionsCounter();
-			UserContextEventHandler contextEventHandler = null;
-			if ((contextEventHandler = contextMenuCommandList.userContextEventHandlers.get(event.getName().toLowerCase())) != null) {
-				contextEventHandler.execute(event);
-			}
-		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported")).queue();	
+		GUI.INSTANCE.increaseExecutionsCounter();
+		UserContextEventHandler contextEventHandler = null;
+		if ((contextEventHandler = contextMenuCommandList.userContextEventHandlers.get(event.getName().toLowerCase())) != null) {
+			contextEventHandler.execute(event);
 		}
 	}
 	
@@ -168,12 +159,9 @@ public class EventProcessor extends ListenerAdapter {
 			JSONArray welcomemsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("welcomemsg");
 			if (!welcomemsg.isEmpty()) {
 				if (welcomemsg.getBoolean(3)) {
-					String msg = welcomemsg.getString(1)
-					   .replace("{server}", guild.getName())
-					   .replace("{user}", event.getMember().getAsMention())
-					   .replace("{membercount}", Integer.toString(guild.getMemberCount()))
-					   .replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
-					guild.getTextChannelById(welcomemsg.getLong(1)).sendMessage(msg).queue();
+					String title = Toolbox.processAutoMessage(welcomemsg.getString(1), guild, event.getUser());
+					String message = Toolbox.processAutoMessage(welcomemsg.getString(2), guild, event.getUser());
+					guild.getTextChannelById(welcomemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
 				}
 			}
 		}
@@ -190,12 +178,9 @@ public class EventProcessor extends ListenerAdapter {
 		JSONArray goodbyemsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("goodbyemsg");
 		if (!goodbyemsg.isEmpty()) {
 			if (goodbyemsg.getBoolean(3)) {
-				String msg = goodbyemsg.getString(1)
-				   .replace("{server}", guild.getName())
-				   .replace("{user}", event.getMember().getAsMention())
-				   .replace("{membercount}", Integer.toString(guild.getMemberCount()))
-				   .replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
-				guild.getTextChannelById(goodbyemsg.getLong(1)).sendMessage(msg).queue();
+				String title = Toolbox.processAutoMessage(goodbyemsg.getString(1), guild, event.getUser());
+				String message = Toolbox.processAutoMessage(goodbyemsg.getString(2), guild, event.getUser());
+				guild.getTextChannelById(goodbyemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
 			}
 		}
 		if (ConfigLoader.INSTANCE.getMemberConfig(guild, user).getLong("customchannelcategory") != 0) {

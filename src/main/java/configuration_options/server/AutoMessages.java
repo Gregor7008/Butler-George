@@ -1,6 +1,6 @@
 package configuration_options.server;
 
-import java.time.OffsetDateTime;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -8,14 +8,20 @@ import org.json.JSONException;
 import base.assets.AwaitTask;
 import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.Toolbox;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Modal;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 
 public class AutoMessages implements ConfigurationEventHandler {
 
@@ -23,30 +29,54 @@ public class AutoMessages implements ConfigurationEventHandler {
 	public void execute(ConfigurationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
-				Button.secondary("welcome", Emoji.fromUnicode("\uD83C\uDF89")),
-				Button.secondary("goodbye", Emoji.fromUnicode("\uD83D\uDC4B"))).queue();
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "unsupportedJDA")).queue();
+//		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
+//				Button.secondary("welcome", Emoji.fromUnicode("\uD83C\uDF89")),
+//				Button.secondary("goodbye", Emoji.fromUnicode("\uD83D\uDC4B")),
+//				Button.secondary("level", Emoji.fromUnicode("\uD83C\uDD99"))).queue();
+		
+//		TODO Implement auto message configuration when JDA updates and supports selection menus in modals!
 		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
 				b -> {
 					String type = b.getComponentId();
-					JSONArray goodbyemsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type + "msg");
+					JSONArray selectedmsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type + "msg");
 					boolean defined = false;
 					try {
-						defined = !goodbyemsg.getString(0).equals("");
+						defined = !selectedmsg.getString(1).equals("");
 					} catch (JSONException e) {}
 					if (event.getSubOperation().equals("set")) {
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setrequest").replaceDescription("{type}", type)).queue();
-						AwaitTask.forMessageReceival(guild, user, event.getChannel(),
-								e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
-							  			  return guild.getTextChannelById(e.getMessage().getMentions().getChannels().get(0).getIdLong()) != null;
-							  		  } else {return false;}},
-								e -> {goodbyemsg.put(1, e.getMessage().getMentions().getChannels().get(0).getIdLong());
-									  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "def" + type + "msg")).queue();
-									  AwaitTask.forMessageReceival(guild, user, event.getChannel(),
-											  a -> {goodbyemsg.put(0, a.getMessage().getContentRaw()).put(2, true);
-											  	    event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, type + "success")).queue();
-											  }).append();
-								}, null).append();
+						SelectMenu.Builder menuBuilder = SelectMenu.create("channel")
+								.setPlaceholder("Select channel")
+								.setRequiredRange(1, 1);
+						List<TextChannel> availableChannels = guild.getTextChannels().stream().filter(
+								c -> guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND)).toList();
+						for (TextChannel channel : availableChannels) {
+							String topic = channel.getTopic();
+							if (topic != null) {
+								menuBuilder.addOption(channel.getName(), channel.getId(), topic);
+							} else {
+								menuBuilder.addOption(channel.getName(), channel.getId());
+							}
+						}
+						SelectMenu menu = menuBuilder.build();
+						TextInput titleInput = TextInput.create("title", "Title", TextInputStyle.SHORT)
+								.setPlaceholder("Input title")
+								.setRequired(true)
+								.build();
+						TextInput messageInput = TextInput.create("message", "Message", TextInputStyle.PARAGRAPH)
+								.setPlaceholder("Input message")
+								.build();
+						Modal.Builder modalBuilder = Modal.create("configMessage", type.substring(0, 1).toUpperCase() + type.substring(1) + " message configuration");
+						modalBuilder.addActionRows(ActionRow.of(menu), ActionRow.of(titleInput), ActionRow.of(messageInput));
+						b.replyModal(modalBuilder.build()).queue();
+						AwaitTask.forModalInteraction(guild, user, event.getChannel(),
+								e -> {
+									selectedmsg.put(0, 0L);			//		<- Get selected value from SelectMenu, convert to long and execute
+									selectedmsg.put(1, e.getValue("title").getAsString());
+									selectedmsg.put(2, e.getValue("message").getAsString());
+									selectedmsg.put(3, true);
+									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, type + "success")).queue();
+								}).append();
 						return;
 					}
 					if (!defined) {
@@ -54,8 +84,8 @@ public class AutoMessages implements ConfigurationEventHandler {
 						return;
 					}
 					if (event.getSubOperation().equals("on")) {
-						if (!goodbyemsg.getBoolean(2)) {
-							goodbyemsg.put(2, true);
+						if (!selectedmsg.getBoolean(3)) {
+							selectedmsg.put(3, true);
 							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onsuccess").replaceDescription("{type}", type)).queue();
 							return;
 						} else {
@@ -64,8 +94,8 @@ public class AutoMessages implements ConfigurationEventHandler {
 						}
 					}
 					if (event.getSubOperation().equals("off")) {
-						if (goodbyemsg.getBoolean(2)) {
-							goodbyemsg.put(2, false);
+						if (selectedmsg.getBoolean(3)) {
+							selectedmsg.put(3, false);
 							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "offsuccess").replaceDescription("{type}", type)).queue();
 							return;
 						} else {
@@ -74,15 +104,12 @@ public class AutoMessages implements ConfigurationEventHandler {
 						}
 					}
 					if (event.getSubOperation().equals("test")) {
-						String msg = goodbyemsg.getString(0)
-						   .replace("{server}", guild.getName())
-						   .replace("{user}", event.getUser().getName())
-						   .replace("{membercount}", Integer.toString(guild.getMemberCount()))
-						   .replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
-						guild.getTextChannelById(goodbyemsg.getLong(1)).sendMessage(msg).queue();
+						String title = Toolbox.processAutoMessage(selectedmsg.getString(1), guild, user);
+						String message = Toolbox.processAutoMessage(selectedmsg.getString(2), guild, user);
+						guild.getTextChannelById(selectedmsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
 						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "testsuccess").replaceDescription("{type}", type)).queue();
 					}
-				}).append();
+				}); //.append(); <- Append again, when JDA supports this operation
 	}
 
 	@Override

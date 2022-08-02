@@ -2,53 +2,52 @@ package base.assets;
 
 import javax.annotation.Nullable;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class CustomMessageEmbed extends MessageEmbed {
 
+	EmbedBuilder eb = new EmbedBuilder();
 
 	public CustomMessageEmbed(MessageEmbed embed) {
 		super(embed.getUrl(), embed.getTitle(), embed.getDescription(), embed.getType(), embed.getTimestamp(), embed.getColorRaw(), embed.getThumbnail(), embed.getSiteProvider(), embed.getAuthor(), embed.getVideoInfo(), embed.getFooter(), embed.getImage(),
 			  embed.getFields());
+		eb.copyFrom(embed);
 	}
 	
 	public CustomMessageEmbed replaceTitle(String target, String replacement) {
-		this.setTitle(this.getTitle().replace(target, replacement));
-		return this;
+		eb.setTitle(this.getTitle().replace(target, replacement));
+		return new CustomMessageEmbed(eb.build());
 	}
 	
 	public CustomMessageEmbed replaceDescription(String target, String replacement) {
-		this.setDescription(this.getDescription().replace(target, replacement));
-		return this;
+		eb.setDescription(this.getDescription().replace(target, replacement));
+		return new CustomMessageEmbed(eb.build());
 	}
 	
 	public CustomMessageEmbed setTitle(String title) {
-		this.setTitle(title);
-		return this;
+		eb.setTitle(title);
+		return new CustomMessageEmbed(eb.build());
 	}
 	
 	public CustomMessageEmbed setDescription(String description) {
-		this.setDescription(description);
-		return this;
+		eb.setDescription(description);
+		return new CustomMessageEmbed(eb.build());
 	}
 	
 	public CustomMessageEmbed setFooter(String replacement, @Nullable String iconURL) {
-		this.setFooter(replacement, iconURL);
-		return this;
+		eb.setFooter(replacement, iconURL);
+		return new CustomMessageEmbed(eb.build());
 	}
 	
 	public CustomMessageEmbed setAuthor(Member member) {
-		this.setAuthor(member);
-		return this;
+		eb.setAuthor(member.getEffectiveName(), member.getAvatarUrl());
+		return new CustomMessageEmbed(eb.build());
 	}
 	
 	public CustomMessageEmbed setThumbnail(String url) {
-		this.setThumbnail(url);
-		return this;
-	}
-	@Deprecated
-	public MessageEmbed convert() {
-		return this;
+		eb.setThumbnail(url);
+		return new CustomMessageEmbed(eb.build());
 	}
 }

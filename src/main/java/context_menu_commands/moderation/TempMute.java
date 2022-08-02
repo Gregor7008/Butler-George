@@ -36,7 +36,7 @@ public class TempMute implements UserContextEventHandler {
 
 	@Override
 	public CommandData initialize() {
-		CommandData context = Commands.context(Command.Type.USER, "TempMute");
+		CommandData context = Commands.context(Command.Type.USER, "TempMute").setGuildOnly(true);
 		return context;
 	}
 	

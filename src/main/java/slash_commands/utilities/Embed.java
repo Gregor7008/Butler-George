@@ -51,7 +51,6 @@ public class Embed implements CommandEventHandler {
 	private List<MessageEmbed> embedCache = new ArrayList<>();
 	private HashMap<String, InputStream> attachments = new HashMap<>();
 	
-//	TODO /embed rework for stability, reliability and more customizability (For a way to manage images, look at Levelbackground.java#>66)!
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		this.member = event.getMember();
@@ -187,7 +186,6 @@ public class Embed implements CommandEventHandler {
 	private void configureTitle(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
 		TextInput.Builder titleInput = TextInput.create("title", "Title", TextInputStyle.SHORT)
 				.setPlaceholder("Input title")
-				.setMinLength(1)
 				.setMaxLength(MessageEmbed.TITLE_MAX_LENGTH)
 				.setRequired(true);
 		String current = eb.build().getTitle();
@@ -220,7 +218,7 @@ public class Embed implements CommandEventHandler {
 	}
 	
 	private void configureDescription(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
-		TextInput.Builder descriptionInput = TextInput.create("description", "Description", TextInputStyle.SHORT)
+		TextInput.Builder descriptionInput = TextInput.create("description", "Description", TextInputStyle.PARAGRAPH)
 				.setPlaceholder("Input description")
 				.setMinLength(1)
 				.setRequired(true);
@@ -319,8 +317,8 @@ public class Embed implements CommandEventHandler {
 	}
 	
 	private void configureFields(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
-		//TODO Implement field configuration when JDA updates and supportes selection menus in modals!
-		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "unsupported")).setActionRows().queue();
+//		TODO Implement field configuration when JDA updates and supports selection menus in modals!
+		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "unsupportedJDA")).setActionRows().queue();
 		this.scheduleFurtherConfiguration(event.getMessage(), menu, eb, true, 5000);
 	}
 	

@@ -23,7 +23,7 @@ public class Mute implements UserContextEventHandler {
 
 	@Override
 	public CommandData initialize() {
-		CommandData context = Commands.context(Command.Type.USER, "Mute");
+		CommandData context = Commands.context(Command.Type.USER, "Mute").setGuildOnly(true);
 		return context;
 	}
 }

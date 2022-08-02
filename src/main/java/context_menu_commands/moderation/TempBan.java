@@ -41,7 +41,7 @@ public class TempBan implements UserContextEventHandler {
 
 	@Override
 	public CommandData initialize() {
-		CommandData context = Commands.context(Command.Type.USER, "TempBan");
+		CommandData context = Commands.context(Command.Type.USER, "TempBan").setGuildOnly(true);
 		return context;
 	}	
 }

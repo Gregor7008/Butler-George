@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -100,5 +101,13 @@ public abstract class Toolbox {
 		} catch (JSONException e) {
 			return null;
 		}
+	}
+	
+	public static String processAutoMessage(String input, Guild guild, User user) {
+		return input.replace("{server}", guild.getName())
+				.replace("{user}", user.getName())
+				.replace("{membercount}", Integer.toString(guild.getMemberCount()))
+				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter))
+				.replace("{level}", String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getInt("level")));
 	}
 }

@@ -3,15 +3,16 @@ package slash_commands.engines;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import base.engines.ConfigLoader;
 import base.engines.ConfigManager;
 import base.engines.LanguageEngine;
+import base.engines.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
@@ -84,17 +85,12 @@ public class LevelEngine {
 		int currentlevel = ConfigLoader.INSTANCE.getMemberConfig(guild, user).getInt("level");
 		if (this.xpleftfornextlevel(guild, user) < 1) {
 			userconfig.put("level", currentlevel + 1);
-			Long id = ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("communityinbox");
-			if (id == 0) {
+			JSONArray levelmessage = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("levelmsg");
+			if (!levelmessage.isEmpty() || levelmessage.getBoolean(3)) {
+				String title = Toolbox.processAutoMessage(levelmessage.getString(1), guild, user);
+				String message = Toolbox.processAutoMessage(levelmessage.getString(2), guild, user);
+				guild.getTextChannelById(levelmessage.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
 				return;
-			}
-			TextChannel channel = guild.getTextChannelById(id);
-			if (channel != null) {
-				channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "levelup")
-						.replaceTitle("{user}", guild.getMember(user).getEffectiveName())
-						.replaceDescription("{level}", String.valueOf(currentlevel + 1))).queue();
-			} else {
-				ConfigLoader.INSTANCE.getGuildConfig(guild).put("communityinbox",0L);
 			}
 		}
 	}

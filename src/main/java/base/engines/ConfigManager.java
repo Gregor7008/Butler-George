@@ -203,6 +203,7 @@ public class ConfigManager {
 		newConfig.put("goodbyemsg",					new JSONArray());
 		newConfig.put("join2createchannels",		new JSONObject());
 		newConfig.put("levelrewards",				new JSONObject());
+		newConfig.put("levelmsg",					"");
 		newConfig.put("moderationroles",			new JSONArray());
 		newConfig.put("moderationinbox",			0L);
 		newConfig.put("offlinemsg",					new JSONArray());
@@ -210,8 +211,6 @@ public class ConfigManager {
 		newConfig.put("suggestioninbox",			0L);
 		newConfig.put("supportroles",				new JSONArray());
 		newConfig.put("supporttalk",				0L);
-		newConfig.put("ticketchannels",				new JSONArray());
-		newConfig.put("ticketcount",				1);
 		newConfig.put("welcomemsg",					new JSONArray());
 		//Deep-nested values (2 layers or more)
 		newConfig.put("modmails",					new JSONObject());

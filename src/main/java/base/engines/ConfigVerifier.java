@@ -40,7 +40,6 @@ public class ConfigVerifier {
 		//Supportrole Check
 		this.supportTalkCheck(guild);
 		this.modInboxChannelCheck(guild);
-		this.ticketChannelsCheck(guild);
 	}
 	public void adminRoleCheck(Guild guild) {
 		JSONObject guildConfig = ConfigLoader.INSTANCE.getGuildConfig(guild);
@@ -229,15 +228,6 @@ public class ConfigVerifier {
 		long supporttalk = guildConfig.getLong("supporttalk");
 		if (guild.getVoiceChannelById(supporttalk) == null) {
 			guildConfig.put("supporttalk", 0L);
-		}
-	}
-	public void ticketChannelsCheck(Guild guild) {
-		JSONObject guildConfig = ConfigLoader.INSTANCE.getGuildConfig(guild);
-		JSONArray ticketchannels = guildConfig.getJSONArray("ticketchannels");
-		for (int i = 0; i < ticketchannels.length(); i++) {
-			if (guild.getTextChannelById(ticketchannels.getLong(i)) == null) {
-				ticketchannels.remove(i);
-			}
 		}
 	}
 	public void welcomeMsgCheck(Guild guild) {
