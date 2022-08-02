@@ -155,9 +155,9 @@ public class AwaitTask<T extends GenericEvent> {
 						keyword = "invalid";
 					}
 					if (message != null) {
-						message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword).convert()).setActionRows().queue();
+						message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setActionRows().queue();
 					} else {
-						channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword).convert()).setActionRows().queue();
+						channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setActionRows().queue();
 					}
 				}
 			}
@@ -173,11 +173,11 @@ public class AwaitTask<T extends GenericEvent> {
 		return this;
 	}
 	
-	public AwaitTask<T> complete(T event) {
+	public boolean complete(T event) {
 		if (this.additionalPredicate != null) {
 			if (!this.additionalPredicate.test(event)) {
 				this.invalidInputReceived = true;
-				return this;
+				return false;
 			}
 		}
 		if (!executed && !cancelled) {
@@ -186,7 +186,7 @@ public class AwaitTask<T extends GenericEvent> {
 			this.executed = true;
 			this.eventConsumer.accept(event);
 		}
-		return this;
+		return true;
 	}	
 	
 	public Guild getGuild() {

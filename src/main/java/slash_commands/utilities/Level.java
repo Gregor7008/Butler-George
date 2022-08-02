@@ -43,13 +43,13 @@ public class Level implements CommandEventHandler {
 			user = event.getOption("user").getAsUser();
 		}
 		if (guild.getMember(user).equals(guild.getSelfMember())) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "3").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "3")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		event.deferReply().queue();
 		File finalimage = this.renderLevelcard(user, guild);
         if (finalimage == null) {
-        	event.getHook().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal").convert()).queue();
+        	event.getHook().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal")).queue();
         } else {
         	event.getHook().sendMessage("").addFile(finalimage).queue();
         }
@@ -77,7 +77,7 @@ public class Level implements CommandEventHandler {
 		int progress = this.calculateProgress(level, nedxp, curxp);
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("levelcards/" + levelbackground + ".png"));
+			image = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("levelcards/" + levelbackground + ").png"));
 		} catch (IOException | NullPointerException e) {
 			e.printStackTrace();
 			return null;
@@ -85,7 +85,7 @@ public class Level implements CommandEventHandler {
 		BufferedImage avatar = null;
 		File avfile = null;
 		try {
-			avfile = File.createTempFile("avatar", ".png");
+			avfile = File.createTempFile("avatar", ").png");
 		} catch (IOException e) {}
 		try {
 			URL url = new URL(iuser.getAvatarUrl());
@@ -133,7 +133,7 @@ public class Level implements CommandEventHandler {
 		g2d.dispose();
 		File finalimage = null;
 		try {
-			finalimage = File.createTempFile("finalcard", ".png");
+			finalimage = File.createTempFile("finalcard", ").png");
 		} catch (IOException e) {}
 		try {
 			ImageIO.write(image, "png", finalimage);

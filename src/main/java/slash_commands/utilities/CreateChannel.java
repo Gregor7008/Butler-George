@@ -29,7 +29,7 @@ public class CreateChannel implements CommandEventHandler {
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
 		this.createTextChannel(guild, user, name);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue();
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public class Report implements CommandEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("modinbox") == 0) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nochannel").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nochannel")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyy");
@@ -40,7 +40,7 @@ public class Report implements CommandEventHandler {
 		}
 		eb.setDescription(event.getOption("reason").getAsString());
 		guild.getTextChannelById(ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("modinbox")).sendMessageEmbeds(eb.build()).queue();
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue(response -> response.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 	}
 
 	@Override

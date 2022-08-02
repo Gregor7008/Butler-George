@@ -28,7 +28,7 @@ public class StaticRoles implements ConfigurationEventHandler {
 	public void execute(ConfigurationEvent event) {
 		guild = event.getGuild();
 		user = event.getUser();
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
 				Button.secondary("adminroles", Emoji.fromUnicode("\u2696")),
 				Button.secondary("moderationroles", Emoji.fromUnicode("\uD83D\uDC6E")),
 				Button.secondary("supportroles", Emoji.fromUnicode("\uD83D\uDEA8")),
@@ -42,10 +42,10 @@ public class StaticRoles implements ConfigurationEventHandler {
 					}
 					if (event.getSubOperation().equals("remove")) {
 						ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type).clear();
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess").replaceDescription("{type}", type).convert()).setActionRows().queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess").replaceDescription("{type}", type)).setActionRows().queue();
 						return;
 					}
-					b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles").convert()).setActionRows().queue();
+					b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).setActionRows().queue();
 					AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 							e -> {
@@ -58,13 +58,13 @@ public class StaticRoles implements ConfigurationEventHandler {
 											ccdefaccessroles.put(roleIDs.get(i));
 										}
 									}
-									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess").replaceDescription("{type}", type).convert()).queue();
+									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess").replaceDescription("{type}", type)).queue();
 								}
 								if (event.getSubOperation().equals("delete")) {
 									for (int i = 0; i < roleIDs.size(); i++) {
 										Toolbox.removeValueFromArray(ccdefaccessroles, roleIDs.get(i));
 									}
-									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").replaceDescription("{type}", type).convert()).queue();
+									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess").replaceDescription("{type}", type)).queue();
 								}
 							}, null).append();
 				}).append();
@@ -87,7 +87,7 @@ public class StaticRoles implements ConfigurationEventHandler {
 		StringBuilder sB = new StringBuilder();
 		JSONArray botautoroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type);
 		if (botautoroles.isEmpty()) {
-			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "none").replaceDescription("{type}", type).convert()).queue();
+			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "none").replaceDescription("{type}", type)).queue();
 			return;
 		}
 		for (int i = 0; i < botautoroles.length(); i++) {
@@ -101,6 +101,6 @@ public class StaticRoles implements ConfigurationEventHandler {
 		}
 		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list")
 				.replaceDescription("{list}", sB.toString())
-				.replaceDescription("{type}", type).convert()).queue();
+				.replaceDescription("{type}", type)).queue();
 	}
 }

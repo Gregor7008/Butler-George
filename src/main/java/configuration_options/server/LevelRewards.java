@@ -24,26 +24,26 @@ public class LevelRewards implements ConfigurationEventHandler {
 		user = event.getUser();
 		JSONObject levelrewards = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("levelrewards");
 		if (event.getSubOperation().equals("add")) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflevel")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflevel")).queue();
 			AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 					e -> {try {Integer.parseInt(e.getMessage().getContentRaw());
 							   return true;
 						  } catch (NumberFormatException ex) {return false;}},
 					e -> {int neededLevel = Integer.parseInt(e.getMessage().getContentRaw());
-						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defrole").convert()).queue();
+						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defrole")).queue();
 						  AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 								  r -> {return !r.getMessage().getMentions().getRoles().isEmpty();},
 								  r -> {long roleID = r.getMessage().getMentions().getRoles().get(0).getIdLong();
 								  	    levelrewards.put(String.valueOf(neededLevel), roleID);
 								  	    event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")
 								  	    		.replaceDescription("{role}", guild.getRoleById(roleID).getAsMention())
-								  	    		.replaceDescription("{level}", String.valueOf(neededLevel)).convert()).queue();
+								  	    		.replaceDescription("{level}", String.valueOf(neededLevel))).queue();
 								  	    return;
 								  }, null).append();
 					}, null).append();
 		}
 		if (event.getSubOperation().equals("delete")) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflevel")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "deflevel")).queue();
 			AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 					e -> {try {Integer.parseInt(e.getMessage().getContentRaw());
 							   return true;
@@ -52,20 +52,20 @@ public class LevelRewards implements ConfigurationEventHandler {
 						  try {
 							  levelrewards.getLong(String.valueOf(level));
 						  } catch (JSONException ex) {
-							  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noreward").convert()).queue();
+							  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noreward")).queue();
 							  return;
 						  }
 						  long roleID = levelrewards.getLong(String.valueOf(level));
 						  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")
 								  .replaceDescription("{role}", guild.getRoleById(roleID).getAsMention())
-								  .replaceDescription("{level}", String.valueOf(level)).convert()).queue();
+								  .replaceDescription("{level}", String.valueOf(level))).queue();
 						  levelrewards.remove(String.valueOf(level));
 						  return;
 					}, null).append();
 		}
 		if (event.getSubOperation().equals("remove")) {
 			levelrewards.clear();
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
 			return;
 		}
 		if (event.getSubOperation().equals("list")) {
@@ -89,7 +89,7 @@ public class LevelRewards implements ConfigurationEventHandler {
 	private void listrewards(ConfigurationEvent event, JSONObject levelrewards) {
 		StringBuilder sB = new StringBuilder();
 		if (levelrewards.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "norewards")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "norewards")).queue();
 			return;
 		}
 		Object[] rewards = levelrewards.keySet().toArray();
@@ -102,6 +102,6 @@ public class LevelRewards implements ConfigurationEventHandler {
 				sB.append(guild.getRoleById(levelrewards.getLong((String) rewards[i])).getAsMention() + "\s->\s" + rewards[i] + "\n");
 			}
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list").replaceDescription("{list}", sB.toString())).queue();
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list").replaceDescription("{list}", sB.toString())).queue();
 	}
 }

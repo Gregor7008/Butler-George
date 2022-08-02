@@ -18,7 +18,7 @@ public class SupportTalk implements ConfigurationEventHandler {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
 		if (event.getSubOperation().equals("set")) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel")).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel")).queue();
 			AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 					e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
 						 	 return e.getMessage().getMentions().getChannels().get(0).getType().isAudio();
@@ -26,13 +26,13 @@ public class SupportTalk implements ConfigurationEventHandler {
 					e -> {
 						GuildChannel channel = e.getMessage().getMentions().getChannels().get(0);
 						ConfigLoader.INSTANCE.getGuildConfig(guild).put("supporttalk", channel.getIdLong());
-						event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess").replaceDescription("{channel}", channel.getAsMention()).convert()).queue();
+						event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess").replaceDescription("{channel}", channel.getAsMention())).queue();
 						return;
 					}, null).append();
 		}
 		if (event.getSubOperation().equals("clear")) {
 			ConfigLoader.INSTANCE.getGuildConfig(guild).put("supporttalk", 0L);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "clearsuccess").convert()).queue();
+			event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "clearsuccess")).queue();
 		}
 	}
 

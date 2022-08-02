@@ -2,54 +2,53 @@ package base.assets;
 
 import javax.annotation.Nullable;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-public class CustomMessageEmbed {
+public class CustomMessageEmbed extends MessageEmbed {
 
-	private EmbedBuilder eb = new EmbedBuilder();
-	
+
 	public CustomMessageEmbed(MessageEmbed embed) {
-		eb.copyFrom(embed);
+		super(embed.getUrl(), embed.getTitle(), embed.getDescription(), embed.getType(), embed.getTimestamp(), embed.getColorRaw(), embed.getThumbnail(), embed.getSiteProvider(), embed.getAuthor(), embed.getVideoInfo(), embed.getFooter(), embed.getImage(),
+			  embed.getFields());
 	}
 	
 	public CustomMessageEmbed replaceTitle(String target, String replacement) {
-		eb.setTitle(eb.build().getTitle().replace(target, replacement));
+		this.setTitle(this.getTitle().replace(target, replacement));
 		return this;
 	}
 	
 	public CustomMessageEmbed replaceDescription(String target, String replacement) {
-		eb.setDescription(eb.build().getDescription().replace(target, replacement));
+		this.setDescription(this.getDescription().replace(target, replacement));
 		return this;
 	}
 	
 	public CustomMessageEmbed setTitle(String title) {
-		eb.setTitle(title);
+		this.setTitle(title);
 		return this;
 	}
 	
 	public CustomMessageEmbed setDescription(String description) {
-		eb.setDescription(description);
+		this.setDescription(description);
 		return this;
 	}
 	
 	public CustomMessageEmbed setFooter(String replacement, @Nullable String iconURL) {
-		eb.setFooter(replacement, iconURL);
+		this.setFooter(replacement, iconURL);
 		return this;
 	}
 	
 	public CustomMessageEmbed setAuthor(Member member) {
-		eb.setAuthor(member.getEffectiveName(), null, member.getAvatarUrl());
+		this.setAuthor(member);
 		return this;
 	}
 	
 	public CustomMessageEmbed setThumbnail(String url) {
-		eb.setThumbnail(url);
+		this.setThumbnail(url);
 		return this;
 	}
-	
+	@Deprecated
 	public MessageEmbed convert() {
-		return eb.build();
+		return this;
 	}
 }

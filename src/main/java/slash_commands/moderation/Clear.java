@@ -31,7 +31,7 @@ public class Clear implements CommandEventHandler {
 //															   System.out.println(duration);
 //															   return duration < 14;}).toList();
 		if (messages.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
 			return;
 		}
 		if (messages.size() == 1) {
@@ -41,10 +41,10 @@ public class Clear implements CommandEventHandler {
 		try {
 			channel.deleteMessages(messages).queue();
 		} catch (IllegalArgumentException e) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
 			return;
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "done").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "done")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 }
 
 	@Override

@@ -49,7 +49,7 @@ public class ModMailHandler {
 			}
 		} catch (ErrorResponseException e) {}
 		if (guild.retrieveBan(user).complete() == null && !member) {
-			event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(null, null, this, "nosupport").convert()).queue();
+			event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(null, null, this, "nosupport")).queue();
 			return;
 		}
 		if (ConfigLoader.INSTANCE.getModMailOfUser(user.getId()) != null) {
@@ -59,13 +59,13 @@ public class ModMailHandler {
 		}
 		OffsetDateTime lastmail = OffsetDateTime.parse(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getString("lastmail"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastmail, OffsetDateTime.now()).toSeconds() > 300) {
-			event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
+			event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue();
 			ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("lastmail", OffsetDateTime.now().format(ConfigManager.dateTimeFormatter));
 			this.processMessage(event);
 		} else {
 			int timeleft = (int) (300 - Duration.between(lastmail, OffsetDateTime.now()).toSeconds());
 			event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timelimit")
-					.replaceDescription("{timeleft}", String.valueOf(timeleft)).convert()).queue();
+					.replaceDescription("{timeleft}", String.valueOf(timeleft))).queue();
 		}
 	}
 	

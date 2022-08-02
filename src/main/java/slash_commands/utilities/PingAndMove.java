@@ -27,33 +27,33 @@ public class PingAndMove implements CommandEventHandler {
 		final User user = event.getUser();
 		final Member omember = guild.getMember(event.getOption("user").getAsUser());
 		if (omember.equals(guild.getMember(user))) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "4").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "4")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (omember.equals(guild.getSelfMember())) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "5").convert()).queue(r -> r.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "5")).queue(r -> r.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
 			return;
 		}
 		if (!omember.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "memnoncon").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "memnoncon")).queue();
 			return;
 		}
 		if (!guild.getMember(user).getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notcon").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notcon")).queue();
 			return;
 		}
 		InteractionHook ih = event.reply(omember.getAsMention()).addEmbeds(LanguageEngine.fetchMessage(guild, user, this, "request")
-				.replaceDescription("{user}", guild.getMember(user).getAsMention()).convert())
+				.replaceDescription("{user}", guild.getMember(user).getAsMention()))
 								.addActionRow(Button.secondary("accept", Emoji.fromUnicode("U+2705")),
 											  Button.secondary("deny", Emoji.fromUnicode("U+274C"))).complete();
 		AwaitTask.forButtonInteraction(guild, user, ih.retrieveOriginal().complete(), null,
 				e -> {if (e.getButton().getId().equals("accept")) {
 						 guild.moveVoiceMember(guild.getMember(user), omember.getVoiceState().getChannel()).queue();
-						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "accepted").convert()).queue();
+						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "accepted")).queue();
 						 return;}
 					  if (e.getButton().getId().equals("deny")) {
-						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "denied").convert()).queue();}},
-				() -> {ih.editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "denied").convert()).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
+						 e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "denied")).queue();}},
+				() -> {ih.editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "denied")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
 	}
 
 	@Override

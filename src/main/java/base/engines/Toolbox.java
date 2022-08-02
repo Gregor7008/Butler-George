@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 public abstract class Toolbox {
@@ -101,27 +100,5 @@ public abstract class Toolbox {
 		} catch (JSONException e) {
 			return null;
 		}
-	}
-	
-	public static void disableActionRows(Message message) {
-		List<ActionRow> actionRows = message.getActionRows();
-		List<ActionRow> newActionRows = new ArrayList<ActionRow>();
-		actionRows.forEach(a -> newActionRows.add(a.asDisabled()));
-		message.editMessageComponents(newActionRows).queue();
-	}
-	
-	public static void disableActionRows(Message message, Runnable followUp) {
-		List<ActionRow> actionRows = message.getActionRows();
-		List<ActionRow> newActionRows = new ArrayList<ActionRow>();
-		actionRows.forEach(a -> newActionRows.add(a.asDisabled()));
-		message.editMessageComponents(newActionRows).queue(e -> followUp.run());
-	}
-	
-	public static void deleteActionRows(Message message) {
-		message.editMessageEmbeds(message.getEmbeds()).setActionRows().queue();
-	}
-	
-	public static void deleteActionRows(Message message, Runnable followUp) {
-		message.editMessageEmbeds(message.getEmbeds()).setActionRows().queue(r -> followUp.run());
 	}
 }

@@ -17,7 +17,7 @@ public class Mute implements UserContextEventHandler {
 		final Guild guild = event.getGuild();
 		ConfigLoader.INSTANCE.getMemberConfig(guild, event.getTarget()).put("muted", true);
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, event.getUser(), this, "success")
-						.replaceDescription("{user}", event.getTarget().getAsMention()).convert()).queue();
+						.replaceDescription("{user}", event.getTarget().getAsMention())).queue();
 		ModController.RUN.userModCheck(guild, event.getTarget());
 	}
 

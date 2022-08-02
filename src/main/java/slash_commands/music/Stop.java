@@ -25,20 +25,20 @@ public class Stop implements CommandEventHandler {
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
 			return;
 		}
 		Stop.stopandleave(guild);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "stopped").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "stopped")).queue();
 	}
 
 	@Override

@@ -26,10 +26,10 @@ public class Levelbackground implements CommandEventHandler {
 		if (event.getSubcommandName().equals("set")) {
 			Level lv = new Level();
 			if (Integer.parseInt(event.getOption("number").getAsString()) > 4 || Integer.parseInt(event.getOption("number").getAsString()) < 0) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "wrongarg").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "wrongarg")).queue();
 			} else {
 				ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("levelbackground", event.getOption("number").getAsInt());
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).addFile(lv.renderLevelcard(user, guild)).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).addFile(lv.renderLevelcard(user, guild)).queue();
 			}
 			return;
 		}
@@ -91,7 +91,7 @@ public class Levelbackground implements CommandEventHandler {
 				.queue();
 			return;
 		} catch (Exception e) {}
-		event.replyEmbeds(LanguageEngine.fetchMessage(null, null, null, "fatal").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(null, null, null, "fatal")).queue();
 	}
 
 	@Override

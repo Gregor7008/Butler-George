@@ -33,16 +33,16 @@ public class Suggest implements CommandEventHandler {
 		final Guild guild = event.getGuild();
 		Long channelid = ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("suggest");
 		if (channelid == 0) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nochannelset").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nochannelset")).queue();
 			return;
 		}
 		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getString("lastsuggestion"), ConfigManager.dateTimeFormatter);
 		if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nospam").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nospam")).queue();
 			return;
 		}
 		this.sendsuggestion(guild, event.getMember(), event.getOption("suggestion").getAsString());
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue();
 	}
 
 	@Override

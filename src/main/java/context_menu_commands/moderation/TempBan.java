@@ -22,7 +22,7 @@ public class TempBan implements UserContextEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final User target = event.getTarget();
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defdays").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defdays")).queue();
 		AwaitTask.forMessageReceival(guild, user, event.getMessageChannel(),
 				  d -> {try {Integer.parseInt(d.getMessage().getContentRaw());
 				  			return true;
@@ -35,7 +35,7 @@ public class TempBan implements UserContextEventHandler {
 						ModController.RUN.userModCheck(guild, target);
 						event.getMessageChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
 								.replaceDescription("{user}", target.getName())
-								.replaceDescription("{time}", String.valueOf(days)).convert()).queue();
+								.replaceDescription("{time}", String.valueOf(days))).queue();
 				  }, null).append();
 	}
 

@@ -2,15 +2,12 @@ package configuration_options.assets;
 
 import javax.annotation.Nullable;
 
-import base.assets.CustomMessageEmbed;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
-import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 
 public class ConfigurationEvent {
 	
@@ -21,18 +18,12 @@ public class ConfigurationEvent {
 	private MessageChannel channel = null;
 	private GenericComponentInteractionCreateEvent event = null;
 	private ConfigurationSubOptionData subOperation = null;
-
-	public ConfigurationEvent(Guild guild, User user, GenericComponentInteractionCreateEvent event, @Nullable ConfigurationSubOptionData subOperation) {
-		this.guild = guild;
-		this.user = user;
-		this.member = guild.getMember(user);
-		this.event = event;
-		this.subOperation = subOperation;
-	}
 	
 	public ConfigurationEvent(Member member, GenericComponentInteractionCreateEvent event, @Nullable ConfigurationSubOptionData subOperation) {
 		this.guild = member.getGuild();
 		this.user = member.getUser();
+		this.message = event.getMessage();
+		this.channel = this.message.getChannel();
 		this.member = member;
 		this.event = event;
 		this.subOperation = subOperation;
@@ -69,15 +60,5 @@ public class ConfigurationEvent {
 	
 	public String getSubOperation() {
 		return this.subOperation.getName();
-	}
-	
-	public MessageEditCallbackAction replyEmbeds(CustomMessageEmbed embed) {
-		return this.replyEmbeds(embed.convert());
-	}
-	
-	public MessageEditCallbackAction replyEmbeds(MessageEmbed embed) {
-		channel = event.getChannel();
-		message = event.getMessage();
-		return event.editMessageEmbeds(embed);
 	}
 }

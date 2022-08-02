@@ -32,15 +32,15 @@ public class Queue implements CommandEventHandler {
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
 			return;
 		}
 		if (queue.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noqueue").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noqueue")).queue();
 			return;
 		}
 		
@@ -67,7 +67,7 @@ public class Queue implements CommandEventHandler {
 		if(trackList.size() > trackCount) {
 			sB.append(temp1[1].replace("{count}", String.valueOf(trackList.size() - trackCount)));
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "queue").replaceDescription("{list}", sB.toString()).convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "queue").replaceDescription("{list}", sB.toString())).queue();
 	}
 
 	@Override

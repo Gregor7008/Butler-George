@@ -69,7 +69,7 @@ public class Leave implements CommandEventHandler {
 				}
 			}
 		} catch (ClassCastException e) {}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
 	}
 
 	@Override

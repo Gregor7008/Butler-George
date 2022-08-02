@@ -23,7 +23,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 	public void execute(ConfigurationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
 				Button.secondary("welcome", Emoji.fromUnicode("\uD83C\uDF89")),
 				Button.secondary("goodbye", Emoji.fromUnicode("\uD83D\uDC4B"))).queue();
 		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
@@ -35,41 +35,41 @@ public class AutoMessages implements ConfigurationEventHandler {
 						defined = !goodbyemsg.getString(0).equals("");
 					} catch (JSONException e) {}
 					if (event.getSubOperation().equals("set")) {
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setrequest").replaceDescription("{type}", type).convert()).queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setrequest").replaceDescription("{type}", type)).queue();
 						AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 								e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
 							  			  return guild.getTextChannelById(e.getMessage().getMentions().getChannels().get(0).getIdLong()) != null;
 							  		  } else {return false;}},
 								e -> {goodbyemsg.put(1, e.getMessage().getMentions().getChannels().get(0).getIdLong());
-									  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "def" + type + "msg").convert()).queue();
+									  event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "def" + type + "msg")).queue();
 									  AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 											  a -> {goodbyemsg.put(0, a.getMessage().getContentRaw()).put(2, true);
-											  	    event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, type + "success").convert()).queue();
+											  	    event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, type + "success")).queue();
 											  }).append();
 								}, null).append();
 						return;
 					}
 					if (!defined) {
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nonedefined").replaceDescription("{type}", type).convert()).queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nonedefined").replaceDescription("{type}", type)).queue();
 						return;
 					}
 					if (event.getSubOperation().equals("on")) {
 						if (!goodbyemsg.getBoolean(2)) {
 							goodbyemsg.put(2, true);
-							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onsuccess").replaceDescription("{type}", type).convert()).queue();
+							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onsuccess").replaceDescription("{type}", type)).queue();
 							return;
 						} else {
-							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onfail").replaceDescription("{type}", type).convert()).queue();
+							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onfail").replaceDescription("{type}", type)).queue();
 							return;
 						}
 					}
 					if (event.getSubOperation().equals("off")) {
 						if (goodbyemsg.getBoolean(2)) {
 							goodbyemsg.put(2, false);
-							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "offsuccess").replaceDescription("{type}", type).convert()).queue();
+							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "offsuccess").replaceDescription("{type}", type)).queue();
 							return;
 						} else {
-							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "offfail").replaceDescription("{type}", type).convert()).queue();
+							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "offfail").replaceDescription("{type}", type)).queue();
 							return;
 						}
 					}
@@ -80,7 +80,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 						   .replace("{membercount}", Integer.toString(guild.getMemberCount()))
 						   .replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter));
 						guild.getTextChannelById(goodbyemsg.getLong(1)).sendMessage(msg).queue();
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "testsuccess").replaceDescription("{type}", type).convert()).queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "testsuccess").replaceDescription("{type}", type)).queue();
 					}
 				}).append();
 	}

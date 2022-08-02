@@ -32,15 +32,15 @@ public class Play implements CommandEventHandler {
 		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "wrongusage").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "wrongusage")).queue();
 			return;
 		}
 		if (!member.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noVCdefined").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noVCdefined")).queue();
 			return;
 		}
 		if (self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "alreadyinuse").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "alreadyinuse")).queue();
 			return;
 		}
 		this.load(event, argument, musicManager, channel, member);

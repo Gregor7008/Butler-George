@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
-import base.engines.Toolbox;
 import configuration_options.ConfigurationOptionList;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationOptionData;
@@ -35,7 +34,7 @@ public class Configure implements CommandEventHandler {
 		
 		ConcurrentHashMap<String, ConfigurationOptionData> operations = new ConcurrentHashMap<String, ConfigurationOptionData>();
 		SelectMenu.Builder menuBuilder1 = SelectMenu.create("selVal").setRequiredRange(1, 1).setPlaceholder("Select a value");
-		EmbedBuilder eb1 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selval").convert());
+		EmbedBuilder eb1 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selval"));
 		
 		if (event.getSubcommandName().equals("server")) {
 			new ConfigurationOptionList().serverOperations.forEach((name, operationRequest) -> {
@@ -53,7 +52,7 @@ public class Configure implements CommandEventHandler {
 					  ConfigurationSubOptionData[] subOperations = data.getSubOperations();
 					  if (subOperations != null) {
 						List<Button> buttons = new ArrayList<>();
-						EmbedBuilder eb2 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selsub").convert());
+						EmbedBuilder eb2 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selsub"));
 						for (int i = 0; i < subOperations.length; i++) {
 							buttons.add(Button.secondary(String.valueOf(i), subOperations[i].getName()));
 								eb2.addField("`" + subOperations[i].getName() + "`", subOperations[i].getInfo(), true);
@@ -61,8 +60,9 @@ public class Configure implements CommandEventHandler {
 						e.editMessageEmbeds(eb2.build()).setActionRow(buttons).queue();
 						AwaitTask.forButtonInteraction(guild, user, msg,
 								s -> {
-									Toolbox.deleteActionRows(s.getMessage(),
-											() -> {data.getOperationEventHandler().execute(new ConfigurationEvent(event.getMember(), s, subOperations[Integer.valueOf(s.getButton().getId())]));});
+									s.editMessageEmbeds(s.getMessage().getEmbeds()).setActionRows().queue(onCompletion -> {
+										data.getOperationEventHandler().execute(new ConfigurationEvent(event.getMember(), s, subOperations[Integer.valueOf(s.getButton().getId())]));
+									});
 								}).append();
 					} else {
 						data.getOperationEventHandler().execute(new ConfigurationEvent(event.getMember(), e, null));

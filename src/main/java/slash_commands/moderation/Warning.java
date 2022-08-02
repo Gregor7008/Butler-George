@@ -36,13 +36,13 @@ public class Warning implements CommandEventHandler {
 				reason = event.getOption("reason").getAsString();
 			}
 			ConfigLoader.INSTANCE.getMemberConfig(guild, iuser).getJSONArray("warnings").put(reason);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue();
 			try {
 				final String repl = reason;
 				iuser.openPrivateChannel().queue(channel -> {
 					channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, iuser, this, "pm")
 							.replaceDescription("{guild}", guild.getName())
-							.replaceDescription("{reason}", repl).convert()).queue();
+							.replaceDescription("{reason}", repl)).queue();
 				});
 			} catch (Exception e) {}
 		}
@@ -51,7 +51,7 @@ public class Warning implements CommandEventHandler {
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			if (this.listwarnings(event)) {
-				event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsel").convert()).queue();
+				event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsel")).queue();
 				TextChannel channel = guild.getTextChannelById(event.getMessageChannel().getIdLong());
 				AwaitTask.forMessageReceival(guild, user, channel,
 						e -> {try {
@@ -62,7 +62,7 @@ public class Warning implements CommandEventHandler {
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
 							  channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
 									  .replaceDescription("{warning}", "`" + warnings.getString(w-1) + "`")
-									  .replaceDescription("{user}", guild.getMember(iuser).getEffectiveName()).convert()).queue();
+									  .replaceDescription("{user}", guild.getMember(iuser).getEffectiveName())).queue();
 							  warnings.remove(w-1);}, null).append();
 			}
 		}
@@ -100,7 +100,7 @@ public class Warning implements CommandEventHandler {
 		final User iuser = event.getOption("user").getAsUser();
 		JSONArray warnings = ConfigLoader.INSTANCE.getMemberConfig(guild, iuser).getJSONArray("warnings");
 		if (warnings.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nowarnings").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nowarnings")).queue();
 			return false;
 		}
 		StringBuilder sB = new StringBuilder();
@@ -115,7 +115,7 @@ public class Warning implements CommandEventHandler {
 		}
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list")
 				.replaceTitle("{user}", guild.getMemberById(iuser.getId()).getEffectiveName())
-				.replaceDescription("{list}", sB.toString()).convert()).queue();
+				.replaceDescription("{list}", sB.toString())).queue();
 		return true;
 	}
 }

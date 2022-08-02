@@ -1,10 +1,15 @@
 package slash_commands.utilities;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import base.Bot;
 import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
 import base.engines.Toolbox;
@@ -13,6 +18,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageEmbed.Footer;
@@ -32,6 +38,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 import slash_commands.assets.CommandEventHandler;
 
@@ -42,6 +49,7 @@ public class Embed implements CommandEventHandler {
 	private Guild guild;
 	private MessageChannel channel, target;
 	private List<MessageEmbed> embedCache = new ArrayList<>();
+	private HashMap<String, InputStream> attachments = new HashMap<>();
 	
 //	TODO /embed rework for stability, reliability and more customizability (For a way to manage images, look at Levelbackground.java#>66)!
 	@Override
@@ -53,13 +61,13 @@ public class Embed implements CommandEventHandler {
 		if (event.getOption("channel") != null) {
 			this.target = event.getOption("channel").getAsChannel().asGuildMessageChannel();
 			if (this.target == null) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, null, "invalid").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, null, "invalid")).queue();
 				return;
 			}
 		} else {
 			this.target = this.channel;
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setup").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setup")).queue();
 		this.startEmbedConfiguration(event.getHook().retrieveOriginal().complete());
 	}
 
@@ -80,7 +88,7 @@ public class Embed implements CommandEventHandler {
 	private void startEmbedConfiguration(Message message) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(LanguageEngine.color);
-		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "author").convert())
+		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "author"))
 			 .setActionRow(Button.secondary("true", Emoji.fromUnicode("\u2705")),
 					  	   Button.secondary("false", Emoji.fromUnicode("\u274C"))).queue();
 		AwaitTask.forButtonInteraction(guild, user, message,
@@ -97,7 +105,6 @@ public class Embed implements CommandEventHandler {
 							.addOption("Thumbnail", "thumbnail", "The thumbnail of your embed, displayed in the top right corner")
 							.addOption("Image", "image", "The image of your embed, displayed between description and any additional fields")
 							.addOption("Field", "field", "Configure additional fields of your embed")
-							.addOption("Attachements", "attachements", "Add attachements to the message containing the embed")
 							.build();
 					e.deferEdit().queue();
 					this.continueEmbedConfiguration(e.getMessage(), menu, true, eb);
@@ -114,7 +121,7 @@ public class Embed implements CommandEventHandler {
 			 						    Button.secondary("cancel", Emoji.fromUnicode("\u274C"))));
 			messageAddon = LanguageEngine.getRaw(guild, user, this, "addon");
 		}
-		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selvalue").replaceDescription("{addon}", messageAddon).convert()).setActionRows(actionRows).queue();
+		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selvalue").replaceDescription("{addon}", messageAddon)).setActionRows(actionRows).queue();
 		AtomicReference<AwaitTask<ButtonInteractionEvent>> buttonInteractionTask = new AtomicReference<>(null);
 		AwaitTask<SelectMenuInteractionEvent> selectionMenuTask = AwaitTask.forSelectMenuInteraction(guild, user, message,
 				s -> {
@@ -140,11 +147,8 @@ public class Embed implements CommandEventHandler {
 					case "field":
 						this.configureFields(menu, eb, s);
 						break;
-					case "attachements":
-						this.configureAttachements(menu, eb, s);
-						break;
 					default:
-						s.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "fatal").convert()).queue();
+						s.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "fatal")).queue();
 					}
 				}).addValidComponents(menu.getId()).append();
 		if (!firstCall) {
@@ -154,11 +158,15 @@ public class Embed implements CommandEventHandler {
 						MessageEditCallbackAction mecAction = null;
 						if (b.getButton().getId().equals("send")) {
 							embedCache.add(eb.build());
-							target.sendMessageEmbeds(embedCache).queue();
+							MessageAction sendAction = target.sendMessageEmbeds(embedCache);
+							attachments.forEach((fileName, inputStream) -> {
+								sendAction.addFile(inputStream, fileName);
+							});
+							sendAction.queue();
 							embedCache.clear();
-							mecAction = b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "sendsuccess").convert()).setActionRows();
+							mecAction = b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "sendsuccess")).setActionRows();
 						} else if (b.getButton().getId().equals("cancel")) {
-							mecAction = b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "cancelsuccess").convert()).setActionRows();
+							mecAction = b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "cancelsuccess")).setActionRows();
 						} else if (b.getButton().getId().equals("again")) {
 							embedCache.add(eb.build());
 							b.deferEdit().queue();
@@ -196,7 +204,7 @@ public class Embed implements CommandEventHandler {
 				.addActionRows(ActionRow.of(titleInput.build()), ActionRow.of(titleURLInput))
 				.build();
 		event.replyModal(modal).queue();
-		AwaitTask.forModalInteraction(guild, user, event.getChannel(),
+		AwaitTask.forModalInteraction(guild, user, event.getChannel(), null,
 				m -> {
 					m.deferEdit().queue();
 					String url = m.getValue("titleURL").getAsString();;
@@ -205,10 +213,9 @@ public class Embed implements CommandEventHandler {
 					}
 					String input = m.getValue("title").getAsString();
 					eb.setTitle(input, url);
-					event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "titlesuccess")
-							.replaceDescription("{title}", input).convert()).setActionRows().queue();
-					try {Thread.sleep(1000);} catch (InterruptedException ex) {}
-					this.continueEmbedConfiguration(event.getMessage(), menu, false, eb);
+					this.defaultConsumer(menu, eb, event, "title", input);
+				}, () -> {
+					this.defaultTimeout(menu, eb, event);
 				}).addValidComponents(modal.getId()).append();
 	}
 	
@@ -216,7 +223,6 @@ public class Embed implements CommandEventHandler {
 		TextInput.Builder descriptionInput = TextInput.create("description", "Description", TextInputStyle.SHORT)
 				.setPlaceholder("Input description")
 				.setMinLength(1)
-				.setMaxLength(MessageEmbed.DESCRIPTION_MAX_LENGTH)
 				.setRequired(true);
 		String current = eb.build().getDescription();
 		if (current != null) {
@@ -226,14 +232,14 @@ public class Embed implements CommandEventHandler {
 				.addActionRows(ActionRow.of(descriptionInput.build()))
 				.build();
 		event.replyModal(modal).queue();
-		AwaitTask.forModalInteraction(guild, user, event.getChannel(),
+		AwaitTask.forModalInteraction(guild, user, event.getChannel(), null,
 				m -> {
+					m.deferEdit().queue();
 					String input = m.getValue("description").getAsString();
 					eb.setDescription(input);
-					event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "descriptionsuccess")
-							.replaceDescription("{description}", input).convert()).setActionRows().queue();
-					try {Thread.sleep(1000);} catch (InterruptedException ex) {}
-					this.continueEmbedConfiguration(event.getMessage(), menu, false, eb);
+					this.defaultConsumer(menu, eb, event, "description", input);
+				}, () -> {
+					this.defaultTimeout(menu, eb, event);
 				}).addValidComponents(modal.getId()).append();
 	}
 	
@@ -247,34 +253,99 @@ public class Embed implements CommandEventHandler {
 		if (current != null) {
 			footerInput.setValue(current.getText());
 		}
-		Modal modal = Modal.create("descriptionConfig", "Description configuration")
+		Modal modal = Modal.create("footerConfig", "Footer configuration")
 				.addActionRows(ActionRow.of(footerInput.build()))
 				.build();
 		event.replyModal(modal).queue();
-		AwaitTask.forModalInteraction(guild, user, event.getChannel(),
+		AwaitTask.forModalInteraction(guild, user, event.getChannel(), null,
 				m -> {
-					String input = m.getValue("description").getAsString();
-					eb.setDescription(input);
-					event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "descriptionsuccess")
-							.replaceDescription("{description}", input).convert()).setActionRows().queue();
-					try {Thread.sleep(1000);} catch (InterruptedException ex) {}
-					this.continueEmbedConfiguration(event.getMessage(), menu, false, eb);
+					m.deferEdit().queue();
+					String input = m.getValue("footer").getAsString();
+					eb.setFooter(input);
+					this.defaultConsumer(menu, eb, event, "footer", input);
+				}, () -> {
+					this.defaultTimeout(menu, eb, event);
 				}).addValidComponents(modal.getId()).append();
 	}
 	
 	private void configureThumbnail(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
-		
+		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "configthumbnail")).setActionRows().queue();
+		AwaitTask.forMessageReceival(guild, user, channel,
+				m -> {
+					return !m.getMessage().getAttachments().stream().filter(a -> a.isImage()).toList().isEmpty();
+				},
+				m -> {
+					Attachment thumbnail = m.getMessage().getAttachments().stream().filter(a -> a.isImage()).toList().get(0);
+					String embedIndex = String.valueOf(embedCache.size());
+					String extension = thumbnail.getFileExtension();
+					if (extension == null) {
+						extension = "png";
+					}
+					try {
+						attachments.put("thumbnail" + embedIndex + ")." + extension, thumbnail.getProxy().download().get());
+						eb.setThumbnail("attachment://thumbnail" + embedIndex + ")." + extension);
+						this.defaultConsumer(menu, eb, event, "thumbnail", "");
+					} catch (InterruptedException | ExecutionException e) {
+						this.errorConsumer(menu, eb, event);
+					}
+				}, () -> {
+					this.defaultTimeout(menu, eb, event);
+				}).append();
 	}
 	
 	private void configureImage(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
-		
+		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "configthumbnail")).setActionRows().queue();
+		AwaitTask.forMessageReceival(guild, user, channel,
+				m -> {
+					return !m.getMessage().getAttachments().stream().filter(a -> a.isImage()).toList().isEmpty();
+				},
+				m -> {
+					Attachment image = m.getMessage().getAttachments().stream().filter(a -> a.isImage()).toList().get(0);
+					String embedIndex = String.valueOf(embedCache.size());
+					String extension = image.getFileExtension();
+					if (extension == null) {
+						extension = "png";
+					}
+					try {
+						attachments.put("image" + embedIndex + ")." + extension, image.getProxy().download().get());
+						eb.setImage("attachment://image" + embedIndex + ")." + extension);
+						this.defaultConsumer(menu, eb, event, "thumbnail", "");
+					} catch (InterruptedException | ExecutionException e) {
+						this.errorConsumer(menu, eb, event);
+					}
+				}, () -> {
+					this.defaultTimeout(menu, eb, event);
+				}).append();
 	}
 	
 	private void configureFields(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
-		
+		//TODO Implement field configuration when JDA updates and supportes selection menus in modals!
+		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "unsupported")).setActionRows().queue();
+		this.scheduleFurtherConfiguration(event.getMessage(), menu, eb, true, 5000);
 	}
 	
-	private void configureAttachements(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
-		
+	private void defaultConsumer(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event, String key, String input) {
+		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, key + "success")
+				.replaceDescription("{" + key + "}", input)).setActionRows().complete();
+		this.scheduleFurtherConfiguration(newMessage, menu, eb, false, 2000);
+	}
+	
+	private void errorConsumer(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).setActionRows().complete();
+		this.scheduleFurtherConfiguration(newMessage, menu, eb, false, 2000);
+	}
+	
+	private void defaultTimeout(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).setActionRows().complete();
+		this.scheduleFurtherConfiguration(newMessage, menu, eb, false, 2000);
+	}
+	
+	private void scheduleFurtherConfiguration(Message newMessage, SelectMenu menu, EmbedBuilder eb, boolean firstCall, long millis) {
+		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
+			@Override
+			public void run() {
+				continueEmbedConfiguration(newMessage, menu, firstCall, eb);
+			}
+		}, millis);
 	}
 }

@@ -101,7 +101,7 @@ public class EventProcessor extends ListenerAdapter {
 			}
 			LevelEngine.getInstance().slashcommand(event);
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported").convert()).queue();	
+			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported")).queue();	
 		}
 	}
 	
@@ -117,7 +117,7 @@ public class EventProcessor extends ListenerAdapter {
 				contextEventHandler.execute(event);
 			}
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported").convert()).queue();	
+			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported")).queue();	
 		}
 	}
 	
@@ -133,7 +133,7 @@ public class EventProcessor extends ListenerAdapter {
 				contextEventHandler.execute(event);
 			}
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported").convert()).queue();	
+			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported")).queue();	
 		}
 	}
 	

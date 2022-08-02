@@ -27,9 +27,9 @@ public class Webhook implements CommandEventHandler {
 		wB.setContent(event.getOption("message").getAsString());
 		try {
 			wB.execute();
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 		} catch (IOException | IllegalArgumentException e) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "elink").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "elink")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 		}
 	}
 	

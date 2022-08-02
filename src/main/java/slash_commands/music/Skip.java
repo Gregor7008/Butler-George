@@ -28,24 +28,24 @@ public class Skip implements CommandEventHandler {
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final AudioPlayer audioPlayer = musicManager.audioPlayer;
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
 			return;
 		}
 		if (audioPlayer.getPlayingTrack() == null) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noneplaying").convert()).queue();
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noneplaying")).queue();
 			return;
 		}
 		musicManager.scheduler.nextTrack();
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "skipped").convert()).queue();
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "skipped")).queue();
 	}
 
 	@Override

@@ -55,7 +55,7 @@ public class Userinfo implements CommandEventHandler {
 			member = event.getGuild().getMember(event.getOption("user").getAsUser());
 		}
 		if (member.equals(event.getGuild().getSelfMember())) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), this, "6").convert()).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), this, "6")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (member.getTimeBoosted() == null) {

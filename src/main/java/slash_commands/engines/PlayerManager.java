@@ -59,7 +59,7 @@ public class PlayerManager {
 				musicManager.scheduler.queue(track);
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "track")
 						.replaceDescription("{track}", track.getInfo().title)
-						.replaceDescription("{author}", track.getInfo().author).convert()).queue();
+						.replaceDescription("{author}", track.getInfo().author)).queue();
 				System.out.println("trackLoaded1");
 			}
 			
@@ -72,28 +72,28 @@ public class PlayerManager {
 					}
 					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list")
 							.replaceDescription("{name}", playlist.getName())
-							.replaceDescription("{author}", String.valueOf(playlist.getTracks().size())).convert()).queue();
+							.replaceDescription("{author}", String.valueOf(playlist.getTracks().size()))).queue();
 					System.out.println("playlistLoaded");
 				} else {
 					AudioTrack track = tracks.get(0);
 					musicManager.scheduler.queue(track);
 					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "track")
 							.replaceDescription("{track}", track.getInfo().title)
-							.replaceDescription("{author}", track.getInfo().author).convert()).queue();
+							.replaceDescription("{author}", track.getInfo().author)).queue();
 					System.out.println("trackLoaded2");
 				}
 			}
 			
 			@Override
 			public void noMatches() {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nomatch").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nomatch")).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 				System.out.println("noMatches");
 			}
 			
 			@Override
 			public void loadFailed(FriendlyException exception) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fail").convert()).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fail")).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 				System.out.println("loadFailed");
 			}
