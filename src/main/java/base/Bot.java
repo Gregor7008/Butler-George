@@ -3,21 +3,16 @@ package base;
 import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.security.auth.login.LoginException;
 
 import org.json.JSONObject;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-
-import components.base.ConfigLoader;
-import components.base.ConfigManager;
-import components.base.ConfigVerifier;
-import components.base.ConsoleEngine;
-import components.base.LanguageEngine;
-import components.commands.ModController;
-import components.commands.ServerUtilities;
+import base.engines.ConfigLoader;
+import base.engines.ConfigVerifier;
+import base.engines.ConsoleEngine;
+import base.engines.EventAwaiter;
+import base.engines.LanguageEngine;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -26,6 +21,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import slash_commands.engines.ModController;
+import slash_commands.engines.ServerUtilities;
 
 public class Bot {
 	
@@ -41,12 +38,11 @@ public class Bot {
 	private boolean errorOccured = false;
 	private boolean shutdown = false;
 	
-	public Bot(String token) throws LoginException, InterruptedException, IOException {
+	public Bot(String token, String databaseIP, String databaseName) throws LoginException, InterruptedException, IOException {
 		INSTANCE = this;
-	    //Create Bot
+		new ConfigLoader(databaseIP, databaseName);
 		JDABuilder builder = JDABuilder.createDefault(token);
-		builder.addEventListeners(eventWaiter);
-		builder.addEventListeners(new Processor());
+		builder.addEventListeners(new EventProcessor(), new EventAwaiter());
 		builder.setRawEventsEnabled(true);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
@@ -130,27 +126,8 @@ public class Bot {
 	private void checkConfigs() {
 		for (int i = 0; i < jda.getGuilds().size(); i++) {
     		Guild guild = jda.getGuilds().get(i);
-    		ConfigVerifier.run.guildCheck(guild);
-    		ConfigVerifier.run.usersCheck(guild);
+    		ConfigVerifier.RUN.guildCheck(guild);
+    		ConfigVerifier.RUN.usersCheck(guild);
 		}
-	}
-	
-	private void startTimer() {
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				List<Guild> guilds = jda.getGuilds();
-				for (int i = 0; i < guilds.size(); i++) {
-					Guild guild = guilds.get(i);
-					ModController.run.guildPenaltyCheck(guild);
-					ModController.run.guildModCheck(guild);
-				}
-				if (timerCount > 0 && noErrorOccured) {
-					ConfigManager.pushCache();
-				}
-				timerCount++;
-				GUI.get.increaseCyclesCounter();
-			}
-		}, 0, 5*60*1000);
 	}
 }

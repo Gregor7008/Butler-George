@@ -1,5 +1,6 @@
 package base;
 
+import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
@@ -7,7 +8,6 @@ import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.security.auth.login.LoginException;
@@ -25,39 +25,35 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
-import components.base.ConfigManager;
-import components.base.ConsoleEngine;
+import base.engines.ConsoleEngine;
 import net.miginfocom.swing.MigLayout;
-import java.awt.Color;
 
-public class GUI extends JFrame implements WindowListener, FocusListener{
+public class GUI extends JFrame implements WindowListener, FocusListener {
 	
-	public static GUI get;
+	public static GUI INSTANCE;
 	private static final long serialVersionUID = 5923282583431103590L;
+	private TimerTask runtimeMeasuringTask;
 	
-	public static JTextArea console = new JTextArea();
-	public static JLabel greenLED = new JLabel();
-	public static JLabel redLED = new JLabel();
-	public static JTextField databaseIP = new JTextField();
-	public static JTextField databaseName = new JTextField();
-	public static JTextField token = new JTextField();
-	public static JButton startButton = new JButton("Start");
-	public static JButton stopButton = new JButton("Stop");
-	public static JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-	public static JTextField consoleIn = new JTextField();
-	public static JProgressBar progressBar = new JProgressBar();
-	public static JLabel progressLabel = new JLabel("0%");
-	public static JTable infoTable = new JTable();
-	public static JTable commandTable = new JTable();
+	public JTextArea console = new JTextArea();
+	public JLabel greenLED = new JLabel();
+	public JLabel redLED = new JLabel();
+	public JTextField databaseIP = new JTextField();
+	public JTextField databaseName = new JTextField();
+	public JTextField token = new JTextField();
+	public JButton startButton = new JButton("Start");
+	public JButton stopButton = new JButton("Stop");
+	public JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+	public JTextField consoleIn = new JTextField();
+	public JProgressBar progressBar = new JProgressBar();
+	public JLabel progressLabel = new JLabel("0%");
+	public JTable infoTable = new JTable();
+	public JTable commandTable = new JTable();
 	
-	private Timer runtimeRefresher;
 	public ImageIcon greenLEDOn;
 	public ImageIcon greenLEDOff;
 	public ImageIcon redLEDOn;
 	public ImageIcon redLEDOff;
 	public ImageIcon icon;
-	
-	
 	
 	public static void main(String[] args) {
 		try {
@@ -69,7 +65,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener{
 	}
 	
 	public GUI(String[] args) {
-		get = this;
+		INSTANCE = this;
 		try {
 			greenLEDOn = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/green_on.png").readAllBytes());
 			greenLEDOff = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/green_off.png").readAllBytes());
@@ -151,22 +147,22 @@ public class GUI extends JFrame implements WindowListener, FocusListener{
 		infoTable.setShowGrid(false);
 		infoTable.setModel(new DefaultTableModel(
 			new Object[][] {
-				{"Name:", Bot.name},
-				{"Version:", Bot.version},
-				{"ID:", Bot.id},
+				{"Name:", Bot.NAME},
+				{"Version:", Bot.VERSION},
+				{"ID:", Bot.ID},
 				{"Runtime:", "00:00:00:00"},
 				{"Errors:", 0},
 				{"Executions:", 0},
 				{"Servers:", 0},
 				{"Users:", 0},
 				{"Push Paused:", false},
-				{"Timer Cycles:", 0}
+				{"Total Pushs:", 0}
 			},
 			new String[] {
 				"key", "value"
 			}
 		) {private static final long serialVersionUID = 4012626449837340333L;
-		
+			
 		   public boolean isCellEditable(int row, int column) {
 				return false;
 		   }
@@ -179,11 +175,6 @@ public class GUI extends JFrame implements WindowListener, FocusListener{
 			new Object[][] {
 				{"stop", ""},
 				{"exit", ""},
-				{"giverole", "[Guild ID]  [User ID]  [Role ID]"},
-				{"removerole", "[Guild ID]  [User ID]  [Role ID]"},
-				{"kick", "[Guild ID]  [User ID]"},
-				{"ban", "[Guild ID]  [User ID]"},
-				{"unban", "[Guild ID]  [User ID]"},
 				{"warn", "[Guild ID]  [User ID]"},
 				{"pushCache", ""},
 				{"printCache", ""},
@@ -255,7 +246,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener{
 		this.setTableValue(5, (int) this.getTableValue(5) + 1);
 	}
 	
-	public void increaseCyclesCounter() {
+	public void increasePushCounter() {
 		this.setTableValue(9, (int) this.getTableValue(9) + 1);
 	}
 	
@@ -278,24 +269,22 @@ public class GUI extends JFrame implements WindowListener, FocusListener{
 	
 	public void startRuntimeMeasuring() {
 		OffsetDateTime startTime = OffsetDateTime.now();
-		runtimeRefresher = new Timer();
-		runtimeRefresher.schedule(new TimerTask() {
+		runtimeMeasuringTask = new TimerTask() {
 			@Override
 			public void run() {
 				Duration diff = Duration.between(startTime, OffsetDateTime.now());
-				GUI.get.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
+				GUI.INSTANCE.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
 						diff.toDays(),
-                        diff.toHours(), 
-                        diff.toMinutesPart(), 
-                        diff.toSecondsPart()));
+	                    diff.toHours(), 
+	                    diff.toMinutesPart(), 
+	                    diff.toSecondsPart()));
 			}
 		};
 		Bot.INSTANCE.getTimer().schedule(runtimeMeasuringTask, 0, 1000);
 	}
 	
 	public void stopRuntimeMeasuring() {
-		runtimeRefresher.cancel();
-		runtimeRefresher = null;
+		runtimeMeasuringTask.cancel();
 	}
 	
 	public void setTableValue(int row, Object value) {
