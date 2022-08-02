@@ -54,7 +54,7 @@ public class Bot {
 	
 	public void startup(String databaseIP, String databaseName) {
 //		Essentials
-		Runtime.getRuntime().addShutdownHook(shutdownThread);
+		Runtime.getRuntime().addShutdownHook(this.getShutdownThread());
 		Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.INSTANCE);
 //	    Engines
 		new ConfigVerifier();

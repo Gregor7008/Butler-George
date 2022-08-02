@@ -2,6 +2,8 @@ package slash_commands.utilities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
@@ -13,10 +15,12 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageEmbed.Footer;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -28,6 +32,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 import slash_commands.assets.CommandEventHandler;
 
 public class Embed implements CommandEventHandler {
@@ -91,7 +96,8 @@ public class Embed implements CommandEventHandler {
 							.addOption("Footer", "footer", "The footer of your embed, displayed right at the bottom of your embed")
 							.addOption("Thumbnail", "thumbnail", "The thumbnail of your embed, displayed in the top right corner")
 							.addOption("Image", "image", "The image of your embed, displayed between description and any additional fields")
-							.addOption("Field", "field", "Add a new field with title and description")
+							.addOption("Field", "field", "Configure additional fields of your embed")
+							.addOption("Attachements", "attachements", "Add attachements to the message containing the embed")
 							.build();
 					e.deferEdit().queue();
 					this.continueEmbedConfiguration(e.getMessage(), menu, true, eb);
@@ -109,48 +115,76 @@ public class Embed implements CommandEventHandler {
 			messageAddon = LanguageEngine.getRaw(guild, user, this, "addon");
 		}
 		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selvalue").replaceDescription("{addon}", messageAddon).convert()).setActionRows(actionRows).queue();
-//					if (e.getComponentType().equals(Component.Type.SELECT_MENU)) {
-//						SelectMenuInteractionEvent sm = (SelectMenuInteractionEvent) e;
-//						switch (sm.getSelectedOptions().get(0).getValue()) {
-//						case "title":
-//							this.configureTitle(menu, eb, sm);
-//							break;
-//						default:
-//							sm.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "fatal").convert()).queue();
-//						}
-//					} else if (e.getComponentType().equals(Component.Type.BUTTON) && firstCall) {
-//						ButtonInteractionEvent bc = (ButtonInteractionEvent) e;
-//						MessageEditCallbackAction mecAction = null;
-//						if (bc.getButton().getId().equals("send")) {
-//							embedCache.add(eb.build());
-//							target.sendMessageEmbeds(embedCache).queue();
-//							embedCache.clear();
-//							mecAction = bc.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "sendsuccess").convert()).setActionRows();
-//						} else if (bc.getButton().getId().equals("cancel")) {
-//							mecAction = bc.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "cancelsuccess").convert()).setActionRows();
-//						} else if (bc.getButton().getId().equals("again")) {
-//							embedCache.add(eb.build());
-//							bc.deferEdit().queue();
-//							this.startEmbedConfiguration(bc.getMessage());
-//						}
-//						if (mecAction != null) {
-//							if (target.getIdLong() == channel.getIdLong()) {
-//								mecAction.queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
-//							} else {
-//								mecAction.queue();
-//							}
-//						}		
-//					}
+		AtomicReference<AwaitTask<ButtonInteractionEvent>> buttonInteractionTask = new AtomicReference<>(null);
+		AwaitTask<SelectMenuInteractionEvent> selectionMenuTask = AwaitTask.forSelectMenuInteraction(guild, user, message,
+				s -> {
+					if (buttonInteractionTask.get() != null) {
+						buttonInteractionTask.get().cancel();
+					}
+					switch (s.getSelectedOptions().get(0).getValue()) {
+					case "title":
+						this.configureTitle(menu, eb, s);
+						break;
+					case "description":
+						this.configureDescription(menu, eb, s);
+						break;
+					case "footer":
+						this.configureFooter(menu, eb, s);
+						break;
+					case "thumbnail":
+						this.configureThumbnail(menu, eb, s);
+						break;
+					case "image":
+						this.configureImage(menu, eb, s);
+						break;
+					case "field":
+						this.configureFields(menu, eb, s);
+						break;
+					case "attachements":
+						this.configureAttachements(menu, eb, s);
+						break;
+					default:
+						s.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "fatal").convert()).queue();
+					}
+				}).addValidComponents(menu.getId()).append();
+		if (!firstCall) {
+			buttonInteractionTask.set(AwaitTask.forButtonInteraction(guild, user, message, null,
+					b -> {
+						selectionMenuTask.cancel();
+						MessageEditCallbackAction mecAction = null;
+						if (b.getButton().getId().equals("send")) {
+							embedCache.add(eb.build());
+							target.sendMessageEmbeds(embedCache).queue();
+							embedCache.clear();
+							mecAction = b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "sendsuccess").convert()).setActionRows();
+						} else if (b.getButton().getId().equals("cancel")) {
+							mecAction = b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "cancelsuccess").convert()).setActionRows();
+						} else if (b.getButton().getId().equals("again")) {
+							embedCache.add(eb.build());
+							b.deferEdit().queue();
+							this.startEmbedConfiguration(b.getMessage());
+						}
+						if (mecAction != null) {
+							if (target.getIdLong() == channel.getIdLong()) {
+								mecAction.queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+							} else {
+								mecAction.queue();
+							}
+						}
+					},
+					() -> {}).append());
+		}
 	}
 	
 	private void configureTitle(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
 		TextInput.Builder titleInput = TextInput.create("title", "Title", TextInputStyle.SHORT)
-				.setPlaceholder("Type your title here")
+				.setPlaceholder("Input title")
 				.setMinLength(1)
 				.setMaxLength(MessageEmbed.TITLE_MAX_LENGTH)
 				.setRequired(true);
-		if (!eb.isEmpty()) {
-			titleInput.setValue(eb.build().getTitle());
+		String current = eb.build().getTitle();
+		if (current != null) {
+			titleInput.setValue(current);
 		}
 		TextInput titleURLInput = TextInput.create("titleURL", "URL", TextInputStyle.SHORT)
 				.setPlaceholder("For an embedded link in your title")
@@ -169,11 +203,78 @@ public class Embed implements CommandEventHandler {
 					if (url.equals("") || !Toolbox.checkURL(url)) {
 						url = null;
 					}
-					eb.setTitle(m.getValue("title").getAsString(), url);
+					String input = m.getValue("title").getAsString();
+					eb.setTitle(input, url);
 					event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "titlesuccess")
-							.replaceDescription("{title}", eb.build().getTitle()).convert()).setActionRows().queue();
+							.replaceDescription("{title}", input).convert()).setActionRows().queue();
 					try {Thread.sleep(1000);} catch (InterruptedException ex) {}
 					this.continueEmbedConfiguration(event.getMessage(), menu, false, eb);
 				}).addValidComponents(modal.getId()).append();
+	}
+	
+	private void configureDescription(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+		TextInput.Builder descriptionInput = TextInput.create("description", "Description", TextInputStyle.SHORT)
+				.setPlaceholder("Input description")
+				.setMinLength(1)
+				.setMaxLength(MessageEmbed.DESCRIPTION_MAX_LENGTH)
+				.setRequired(true);
+		String current = eb.build().getDescription();
+		if (current != null) {
+			descriptionInput.setValue(current);
+		}
+		Modal modal = Modal.create("descriptionConfig", "Description configuration")
+				.addActionRows(ActionRow.of(descriptionInput.build()))
+				.build();
+		event.replyModal(modal).queue();
+		AwaitTask.forModalInteraction(guild, user, event.getChannel(),
+				m -> {
+					String input = m.getValue("description").getAsString();
+					eb.setDescription(input);
+					event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "descriptionsuccess")
+							.replaceDescription("{description}", input).convert()).setActionRows().queue();
+					try {Thread.sleep(1000);} catch (InterruptedException ex) {}
+					this.continueEmbedConfiguration(event.getMessage(), menu, false, eb);
+				}).addValidComponents(modal.getId()).append();
+	}
+	
+	private void configureFooter(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+		TextInput.Builder footerInput = TextInput.create("footer", "Footer", TextInputStyle.SHORT)
+				.setPlaceholder("Input footer")
+				.setMinLength(1)
+				.setMaxLength(MessageEmbed.TEXT_MAX_LENGTH)
+				.setRequired(true);
+		Footer current = eb.build().getFooter();
+		if (current != null) {
+			footerInput.setValue(current.getText());
+		}
+		Modal modal = Modal.create("descriptionConfig", "Description configuration")
+				.addActionRows(ActionRow.of(footerInput.build()))
+				.build();
+		event.replyModal(modal).queue();
+		AwaitTask.forModalInteraction(guild, user, event.getChannel(),
+				m -> {
+					String input = m.getValue("description").getAsString();
+					eb.setDescription(input);
+					event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "descriptionsuccess")
+							.replaceDescription("{description}", input).convert()).setActionRows().queue();
+					try {Thread.sleep(1000);} catch (InterruptedException ex) {}
+					this.continueEmbedConfiguration(event.getMessage(), menu, false, eb);
+				}).addValidComponents(modal.getId()).append();
+	}
+	
+	private void configureThumbnail(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+		
+	}
+	
+	private void configureImage(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+		
+	}
+	
+	private void configureFields(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+		
+	}
+	
+	private void configureAttachements(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+		
 	}
 }

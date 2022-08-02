@@ -139,7 +139,7 @@ public class AwaitTask<T extends GenericEvent> {
 		return this;
 	}
 	
-	public void append() {
+	public AwaitTask<T> append() {
 		AwaitTask<T> self = this;
 		EventAwaiter.INSTANCE.appendTask(self);
 		this.timeoutTask = new TimerTask() {
@@ -163,19 +163,21 @@ public class AwaitTask<T extends GenericEvent> {
 			}
 		};
 		Bot.INSTANCE.getTimer().schedule(timeoutTask, TimeUnit.MINUTES.toMillis(1));
+		return this;
 	}
 	
-	public void cancel() {
+	public AwaitTask<T> cancel() {
 		EventAwaiter.INSTANCE.removeTask(this.selfId);
 		this.timeoutTask.cancel();
 		this.cancelled = true;
+		return this;
 	}
 	
-	public void complete(T event) {
+	public AwaitTask<T> complete(T event) {
 		if (this.additionalPredicate != null) {
 			if (!this.additionalPredicate.test(event)) {
 				this.invalidInputReceived = true;
-				return;
+				return this;
 			}
 		}
 		if (!executed && !cancelled) {
@@ -184,6 +186,7 @@ public class AwaitTask<T extends GenericEvent> {
 			this.executed = true;
 			this.eventConsumer.accept(event);
 		}
+		return this;
 	}	
 	
 	public Guild getGuild() {

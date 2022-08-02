@@ -71,7 +71,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 			greenLEDOff = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/green_off.png").readAllBytes());
 			redLEDOn = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/red_on.png").readAllBytes());
 			redLEDOff = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/red_off.png").readAllBytes());
-			icon = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/window_icon.png").readAllBytes());
+			icon = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("misc/self_avatar.png").readAllBytes());
 		} catch (IOException e) {}
 		
 		setIconImage(icon.getImage());
@@ -210,7 +210,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 	}
 
 	private void startBot() {
-		if (Bot.INSTANCE == null) {
+		if (Bot.INSTANCE == null || Bot.INSTANCE.isShutdown()) {
 			try {
 				new Bot(token.getText(), databaseIP.getText(), databaseName.getText());
 			} catch (LoginException | InterruptedException | IOException e1) {
