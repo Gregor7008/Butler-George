@@ -7,6 +7,7 @@ import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
@@ -103,11 +104,24 @@ public abstract class Toolbox {
 		}
 	}
 	
-	public static String processAutoMessage(String input, Guild guild, User user) {
-		return input.replace("{server}", guild.getName())
-				.replace("{user}", user.getName())
+	public static String processAutoMessage(String input, Guild guild, User user, boolean mentions) {
+		String output =  input.replace("{server}", guild.getName())
 				.replace("{membercount}", Integer.toString(guild.getMemberCount()))
 				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter))
 				.replace("{level}", String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getInt("level")));
+		if (mentions) {
+			return output.replace("{user}", user.getAsMention());
+		} else {
+			return output.replace("{user}", user.getName());
+		}
+	}
+	
+	public static void scheduleOperation(Runnable operation, long delay) {
+		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
+			@Override
+			public void run() {
+				operation.run();
+			}
+		}, delay);
 	}
 }

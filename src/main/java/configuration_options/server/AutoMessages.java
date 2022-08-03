@@ -15,10 +15,13 @@ import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Modal;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
@@ -29,13 +32,11 @@ public class AutoMessages implements ConfigurationEventHandler {
 	public void execute(ConfigurationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "unsupportedJDA")).queue();
-//		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
-//				Button.secondary("welcome", Emoji.fromUnicode("\uD83C\uDF89")),
-//				Button.secondary("goodbye", Emoji.fromUnicode("\uD83D\uDC4B")),
-//				Button.secondary("level", Emoji.fromUnicode("\uD83C\uDD99"))).queue();
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
+				Button.secondary("welcome", Emoji.fromUnicode("\uD83C\uDF89")),
+				Button.secondary("goodbye", Emoji.fromUnicode("\uD83D\uDC4B")),
+				Button.secondary("level", Emoji.fromUnicode("\uD83C\uDD99"))).queue();
 		
-//		TODO Implement auto message configuration when JDA updates and supports selection menus in modals!
 		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
 				b -> {
 					String type = b.getComponentId();
@@ -45,6 +46,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 						defined = !selectedmsg.getString(1).equals("");
 					} catch (JSONException e) {}
 					if (event.getSubOperation().equals("set")) {
+						//Implement menu
 						SelectMenu.Builder menuBuilder = SelectMenu.create("channel")
 								.setPlaceholder("Select channel")
 								.setRequiredRange(1, 1);
@@ -59,23 +61,31 @@ public class AutoMessages implements ConfigurationEventHandler {
 							}
 						}
 						SelectMenu menu = menuBuilder.build();
-						TextInput titleInput = TextInput.create("title", "Title", TextInputStyle.SHORT)
-								.setPlaceholder("Input title")
-								.setRequired(true)
-								.build();
-						TextInput messageInput = TextInput.create("message", "Message", TextInputStyle.PARAGRAPH)
-								.setPlaceholder("Input message")
-								.build();
-						Modal.Builder modalBuilder = Modal.create("configMessage", type.substring(0, 1).toUpperCase() + type.substring(1) + " message configuration");
-						modalBuilder.addActionRows(ActionRow.of(menu), ActionRow.of(titleInput), ActionRow.of(messageInput));
-						b.replyModal(modalBuilder.build()).queue();
-						AwaitTask.forModalInteraction(guild, user, event.getChannel(),
-								e -> {
-									selectedmsg.put(0, 0L);			//		<- Get selected value from SelectMenu, convert to long and execute
-									selectedmsg.put(1, e.getValue("title").getAsString());
-									selectedmsg.put(2, e.getValue("message").getAsString());
-									selectedmsg.put(3, true);
-									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, type + "success")).queue();
+						MessageEmbed firstReplyEmbed = LanguageEngine.fetchMessage(guild, user, this, "selchannel").replaceDescription("{type}", type);
+						b.editMessageEmbeds(firstReplyEmbed).setActionRows(ActionRow.of(menu)).queue();
+						AwaitTask.forSelectMenuInteraction(guild, user, event.getMessage(),
+								s -> {
+									long selChannelId = Long.valueOf(s.getSelectedOptions().get(0).getValue());
+									TextInput titleInput = TextInput.create("title", "Title", TextInputStyle.SHORT)
+											.setPlaceholder("Input title")
+											.setRequired(true)
+											.build();
+									TextInput messageInput = TextInput.create("message", "Message", TextInputStyle.PARAGRAPH)
+											.setPlaceholder("Input message")
+											.build();
+									Modal.Builder modalBuilder = Modal.create("configMessage", type.substring(0, 1).toUpperCase() + type.substring(1) + " message configuration");
+									modalBuilder.addActionRows(ActionRow.of(titleInput), ActionRow.of(messageInput));
+//									String infoText = LanguageEngine.getDescription(guild, user, this, "def" + type + "msg");
+									s.replyModal(modalBuilder.build()).queue();
+									s.getMessage().editMessageEmbeds(firstReplyEmbed).setActionRows().queue();
+									AwaitTask.forModalInteraction(guild, user, s.getMessage(),
+											e -> {
+												selectedmsg.put(0, selChannelId);
+												selectedmsg.put(1, e.getValue("title").getAsString());
+												selectedmsg.put(2, e.getValue("message").getAsString());
+												selectedmsg.put(3, true);
+												e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, type + "success")).setActionRows().queue();
+											}).append();
 								}).append();
 						return;
 					}
@@ -104,12 +114,12 @@ public class AutoMessages implements ConfigurationEventHandler {
 						}
 					}
 					if (event.getSubOperation().equals("test")) {
-						String title = Toolbox.processAutoMessage(selectedmsg.getString(1), guild, user);
-						String message = Toolbox.processAutoMessage(selectedmsg.getString(2), guild, user);
+						String title = Toolbox.processAutoMessage(selectedmsg.getString(1), guild, user, false);
+						String message = Toolbox.processAutoMessage(selectedmsg.getString(2), guild, user, true);
 						guild.getTextChannelById(selectedmsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
 						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "testsuccess").replaceDescription("{type}", type)).queue();
 					}
-				}); //.append(); <- Append again, when JDA supports this operation
+				}).append();
 	}
 
 	@Override

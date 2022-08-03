@@ -7,7 +7,6 @@ import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.annotation.Nullable;
@@ -79,7 +78,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 	}
 	
 	private void checkStreams() {
-		new Timer().schedule(new TimerTask() {
+		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				if (errStream.size() > 0) {
@@ -91,7 +90,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 					outStream.reset();
 				}
 			}
-		}, 0, 2*1000);
+		}, 0, 1000);
 	}
 
 	@Override

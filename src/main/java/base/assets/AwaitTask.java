@@ -60,7 +60,6 @@ public class AwaitTask<T extends GenericEvent> {
 	public static AwaitTask<MessageReactionAddEvent> forReactionAdding(Guild guild, User user, Message message,
 			@Nullable Predicate<MessageReactionAddEvent> additionalPredicate, Consumer<MessageReactionAddEvent> onSuccess, @Nullable Runnable onTimeout) {
 		return new AwaitTask<MessageReactionAddEvent>(AwaitedEvent.MESSAGE_REACTION_ADD_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
-		
 	}
 	
 	public static AwaitTask<MessageReactionRemoveEvent> forReactionRemoval(Guild guild, User user, Message message, Consumer<MessageReactionRemoveEvent> onSuccess) {
@@ -70,7 +69,6 @@ public class AwaitTask<T extends GenericEvent> {
 	public static AwaitTask<MessageReactionRemoveEvent> forReactionRemoval(Guild guild, User user, Message message,
 			@Nullable Predicate<MessageReactionRemoveEvent> additionalPredicate, Consumer<MessageReactionRemoveEvent> onSuccess, @Nullable Runnable onTimeout) {
 		return new AwaitTask<MessageReactionRemoveEvent>(AwaitedEvent.MESSAGE_REACTION_REMOVE_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
-		
 	}
 	
 	public static AwaitTask<ButtonInteractionEvent> forButtonInteraction(Guild guild, User user, Message message, Consumer<ButtonInteractionEvent> onSuccess) {
@@ -80,7 +78,6 @@ public class AwaitTask<T extends GenericEvent> {
 	public static AwaitTask<ButtonInteractionEvent> forButtonInteraction(Guild guild, User user, Message message,
 			@Nullable Predicate<ButtonInteractionEvent> additionalPredicate, Consumer<ButtonInteractionEvent> onSuccess, @Nullable Runnable onTimeout) {
 		return new AwaitTask<ButtonInteractionEvent>(AwaitedEvent.BUTTON_INTERACTION_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
-		
 	}
 	
 	public static AwaitTask<SelectMenuInteractionEvent> forSelectMenuInteraction(Guild guild, User user, Message message, Consumer<SelectMenuInteractionEvent> onSuccess) {
@@ -90,7 +87,6 @@ public class AwaitTask<T extends GenericEvent> {
 	public static AwaitTask<SelectMenuInteractionEvent> forSelectMenuInteraction(Guild guild, User user, Message message,
 			@Nullable Predicate<SelectMenuInteractionEvent> additionalPredicate, Consumer<SelectMenuInteractionEvent> onSuccess, @Nullable Runnable onTimeout) {
 		return new AwaitTask<SelectMenuInteractionEvent>(AwaitedEvent.SELECT_MENU_INTERACTION_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
-		
 	}
 	
 	public static AwaitTask<ModalInteractionEvent> forModalInteraction(Guild guild, User user, MessageChannel channel, Consumer<ModalInteractionEvent> onSuccess) {
@@ -100,7 +96,15 @@ public class AwaitTask<T extends GenericEvent> {
 	public static AwaitTask<ModalInteractionEvent> forModalInteraction(Guild guild, User user, MessageChannel channel,
 			@Nullable Predicate<ModalInteractionEvent> additionalPredicate, Consumer<ModalInteractionEvent> onSuccess, @Nullable Runnable onTimeout) {
 		return new AwaitTask<ModalInteractionEvent>(AwaitedEvent.MODAL_INTERACTION_EVENT, guild, user, channel, additionalPredicate, onSuccess, onTimeout);
-		
+	}
+	
+	public static AwaitTask<ModalInteractionEvent> forModalInteraction(Guild guild, User user, Message message, Consumer<ModalInteractionEvent> onSuccess) {
+		return AwaitTask.forModalInteraction(guild, user, message, null, onSuccess, null);
+	}
+	
+	public static AwaitTask<ModalInteractionEvent> forModalInteraction(Guild guild, User user, Message message,
+			@Nullable Predicate<ModalInteractionEvent> additionalPredicate, Consumer<ModalInteractionEvent> onSuccess, @Nullable Runnable onTimeout) {
+		return new AwaitTask<ModalInteractionEvent>(AwaitedEvent.MODAL_INTERACTION_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
 	}
 	
 	protected AwaitTask(AwaitedEvent awaitedEvent, Guild guild, User user, Message message,

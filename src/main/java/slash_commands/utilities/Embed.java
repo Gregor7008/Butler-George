@@ -4,12 +4,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import base.Bot;
 import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
 import base.engines.Toolbox;
@@ -202,7 +200,7 @@ public class Embed implements CommandEventHandler {
 				.addActionRows(ActionRow.of(titleInput.build()), ActionRow.of(titleURLInput))
 				.build();
 		event.replyModal(modal).queue();
-		AwaitTask.forModalInteraction(guild, user, event.getChannel(), null,
+		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
 				m -> {
 					m.deferEdit().queue();
 					String url = m.getValue("titleURL").getAsString();;
@@ -230,7 +228,7 @@ public class Embed implements CommandEventHandler {
 				.addActionRows(ActionRow.of(descriptionInput.build()))
 				.build();
 		event.replyModal(modal).queue();
-		AwaitTask.forModalInteraction(guild, user, event.getChannel(), null,
+		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
 				m -> {
 					m.deferEdit().queue();
 					String input = m.getValue("description").getAsString();
@@ -255,7 +253,7 @@ public class Embed implements CommandEventHandler {
 				.addActionRows(ActionRow.of(footerInput.build()))
 				.build();
 		event.replyModal(modal).queue();
-		AwaitTask.forModalInteraction(guild, user, event.getChannel(), null,
+		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
 				m -> {
 					m.deferEdit().queue();
 					String input = m.getValue("footer").getAsString();
@@ -319,31 +317,22 @@ public class Embed implements CommandEventHandler {
 	private void configureFields(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
 //		TODO Implement field configuration when JDA updates and supports selection menus in modals!
 		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "unsupportedJDA")).setActionRows().queue();
-		this.scheduleFurtherConfiguration(event.getMessage(), menu, eb, true, 5000);
+		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(event.getMessage(), menu, true, eb), 500);
 	}
 	
 	private void defaultConsumer(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event, String key, String input) {
 		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, key + "success")
 				.replaceDescription("{" + key + "}", input)).setActionRows().complete();
-		this.scheduleFurtherConfiguration(newMessage, menu, eb, false, 2000);
+		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
 	}
 	
 	private void errorConsumer(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
 		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).setActionRows().complete();
-		this.scheduleFurtherConfiguration(newMessage, menu, eb, false, 2000);
+		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
 	}
 	
 	private void defaultTimeout(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
 		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).setActionRows().complete();
-		this.scheduleFurtherConfiguration(newMessage, menu, eb, false, 2000);
-	}
-	
-	private void scheduleFurtherConfiguration(Message newMessage, SelectMenu menu, EmbedBuilder eb, boolean firstCall, long millis) {
-		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
-			@Override
-			public void run() {
-				continueEmbedConfiguration(newMessage, menu, firstCall, eb);
-			}
-		}, millis);
+		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
 	}
 }

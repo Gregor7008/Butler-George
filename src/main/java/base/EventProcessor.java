@@ -159,8 +159,8 @@ public class EventProcessor extends ListenerAdapter {
 			JSONArray welcomemsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("welcomemsg");
 			if (!welcomemsg.isEmpty()) {
 				if (welcomemsg.getBoolean(3)) {
-					String title = Toolbox.processAutoMessage(welcomemsg.getString(1), guild, event.getUser());
-					String message = Toolbox.processAutoMessage(welcomemsg.getString(2), guild, event.getUser());
+					String title = Toolbox.processAutoMessage(welcomemsg.getString(1), guild, event.getUser(), false);
+					String message = Toolbox.processAutoMessage(welcomemsg.getString(2), guild, event.getUser(), true);
 					guild.getTextChannelById(welcomemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
 				}
 			}
@@ -178,8 +178,8 @@ public class EventProcessor extends ListenerAdapter {
 		JSONArray goodbyemsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("goodbyemsg");
 		if (!goodbyemsg.isEmpty()) {
 			if (goodbyemsg.getBoolean(3)) {
-				String title = Toolbox.processAutoMessage(goodbyemsg.getString(1), guild, event.getUser());
-				String message = Toolbox.processAutoMessage(goodbyemsg.getString(2), guild, event.getUser());
+				String title = Toolbox.processAutoMessage(goodbyemsg.getString(1), guild, event.getUser(), false);
+				String message = Toolbox.processAutoMessage(goodbyemsg.getString(2), guild, event.getUser(), true);
 				guild.getTextChannelById(goodbyemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
 			}
 		}
