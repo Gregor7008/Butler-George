@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.annotation.Nullable;
@@ -17,10 +18,13 @@ import net.dv8tion.jda.api.JDA;
 
 public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
     
-	private DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
 	public static ConsoleEngine INSTANCE;
+	
+	public Timer streamConnector = new Timer();
+	
 	private ByteArrayOutputStream errStream = new ByteArrayOutputStream();
 	private ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+	private DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
 	
 	public ConsoleEngine() {
 		INSTANCE = this;
@@ -78,7 +82,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 	}
 	
 	private void checkStreams() {
-		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
+		this.streamConnector.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				if (errStream.size() > 0) {
@@ -98,7 +102,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		String input = GUI.INSTANCE.consoleIn.getText();
 		this.userInput(input);
 		GUI.INSTANCE.consoleIn.setText("");
-		if (Bot.INSTANCE != null && Bot.INSTANCE.jda != null) {
+		if (Bot.INSTANCE != null && !Bot.INSTANCE.isShutdown()) {
 			this.commandListener(input);
 		} else {
 			this.info(this, "Input ignored as the bot is offline!");
@@ -108,9 +112,11 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
 		e.printStackTrace();
-		Bot.INSTANCE.errorOccurred();
 		GUI.INSTANCE.increaseErrorCounter();
 		GUI.INSTANCE.updateBotBoolean();
+		if (Bot.INSTANCE != null) {
+			Bot.INSTANCE.errorOccurred();
+		}
 	}
 	
 	private void commandListener(String line) {
@@ -119,13 +125,9 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		String command = insplit[0];
 		switch (command) {
 			case "stop":
-				if (!Bot.INSTANCE.isShutdown()) {
-					Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
-					Bot.INSTANCE.getShutdownThread().start();
-				}
+				GUI.INSTANCE.shutdownBot();
 				break;
 			case "exit":
-				jda.shutdown();
 				System.exit(0);
 				break;
 			case "warn":

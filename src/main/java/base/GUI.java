@@ -135,10 +135,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		getContentPane().add(startButton, "flowx,cell 1 2,growx,aligny center");
 		
 		stopButton.addActionListener(e -> {
-			if (!Bot.INSTANCE.isShutdown()) {
-				Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
-				Bot.INSTANCE.getShutdownThread().start();
-			}
+			this.shutdownBot();
 		});
 		getContentPane().add(stopButton, "cell 2 2 3 1,growx,aligny center");
 		
@@ -218,6 +215,13 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 			} catch (IllegalArgumentException e2) {
 				ConsoleEngine.INSTANCE.error(this, "Bot instanciation failed - Check database configuration!");
 			}
+		}
+	}
+	
+	public void shutdownBot() {
+		if (!Bot.INSTANCE.isShutdown()) {
+			Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
+			Bot.INSTANCE.getShutdownThread().start();
 		}
 	}
 	

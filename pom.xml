@@ -11,8 +11,8 @@
   <url>https://github.com/Gregor7008/Butler-George</url>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <java.version>17</java.version>
+    <maven.compiler.source>18</maven.compiler.source>
+    <java.version>18</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
