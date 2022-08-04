@@ -76,60 +76,31 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 ![Activity][activityshield]
 ![New Commits][commitssincereleaseshield]<br>
 
-
-
 ### ✨ The Team
 
-<details class="indent">
-    <summary class="summary__sub_title"><a href="https://github.com/Gregor7008">Gregor7008</a> (Team Leader)</summary>
-    <img class="indent" alt="Gregor7008 Card" src="https://github.com/Gregor7008/Butler-George/blob/main/.github/resources/Gregor7008%20Card.png?raw=true" width="250" height="100"/>
+<details>
+    <summary><a href="https://github.com/Gregor7008">Gregor7008</a> (Team Leader)</summary>
     <br>
-    <img class="indent" alt="Gregor7008 Activity" src="https://wakatime.com/badge/github/Gregor7008/Butler-George.svg" width="" height=""/>
+    <img alt="Gregor7008 Card" src="https://github.com/Gregor7008/Butler-George/blob/main/.github/resources/Gregor7008%20Card.png?raw=true" width="250" height="100"/>
+    <br>
+    <img alt="Gregor7008 Activity" src="https://wakatime.com/badge/github/Gregor7008/Butler-George.svg" width="" height=""/>
 </details>
+
 <!--
-<details class="indent">
-    <summary class="summary__sub_title"><a href="https://github.com/[User]">[User]</a> ([Role])</summary>
-    <img class="indent" alt="[User] Card" src="https://github.com/Gregor7008/Butler-George/blob/main/.github/resources/[User]%20Card.png?raw=true" width="250" height="100"/>
+<details>
+    <summary><a href="https://github.com/[User]">[User]</a> ([Role])</summary>
+    <br>
+    <img alt="[User] Card" src="https://github.com/Gregor7008/Butler-George/blob/main/.github/resources/[User]%20Card.png?raw=true" width="250" height="100"/>
     <br>
     [Additional badges]
 </details>
 -->
-<details>
-    <summary class="summary_title">🧭 Credits</summary>
-    <a href="https://github.com/anuraghazra/github-readme-stats">ReadMe Statistics</a> by <a href="https://github.com/anuraghazra">@anuraghazra</a>
-    <br>
-    <a href="https://github.com/gautamkrishnar/blog-post-workflow">Blog Post Workflow</a> by <a href="https://github.com/gautamkrishnar">@gautamkrishnar</a>
-    <br>
-    <a href="https://github.com/lowlighter/metrics">Metrics</a> by <a href="https://github.com/lowlighter">@lowlighter</a>
-    <br>
-    Shields by <a href="https://shields.io">shields.io</a>
-    <br>
-    Activity recorded by <a href="https://wakatime.com">wakatime.com</a>
-</details>
 
-<style>
-    .summary_title {
-        display: block;
-        font-size: 1.17em;
-        margin-top: 1em;
-        margin-bottom: 1em;
-        margin-left: 0;
-        margin-right: 0;
-        font-weight: bold;
-    }
-    .summary__sub_title {
-        display: block;
-        font-size: 18px;
-        margin-top: 1em;
-        margin-bottom: 1em;
-        margin-left: 0;
-        margin-right: 0;
-        font-weight: bold;
-    }
-    .indent {
-        text-indent: 1em;
-        margin-left: 2em;
-    }
-</style>
+### 🧭 Credits
+<a href="https://github.com/anuraghazra/github-readme-stats">ReadMe Statistics</a> by <a href="https://github.com/anuraghazra">@anuraghazra</a><br>
+<a href="https://github.com/gautamkrishnar/blog-post-workflow">Blog Post Workflow</a> by <a href="https://github.com/gautamkrishnar">@gautamkrishnar</a><br>
+<a href="https://github.com/lowlighter/metrics">Metrics</a> by <a href="https://github.com/lowlighter">@lowlighter</a><br>
+Shields by <a href="https://shields.io">shields.io</a><br>
+Activity recorded by <a href="https://wakatime.com">wakatime.com</a>
 
 ©️ [Gregor7008](https://github.com/Gregor7008) - 03.08.2022
