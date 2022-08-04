@@ -13,7 +13,6 @@ jobs:
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           template: repository
-          user: Gregor7008
           repo: Butler-George
           plugin_lines: yes
           plugin_followup: yes
