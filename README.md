@@ -48,7 +48,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 
 **🧮 Code:**<br>
 ![Code lines][linesshield]
-![Project size][storagesizeshield]
+![Project size][storagesizeshield]<br>
 ![Java Version][javashield]
 ![Platforms][platformshield]
 
@@ -63,7 +63,8 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 **💻 Activity:**<br>
 ![Last Commit][lastcommitshield]
 ![Activity][activityshield]
-![New Commits][commitssincereleaseshield]
+![New Commits][commitssincereleaseshield]<br>
+[![wakatime](https://wakatime.com/badge/github/Gregor7008/Butler-George.svg)](https://wakatime.com/badge/github/Gregor7008/Butler-George)
 
 ### ✨ The Team
 
