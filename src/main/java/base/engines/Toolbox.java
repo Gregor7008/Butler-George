@@ -108,6 +108,7 @@ public abstract class Toolbox {
 		String output =  input.replace("{server}", guild.getName())
 				.replace("{membercount}", Integer.toString(guild.getMemberCount()))
 				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.formatter))
+				.replace("{boosts}", String.valueOf(guild.getBoostCount()))
 				.replace("{level}", String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getInt("level")));
 		if (mentions) {
 			return output.replace("{user}", user.getAsMention());

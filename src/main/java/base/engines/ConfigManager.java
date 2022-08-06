@@ -231,6 +231,7 @@ public class ConfigManager {
 		//Simple values
 		newConfig.put("id",							guild.getIdLong());
 		newConfig.put("adminroles",					new JSONArray());
+		newConfig.put("boostmsg",					new JSONArray());
 		newConfig.put("userautoroles",				new JSONArray());
 		newConfig.put("botautoroles",				new JSONArray());
 		newConfig.put("communityinbox",				0L);

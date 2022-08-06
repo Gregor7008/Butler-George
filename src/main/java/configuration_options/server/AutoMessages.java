@@ -35,7 +35,8 @@ public class AutoMessages implements ConfigurationEventHandler {
 		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype")).setActionRow(
 				Button.secondary("welcome", Emoji.fromUnicode("\uD83C\uDF89")),
 				Button.secondary("goodbye", Emoji.fromUnicode("\uD83D\uDC4B")),
-				Button.secondary("level", Emoji.fromUnicode("\uD83C\uDD99"))).queue();
+				Button.secondary("level", Emoji.fromUnicode("\uD83C\uDD99")),
+				Button.secondary("boost", Emoji.fromUnicode("\uD83D\uDC8E"))).queue();
 		
 		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
 				b -> {
@@ -72,10 +73,14 @@ public class AutoMessages implements ConfigurationEventHandler {
 											.build();
 									TextInput messageInput = TextInput.create("message", "Message", TextInputStyle.PARAGRAPH)
 											.setPlaceholder("Input message")
+											.setRequired(false)
+											.build();
+									TextInput varDisplay = TextInput.create("variables", "You may use following variables:", TextInputStyle.PARAGRAPH)
+											.setValue(LanguageEngine.getRaw(guild, user, this, "variables"))
+											.setRequired(false)
 											.build();
 									Modal.Builder modalBuilder = Modal.create("configMessage", type.substring(0, 1).toUpperCase() + type.substring(1) + " message configuration");
-									modalBuilder.addActionRows(ActionRow.of(titleInput), ActionRow.of(messageInput));
-//									String infoText = LanguageEngine.getDescription(guild, user, this, "def" + type + "msg");
+									modalBuilder.addActionRows(ActionRow.of(titleInput), ActionRow.of(messageInput), ActionRow.of(varDisplay));
 									s.replyModal(modalBuilder.build()).queue();
 									s.getMessage().editMessageEmbeds(firstReplyEmbed).setActionRows().queue();
 									AwaitTask.forModalInteraction(guild, user, s.getMessage(),
@@ -90,26 +95,26 @@ public class AutoMessages implements ConfigurationEventHandler {
 						return;
 					}
 					if (!defined) {
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nonedefined").replaceDescription("{type}", type)).queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nonedefined").replaceDescription("{type}", type)).setActionRows().queue();
 						return;
 					}
 					if (event.getSubOperation().equals("on")) {
 						if (!selectedmsg.getBoolean(3)) {
 							selectedmsg.put(3, true);
-							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onsuccess").replaceDescription("{type}", type)).queue();
+							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onsuccess").replaceDescription("{type}", type)).setActionRows().queue();
 							return;
 						} else {
-							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onfail").replaceDescription("{type}", type)).queue();
+							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "onfail").replaceDescription("{type}", type)).setActionRows().queue();
 							return;
 						}
 					}
 					if (event.getSubOperation().equals("off")) {
 						if (selectedmsg.getBoolean(3)) {
 							selectedmsg.put(3, false);
-							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "offsuccess").replaceDescription("{type}", type)).queue();
+							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "offsuccess").replaceDescription("{type}", type)).setActionRows().queue();
 							return;
 						} else {
-							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "offfail").replaceDescription("{type}", type)).queue();
+							b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "offfail").replaceDescription("{type}", type)).setActionRows().queue();
 							return;
 						}
 					}
@@ -117,7 +122,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 						String title = Toolbox.processAutoMessage(selectedmsg.getString(1), guild, user, false);
 						String message = Toolbox.processAutoMessage(selectedmsg.getString(2), guild, user, true);
 						guild.getTextChannelById(selectedmsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "testsuccess").replaceDescription("{type}", type)).queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "testsuccess").replaceDescription("{type}", type)).setActionRows().queue();
 					}
 				}).append();
 	}

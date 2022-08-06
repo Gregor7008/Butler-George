@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateBoostTimeEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
@@ -191,6 +192,25 @@ public class EventProcessor extends ListenerAdapter {
 			}
 			ctg.delete().queue();
 			ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("customchannelcategory", 0L);
+		}
+	}
+	
+	@Override
+	public void onGuildMemberUpdateBoostTime(GuildMemberUpdateBoostTimeEvent event) {
+		if (event.getUser().isBot()) {
+			return;
+		}
+		Guild guild = event.getGuild();
+		User user = event.getUser();
+		if (event.getNewTimeBoosted() != null) {
+			JSONArray boostmsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("boostmsg");
+			if (!boostmsg.isEmpty()) {
+				if (boostmsg.getBoolean(3)) {
+					String title = Toolbox.processAutoMessage(boostmsg.getString(1), guild, user, false);
+					String message = Toolbox.processAutoMessage(boostmsg.getString(2), guild, user, true);
+					guild.getTextChannelById(boostmsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
+				}
+			}
 		}
 	}
 	
