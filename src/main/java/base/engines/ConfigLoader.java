@@ -13,8 +13,8 @@ public class ConfigLoader{
 	public static ConfigLoader INSTANCE;
 	public ConfigManager manager;
 	
-	public ConfigLoader(String clientIP, String databaseName) {
-		manager = new ConfigManager(clientIP, databaseName);
+	public ConfigLoader(String serverIP, String port, String databaseName, String username, String password) {
+		manager = new ConfigManager(serverIP, port, databaseName, username, password);
 		INSTANCE = this;
 	}
 	

@@ -1,5 +1,8 @@
 package base.engines;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimerTask;
@@ -10,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.mongodb.MongoQueryException;
+import com.mongodb.MongoSecurityException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -32,24 +37,48 @@ public class ConfigManager {
 	private ConcurrentHashMap<Long, JSONObject> userConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	private ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	
-	public ConfigManager(String clientIP, String databaseName) {
-		if (clientIP.equals("Enter database IP") || databaseName.equals("Enter database name")) {
-			throw new IllegalArgumentException("Invalid client IP!");
+	public ConfigManager(String serverIP, String serverPort, String databaseName, String username, String password) {
+		if (serverIP.equals(GUI.INSTANCE.databaseIP.getName())) {
+			throw new IllegalArgumentException("No database IP provided!");
 		}
-		client = MongoClients.create("mongodb://" + clientIP.replace("mongodb://", ""));
-		client.listDatabases();
+		if (databaseName.equals(GUI.INSTANCE.databaseName.getName())) {
+			throw new IllegalArgumentException("No database name provided!");
+		}
+		StringBuilder uriBuilder = new StringBuilder();
+		uriBuilder.append("mongodb://");
+		boolean customUser = false;
+		if (!username.equals(GUI.INSTANCE.username.getName())) {
+			uriBuilder.append(this.encodeToURL(username) + ":" + this.encodeToURL(password) + "@");
+			customUser = true;
+		}
+		uriBuilder.append(serverIP.replace("mongodb://", ""));
+		if (serverPort.equals(GUI.INSTANCE.databasePort.getName())) {
+			uriBuilder.append(":27017");
+		} else {
+			uriBuilder.append(":" + serverPort);
+		}
+		if (customUser) {
+			uriBuilder.append("/?authMechanism=SCRAM-SHA-256");
+		}
+		client = MongoClients.create(uriBuilder.toString());
 		database = client.getDatabase(databaseName);
 		try {
 			userconfigs = database.getCollection("user");
 		} catch (IllegalArgumentException e) {
-			 database.createCollection("user");
-			 userconfigs = database.getCollection("user");
+			database.createCollection("user");
+			userconfigs = database.getCollection("user");
 		}
 		try {
 			guildconfigs = database.getCollection("guild");
 		} catch (IllegalArgumentException e) {
-			 database.createCollection("guild");
-			 guildconfigs = database.getCollection("guild");
+			database.createCollection("guild");
+			guildconfigs = database.getCollection("guild");
+		}
+		try {
+			userconfigs.find(new Document("id", 475974084937646080L)).first();
+		} catch (MongoSecurityException | MongoQueryException e) {
+			client.close();
+			throw new IllegalArgumentException("Authentication data invalid!");
 		}
 		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
 			private int executions = 0;
@@ -61,6 +90,14 @@ public class ConfigManager {
 				GUI.INSTANCE.increasePushCounter();
 			}
 		}, 5*60*1000);
+	}
+	
+	private String encodeToURL(String input) {
+		try {
+			return URLEncoder.encode(input, StandardCharsets.UTF_8.toString());
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
 	}
 	
 	//Manage cache	

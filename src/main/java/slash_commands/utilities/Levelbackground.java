@@ -75,8 +75,6 @@ public class Levelbackground implements CommandEventHandler {
 			File file3 = new File(this.getClass().getClassLoader().getResource("levelcards/3.png").toURI());
 			File file4 = new File(this.getClass().getClassLoader().getResource("levelcards/4.png").toURI());
 			
-			System.out.println(file0.getName());
-			
 			eb0.setImage("attachment://0.png");
 			eb1.setImage("attachment://1.png");
 			eb2.setImage("attachment://2.png");

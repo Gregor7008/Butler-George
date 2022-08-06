@@ -77,7 +77,7 @@ public class Level implements CommandEventHandler {
 		int progress = this.calculateProgress(level, nedxp, curxp);
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("levelcards/" + levelbackground + ").png"));
+			image = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream("levelcards/" + levelbackground + ".png"));
 		} catch (IOException | NullPointerException e) {
 			e.printStackTrace();
 			return null;

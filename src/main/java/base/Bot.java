@@ -38,9 +38,9 @@ public class Bot {
 	private boolean errorOccured = false;
 	private boolean shutdown = false;
 	
-	public Bot(String token, String databaseIP, String databaseName) throws LoginException, InterruptedException, IOException {
+	public Bot(String token, String serverIP, String port, String databaseName, String username, String password) throws LoginException, InterruptedException, IOException {
 		INSTANCE = this;
-		new ConfigLoader(databaseIP, databaseName);
+		new ConfigLoader(serverIP, port, databaseName, username, password);
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(new EventProcessor(), new EventAwaiter());
 		builder.setRawEventsEnabled(true);
@@ -49,10 +49,10 @@ public class Bot {
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing(VERSION));
-	    this.startup(databaseIP, databaseName);
+	    this.startup();
 	}
 	
-	public void startup(String databaseIP, String databaseName) {
+	public void startup() {
 //		Essentials
 		Runtime.getRuntime().addShutdownHook(this.getShutdownThread());
 		Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.INSTANCE);
@@ -121,6 +121,11 @@ public class Bot {
 	
 	public boolean isShutdown() {
 		return shutdown;
+	}
+	
+	public void kill() {
+		INSTANCE = null;
+		this.shutdown = true;
 	}
 	
 	private void checkConfigs() {
