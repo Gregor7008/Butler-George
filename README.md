@@ -25,7 +25,7 @@
         </span></h1>
 </p>
 <h3 align="right">Why another bot, if you only need one</h3>
-<p align="right">Everything you need, right here: Moderation, Adimistration, Configuration...</p>
+<p align="right">Everything you need, right here: Moderation, Administration, Configuration...</p>
 
 ### 🌐 Overview
 **Butler George** is a complex [Discord](https://discord.com) bot including not only all commonly used functions of popular Discord bots, but also everything else you will ever need.<br>
