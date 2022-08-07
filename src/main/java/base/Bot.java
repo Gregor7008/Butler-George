@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
 
+import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
 
 import org.json.JSONObject;
@@ -76,42 +77,68 @@ public class Bot {
 		if (shutdownThread == null) {
 			shutdownThread = new Thread(() -> {
 				if (!shutdown) {
-					List<Guild> guilds = jda.getGuilds();
-					for (int i = 0; i < guilds.size(); i++) {
-			    		Guild guild = guilds.get(i);
-//			    		Delete channels created with Join2Create channels
-			    		JSONObject createdchannels = ConfigLoader.INSTANCE.getFirstGuildLayerConfig(guild, "createdchannels");
-			    		if (!createdchannels.isEmpty()) {
-			    			createdchannels.keySet().forEach(e -> createdchannels.getJSONObject(e).keySet().forEach(a ->  guild.getVoiceChannelById(a).delete().queue()));
-			    			createdchannels.clear();
-			    		}
-//			    		Send offline message
-			    		long chid = ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("communityinbox");
-			    		if (chid == 0L) {
-			        		chid = guild.getTextChannels().stream().filter(c -> {return guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND);}).toList().get(0).getIdLong();
-			        	}
-			    		long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.fetchMessage(guild, null, this, "offline")).complete().getIdLong();
-			    		ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").put(0, msgid).put(1, chid);
-			    	}
-//					Stop period operations and shutdown bot
-					timer.cancel();
-					ServerUtilities.controlChannels(false);
-					jda.getPresence().setStatus(OnlineStatus.OFFLINE);
-					jda.shutdown();
-					GUI.INSTANCE.setBotRunning(false);
-					GUI.INSTANCE.stopRuntimeMeasuring();
-					if (!errorOccured) {
-						ConfigLoader.INSTANCE.manager.pushCache();
-					}
-					ConsoleEngine.INSTANCE.info(this, "Bot offline");
-					shutdown = true;
+					shutdown(ShutdownReason.RESTART, null);
 				}
 			});
 		}
 		return shutdownThread;
 	}
 	
-	public void errorOccurred() {
+	public void shutdown(ShutdownReason reason, @Nullable String additionalMessage) {
+		List<Guild> guilds = jda.getGuilds();
+		for (int i = 0; i < guilds.size(); i++) {
+    		Guild guild = guilds.get(i);
+//    		Delete channels created with Join2Create channels
+    		JSONObject createdchannels = ConfigLoader.INSTANCE.getFirstGuildLayerConfig(guild, "createdchannels");
+    		if (!createdchannels.isEmpty()) {
+    			createdchannels.keySet().forEach(e -> createdchannels.getJSONObject(e).keySet().forEach(a ->  guild.getVoiceChannelById(a).delete().queue()));
+    			createdchannels.clear();
+    		}
+//    		Send offline message
+    		long chid = ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("communityinbox");
+    		if (chid == 0L) {
+        		chid = guild.getTextChannels().stream().filter(c -> {return guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND);}).toList().get(0).getIdLong();
+        	}
+    		StringBuilder offlineMessageBuilder = new StringBuilder();
+    		switch (reason) {
+			case FATAL_ERROR:
+				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "fatal"));
+				break;
+			case MAINTENANCE:
+				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "maintenance"));
+				break;
+			case OFFLINE:
+				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "offline"));
+				break;
+			case RESTART:
+				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "restart"));
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid shutdown reason - Contact support immediately!");
+			}
+    		offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "information"));
+    		if (additionalMessage != null && !additionalMessage.equals("")) {
+    			offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "addonpresent"));
+    			offlineMessageBuilder.append(additionalMessage);
+    		}
+    		long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.buildMessageFromRaw(offlineMessageBuilder.toString(), null)).complete().getIdLong();
+    		ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").put(0, msgid).put(1, chid);
+    	}
+//		Stop period operations and shutdown bot
+		timer.cancel();
+		ServerUtilities.controlChannels(false);
+		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
+		jda.shutdown();
+		GUI.INSTANCE.setBotRunning(false);
+		GUI.INSTANCE.stopRuntimeMeasuring();
+		if (!errorOccured) {
+			ConfigLoader.INSTANCE.manager.pushCache();
+		}
+		ConsoleEngine.INSTANCE.info(this, "Bot offline");
+		shutdown = true;
+	}
+	
+	public void onErrorOccurrence() {
 		errorOccured = true;
 	}
 	
@@ -124,6 +151,7 @@ public class Bot {
 	}
 	
 	public void kill() {
+		this.timer.cancel();
 		INSTANCE = null;
 		this.shutdown = true;
 	}
@@ -134,5 +162,14 @@ public class Bot {
     		ConfigVerifier.RUN.guildCheck(guild);
     		ConfigVerifier.RUN.usersCheck(guild);
 		}
+	}
+	
+	public static enum ShutdownReason {
+		
+		OFFLINE,
+		MAINTENANCE,
+		RESTART,
+		FATAL_ERROR;
+		
 	}
 }

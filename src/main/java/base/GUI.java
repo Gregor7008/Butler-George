@@ -17,6 +17,7 @@ import java.util.TimerTask;
 import javax.security.auth.login.LoginException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
@@ -29,6 +30,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
+import base.Bot.ShutdownReason;
+import base.assets.ShutdownWindow;
 import base.engines.ConsoleEngine;
 import net.miginfocom.swing.MigLayout;
 
@@ -47,6 +50,8 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 	private final JTable infoTable = new JTable();
 	private final JTable commandTable = new JTable();
 	private final JButton showPassword = new JButton("");
+	private final JCheckBox shutdownWindowBox = new JCheckBox("");
+	private final JLabel sdWLabel = new JLabel("Custom shutdown reason:");
 	
 	public final JTextArea console = new JTextArea();
 	public final JTextField consoleIn = new JTextField();
@@ -91,8 +96,9 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		setSize(1200, 600);
 		setTitle(Bot.NAME + " - " + Bot.VERSION);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setLocationRelativeTo(null);
 		addWindowListener(this);
-		getContentPane().setLayout(new MigLayout("", "[600,grow][125:125:125][75:75:75][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][12.00][20:n][20:n][510,grow][20:n]"));
+		getContentPane().setLayout(new MigLayout("", "[600,grow][125:125:125][75:75:75][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][20:n][20:n][510,grow][20:n]"));
 		
 		JScrollPane consoleScrollPane = new JScrollPane(console);
 		consoleScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -166,17 +172,26 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		getContentPane().add(showPassword, "cell 5 1,alignx left");
 		
 		this.setupTextField(args, botToken, "Bot Token", 5);
-		getContentPane().add(botToken, "cell 1 3 5 1,grow");
+		getContentPane().add(botToken, "cell 1 2 5 1,grow");
 		
 		startButton.addActionListener(e -> {
 			this.startBot();
 		});
-		getContentPane().add(startButton, "flowx,cell 1 4 2 1,grow");
+		getContentPane().add(startButton, "flowx,cell 1 3 2 1,grow");
 		
 		stopButton.addActionListener(e -> {
-			this.shutdownBot();
+			if (shutdownWindowBox.isSelected()) {
+				new ShutdownWindow((reasons, additionalMessage) -> this.shutdownBot(reasons.get(0), additionalMessage));
+			} else {
+				this.shutdownBot(ShutdownReason.OFFLINE, null);
+			}
 		});
-		getContentPane().add(stopButton, "cell 3 4 3 1,grow");
+		stopButton.setEnabled(false);
+		getContentPane().add(stopButton, "cell 3 3 3 1,grow");
+		
+		getContentPane().add(sdWLabel, "cell 3 4 2 1,alignx right,aligny center");
+		
+		getContentPane().add(shutdownWindowBox, "cell 5 4,alignx left,aligny center");
 		
 		infoTable.setShowGrid(false);
 		infoTable.setModel(new DefaultTableModel(
@@ -224,8 +239,8 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		   }
 		});
 		commandTable.getColumnModel().getColumn(0).setResizable(false);
-		tabbedPane.addTab("Commands", null, commandTable, null);
 		
+		tabbedPane.addTab("Commands", null, commandTable, null);
 		getContentPane().add(tabbedPane, "cell 1 5 5 2,grow");
 		
 		consoleIn.addActionListener(new ConsoleEngine());
@@ -244,11 +259,11 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		if (Bot.INSTANCE == null || Bot.INSTANCE.isShutdown()) {
 			try {
 				new Bot(botToken.getText(), databaseIP.getText(), databasePort.getText(), databaseName.getText(), username.getText(), String.copyValueOf(password.getPassword()));
-			} catch (LoginException | InterruptedException | IOException e1) {
+			} catch (LoginException | InterruptedException | IOException e) {
 				ConsoleEngine.INSTANCE.error(Bot.INSTANCE, "Bot instanciation failed - Check token validity!");
 				Bot.INSTANCE.kill();
-			} catch (IllegalArgumentException e2) {
-				ConsoleEngine.INSTANCE.error(this, "Bot instanciation failed - " + e2.getMessage());
+			} catch (IllegalArgumentException e) {
+				ConsoleEngine.INSTANCE.error(Bot.INSTANCE, "Bot instanciation failed - " + e.getMessage());
 				Bot.INSTANCE.kill();
 			}
 		}
@@ -265,10 +280,10 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		} catch (IndexOutOfBoundsException e) {}
 	}
 	
-	public void shutdownBot() {
+	public void shutdownBot(ShutdownReason reason, String additionalMessage) {
 		if (Bot.INSTANCE != null && !Bot.INSTANCE.isShutdown()) {
 			Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
-			Bot.INSTANCE.getShutdownThread().start();
+			Bot.INSTANCE.shutdown(reason, additionalMessage);
 		}
 	}
 	
@@ -280,6 +295,8 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 			redLED.setIcon(redLEDOn);
 			greenLED.setIcon(greenLEDOff);
 		}
+		stopButton.setEnabled(status);
+		startButton.setEnabled(!status);
 	}
 	
 	public void increaseErrorCounter() {

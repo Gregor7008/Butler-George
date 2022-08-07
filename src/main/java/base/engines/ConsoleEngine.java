@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 
 import base.Bot;
 import base.GUI;
+import base.Bot.ShutdownReason;
 import net.dv8tion.jda.api.JDA;
 
 public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
@@ -115,7 +116,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		GUI.INSTANCE.increaseErrorCounter();
 		GUI.INSTANCE.updateBotBoolean();
 		if (Bot.INSTANCE != null) {
-			Bot.INSTANCE.errorOccurred();
+			Bot.INSTANCE.onErrorOccurrence();
 		}
 	}
 	
@@ -125,7 +126,7 @@ public class ConsoleEngine implements UncaughtExceptionHandler, ActionListener{
 		String command = insplit[0];
 		switch (command) {
 			case "stop":
-				GUI.INSTANCE.shutdownBot();
+				GUI.INSTANCE.shutdownBot(ShutdownReason.OFFLINE, null);
 				break;
 			case "exit":
 				System.exit(0);

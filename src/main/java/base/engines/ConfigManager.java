@@ -7,14 +7,18 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoQueryException;
 import com.mongodb.MongoSecurityException;
+import com.mongodb.MongoTimeoutException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -60,25 +64,37 @@ public class ConfigManager {
 		if (customUser) {
 			uriBuilder.append("/?authMechanism=SCRAM-SHA-256");
 		}
-		client = MongoClients.create(uriBuilder.toString());
-		database = client.getDatabase(databaseName);
+		MongoClientSettings setting = MongoClientSettings.builder()
+				.applyToSocketSettings(builder -> {
+					builder.connectTimeout(3, TimeUnit.SECONDS);
+					builder.readTimeout(500, TimeUnit.MILLISECONDS);
+				})
+				.applyToClusterSettings( builder -> builder.serverSelectionTimeout(3, TimeUnit.SECONDS))
+				.applyConnectionString(new ConnectionString(uriBuilder.toString()))
+				.build();
 		try {
-			userconfigs = database.getCollection("user");
-		} catch (IllegalArgumentException e) {
-			database.createCollection("user");
-			userconfigs = database.getCollection("user");
-		}
-		try {
-			guildconfigs = database.getCollection("guild");
-		} catch (IllegalArgumentException e) {
-			database.createCollection("guild");
-			guildconfigs = database.getCollection("guild");
-		}
-		try {
-			userconfigs.find(new Document("id", 475974084937646080L)).first();
-		} catch (MongoSecurityException | MongoQueryException e) {
-			client.close();
-			throw new IllegalArgumentException("Authentication data invalid!");
+			client = MongoClients.create(setting);
+			database = client.getDatabase(databaseName);
+			try {
+				userconfigs = database.getCollection("user");
+			} catch (IllegalArgumentException e) {
+				database.createCollection("user");
+				userconfigs = database.getCollection("user");
+			}
+			try {
+				guildconfigs = database.getCollection("guild");
+			} catch (IllegalArgumentException e) {
+				database.createCollection("guild");
+				guildconfigs = database.getCollection("guild");
+			}
+			try {
+				userconfigs.find(new Document("id", 475974084937646080L)).first();
+			} catch (MongoSecurityException | MongoQueryException e) {
+				client.close();
+				throw new IllegalArgumentException("Authentication data invalid!");
+			}
+		} catch (MongoTimeoutException e) {
+			throw new IllegalArgumentException("Connection to server failed, please check online status of server!");
 		}
 		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
 			private int executions = 0;
