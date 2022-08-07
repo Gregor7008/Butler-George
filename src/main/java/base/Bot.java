@@ -1,6 +1,7 @@
 package base;
 
 import java.io.IOException;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 import java.util.Timer;
 
@@ -9,11 +10,12 @@ import javax.security.auth.login.LoginException;
 
 import org.json.JSONObject;
 
-import base.engines.ConfigLoader;
-import base.engines.ConfigVerifier;
-import base.engines.ConsoleEngine;
 import base.engines.EventAwaiter;
 import base.engines.LanguageEngine;
+import base.engines.configs.ConfigLoader;
+import base.engines.configs.ConfigVerifier;
+import base.engines.logging.ConsoleEngine;
+import base.engines.logging.Logger;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -25,7 +27,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import slash_commands.engines.ModController;
 import slash_commands.engines.ServerUtilities;
 
-public class Bot {
+public class Bot implements UncaughtExceptionHandler {
 	
 	public static Bot INSTANCE;
 	public static String VERSION = "V2.0-dev";
@@ -33,7 +35,10 @@ public class Bot {
 	public static String ID = "853887837823959041";
 	public static String HOME = "708381749826289666";
 	
+	private static Logger LOG = ConsoleEngine.getLogger(Bot.class);
+	
 	public JDA jda;
+	
 	private Timer timer = new Timer();
 	private Thread shutdownThread = null;
 	private boolean errorOccured = false;
@@ -56,7 +61,7 @@ public class Bot {
 	public void startup() {
 //		Essentials
 		Runtime.getRuntime().addShutdownHook(this.getShutdownThread());
-		Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.INSTANCE);
+		Thread.setDefaultUncaughtExceptionHandler(this);
 //	    Engines
 		new ConfigVerifier();
 	    new ModController();
@@ -67,21 +72,6 @@ public class Bot {
     	GUI.INSTANCE.setBotRunning(true);
     	GUI.INSTANCE.updateStatistics();
     	GUI.INSTANCE.startRuntimeMeasuring();
-	}
-	
-	public Timer getTimer() {
-		return timer;
-	}
-	
-	public Thread getShutdownThread() {
-		if (shutdownThread == null) {
-			shutdownThread = new Thread(() -> {
-				if (!shutdown) {
-					shutdown(ShutdownReason.RESTART, null);
-				}
-			});
-		}
-		return shutdownThread;
 	}
 	
 	public void shutdown(ShutdownReason reason, @Nullable String additionalMessage) {
@@ -134,12 +124,34 @@ public class Bot {
 		if (!errorOccured) {
 			ConfigLoader.INSTANCE.manager.pushCache();
 		}
-		ConsoleEngine.INSTANCE.info(this, "Bot offline");
+		LOG.info("Bot offline");
 		shutdown = true;
+	}
+	
+	@Override
+	public void uncaughtException(Thread t, Throwable e) {
+		LOG.error("Uncaught Exception occurred!", e);
+	}
+	
+	public Timer getTimer() {
+		return timer;
+	}
+	
+	public Thread getShutdownThread() {
+		if (shutdownThread == null) {
+			shutdownThread = new Thread(() -> {
+				if (!shutdown) {
+					shutdown(ShutdownReason.RESTART, null);
+				}
+			});
+		}
+		return shutdownThread;
 	}
 	
 	public void onErrorOccurrence() {
 		errorOccured = true;
+		GUI.INSTANCE.increaseErrorCounter();
+		GUI.INSTANCE.updateBotBoolean();
 	}
 	
 	public boolean hasErrorOccurred() {

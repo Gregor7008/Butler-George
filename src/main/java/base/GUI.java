@@ -7,8 +7,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -28,19 +26,20 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
 import base.Bot.ShutdownReason;
 import base.assets.ShutdownWindow;
-import base.engines.ConsoleEngine;
+import base.engines.ConsoleCommandListener;
+import base.engines.logging.ConsoleEngine;
 import net.miginfocom.swing.MigLayout;
 
-public class GUI extends JFrame implements WindowListener, FocusListener {
+public class GUI extends JFrame implements FocusListener {
 	
 	public static GUI INSTANCE;
 	private static final long serialVersionUID = 5923282583431103590L;
 	private TimerTask runtimeMeasuringTask;
-	
 	
 	private final JLabel greenLED = new JLabel();
 	private final JLabel redLED = new JLabel();
@@ -95,9 +94,8 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		setIconImage(windowIcon.getImage());
 		setSize(1200, 600);
 		setTitle(Bot.NAME + " - " + Bot.VERSION);
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		addWindowListener(this);
 		getContentPane().setLayout(new MigLayout("", "[600,grow][125:125:125][75:75:75][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][20:n][20:n][510,grow][20:n]"));
 		
 		JScrollPane consoleScrollPane = new JScrollPane(console);
@@ -243,7 +241,7 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 		tabbedPane.addTab("Commands", null, commandTable, null);
 		getContentPane().add(tabbedPane, "cell 1 5 5 2,grow");
 		
-		consoleIn.addActionListener(new ConsoleEngine());
+		consoleIn.addActionListener(new ConsoleCommandListener());
 		getContentPane().add(consoleIn, "cell 0 6,growx,aligny center");
 		
 		setVisible(true);
@@ -260,10 +258,10 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 			try {
 				new Bot(botToken.getText(), databaseIP.getText(), databasePort.getText(), databaseName.getText(), username.getText(), String.copyValueOf(password.getPassword()));
 			} catch (LoginException | InterruptedException | IOException e) {
-				ConsoleEngine.INSTANCE.error(Bot.INSTANCE, "Bot instanciation failed - Check token validity!");
+				ConsoleEngine.getLogger(Bot.class).error("Bot instanciation failed - Check token validity!");
 				Bot.INSTANCE.kill();
 			} catch (IllegalArgumentException e) {
-				ConsoleEngine.INSTANCE.error(Bot.INSTANCE, "Bot instanciation failed - " + e.getMessage());
+				ConsoleEngine.getLogger(Bot.class).error("Bot instanciation failed - " + e.getMessage());
 				Bot.INSTANCE.kill();
 			}
 		}
@@ -356,29 +354,6 @@ public class GUI extends JFrame implements WindowListener, FocusListener {
 	public Object getTableValue(int row) {
 		return infoTable.getModel().getValueAt(row, 1);
 	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {}
-
-	@Override
-	public void windowClosing(WindowEvent e) {
-		System.exit(0);
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {}
-
-	@Override
-	public void windowIconified(WindowEvent e) {}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {}
-
-	@Override
-	public void windowActivated(WindowEvent e) {}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {}
 	
 	@Override
 	public void focusGained(FocusEvent e) {

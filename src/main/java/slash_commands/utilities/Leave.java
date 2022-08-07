@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 
 import base.Bot;
-import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.configs.ConfigLoader;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;

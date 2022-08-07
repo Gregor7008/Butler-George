@@ -18,9 +18,10 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 
-import base.engines.ConfigLoader;
-import base.engines.ConsoleEngine;
 import base.engines.LanguageEngine;
+import base.engines.configs.ConfigLoader;
+import base.engines.logging.ConsoleEngine;
+import base.engines.logging.Logger;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -35,6 +36,8 @@ import slash_commands.engines.LevelEngine;
 
 public class Level implements CommandEventHandler {
 
+	private static Logger LOG = ConsoleEngine.getLogger(Level.class);
+	
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
@@ -96,7 +99,7 @@ public class Level implements CommandEventHandler {
 		try {
 			font = Font.createFont(Font.TRUETYPE_FONT, this.getClass().getClassLoader().getResourceAsStream("levelcards/font.ttf"));
 		} catch (FontFormatException | IOException e) {
-			ConsoleEngine.INSTANCE.error(this, "Couldn't load font!");
+			LOG.error("Couldn't load font!");
 			return null;
 		}
 		
@@ -137,7 +140,7 @@ public class Level implements CommandEventHandler {
 		} catch (IOException e) {}
 		try {
 			ImageIO.write(image, "png", finalimage);
-		}catch (IOException e) {
+		} catch (IOException e) {
 			return null;
 		}
 		return finalimage;

@@ -3,8 +3,8 @@ package slash_commands.utilities;
 import java.util.List;
 
 import base.assets.AwaitTask;
-import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.configs.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;

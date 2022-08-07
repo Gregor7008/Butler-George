@@ -7,6 +7,9 @@ import java.util.Properties;
 import javax.annotation.Nullable;
 
 import base.assets.CustomMessageEmbed;
+import base.engines.configs.ConfigManager;
+import base.engines.logging.ConsoleEngine;
+import base.engines.logging.Logger;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -16,6 +19,8 @@ public class LanguageEngine {
 	public static String footer = "Made with ❤️ by Gregor7008";
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 	public static int color = 56575;
+	
+	private static Logger LOG = ConsoleEngine.getLogger(ConfigManager.class);
 	
 	public static CustomMessageEmbed fetchMessage(Guild guild, User user, Object requester, String key)  {
 		String raw = LanguageEngine.getRaw(guild, user, requester, key);
@@ -81,7 +86,7 @@ public class LanguageEngine {
 				return temp2;
 			}
 		} catch (NullPointerException | IOException e) {
-			ConsoleEngine.INSTANCE.error(LanguageEngine.class, "Couldn't find language file for " + fullpath + ":" + key);
+			LOG.error("Couldn't find language file for " + fullpath + ":" + key);
 			return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
 		}
 	}

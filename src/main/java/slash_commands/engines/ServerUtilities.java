@@ -3,7 +3,7 @@ package slash_commands.engines;
 import java.util.List;
 
 import base.Bot;
-import base.engines.ConfigLoader;
+import base.engines.configs.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

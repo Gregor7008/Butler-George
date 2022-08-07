@@ -1,4 +1,4 @@
-package base.engines;
+package base.engines.configs;
 
 import org.json.JSONException;
 import org.json.JSONObject;

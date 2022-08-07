@@ -6,8 +6,8 @@ import java.util.List;
 import org.json.JSONArray;
 
 import base.assets.AwaitTask;
-import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.configs.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;

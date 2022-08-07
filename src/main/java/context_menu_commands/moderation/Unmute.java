@@ -2,8 +2,8 @@ package context_menu_commands.moderation;
 
 import org.json.JSONObject;
 
-import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.configs.ConfigLoader;
 import context_menu_commands.assets.UserContextEventHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;

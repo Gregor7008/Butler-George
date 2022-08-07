@@ -4,10 +4,10 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import base.Bot;
-import base.engines.ConfigLoader;
-import base.engines.ConfigManager;
 import base.engines.LanguageEngine;
 import base.engines.Toolbox;
+import base.engines.configs.ConfigLoader;
+import base.engines.configs.ConfigManager;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;

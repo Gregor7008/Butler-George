@@ -3,8 +3,8 @@ package slash_commands.moderation;
 import java.util.ArrayList;
 import java.util.List;
 
-import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.configs.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;

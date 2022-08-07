@@ -12,8 +12,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import base.Bot;
-import base.engines.ConfigLoader;
-import base.engines.ConfigManager;
+import base.engines.configs.ConfigLoader;
+import base.engines.configs.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;

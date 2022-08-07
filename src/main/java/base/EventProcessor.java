@@ -9,10 +9,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import base.engines.ConfigLoader;
-import base.engines.ConfigVerifier;
 import base.engines.LanguageEngine;
 import base.engines.Toolbox;
+import base.engines.configs.ConfigLoader;
+import base.engines.configs.ConfigVerifier;
 import context_menu_commands.ContextMenuCommandList;
 import context_menu_commands.assets.MessageContextEventHandler;
 import context_menu_commands.assets.UserContextEventHandler;

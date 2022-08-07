@@ -1,4 +1,4 @@
-package base.engines;
+package base.engines.configs;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -27,12 +27,16 @@ import com.mongodb.lang.NonNull;
 
 import base.Bot;
 import base.GUI;
+import base.engines.logging.ConsoleEngine;
+import base.engines.logging.Logger;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
 public class ConfigManager {
 
 	public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
+	
+	private static Logger LOG = ConsoleEngine.getLogger(ConfigManager.class);
 	
 	private MongoClient client;
 	private MongoDatabase database;
@@ -139,7 +143,7 @@ public class ConfigManager {
 			guildConfigCache.clear();
 			return true;
 		} catch (Exception e) {
-			ConsoleEngine.INSTANCE.error(ConfigManager.class, "Push failed!");
+			LOG.error("Push failed!");
 			return false;
 		}
 	}

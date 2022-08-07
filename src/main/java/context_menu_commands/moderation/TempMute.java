@@ -3,8 +3,8 @@ package context_menu_commands.moderation;
 import java.util.concurrent.TimeUnit;
 
 import base.assets.AwaitTask;
-import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
+import base.engines.configs.ConfigLoader;
 import context_menu_commands.assets.UserContextEventHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;

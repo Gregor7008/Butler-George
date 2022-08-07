@@ -6,9 +6,9 @@ import java.util.List;
 import org.json.JSONArray;
 
 import base.assets.AwaitTask;
-import base.engines.ConfigLoader;
 import base.engines.LanguageEngine;
 import base.engines.Toolbox;
+import base.engines.configs.ConfigLoader;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;

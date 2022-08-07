@@ -7,10 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import base.engines.ConfigLoader;
-import base.engines.ConfigManager;
 import base.engines.LanguageEngine;
 import base.engines.Toolbox;
+import base.engines.configs.ConfigLoader;
+import base.engines.configs.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
