@@ -8,7 +8,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: lowlighter/metrics@latest
+      - uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           template: repository
@@ -16,7 +16,7 @@ jobs:
           plugin_lines: yes
           plugin_followup: yes
           plugin_projects: yes
-          plugin_projects_repositories: users/Gregor7008/projects/2
+          plugin_projects_repositories: Gregor7008/Butler-George/projects/2
           plugin_licenses: yes
           plugin_licenses_setup: npm ci
           plugin_licenses_legal: no
