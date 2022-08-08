@@ -1,5 +1,8 @@
 package base.engines.logging;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.slf4j.Marker;
 import org.slf4j.event.Level;
 import org.slf4j.helpers.FormattingTuple;
@@ -65,11 +68,16 @@ public class Logger implements org.slf4j.Logger {
 	}
 	
 	private void handleCall(Level level, String msg, Throwable t) {
-		if (t != null)
-			msg += "\n" + t.getClass().getName() + ": " + t.getMessage();
+		StringBuilder sB = new StringBuilder();
+		sB.append(msg);
+		if (t != null) {;
+			 	StringWriter sw = new StringWriter();
+			 	PrintWriter pw = new PrintWriter(sw);
+			 	t.printStackTrace(pw);
+			 	sB.append("\n" + sw.toString());
+		}
 		if (this.isEnabledFor(level)) {
-			t.printStackTrace();
-			ConsoleEngine.getInstance().print(level, name, msg);
+			ConsoleEngine.getInstance().print(level, name, sB.toString());
 		}
 	}
 	
