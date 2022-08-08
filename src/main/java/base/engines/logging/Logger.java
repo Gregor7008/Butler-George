@@ -36,6 +36,48 @@ public class Logger implements org.slf4j.Logger {
 		}
 		return this;
 	}
+	
+	public boolean isEnabledFor(Level level) {
+		switch (level) {
+		case TRACE:
+			return traceEnabled;
+		case DEBUG:
+			return debugEnabled;
+		case INFO:
+			return infoEnabled;
+		case WARN:
+			return warnEnabled;
+		case ERROR:
+			return errorEnabled;
+		default:
+			return false;
+		}
+	}
+	
+	private void handleCall(Level level, String msg) {
+		if (this.isEnabledFor(level)) {
+			ConsoleEngine.getInstance().print(level, name, msg);
+		}
+	}
+	
+	private void handleCall(Level level, String format, Object... arguments) {
+		FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+		this.handleCall(level, tp.getMessage(), tp.getThrowable());
+	}
+	
+	private void handleCall(Level level, String msg, Throwable t) {
+		if (t != null)
+			msg += "\n" + t.getClass().getName() + ": " + t.getMessage();
+		if (this.isEnabledFor(level)) {
+			ConsoleEngine.getInstance().print(level, name, msg);
+		}
+	}
+	
+	public void title(String title) {
+		if (this.infoEnabled) {
+			ConsoleEngine.getInstance().print(null, null, "---------| " + title + " |---------");
+		}
+	}
 
 	@Override
 	public String getName() {
@@ -340,24 +382,5 @@ public class Logger implements org.slf4j.Logger {
 	@Override
 	public void error(Marker marker, String msg, Throwable t) {
 		this.handleCall(Level.ERROR, msg, t);
-	}
-	
-	public void title(String title) {
-		ConsoleEngine.getInstance().print(null, null, "---------| " + title + " |---------");
-	}
-	
-	private void handleCall(Level level, String msg) {
-		ConsoleEngine.getInstance().print(level, name, msg);
-	}
-	
-	private void handleCall(Level level, String format, Object... arguments) {
-		FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-		this.handleCall(level, tp.getMessage(), tp.getThrowable());
-	}
-	
-	private void handleCall(Level level, String msg, Throwable t) {
-		if (t != null)
-			msg += "\n" + t.getClass().getName() + ": " + t.getMessage();
-		ConsoleEngine.getInstance().print(level, name, msg);
 	}
 }
