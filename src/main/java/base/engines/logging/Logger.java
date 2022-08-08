@@ -55,9 +55,8 @@ public class Logger implements org.slf4j.Logger {
 	}
 	
 	private void handleCall(Level level, String msg) {
-		if (this.isEnabledFor(level)) {
+		if (this.isEnabledFor(level))
 			ConsoleEngine.getInstance().print(level, name, msg);
-		}
 	}
 	
 	private void handleCall(Level level, String format, Object... arguments) {
@@ -69,14 +68,14 @@ public class Logger implements org.slf4j.Logger {
 		if (t != null)
 			msg += "\n" + t.getClass().getName() + ": " + t.getMessage();
 		if (this.isEnabledFor(level)) {
+			t.printStackTrace();
 			ConsoleEngine.getInstance().print(level, name, msg);
 		}
 	}
 	
 	public void title(String title) {
-		if (this.infoEnabled) {
+		if (this.infoEnabled)
 			ConsoleEngine.getInstance().print(null, null, "---------| " + title + " |---------");
-		}
 	}
 
 	@Override

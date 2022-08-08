@@ -1,7 +1,6 @@
 package base;
 
 import java.io.IOException;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 import java.util.Timer;
 
@@ -27,7 +26,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import slash_commands.engines.ModController;
 import slash_commands.engines.ServerUtilities;
 
-public class Bot implements UncaughtExceptionHandler {
+public class Bot {
 	
 	public static Bot INSTANCE;
 	public static String VERSION = "V2.0-dev";
@@ -61,7 +60,7 @@ public class Bot implements UncaughtExceptionHandler {
 	public void startup() {
 //		Essentials
 		Runtime.getRuntime().addShutdownHook(this.getShutdownThread());
-		Thread.setDefaultUncaughtExceptionHandler(this);
+		Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.getInstance());
 //	    Engines
 		new ConfigVerifier();
 	    new ModController();
@@ -126,11 +125,6 @@ public class Bot implements UncaughtExceptionHandler {
 		}
 		LOG.info("Bot offline");
 		shutdown = true;
-	}
-	
-	@Override
-	public void uncaughtException(Thread t, Throwable e) {
-		LOG.error("Uncaught Exception occurred!", e);
 	}
 	
 	public Timer getTimer() {

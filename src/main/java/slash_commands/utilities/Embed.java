@@ -14,11 +14,12 @@ import base.engines.Toolbox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.entities.MessageEmbed.Footer;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -45,7 +46,7 @@ public class Embed implements CommandEventHandler {
 	private Member member;
 	private User user;
 	private Guild guild;
-	private MessageChannel channel, target;
+	private GuildMessageChannel channel, target;
 	private List<MessageEmbed> embedCache = new ArrayList<>();
 	private HashMap<String, InputStream> attachments = new HashMap<>();
 	
@@ -54,15 +55,15 @@ public class Embed implements CommandEventHandler {
 		this.member = event.getMember();
 		this.user = event.getUser();
 		this.guild = event.getGuild();
-		this.channel = event.getMessageChannel();
+		this.channel = event.getGuildChannel().asStandardGuildMessageChannel();
 		if (event.getOption("channel") != null) {
 			this.target = event.getOption("channel").getAsChannel().asGuildMessageChannel();
-			if (this.target == null) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, null, "invalid")).queue();
-				return;
-			}
 		} else {
 			this.target = this.channel;
+		}
+		if (!member.hasPermission(target, Permission.MESSAGE_SEND)) {
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
+			return;
 		}
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setup")).queue();
 		this.startEmbedConfiguration(event.getHook().retrieveOriginal().complete());
@@ -176,8 +177,8 @@ public class Embed implements CommandEventHandler {
 								mecAction.queue();
 							}
 						}
-					},
-					() -> {}).append());
+					}, () -> {})
+				.append());
 		}
 	}
 	
@@ -315,9 +316,75 @@ public class Embed implements CommandEventHandler {
 	}
 	
 	private void configureFields(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
-//		TODO Implement field configuration when JDA updates and supports selection menus in modals!
-		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "unsupportedJDA")).setActionRows().queue();
-		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(event.getMessage(), menu, true, eb), 500);
+		List<Field> fields = eb.build().getFields();
+		if (!fields.isEmpty()) {
+			SelectMenu.Builder menuBuilder = SelectMenu.create("fieldselection")
+					.setRequiredRange(1, 1)
+					.setPlaceholder("Select field to configure")
+					.addOption("New field", "new");
+			for (int i = 0; i < fields.size(); i++) {
+				menuBuilder.addOption(fields.get(i).getName(), String.valueOf(i));
+			}
+			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selfield")).setActionRow(menuBuilder.build()).queue();
+			AwaitTask.forSelectMenuInteraction(guild, user, event.getMessage(), null,
+					sm -> {
+						String value = sm.getSelectedOptions().get(0).getValue();
+						if (!value.equals("new")) {
+							this.continueFieldConfiguration(menu, eb, sm, Integer.parseInt(value), fields);
+						} else {
+							this.continueFieldConfiguration(menu, eb, sm, -1, fields);
+						}
+					}, () -> {
+						this.defaultTimeout(menu, eb, event);
+					}).addValidComponents(menuBuilder.getId()).append();
+		} else {
+			this.continueFieldConfiguration(menu, eb, event, -1, fields);
+		}
+	}
+	
+	private void continueFieldConfiguration(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event, int targetIndex, List<Field> fields) {
+		TextInput.Builder titleInput = TextInput.create("title", "Title", TextInputStyle.SHORT)
+				.setMaxLength(MessageEmbed.TITLE_MAX_LENGTH)
+				.setRequired(true)
+				.setPlaceholder("Input title");
+		TextInput.Builder descriptionInput = TextInput.create("description", "Description", TextInputStyle.PARAGRAPH)
+				.setMaxLength(MessageEmbed.VALUE_MAX_LENGTH)
+				.setRequired(true)
+				.setPlaceholder("Input description");
+		if (targetIndex >= 0) {
+			titleInput.setValue(fields.get(targetIndex).getName());
+			descriptionInput.setValue(fields.get(targetIndex).getValue());
+		}
+		Modal modal = Modal.create("fieldconfig", "Field configuration")
+				.addActionRows(ActionRow.of(titleInput.build()), ActionRow.of(descriptionInput.build()))
+				.build();
+		event.replyModal(modal).queue();
+		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
+				mi -> {
+					mi.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selinline"))
+							.setActionRow(Button.secondary("true", Emoji.fromUnicode("\u2705")),
+										  Button.secondary("false", Emoji.fromUnicode("\u274C"))).queue();
+					AwaitTask.forButtonInteraction(guild, user, event.getMessage(), null,
+							bi -> {
+								String title = mi.getValue("title").getAsString();
+								String description = mi.getValue("description").getAsString();
+								boolean inline = Boolean.parseBoolean(bi.getComponentId());
+								if (targetIndex < 0) {
+									eb.addField(title, description, inline);
+								} else {
+									eb.clearFields();
+									fields.set(targetIndex, new Field(title, description, inline));
+									for(Field field : fields) {
+										eb.addField(field);
+									}
+								}
+								this.defaultConsumer(menu, eb, event, "field", "");
+							}, () -> {
+								this.defaultTimeout(menu, eb, event);
+							}).addValidComponents("true", "false").append();
+				}, () -> {
+					this.defaultTimeout(menu, eb, event);
+				}).addValidComponents(modal.getId()).append();
 	}
 	
 	private void defaultConsumer(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event, String key, String input) {

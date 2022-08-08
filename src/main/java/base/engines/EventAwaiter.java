@@ -1,9 +1,7 @@
 package base.engines;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import base.assets.AwaitTask;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -19,68 +17,128 @@ public class EventAwaiter extends ListenerAdapter {
 
 	public static EventAwaiter INSTANCE;
 	
-	private HashMap<Long, AwaitTask<MessageReceivedEvent>> awaitingMessageReceival = new HashMap<>();
-	private HashMap<Long, AwaitTask<MessageReactionAddEvent>> awaitingReactionAdding = new HashMap<>();
-	private HashMap<Long, AwaitTask<MessageReactionRemoveEvent>> awaitingReactionRemoval = new HashMap<>();
-	private HashMap<Long, AwaitTask<ButtonInteractionEvent>> awaitingButtonInteraction = new HashMap<>();
-	private HashMap<Long, AwaitTask<SelectMenuInteractionEvent>> awaitingSelectMenuInteraction = new HashMap<>();
-	private HashMap<Long, AwaitTask<ModalInteractionEvent>> awaitingModalInteraction = new HashMap<>();
-	private List<Long> ids = new ArrayList<>();
+	private List<AwaitTask<MessageReceivedEvent>> awaitingMessageReceival = new ArrayList<>();
+	private List<AwaitTask<MessageReactionAddEvent>> awaitingReactionAdding = new ArrayList<>();
+	private List<AwaitTask<MessageReactionRemoveEvent>> awaitingReactionRemoval = new ArrayList<>();
+	private List<AwaitTask<ButtonInteractionEvent>> awaitingButtonInteraction = new ArrayList<>();
+	private List<AwaitTask<SelectMenuInteractionEvent>> awaitingSelectMenuInteraction = new ArrayList<>();
+	private List<AwaitTask<ModalInteractionEvent>> awaitingModalInteraction = new ArrayList<>();
 	
 	public EventAwaiter() {
 		INSTANCE = this;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T extends GenericEvent> long appendTask(AwaitTask<T> task) {
-		long id = 0L;
-		while (ids.contains(id)) {
-			id = ThreadLocalRandom.current().nextLong(100000, 999999);
+	@Override
+	public String toString() {
+		StringBuilder sB = new StringBuilder();
+		String prefix = "";
+		if (awaitingMessageReceival.size() > 0) {
+			sB.append("Awaiting message receival (" + awaitingMessageReceival.size() + "):");
+			awaitingMessageReceival.forEach(task -> {
+				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
+			});
+			prefix = "\n";
 		}
+		if (awaitingReactionAdding.size() > 0) {
+			sB.append(prefix + "Awaiting reaction adding (" + awaitingReactionAdding.size() + "):");
+			awaitingReactionAdding.forEach(task -> {
+				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
+			});
+			prefix = "\n";
+		}
+		if (awaitingReactionRemoval.size() > 0) {
+			sB.append(prefix + "Awaiting reaction removal (" + awaitingReactionRemoval.size() + "):");
+			awaitingReactionRemoval.forEach(task -> {
+				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
+			});
+			prefix = "\n";
+		}
+		if (awaitingButtonInteraction.size() > 0) {
+			sB.append(prefix + "Awaiting button interaction (" + awaitingButtonInteraction.size() + "):");
+			awaitingButtonInteraction.forEach(task -> {
+				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
+			});
+			prefix = "\n";
+		}
+		if (awaitingSelectMenuInteraction.size() > 0) {
+			sB.append(prefix + "Awaiting select menu interaction (" + awaitingSelectMenuInteraction.size() + "):");
+			awaitingSelectMenuInteraction.forEach(task -> {
+				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
+			});
+			prefix = "\n";
+		}
+		if (awaitingModalInteraction.size() > 0) {
+			sB.append(prefix + "Awaiting modal interaction (" + awaitingModalInteraction.size() + "):");
+			awaitingModalInteraction.forEach(task -> {
+				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
+			});
+		}
+		if (prefix.isBlank()) {
+			sB.append("The EventAwaiter instance doesn't wait for any events at the moment!");
+		}
+		return sB.toString();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends GenericEvent> void appendTask(AwaitTask<T> task) {
 		switch (task.awaitedEvent) {
 		case BUTTON_INTERACTION_EVENT:
-			awaitingButtonInteraction.put(id, (AwaitTask<ButtonInteractionEvent>) task);
+			awaitingButtonInteraction.add((AwaitTask<ButtonInteractionEvent>) task);
 			break;
 		case MESSAGE_REACTION_ADD_EVENT:
-			awaitingReactionAdding.put(id, (AwaitTask<MessageReactionAddEvent>) task);
+			awaitingReactionAdding.add((AwaitTask<MessageReactionAddEvent>) task);
 			break;
 		case MESSAGE_REACTION_REMOVE_EVENT:
-			awaitingReactionRemoval.put(id, (AwaitTask<MessageReactionRemoveEvent>) task);
+			awaitingReactionRemoval.add((AwaitTask<MessageReactionRemoveEvent>) task);
 			break;
 		case MESSAGE_RECEIVED_EVENT:
-			awaitingMessageReceival.put(id, (AwaitTask<MessageReceivedEvent>) task);
+			awaitingMessageReceival.add((AwaitTask<MessageReceivedEvent>) task);
 			break;
 		case MODAL_INTERACTION_EVENT:
-			awaitingModalInteraction.put(id, (AwaitTask<ModalInteractionEvent>) task);
+			awaitingModalInteraction.add((AwaitTask<ModalInteractionEvent>) task);
 			break;
 		case SELECT_MENU_INTERACTION_EVENT:
-			awaitingSelectMenuInteraction.put(id, (AwaitTask<SelectMenuInteractionEvent>) task);
+			awaitingSelectMenuInteraction.add((AwaitTask<SelectMenuInteractionEvent>) task);
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid awaited event " + task.awaitedEvent.name() + "!");
 		}
-		ids.add(id);
-		return id;
 	}
 	
-	public void removeTask(long id) {
-		awaitingButtonInteraction.remove(id);
-		awaitingReactionAdding.remove(id);
-		awaitingReactionRemoval.remove(id);
-		awaitingMessageReceival.remove(id);
-		awaitingModalInteraction.remove(id);
-		awaitingSelectMenuInteraction.remove(id);
-		ids.remove(id);
+	public <T extends GenericEvent> void removeTask(AwaitTask<T> task) {
+		switch (task.awaitedEvent) {
+		case BUTTON_INTERACTION_EVENT:
+			awaitingButtonInteraction.remove(task);
+			break;
+		case MESSAGE_REACTION_ADD_EVENT:
+			awaitingReactionAdding.remove(task);
+			break;
+		case MESSAGE_REACTION_REMOVE_EVENT:
+			awaitingReactionRemoval.remove(task);
+			break;
+		case MESSAGE_RECEIVED_EVENT:
+			awaitingMessageReceival.remove(task);
+			break;
+		case MODAL_INTERACTION_EVENT:
+			awaitingModalInteraction.remove(task);
+			break;
+		case SELECT_MENU_INTERACTION_EVENT:
+			awaitingSelectMenuInteraction.remove(task);
+			break;
+		default:
+			break;
+		}
 	}
 	
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
-		for (AwaitTask<MessageReceivedEvent> task : awaitingMessageReceival.values()) {
+		List<AwaitTask<MessageReceivedEvent>> listCopy = List.copyOf(awaitingMessageReceival);
+		for (int i = 0; i < listCopy.size(); i++) {
+			AwaitTask<MessageReceivedEvent> task = listCopy.get(i);
 			if (!event.getAuthor().isBot()
 					&& event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getAuthor().getId().equals(task.getUser().getId())
-					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& ids.contains(task.getId())) {
+					&& event.getChannel().getId().equals(task.getChannel().getId())) {
 				task.complete(event);
 			}
 		}
@@ -88,12 +146,13 @@ public class EventAwaiter extends ListenerAdapter {
 
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
-		for (AwaitTask<MessageReactionAddEvent> task : awaitingReactionAdding.values()) {
+		List<AwaitTask<MessageReactionAddEvent>> listCopy = List.copyOf(awaitingReactionAdding);
+		for (int i = 0; i < listCopy.size(); i++) {
+			AwaitTask<MessageReactionAddEvent> task = listCopy.get(i);
 			if (event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& event.getMessageId().equals(task.getMessage().getId())
-					&& ids.contains(task.getId())) {
+					&& event.getMessageId().equals(task.getMessage().getId())) {
 				task.complete(event);
 			}
 		}
@@ -101,12 +160,13 @@ public class EventAwaiter extends ListenerAdapter {
 
 	@Override
 	public void onMessageReactionRemove(MessageReactionRemoveEvent event) {
-		for (AwaitTask<MessageReactionRemoveEvent> task : awaitingReactionRemoval.values()) {
+		List<AwaitTask<MessageReactionRemoveEvent>> listCopy = List.copyOf(awaitingReactionRemoval);
+		for (int i = 0; i < listCopy.size(); i++) {
+			AwaitTask<MessageReactionRemoveEvent> task = listCopy.get(i);
 			if (!event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& event.getMessageId().equals(task.getMessage().getId())
-					&& ids.contains(task.getId())) {
+					&& event.getMessageId().equals(task.getMessage().getId())) {
 				task.complete(event);
 			}
 		}
@@ -114,12 +174,13 @@ public class EventAwaiter extends ListenerAdapter {
 
 	@Override
 	public void onButtonInteraction(ButtonInteractionEvent event) {
-		for (AwaitTask<ButtonInteractionEvent> task : awaitingButtonInteraction.values()) {
+		List<AwaitTask<ButtonInteractionEvent>> listCopy = List.copyOf(awaitingButtonInteraction);
+		for (int i = 0; i < listCopy.size(); i++) {
+			AwaitTask<ButtonInteractionEvent> task = listCopy.get(i);
 			if (event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& event.getMessageId().equals(task.getMessage().getId())
-					&& ids.contains(task.getId())) {
+					&& event.getMessageId().equals(task.getMessage().getId())) {
 				if (task.getComponentIds() != null) {
 					if (task.getComponentIds().contains(event.getComponentId())) {
 						task.complete(event);
@@ -133,12 +194,13 @@ public class EventAwaiter extends ListenerAdapter {
 
 	@Override
 	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {
-		for (AwaitTask<SelectMenuInteractionEvent> task : awaitingSelectMenuInteraction.values()) {
+		List<AwaitTask<SelectMenuInteractionEvent>> listCopy = List.copyOf(awaitingSelectMenuInteraction);
+		for (int i = 0; i < listCopy.size(); i++) {
+			AwaitTask<SelectMenuInteractionEvent> task = listCopy.get(i);
 			if (event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& event.getMessageId().equals(task.getMessage().getId())
-					&& ids.contains(task.getId())) {
+					&& event.getMessageId().equals(task.getMessage().getId())) {
 				if (task.getComponentIds() != null) {
 					if (task.getComponentIds().contains(event.getComponentId())) {
 						task.complete(event);
@@ -152,11 +214,12 @@ public class EventAwaiter extends ListenerAdapter {
 
 	@Override
 	public void onModalInteraction(ModalInteractionEvent event) {
-		for (AwaitTask<ModalInteractionEvent> task : awaitingModalInteraction.values()) {
+		List<AwaitTask<ModalInteractionEvent>> listCopy = List.copyOf(awaitingModalInteraction);
+		for (int i = 0; i < listCopy.size(); i++) {
+			AwaitTask<ModalInteractionEvent> task = listCopy.get(i);
 			if (event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getUser().getId().equals(task.getUser().getId())
-					&& event.getChannel().getId().equals(task.getChannel().getId())
-					&& ids.contains(task.getId())) {
+					&& event.getChannel().getId().equals(task.getChannel().getId())) {
 				if (task.getComponentIds() != null) {
 					if (task.getComponentIds().contains(event.getModalId())) {
 						task.complete(event);

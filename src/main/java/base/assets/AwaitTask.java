@@ -42,7 +42,6 @@ public class AwaitTask<T extends GenericEvent> {
 	private boolean executed = false;
 	private boolean cancelled = false;
 	private TimerTask timeoutTask = null;
-	private long selfId = 0L;
 	
 	public static AwaitTask<MessageReceivedEvent> forMessageReceival(Guild guild, User user, MessageChannel channel, Consumer<MessageReceivedEvent> onSuccess) {
 		return AwaitTask.forMessageReceival(guild, user, channel, null, onSuccess, null);
@@ -149,7 +148,7 @@ public class AwaitTask<T extends GenericEvent> {
 		this.timeoutTask = new TimerTask() {
 			@Override
 			public void run() {
-				EventAwaiter.INSTANCE.removeTask(selfId);
+				EventAwaiter.INSTANCE.removeTask(self);
 				cancelled = true;
 				if (timeoutRunnable != null) {
 					timeoutRunnable.run();
@@ -171,7 +170,7 @@ public class AwaitTask<T extends GenericEvent> {
 	}
 	
 	public AwaitTask<T> cancel() {
-		EventAwaiter.INSTANCE.removeTask(this.selfId);
+		EventAwaiter.INSTANCE.removeTask(this);
 		this.timeoutTask.cancel();
 		this.cancelled = true;
 		return this;
@@ -185,7 +184,7 @@ public class AwaitTask<T extends GenericEvent> {
 			}
 		}
 		if (!executed && !cancelled) {
-			EventAwaiter.INSTANCE.removeTask(this.selfId);
+			EventAwaiter.INSTANCE.removeTask(this);
 			this.timeoutTask.cancel();
 			this.executed = true;
 			this.eventConsumer.accept(event);
@@ -211,10 +210,6 @@ public class AwaitTask<T extends GenericEvent> {
 	
 	public List<String> getComponentIds() {
 		return componentIds;
-	}
-	
-	public long getId() {
-		return this.selfId;
 	}
 	
 	public static enum AwaitedEvent {

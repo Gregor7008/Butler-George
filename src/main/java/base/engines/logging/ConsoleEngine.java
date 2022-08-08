@@ -2,6 +2,7 @@ package base.engines.logging;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Timer;
@@ -15,7 +16,7 @@ import org.slf4j.event.Level;
 
 import base.GUI;
 
-public class ConsoleEngine implements ILoggerFactory {
+public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
     
 	private static ConsoleEngine INSTANCE;
 	private static Logger LOG = ConsoleEngine.getLogger(ConsoleEngine.class);
@@ -57,6 +58,11 @@ public class ConsoleEngine implements ILoggerFactory {
 		}
 		return logger;
 	}
+
+	@Override
+	public void uncaughtException(Thread t, Throwable e) {
+		e.printStackTrace();
+	}
 	
 	public void print(@Nullable Level level, @Nullable String callerName, @Nullable String message) {
 		this.print(level.toString(), callerName, message, true);
@@ -64,6 +70,7 @@ public class ConsoleEngine implements ILoggerFactory {
 	
 	public void print(@Nullable String prefix, @Nullable String callerName, @Nullable String message, boolean timeCode) {
 		String timeCodeText = "";
+		String callerNameText = "";
 		if (timeCode)
 			timeCodeText = OffsetDateTime.now().format(format) + " | ";
 		if (prefix == null) {
@@ -72,17 +79,19 @@ public class ConsoleEngine implements ILoggerFactory {
 			prefix = "[" + prefix.toUpperCase() + "] ";
 		}
 		if (callerName == null) {
-			callerName = "";
+			callerNameText = "";
 		} else if (callerName.isBlank()) {
-			callerName = "";
+			callerNameText = "";
 		} else {
-			callerName = "[" + callerName + "] ";
+			String[] callerNameSplit = callerName.split("\\.");
+			String callerNameRaw = callerNameSplit[callerNameSplit.length - 1];
+			callerNameText = "[" + callerNameRaw.substring(0, 1).toUpperCase() + callerNameRaw.substring(1) + "] ";
 		}
 		if (message == null)
 			message = "No message";
 		String[] messageParts = message.split("\n");
 		for (int i = 0; i < messageParts.length; i++) {
-			GUI.INSTANCE.console.append(timeCodeText + prefix + callerName + messageParts[i] + "\n");
+			GUI.INSTANCE.console.append(timeCodeText + prefix + callerNameText + messageParts[i] + "\n");
 		}
 	}
 	
@@ -91,7 +100,7 @@ public class ConsoleEngine implements ILoggerFactory {
 			@Override
 			public void run() {
 				if (errStream.size() > 0) {
-					LOG.error(errStream.toString());
+					print(Level.ERROR, "ConsoleEngine", errStream.toString());
 					errStream.reset();
 				}
 				if (outStream.size() > 0) {
