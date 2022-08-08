@@ -56,7 +56,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 ### 📊 Statistics
 
 **🆔 Display Card:**<br>
-<img src="https://raw.githubusercontent.com/Gregor7008/Butler-George/V2-CommandRework/github-metrics.svg" alt="Metric Stats" height="290" width="410"><br>
+<img src="https://raw.githubusercontent.com/Gregor7008/Gregor7008/main/resources/actions/butler-george-metrics.svg" alt="Metric Stats" height="350" width="400"><br>
 **🧮 Code:**<br>
 ![Code lines][linesshield]
 ![Project size][storagesizeshield]<br>
@@ -81,7 +81,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 <details>
     <summary><a href="https://github.com/Gregor7008">Gregor7008</a> (Team Leader)</summary>
     <br>
-    <img alt="Gregor7008 Card" src="https://github.com/Gregor7008/Butler-George/blob/main/.github/resources/Gregor7008%20Card.png?raw=true" width="250" height="100"/>
+    <img alt="Gregor7008 Card" src="https://github.com/Gregor7008/Gregor7008/blob/main/resources/graphics/widgets/Gregor7008%20Card.png?raw=true" width="250" height="100"/>
     <br>
     <img alt="Gregor7008 Activity" src="https://wakatime.com/badge/github/Gregor7008/Butler-George.svg" width="" height=""/>
 </details>
