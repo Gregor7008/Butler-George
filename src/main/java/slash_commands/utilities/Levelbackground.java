@@ -15,9 +15,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import slash_commands.assets.CommandEventHandler;
+import slash_commands.assets.SlashCommandEventHandler;
 
-public class Levelbackground implements CommandEventHandler {
+public class Levelbackground implements SlashCommandEventHandler {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {

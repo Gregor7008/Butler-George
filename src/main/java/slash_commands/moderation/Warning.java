@@ -20,10 +20,10 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import slash_commands.assets.CommandEventHandler;
+import slash_commands.assets.SlashCommandEventHandler;
 import slash_commands.engines.ModController;
 
-public class Warning implements CommandEventHandler {
+public class Warning implements SlashCommandEventHandler {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {

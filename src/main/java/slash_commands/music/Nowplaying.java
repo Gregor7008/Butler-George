@@ -13,10 +13,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import slash_commands.assets.CommandEventHandler;
+import slash_commands.assets.SlashCommandEventHandler;
 import slash_commands.engines.PlayerManager;
 
-public class Nowplaying implements CommandEventHandler {
+public class Nowplaying implements SlashCommandEventHandler {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {

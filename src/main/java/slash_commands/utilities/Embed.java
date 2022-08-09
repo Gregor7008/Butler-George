@@ -39,9 +39,9 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
-import slash_commands.assets.CommandEventHandler;
+import slash_commands.assets.SlashCommandEventHandler;
 
-public class Embed implements CommandEventHandler {
+public class Embed implements SlashCommandEventHandler {
 
 	private Member member;
 	private User user;

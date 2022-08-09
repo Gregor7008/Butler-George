@@ -23,9 +23,9 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
-import slash_commands.assets.CommandEventHandler;
+import slash_commands.assets.SlashCommandEventHandler;
 
-public class Configure implements CommandEventHandler {
+public class Configure implements SlashCommandEventHandler {
 	
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {

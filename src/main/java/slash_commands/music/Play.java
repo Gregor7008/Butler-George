@@ -16,11 +16,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import slash_commands.assets.CommandEventHandler;
+import slash_commands.assets.SlashCommandEventHandler;
 import slash_commands.engines.GuildMusicManager;
 import slash_commands.engines.PlayerManager;
 
-public class Play implements CommandEventHandler {
+public class Play implements SlashCommandEventHandler {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {

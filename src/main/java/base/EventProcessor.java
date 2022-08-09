@@ -52,7 +52,7 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import slash_commands.CommandList;
-import slash_commands.assets.CommandEventHandler;
+import slash_commands.assets.SlashCommandEventHandler;
 import slash_commands.engines.LevelEngine;
 import slash_commands.engines.ServerUtilities;
 import slash_commands.music.Stop;
@@ -65,7 +65,7 @@ public class EventProcessor extends ListenerAdapter {
 	@Override
 	public void onReady(ReadyEvent event) {
 		CommandListUpdateAction clua = event.getJDA().updateCommands();
-		commandList.commandEventHandlers.forEach((name, cmd) -> {
+		commandList.slashCommandEventHandlers.forEach((name, cmd) -> {
 			clua.addCommands(cmd.initialize());
 		});
 		contextMenuCommandList.messageContextEventHandlers.forEach((name, cmd) -> {
@@ -94,9 +94,9 @@ public class EventProcessor extends ListenerAdapter {
 			return;
 		}
 		GUI.INSTANCE.increaseExecutionsCounter();
-		CommandEventHandler commandEventHandler = null;
-		if ((commandEventHandler = commandList.commandEventHandlers.get(event.getName().toLowerCase())) != null) {
-			commandEventHandler.execute(event);
+		SlashCommandEventHandler slashCommandEventHandler = null;
+		if ((slashCommandEventHandler = commandList.slashCommandEventHandlers.get(event.getName().toLowerCase())) != null) {
+			slashCommandEventHandler.execute(event);
 		}
 		LevelEngine.getInstance().slashcommand(event);
 	}

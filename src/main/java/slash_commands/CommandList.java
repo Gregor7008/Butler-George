@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import slash_commands.administration.Configure;
 import slash_commands.administration.Rolesorting;
 import slash_commands.administration.Webhook;
-import slash_commands.assets.CommandEventHandler;
+import slash_commands.assets.SlashCommandEventHandler;
 import slash_commands.moderation.Clear;
 import slash_commands.moderation.Move;
 import slash_commands.moderation.Warning;
@@ -29,36 +29,36 @@ import slash_commands.utilities.Userinfo;
 
 public class CommandList {
 
-	public ConcurrentHashMap<String, CommandEventHandler> commandEventHandlers = new ConcurrentHashMap<String, CommandEventHandler>();
+	public ConcurrentHashMap<String, SlashCommandEventHandler> slashCommandEventHandlers = new ConcurrentHashMap<String, SlashCommandEventHandler>();
 	
 	public CommandList() {
 		//Administration
-		this.commandEventHandlers.put("clear", new Clear());
-		this.commandEventHandlers.put("rolesort", new Rolesorting());
-		this.commandEventHandlers.put("move", new Move());
-		this.commandEventHandlers.put("warning", new Warning());
-		this.commandEventHandlers.put("configure", new Configure());
+		this.slashCommandEventHandlers.put("clear", new Clear());
+		this.slashCommandEventHandlers.put("rolesort", new Rolesorting());
+		this.slashCommandEventHandlers.put("move", new Move());
+		this.slashCommandEventHandlers.put("warning", new Warning());
+		this.slashCommandEventHandlers.put("configure", new Configure());
 		
 		//Music
-		this.commandEventHandlers.put("nowplaying", new Nowplaying());
-		this.commandEventHandlers.put("play", new Play());
-		this.commandEventHandlers.put("queue", new Queue());
-		this.commandEventHandlers.put("skip", new Skip());
-		this.commandEventHandlers.put("stop", new Stop());
+		this.slashCommandEventHandlers.put("nowplaying", new Nowplaying());
+		this.slashCommandEventHandlers.put("play", new Play());
+		this.slashCommandEventHandlers.put("queue", new Queue());
+		this.slashCommandEventHandlers.put("skip", new Skip());
+		this.slashCommandEventHandlers.put("stop", new Stop());
 		
 		//Utilities
-		this.commandEventHandlers.put("embed", new Embed());
-		this.commandEventHandlers.put("level", new Level());
-		this.commandEventHandlers.put("levelbackground", new Levelbackground());
-		this.commandEventHandlers.put("suggest", new Suggest());
-		this.commandEventHandlers.put("userinfo", new Userinfo());
-		this.commandEventHandlers.put("report", new Report());
-		this.commandEventHandlers.put("serverinfo", new Serverinfo());
-		this.commandEventHandlers.put("language", new Language());
-		this.commandEventHandlers.put("webhook", new Webhook());
-		this.commandEventHandlers.put("createchannel", new CreateChannel());
-		this.commandEventHandlers.put("channelpermission", new Channelpermission());
-		this.commandEventHandlers.put("pingandmove", new PingAndMove());
-		this.commandEventHandlers.put("leave", new Leave());
+		this.slashCommandEventHandlers.put("embed", new Embed());
+		this.slashCommandEventHandlers.put("level", new Level());
+		this.slashCommandEventHandlers.put("levelbackground", new Levelbackground());
+		this.slashCommandEventHandlers.put("suggest", new Suggest());
+		this.slashCommandEventHandlers.put("userinfo", new Userinfo());
+		this.slashCommandEventHandlers.put("report", new Report());
+		this.slashCommandEventHandlers.put("serverinfo", new Serverinfo());
+		this.slashCommandEventHandlers.put("language", new Language());
+		this.slashCommandEventHandlers.put("webhook", new Webhook());
+		this.slashCommandEventHandlers.put("createchannel", new CreateChannel());
+		this.slashCommandEventHandlers.put("channelpermission", new Channelpermission());
+		this.slashCommandEventHandlers.put("pingandmove", new PingAndMove());
+		this.slashCommandEventHandlers.put("leave", new Leave());
 	}
 }

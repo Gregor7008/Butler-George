@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public interface CommandEventHandler {
+public interface SlashCommandEventHandler {
 	
 	public void execute(SlashCommandInteractionEvent event);
 	public CommandData initialize();
