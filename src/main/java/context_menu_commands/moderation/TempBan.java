@@ -13,6 +13,10 @@ import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEven
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Modal;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import slash_commands.engines.ModController;
 
 public class TempBan implements UserContextEventHandler {
@@ -22,21 +26,29 @@ public class TempBan implements UserContextEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final User target = event.getTarget();
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defdays")).queue();
-		AwaitTask.forMessageReceival(guild, user, event.getMessageChannel(),
-				  d -> {try {Integer.parseInt(d.getMessage().getContentRaw());
-				  			return true;
-				  		} catch (NumberFormatException ex) {return false;}},
-				  d -> {int days = Integer.parseInt(d.getMessage().getContentRaw());
-				        OffsetDateTime until = OffsetDateTime.now().plusDays(days);
-						ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
-						ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanned", true);
-						guild.getMember(target).ban(0).queue();
-						ModController.RUN.userModCheck(guild, target);
-						event.getMessageChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
-								.replaceDescription("{user}", target.getName())
-								.replaceDescription("{time}", String.valueOf(days))).queue();
-				  }, null).append();
+		TextInput dayInput = TextInput.create("duration", "Duration", TextInputStyle.SHORT)
+				.setMinLength(1)
+				.setMaxLength(3)
+				.setPlaceholder("Input duration in days")
+				.build();
+		Modal modal = Modal.create("configTempban", "Configure temporary ban").addActionRows(ActionRow.of(dayInput)).build();
+		event.replyModal(modal).queue();
+		AwaitTask.forModalInteraction(guild, user, event.getMessageChannel(),
+				  d -> {
+					  try {
+						  int days = Integer.parseInt(d.getValue("duration").getAsString());
+					        OffsetDateTime until = OffsetDateTime.now().plusDays(days);
+							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
+							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanned", true);
+							guild.getMember(target).ban(0).queue();
+							ModController.RUN.userModCheck(guild, target);
+							d.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
+									.replaceDescription("{user}", target.getName())
+									.replaceDescription("{time}", String.valueOf(days))).setEphemeral(true).queue();
+					  } catch (NumberFormatException e) {
+						  d.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).setEphemeral(true).queue();
+					  }
+				  }).append();
 	}
 
 	@Override

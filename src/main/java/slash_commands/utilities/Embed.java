@@ -349,7 +349,7 @@ public class Embed implements CommandEventHandler {
 				.setPlaceholder("Input title");
 		TextInput.Builder descriptionInput = TextInput.create("description", "Description", TextInputStyle.PARAGRAPH)
 				.setMaxLength(MessageEmbed.VALUE_MAX_LENGTH)
-				.setRequired(true)
+				.setRequired(false)
 				.setPlaceholder("Input description");
 		if (targetIndex >= 0) {
 			titleInput.setValue(fields.get(targetIndex).getName());
