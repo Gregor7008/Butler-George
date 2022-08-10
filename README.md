@@ -103,4 +103,4 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 Shields by <a href="https://shields.io">shields.io</a><br>
 Activity recorded by <a href="https://wakatime.com">wakatime.com</a>
 
-©️ [Gregor7008](https://github.com/Gregor7008) - 03.08.2022
+©️ [Gregor7008](https://github.com/Gregor7008) - 2022
