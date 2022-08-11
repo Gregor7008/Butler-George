@@ -71,10 +71,10 @@
 [partner_badge_matt_link]: https://cdn.discordapp.com/emojis/1006963992272588853.webp?size=32&amp;&quality=lossless
 [server_owner_badge_link]: https://cdn.discordapp.com/emojis/1006963993530871888.webp?size=32&amp;&quality=lossless
 [server_team_badge_link]: https://cdn.discordapp.com/emojis/1006964120169496616.webp?size=32&amp;&quality=lossless
-[system_badge_link]: https://cdn.discordapp.com/emojis/1006963994881429504.webp?size=32&amp;&quality=lossless
+[system_badge_link]: https://cdn.discordapp.com/emojis/1006963994881429504.webp?size=64&amp;&quality=lossless
 [verified_badge_link]: https://cdn.discordapp.com/emojis/1006963995959373956.webp?size=32&amp;&quality=lossless
 [verified_badge_green_link]: https://cdn.discordapp.com/emojis/1006963998597582958.webp?size=32&amp;&quality=lossless
-[verified_bot_badge_link]: https://cdn.discordapp.com/emojis/1006963997318328360.webp?size=32&amp;&quality=lossless
+[verified_bot_badge_link]: https://cdn.discordapp.com/emojis/1006963997318328360.webp?size=48&amp;&quality=lossless
 <!-- Emojis - Logos Server 
 []: 
 []: 
@@ -221,6 +221,7 @@ Emoji                                                   | Name                  
 ![2nd][second_link]                                     | 2nd                       | 1006964117376090123 | .png
 ![3rd][third_link]                                      | 3rd                       | 1006964118630174894 | .png
 ![bot_badge][bot_badge_link]                            | bot_badge                 | 1006963978372661268 | .png
+![verified_bot_badge][verified_bot_badge_link]          | verified_bot_badge        | 1006963997318328360 | .png
 ![system_badge][system_badge_link]                      | system_badge              | 1006963994881429504 | .png
 ![balance_squad_badge][balance_squad_badge_link]        | balance_squad_badge       | 1006963977114353664 | .png
 ![bravery_squad_badge][bravery_squad_badge_link]        | bravery_squad_badge       | 1006963979505119272 | .png
@@ -230,10 +231,10 @@ Emoji                                                   | Name                  
 ![bughunter_lvl2_badge][bughunter_lvl2_badge_link]      | bughunter_lvl2_badge      | 1006963983145766972 | .png
 ![employee_badge][employee_badge_link]                  | employee_badge            | 1006963985553305690 | .png
 ![employee_badge__matt][employee_badge__matt_link]      | employee_badge__matt      | 1006963986673180833 | .png
-![early_supporter_badge][early_supporter_badge_link]    | early_supporter_badge     | 1006963984378900490 | .png
-![nitro_booster_badge][nitro_booster_badge_link]        | nitro_booster_badge       | 1006963989105872996 | .png
 ![partner_badge][partner_badge_link]                    | partner_badge             | 1006963990305439805 | .png
 ![partner_badge_matt][partner_badge_matt_link]          | partner_badge_matt        | 1006963992272588853 | .png
+![early_supporter_badge][early_supporter_badge_link]    | early_supporter_badge     | 1006963984378900490 | .png
+![nitro_booster_badge][nitro_booster_badge_link]        | nitro_booster_badge       | 1006963989105872996 | .png
 ![server_owner_badge][server_owner_badge_link]          | server_owner_badge        | 1006963993530871888 | .png
 ![server_team_badge][server_team_badge_link]            | server_team_badge         | 1006964120169496616 | .png
 ![verified_badge][verified_badge_link]                  | verified_badge            | 1006963995959373956 | .png
