@@ -2,11 +2,10 @@ package slash_commands.administration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
-import configuration_options.ConfigurationOptionList;
+import configuration_options.ServerConfigurationOptionsList;
 import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
@@ -32,14 +31,12 @@ public class Configure implements SlashCommandEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		
-		ConcurrentHashMap<String, ConfigurationOptionData> operations = new ConcurrentHashMap<String, ConfigurationOptionData>();
 		SelectMenu.Builder menuBuilder1 = SelectMenu.create("selVal").setRequiredRange(1, 1).setPlaceholder("Select a value");
 		EmbedBuilder eb1 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selval"));
 		
 		if (event.getSubcommandName().equals("server")) {
-			new ConfigurationOptionList().serverOperations.forEach((name, operationRequest) -> {
-				ConfigurationOptionData data = operationRequest.initialize();
-				operations.put(name, data);
+			ServerConfigurationOptionsList.getConfigurationOptionData().forEach(data -> {
+				String name = data.getName();
 				menuBuilder1.addOption(name, name);
 				eb1.addField("`" + name + "`", data.getInfo(), true);
 			});
@@ -48,7 +45,7 @@ public class Configure implements SlashCommandEventHandler {
 		SelectMenu menu = menuBuilder1.build();
 		Message msg = event.replyEmbeds(eb1.build()).addActionRow(menu).complete().retrieveOriginal().complete();
 		AwaitTask.forSelectMenuInteraction(guild, user, msg,
-				e -> {ConfigurationOptionData data = operations.get(e.getSelectedOptions().get(0).getValue());
+				e -> {ConfigurationOptionData data = ServerConfigurationOptionsList.getConfigurationOptionData(e.getSelectedOptions().get(0).getValue());
 					  ConfigurationSubOptionData[] subOperations = data.getSubOperations();
 					  if (subOperations != null) {
 						List<Button> buttons = new ArrayList<>();

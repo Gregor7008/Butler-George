@@ -66,6 +66,18 @@
       <version>2.0.0-beta1</version>
       <!-- MIT -->
 	</dependency>
+	<dependency>
+      <groupId>com.miglayout</groupId>
+      <artifactId>miglayout-core</artifactId>
+      <version>11.0</version>
+	</dependency>
+	<!-- BSD -->
+	<dependency>
+      <groupId>com.miglayout</groupId>
+      <artifactId>miglayout-swing</artifactId>
+      <version>11.0</version>
+	</dependency>
+	<!-- BSD -->
   </dependencies>
 
   <build>

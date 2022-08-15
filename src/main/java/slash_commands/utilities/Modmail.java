@@ -68,31 +68,31 @@ public class Modmail implements SlashCommandEventHandler {
 	}
 
 	private void openOnGuild(SlashCommandInteractionEvent event) {
-
+		//Reply with modal and ask for title and description, open ticket on valid input
 	}
 
 
 	private void selectOnGuild(SlashCommandInteractionEvent event) {
-
+		//List tickets from guild and add select menu, select selected ticket
 	}
 
 	private void closeOnGuild(SlashCommandInteractionEvent event) {
-
+		//If option valid, close - else list tickets from guild and add select menu, close selected ticket
 	}
 
 	private void openOnPrivate(SlashCommandInteractionEvent event) {
-
+		//Reply with select menu, choose guild, then as in "openOnguild"
 	}
 
 	private void selectOnPrivate(SlashCommandInteractionEvent event) {
-
+		//List all tickets by guild and add select menu, select selected ticket
 	}
 
 	private void closeOnPrivate(SlashCommandInteractionEvent event) {
-
+		//If option valid, close - else list tickets by guild and add select menu, close selected ticket
 	}
 
 	private void list(SlashCommandInteractionEvent event) {
-
+		//List all tickets by guild and add select menu, reply with button row for selection or closing the ticket
 	}
 }

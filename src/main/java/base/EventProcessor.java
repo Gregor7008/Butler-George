@@ -13,7 +13,8 @@ import base.engines.LanguageEngine;
 import base.engines.Toolbox;
 import base.engines.configs.ConfigLoader;
 import base.engines.configs.ConfigVerifier;
-import context_menu_commands.ContextMenuCommandList;
+import context_menu_commands.MessageContextCommandList;
+import context_menu_commands.UserContextCommandList;
 import context_menu_commands.assets.MessageContextEventHandler;
 import context_menu_commands.assets.UserContextEventHandler;
 import net.dv8tion.jda.api.Permission;
@@ -28,14 +29,11 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateBoostTimeEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
@@ -43,36 +41,30 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
-import net.dv8tion.jda.api.events.role.RoleCreateEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import slash_commands.CommandList;
+import slash_commands.SlashCommandList;
 import slash_commands.assets.SlashCommandEventHandler;
 import slash_commands.engines.LevelEngine;
-import slash_commands.engines.ServerUtilities;
 import slash_commands.music.Stop;
 
 public class EventProcessor extends ListenerAdapter {
 	
-	private CommandList commandList = new CommandList();
-	private ContextMenuCommandList contextMenuCommandList = new ContextMenuCommandList();
-	
 	@Override
 	public void onReady(ReadyEvent event) {
 		CommandListUpdateAction clua = event.getJDA().updateCommands();
-		commandList.slashCommandEventHandlers.forEach((name, cmd) -> {
-			clua.addCommands(cmd.initialize());
+		SlashCommandList.getCommandData().forEach(data -> {
+			clua.addCommands(data);
 		});
-		contextMenuCommandList.messageContextEventHandlers.forEach((name, cmd) -> {
-			clua.addCommands(cmd.initialize());
+		UserContextCommandList.getCommandData().forEach(data -> {
+			clua.addCommands(data);
 		});
-		contextMenuCommandList.userContextEventHandlers.forEach((name, cmd) -> {
-			clua.addCommands(cmd.initialize());
+		UserContextCommandList.getCommandData().forEach(data -> {
+			clua.addCommands(data);
 		});
 		clua.queue();
 	    List<Guild> guilds = event.getJDA().getGuilds();
@@ -94,8 +86,8 @@ public class EventProcessor extends ListenerAdapter {
 			return;
 		}
 		GUI.INSTANCE.increaseExecutionsCounter();
-		SlashCommandEventHandler slashCommandEventHandler = null;
-		if ((slashCommandEventHandler = commandList.slashCommandEventHandlers.get(event.getName().toLowerCase())) != null) {
+		SlashCommandEventHandler slashCommandEventHandler = SlashCommandList.getHandler(event.getName().toLowerCase());
+		if (slashCommandEventHandler != null) {
 			slashCommandEventHandler.execute(event);
 		}
 		LevelEngine.getInstance().slashcommand(event);
@@ -107,9 +99,9 @@ public class EventProcessor extends ListenerAdapter {
 			return;
 		}
 		GUI.INSTANCE.increaseExecutionsCounter();
-		UserContextEventHandler contextEventHandler = null;
-		if ((contextEventHandler = contextMenuCommandList.userContextEventHandlers.get(event.getName().toLowerCase())) != null) {
-			contextEventHandler.execute(event);
+		UserContextEventHandler userContextEventHandler = UserContextCommandList.getHandler(event.getName().toLowerCase());
+		if (userContextEventHandler != null) {
+			userContextEventHandler.execute(event);
 		}
 	}
 	
@@ -120,21 +112,11 @@ public class EventProcessor extends ListenerAdapter {
 		}
 		if (event.isFromGuild()) {
 			GUI.INSTANCE.increaseExecutionsCounter();
-			MessageContextEventHandler contextEventHandler = null;
-			if ((contextEventHandler = contextMenuCommandList.messageContextEventHandlers.get(event.getName().toLowerCase())) != null) {
-				contextEventHandler.execute(event);
+			MessageContextEventHandler messageContextEventHandler = MessageContextCommandList.getHandler(event.getName().toLowerCase());
+			if (messageContextEventHandler != null) {
+				messageContextEventHandler.execute(event);
 			}
-		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, this, "notsupported")).queue();	
 		}
-	}
-	
-	@Override
-	public void onMessageReceived(MessageReceivedEvent event) {
-		if (event.getAuthor().isBot()) {
-			return;
-		}
-		//TODO Implement Modmail
 	}
 	
 	@Override
@@ -288,19 +270,6 @@ public class EventProcessor extends ListenerAdapter {
 	}
 	
 	@Override
-	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
-		ServerUtilities.rolecheck();
-	}
-	
-	@Override
-	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
-		ServerUtilities.rolecheck();
-	}
-	
-	@Override
-	public void onChannelCreate(ChannelCreateEvent event) {}
-	
-	@Override
 	public void onChannelDelete(ChannelDeleteEvent event) {
 		Guild guild = event.getGuild();
 		ConfigVerifier.RUN.guildCheck(guild);
@@ -311,9 +280,6 @@ public class EventProcessor extends ListenerAdapter {
 			}
 		}
 	}
-	
-	@Override
-	public void onRoleCreate(RoleCreateEvent event) {}
 	
 	@Override
 	public void onRoleDelete(RoleDeleteEvent event) {

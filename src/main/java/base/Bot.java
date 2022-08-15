@@ -15,6 +15,10 @@ import base.engines.configs.ConfigLoader;
 import base.engines.configs.ConfigVerifier;
 import base.engines.logging.ConsoleEngine;
 import base.engines.logging.Logger;
+import configuration_options.ServerConfigurationOptionsList;
+import context_menu_commands.MessageContextCommandList;
+import context_menu_commands.UserContextCommandList;
+import miscellaneous.ServerUtilsList;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -23,8 +27,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import slash_commands.SlashCommandList;
 import slash_commands.engines.ModController;
-import slash_commands.engines.ServerUtilities;
 
 public class Bot {
 	
@@ -44,20 +48,34 @@ public class Bot {
 	private boolean shutdown = false;
 	
 	public Bot(String token, String serverIP, String port, String databaseName, String username, String password) throws LoginException, InterruptedException, IOException {
-		INSTANCE = this;
-		new ConfigLoader(serverIP, port, databaseName, username, password);
+		this.performPreStartupOperations(serverIP, port, databaseName, username, password);
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(new EventProcessor(), new EventAwaiter());
+		builder.addEventListeners(ServerUtilsList.getEngines().values());
 		builder.setRawEventsEnabled(true);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing(VERSION));
-	    this.startup();
+	    this.performPostStartupOperations();
 	}
 	
-	public void startup() {
+	private void performPreStartupOperations(String serverIP, String port, String databaseName, String username, String password) {
+//		Essentials
+		INSTANCE = this;
+		new ConfigLoader(serverIP, port, databaseName, username, password);
+//	    Lists
+	    ServerConfigurationOptionsList.create();
+	    MessageContextCommandList.create();
+	    UserContextCommandList.create();
+	    ServerUtilsList.create();
+	    SlashCommandList.create();
+//	    Debug logging
+	    LOG.debug("Pre-Startup operations completed");
+	}
+	
+	private void performPostStartupOperations() {
 //		Essentials
 		Runtime.getRuntime().addShutdownHook(this.getShutdownThread());
 		Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.getInstance());
@@ -66,11 +84,13 @@ public class Bot {
 	    new ModController();
 //	    Startup operations
     	checkConfigs();
-    	ServerUtilities.controlChannels(true);
+    	ServerUtilsList.getEngines().forEach((id, handler) -> handler.onStartup());
 //    	GUI
     	GUI.INSTANCE.setBotRunning(true);
     	GUI.INSTANCE.updateStatistics();
     	GUI.INSTANCE.startRuntimeMeasuring();
+//    	Debug logging
+    	LOG.debug("Post-Startup operations completed");
 	}
 	
 	public void shutdown(ShutdownReason reason, @Nullable String additionalMessage) {
@@ -103,7 +123,7 @@ public class Bot {
 				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "restart"));
 				break;
 			default:
-				throw new IllegalArgumentException("Invalid shutdown reason - Contact support immediately!");
+				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "offline"));
 			}
     		offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "information"));
     		if (additionalMessage != null && !additionalMessage.equals("")) {
@@ -113,9 +133,11 @@ public class Bot {
     		long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.buildMessageFromRaw(offlineMessageBuilder.toString(), null)).complete().getIdLong();
     		ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").put(0, msgid).put(1, chid);
     	}
-//		Stop period operations and shutdown bot
+//		Stop period operations
 		timer.cancel();
-		ServerUtilities.controlChannels(false);
+//		Shutdown operations
+		ServerUtilsList.getEngines().forEach((id, handler) -> handler.onShutdown(reason));
+//		Shutdown bot
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
 		GUI.INSTANCE.setBotRunning(false);
@@ -123,8 +145,9 @@ public class Bot {
 		if (!errorOccured) {
 			ConfigLoader.INSTANCE.manager.pushCache();
 		}
-		LOG.info("Bot offline");
 		shutdown = true;
+//		Debug logging
+		LOG.debug("Bot offline");
 	}
 	
 	public Timer getTimer() {
@@ -171,11 +194,9 @@ public class Bot {
 	}
 	
 	public static enum ShutdownReason {
-		
 		OFFLINE,
 		MAINTENANCE,
 		RESTART,
 		FATAL_ERROR;
-		
 	}
 }

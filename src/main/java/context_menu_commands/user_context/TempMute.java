@@ -1,11 +1,10 @@
-package context_menu_commands.moderation;
+package context_menu_commands.user_context;
 
-import java.time.OffsetDateTime;
+import java.util.concurrent.TimeUnit;
 
 import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
 import base.engines.configs.ConfigLoader;
-import base.engines.configs.ConfigManager;
 import context_menu_commands.assets.UserContextEventHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -19,7 +18,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import slash_commands.engines.ModController;
 
-public class TempBan implements UserContextEventHandler {
+public class TempMute implements UserContextEventHandler {
 
 	@Override
 	public void execute(UserContextInteractionEvent event) {
@@ -34,26 +33,28 @@ public class TempBan implements UserContextEventHandler {
 		Modal modal = Modal.create("configTempban", "Configure temporary ban").addActionRows(ActionRow.of(dayInput)).build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessageChannel(),
-				  d -> {
-					  try {
-						  int days = Integer.parseInt(d.getValue("duration").getAsString());
-					        OffsetDateTime until = OffsetDateTime.now().plusDays(days);
-							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
-							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanned", true);
-							guild.getMember(target).ban(0).queue();
-							ModController.RUN.userModCheck(guild, target);
-							d.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
-									.replaceDescription("{user}", target.getName())
-									.replaceDescription("{time}", String.valueOf(days))).setEphemeral(true).queue();
-					  } catch (NumberFormatException e) {
-						  d.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).setEphemeral(true).queue();
-					  }
-				  }).append();
+				d -> {
+					try {
+						int days = Integer.parseInt(d.getValue("duration").getAsString());
+						this.tempmute(days, guild, target);
+						event.getMessageChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
+								.replaceDescription("{user}", target.getAsMention())
+								.replaceDescription("{time}", String.valueOf(days))).queue();
+					} catch (NumberFormatException e) {
+						d.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).setEphemeral(true).queue();
+					}
+				}).append();
 	}
 
 	@Override
 	public CommandData initialize() {
-		CommandData context = Commands.context(Command.Type.USER, "TempBan").setGuildOnly(true);
+		CommandData context = Commands.context(Command.Type.USER, "TempMute").setGuildOnly(true);
 		return context;
-	}	
+	}
+	
+	private void tempmute(int days, Guild guild, User user) {
+		ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("tempmuted", true);
+		guild.getMember(user).timeoutFor(days, TimeUnit.DAYS).queue();
+		ModController.RUN.userModCheck(guild, user);
+	}
 }

@@ -1,4 +1,4 @@
-package context_menu_commands.moderation;
+package context_menu_commands.user_context;
 
 import base.engines.LanguageEngine;
 import base.engines.configs.ConfigLoader;
