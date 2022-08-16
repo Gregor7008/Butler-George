@@ -56,7 +56,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 ### 📊 Statistics
 
 **🆔 Display Card:**<br>
-<img src="https://raw.githubusercontent.com/Gregor7008/Gregor7008/main/resources/actions/butler-george-metrics.svg" alt="Metric Stats" height="350" width="400"><br>
+<img src="https://raw.githubusercontent.com/Gregor7008/Gregor7008/main/resources/actions/butler-george-metrics.svg" alt="Metric Stats" height="420" width="430"><br>
 **🧮 Code:**<br>
 ![Code lines][linesshield]
 ![Project size][storagesizeshield]<br>
