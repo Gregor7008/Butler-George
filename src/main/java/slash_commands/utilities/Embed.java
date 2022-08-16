@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.entities.MessageEmbed.Footer;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -79,8 +78,15 @@ public class Embed implements SlashCommandEventHandler {
 	}
 
 	@Override
-	public List<Role> additionalWhitelistedRoles(Guild guild) {
-		return null;
+	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	private void startEmbedConfiguration(Message message) {

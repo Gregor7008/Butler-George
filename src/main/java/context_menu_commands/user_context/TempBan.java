@@ -8,6 +8,7 @@ import base.engines.configs.ConfigLoader;
 import base.engines.configs.ConfigManager;
 import context_menu_commands.assets.UserContextEventHandler;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -55,5 +56,17 @@ public class TempBan implements UserContextEventHandler {
 	public CommandData initialize() {
 		CommandData context = Commands.context(Command.Type.USER, "TempBan").setGuildOnly(true);
 		return context;
-	}	
+	}
+
+	@Override
+	public boolean checkBotPermissions(UserContextInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

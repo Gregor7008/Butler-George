@@ -1,13 +1,10 @@
 package slash_commands.moderation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import base.engines.LanguageEngine;
 import base.engines.configs.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -54,12 +51,16 @@ public class Move implements SlashCommandEventHandler {
 		   	   .setGuildOnly(true);
 		return command;
 	}
-	
+
 	@Override
-	public List<Role> additionalWhitelistedRoles(Guild guild) {
-		List<Role> roles = new ArrayList<>();
-		Role supportrole = guild.getRoleById(ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("supportrole"));
-		roles.add(supportrole);
-		return roles;
+	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-
 import base.engines.LanguageEngine;
 import base.engines.configs.ConfigLoader;
 import base.engines.configs.ConfigManager;
@@ -13,7 +11,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -53,6 +50,18 @@ public class Suggest implements SlashCommandEventHandler {
 		   .setGuildOnly(true);
 		return command;
 	}
+
+	@Override
+	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 	public void sendsuggestion(Guild guild, Member member, String idea) {
 		TextChannel channel = guild.getTextChannelById(ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("suggest"));
@@ -65,10 +74,5 @@ public class Suggest implements SlashCommandEventHandler {
 		Message message = channel.sendMessageEmbeds(eb.build()).complete();
 		message.addReaction(Emoji.fromUnicode("U+1F44D")).queue();
 		message.addReaction(Emoji.fromUnicode("U+1F44E")).queue();
-	}
-
-	@Override
-	public List<Role> additionalWhitelistedRoles(Guild guild) {
-		return null;
 	}
 }

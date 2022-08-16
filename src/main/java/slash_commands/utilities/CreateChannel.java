@@ -1,10 +1,7 @@
 package slash_commands.utilities;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
-
 import org.json.JSONArray;
 
 import base.engines.LanguageEngine;
@@ -12,7 +9,7 @@ import base.engines.configs.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -42,17 +39,15 @@ public class CreateChannel implements SlashCommandEventHandler {
 	}
 
 	@Override
-	public List<Role> additionalWhitelistedRoles(Guild guild) {
-		JSONArray cccroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("customchannelroles");
-		if (cccroles.isEmpty()) {
-			return null;
-		}
-		List<Role> roles = new ArrayList<>();
-		for (int i = 0; i < cccroles.length(); i++) {
-			Role role = guild.getRoleById(cccroles.getLong(i));
-			roles.add(role);
-		}
-		return roles;
+	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	private void createTextChannel(Guild guild, User user, String name) {

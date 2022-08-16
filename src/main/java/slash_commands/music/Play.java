@@ -1,12 +1,9 @@
 package slash_commands.music;
 
-import java.util.List;
-
 import base.engines.LanguageEngine;
 import base.engines.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -54,11 +51,6 @@ public class Play implements SlashCommandEventHandler {
 		   .setGuildOnly(true);
 		return command;
 	}
-
-	@Override
-	public List<Role> additionalWhitelistedRoles(Guild guild) {
-		return null;
-	}
 	
 	private void load(SlashCommandInteractionEvent event, String argument, GuildMusicManager musicManager, TextChannel channel, Member member) {
 		VoiceChannel vc = (VoiceChannel) member.getVoiceState().getChannel();
@@ -76,5 +68,17 @@ public class Play implements SlashCommandEventHandler {
 			musicManager.scheduler.player.setVolume(15);
 			PlayerManager.getInstance().loadAndPlay(event, argument);
 		}
+	}
+
+	@Override
+	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

@@ -1,11 +1,8 @@
 package slash_commands.music;
 
-import java.util.List;
-
 import base.engines.LanguageEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -50,8 +47,15 @@ public class Stop implements SlashCommandEventHandler {
 	}
 
 	@Override
-	public List<Role> additionalWhitelistedRoles(Guild guild) {
-		return null;
+	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	public static  void stopandleave(Guild guild) {

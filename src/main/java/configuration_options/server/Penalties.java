@@ -12,6 +12,7 @@ import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -61,6 +62,18 @@ public class Penalties implements ConfigurationEventHandler {
 															new ConfigurationSubOptionData("list", "List all active penalties")
 													});
 		return configurationOptionData;
+	}
+
+	@Override
+	public boolean checkBotPermissions(ConfigurationEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	private void deletepenalties(ConfigurationEvent event) {

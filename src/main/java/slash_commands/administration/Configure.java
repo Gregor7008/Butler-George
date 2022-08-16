@@ -12,8 +12,8 @@ import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -25,7 +25,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import slash_commands.assets.SlashCommandEventHandler;
 
 public class Configure implements SlashCommandEventHandler {
-	
+
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		final Guild guild = event.getGuild();
@@ -77,7 +77,14 @@ public class Configure implements SlashCommandEventHandler {
 	}
 	
 	@Override
-	public List<Role> additionalWhitelistedRoles(Guild guild) {
-		return null;
+	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

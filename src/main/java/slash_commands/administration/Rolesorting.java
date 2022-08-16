@@ -47,9 +47,21 @@ public class Rolesorting implements SlashCommandEventHandler {
 		return command;
 	}
 	
+	private void cleanup() {
+		oevent.getHook().deleteOriginal().queue();
+		channel.deleteMessages(messages).queue();
+	}
+
 	@Override
-	public List<Role> additionalWhitelistedRoles(Guild guild) {
-		return null;
+	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	private void definegroup() {
@@ -103,10 +115,5 @@ public class Rolesorting implements SlashCommandEventHandler {
 			if (match == 0 && mb.getRoles().contains(gr)) {
 				iguild.removeRoleFromMember(mb, gr).queue();
 			}
-	}
-	
-	private void cleanup() {
-		oevent.getHook().deleteOriginal().queue();
-		channel.deleteMessages(messages).queue();
 	}
 }

@@ -15,6 +15,7 @@ import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -69,6 +70,18 @@ public class Join2CreateChannels implements ConfigurationEventHandler {
 				  											new ConfigurationSubOptionData("list", "List all active channels")
 													});
 		return configurationOptionData;
+	}
+
+	@Override
+	public boolean checkBotPermissions(ConfigurationEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	private void listJoin2Creates(ConfigurationEvent event) {

@@ -14,6 +14,7 @@ import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -98,5 +99,17 @@ public class AutoRoles implements ConfigurationEventHandler {
 			}
 		}
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,  this, selection + "list").replaceDescription("{list}", sB.toString())).queue();
+	}
+
+	@Override
+	public boolean checkBotPermissions(ConfigurationEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

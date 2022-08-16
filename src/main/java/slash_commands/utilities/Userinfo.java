@@ -1,16 +1,13 @@
 package slash_commands.utilities;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import base.engines.LanguageEngine;
 import base.engines.configs.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -39,8 +36,15 @@ public class Userinfo implements SlashCommandEventHandler {
 	}
 
 	@Override
-	public List<Role> additionalWhitelistedRoles(Guild guild) {
-		return null;
+	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	private void listInfo (SlashCommandInteractionEvent event, boolean moderator) {

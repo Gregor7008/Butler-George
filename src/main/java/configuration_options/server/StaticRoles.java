@@ -14,6 +14,7 @@ import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -81,6 +82,18 @@ public class StaticRoles implements ConfigurationEventHandler {
 				  											new ConfigurationSubOptionData("list", "List all active roles")
 				  									});
 		return configurationOptionData;
+	}
+
+	@Override
+	public boolean checkBotPermissions(ConfigurationEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailableTo(Member member) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	private void listroles(ButtonInteractionEvent event, String type) {
