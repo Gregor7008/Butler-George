@@ -96,6 +96,63 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 </details>
 -->
 
+### 🈯 About Translating
+
+ ℹ️ We're assuming you are familiar with using GitHub and have already cloned this GitHub repository!<br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If you aren't familiar with GitHub: [Reach out](https://github.com/Gregor7008/Butler-George/tree/V2-CommandRework#-contact-us) to us we're grateful to help!<br>
+
+1. #### Quick Start
+   We currently have 5 languages to choose from: English (`en`), German (`de`), Spanish (`es`), French (`fr`) and Dutch (`nl`).<br>
+   To start translating, please copy the default `en` folder in `src/main/resources/languages` and rename it to either one of the already supported abbreviations or to the two letter abbreviation of a new language.<br>
+   <ins>**Please note:**</ins> A new language will not be available as soon as the folder is created, as we have add it to the bots internal list!
+
+2. #### Keywords
+   **Butler George** uses keywords for obtaining message content. You will therefore notice the following structure in all files:<br>
+   `keyword=a_lot_of_text_here`<br>
+   For everything to work correctly: **DO NOT CHANGE** the keyword and the `=`. Only translate what is written behind the `=`!
+
+   <ins>**Please note:**</ins> The bot will only read the text **BEHIND** the keyword, not the text in a following line (v.i.)!
+
+3. #### Message parts
+   **Butler George** usually replies with a two-part message: The first part describes the type of the event the bot replies to (i.e. when a command was successfully executed), the second part then goes into more detail. Because of this division, it needed a separation symbol.<br>
+   We utilize `; ‎` for this and let **Butler George** search for it. You'll notice them not far behind the `=`.<br>
+   You may translate everything before and behind the `; `. **DO NOT CHANGE** the `; ‎` itself, as well as the space behind it!
+
+4. #### Variables
+   In some instances **Butler George** has to variate the message, depending on who is repsponsible for an event (i.e. when a user joins a server).<br>
+   For that we choose the format `{variable}`, where `variable` would be the name of the variable. This name is choosen in correlation to what the variable will be replaced with (i.e. a variating user would have the variable `{user}`).<br>
+   You may translate everything before and behind the variable. **DO NOT CHANGE** the variables name!
+
+5. #### New lines
+   As **Butler George** is dependent on the keyword-value structure and therefore searches every line of a file for this structure, you can't create a new line in the final message by just pressing `Enter`, but have to use the regex notation.<br>
+   Explaining this would be way beyong the scope of this text, but for the purpose of translating the replies of this bot you only need to know `\n`, which would be the regex expression for a new line.<br>
+   For the english version I used `\n` sometimes, when the line got too long, or the topic changed drastically.<br>
+   You may use `\n` at your own discretion!
+
+6. #### Emojis
+   As you probably already know, Discord uses not Unicode but Markdown expressions for displaying emojis.<br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ℹ️ [Unicode](https://wikipedia.org/wiki/Unicode) is the internationally used standard for en- and decoding text/symbols/emojis on computers.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Emoji code looks like this: `U+2764`<br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ℹ️ [Markdown](https://wikipedia.org/wiki/Markdown) is a readable language for the creation of formatted text or simple websites, replacing complex code.
+   <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Emoji code looks like this: `:sweat_smile:`<br>
+   To now use emojis in the text, we have to just write the respective expression in the text and it'll be replaced automatically. You'll see those expressions used in nearly every message and recognize them in the files as well.
+
+   For **Butler George** we decided to establish a simple system:<br>
+   `keyword=message title; :emoji_expression: | message_description`<br>
+   We're hereby asking you to keep this system so the responses of **Butler George** stay clean and tidy.
+
+   <ins>**Quick tip:**</ins> It looks way better, if you not only use the system `:emoji: | text` at the start of the messsages description, but also whenever you're creating a new line using `\n` (v.s.)!
+
+7. #### Folder structure
+   To make it simpler in the developement phase, **Butler George** relies, when finding the language files for a certain instance, on the language files being ordered in the exact same way, as the program is setup.<br>
+   So... <ins>**DO NOT CHANGE THE FOLDER STRUCTURE!!!**</ins>
+
+8. #### Contributing
+   To finally commit your changes, you have three options: You may either [open a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request), send the changed files directly to a [developement team](https://github.com/Gregor7008/Butler-George/tree/V2-CommandRework#-the-team) member (contact details are on their profiles) or use one of the [contact options](https://github.com/Gregor7008/Butler-George/tree/V2-CommandRework#-contact-us) to hand over the files.
+   
+   If you want to get credit for the translations you made, please tell us when commiting the changes as well as who to credit. This may be a Discord user, a GitHub organization or a private person.
+
+If you are considering to translate: Thank you very much :heart:! We're looking forward to working with you!
+
 <!-- Emojis - Icons Server -->
 [announcement_icon_link]: https://cdn.discordapp.com/emojis/1006860118794711151.webp?size=32&amp;quality=lossless
 [bell_icon_link]: https://cdn.discordapp.com/emojis/1006860119981695077.webp?size=32&amp;quality=lossless
@@ -405,6 +462,15 @@ The table below shows <ins>**all**</ins> the emojis available to **Butler George
     ![wumpus_witch][wumpus_witch_link]            | wumpus_witch       | 1006920826936889384 | .gif
     ![wumpus_yee][wumpus_yee_link]                | wumpus_yee         | 1006920831961665606 | .gif
   </details>
+
+### 📇 Contact Us
+
+You may contact us...
+
+  - via our [Discord][discordinvite] server
+  - by opening a new issue [here](https://github.com/Gregor7008/Butler-George/issues)
+  - by starting a new discussion [here](https://github.com/Gregor7008/Butler-George/discussions)
+  - in urgent cases via [E-mail](mailto:gregor7009@gmail.com)
 
 ### 🧭 Credits
 <a href="https://github.com/anuraghazra/github-readme-stats">ReadMe Statistics</a> by <a href="https://github.com/anuraghazra">@anuraghazra</a><br>
