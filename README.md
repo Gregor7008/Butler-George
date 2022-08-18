@@ -27,7 +27,7 @@
 <h3 align="right">Why another bot, if you only need one</h3>
 <p align="right">Everything you need, right here: Moderation, Administration, Configuration...</p>
 
-### 🌐 Overview
+## 🌐 Overview
 **Butler George** is a complex [Discord](https://discord.com) bot including not only all commonly used functions of popular Discord bots, but also everything else you will ever need.<br>
 Combined neatly into one single bot, so no one can ever complain about too many bots on your server!
 
@@ -49,34 +49,35 @@ The newest version of **Butler George** will feature:
     - Reduced message spam (Both server and private side)
     - Private messages are no longer embedded
     
-### 📗 History
+## 📗 History
 In Juli 2021 [Nevar](https://nevar.eu) by [@1887Jonas](https://discordapp.com/users/631176108372656148), the bot we used since the creation of our community was shutdown. And as auto role assignment was really important for the security of the server back then, we needed to find a replacement real quick. And as there was also a need for automated actions resulting from this autorole mess, we decided to start our own bot: **Butler George** was born!<br>
 On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/bca680096ab6ee534a6621c9ed565e940733ca57) **Butler George** was finally ready to completey replace all previously used functions of Nevar. Since then he was developed into a huge tool for administration, moderation and server configuration, implementing all commonly used functions on big servers: Join2Create channels, level and experience system, ModMail, reaction roles and much more.
 
-### 📊 Statistics
+## 📊 Statistics
 
-**🆔 Display Card:**<br>
-<img src="https://raw.githubusercontent.com/Gregor7008/Gregor7008/main/resources/actions/butler-george-metrics.svg" alt="Metric Stats" height="420" width="430"><br>
-**🧮 Code:**<br>
+### 🆔 Display Card:
+<img src="https://raw.githubusercontent.com/Gregor7008/Gregor7008/main/resources/actions/butler-george-metrics.svg" alt="Metric Stats"><br>
+
+#### 🧮 Code:
 ![Code lines][linesshield]
 ![Project size][storagesizeshield]<br>
 ![Java Version][javashield]
 ![Platforms][platformshield]
 
-**🆘 Issues:**<br>
+#### 🆘 Issues:
 ![Open issues][issuesopenshield]
 ![Closed issues][issuesclosedshield]
 
-**📥 Interaction:**<br>
+#### 📥 Interaction:
 ![Contributors][contributorsshield]
 ![Downloads][downloadsshield]
 
-**💻 Activity:**<br>
+#### 💻 Activity:
 ![Last Commit][lastcommitshield]
 ![Activity][activityshield]
-![New Commits][commitssincereleaseshield]<br>
+![New Commits][commitssincereleaseshield]
 
-### ✨ The Team
+## ✨ The Team
 
 <details>
     <summary><a href="https://github.com/Gregor7008">Gregor7008</a> (Team Leader)</summary>
@@ -96,7 +97,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 </details>
 -->
 
-### 🈯 About Translating
+## 🈯 About Translating
 
  ℹ️ We're assuming you are familiar with using GitHub and have already cloned this GitHub repository!<br>
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If you aren't familiar with GitHub: [Reach out](https://github.com/Gregor7008/Butler-George/tree/V2-CommandRework#-contact-us) to us we're grateful to help!<br>
@@ -152,6 +153,8 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
    If you want to get credit for the translations you made, please tell us when commiting the changes as well as who to credit. This may be a Discord user, a GitHub organization or a private person.
 
 If you are considering to translate: Thank you very much :heart:! We're looking forward to working with you!
+
+## 💕 About Emojis
 
 <!-- Emojis - Icons Server -->
 [announcement_icon_link]: https://cdn.discordapp.com/emojis/1006860118794711151.webp?size=32&amp;quality=lossless
@@ -287,13 +290,11 @@ If you are considering to translate: Thank you very much :heart:! We're looking 
 [wumpus_witch_link]: https://cdn.discordapp.com/emojis/1006920826936889384.gif?size=32&amp;&quality=lossless
 [wumpus_yee_link]: https://cdn.discordapp.com/emojis/1006920831961665606.gif?size=32&amp;&quality=lossless
 
-### 💕 About Emojis
-
-- #### ℹ️ Disclaimer:
+- ### ℹ️ Disclaimer:
   All emojis used by **[Butler George](https://github.com/Gregor7008/Butler-George)** are provided by [Discord](https://discord.com), or publicly available and are not under any copyright!<br>
 The table below shows <ins>**all**</ins> the emojis available to **Butler George**!
 
-- #### ✨ Personal usage:
+- ### ✨ Personal usage:
   If you want to use the emojis for yourself (Considering you have [Discord Nitro](https://discord.com/nitro)) or make them available for your own Discord bot:<br> Join these servers:
   - Icons:<br>
 <a href="https://discord.gg/HqmQT5ThJa"><img src="https://github.com/Gregor7008/Gregor7008/blob/main/resources/graphics/widgets/Emojis%20-%20Icons%20Widget%20Small.png?raw=true" alt="Emoji - Icons Widget Small" height="60"/></a>
@@ -306,7 +307,7 @@ The table below shows <ins>**all**</ins> the emojis available to **Butler George
 
   You may send an invitation for your bot into `#📥-invite-your-bot` (A command for automation will be added soon), so we can invite your bot and therefore make the emojis available.
 
-- #### 📋 Available Emojis:
+- ### 📋 Available Emojis:
     <details>
           <summary><b>Icons</b> from <a href="https://discord.gg/HqmQT5ThJa">Emojis - Icons</a></summary>
     
@@ -463,7 +464,7 @@ The table below shows <ins>**all**</ins> the emojis available to **Butler George
     ![wumpus_yee][wumpus_yee_link]                | wumpus_yee         | 1006920831961665606 | .gif
   </details>
 
-### 📇 Contact Us
+## 📇 Contact Us
 
 You may contact us...
 
@@ -472,11 +473,11 @@ You may contact us...
   - by starting a new discussion [here](https://github.com/Gregor7008/Butler-George/discussions)
   - in urgent cases via [E-mail](mailto:gregor7009@gmail.com)
 
-### 🧭 Credits
+## 🧭 Credits
 <a href="https://github.com/anuraghazra/github-readme-stats">ReadMe Statistics</a> by <a href="https://github.com/anuraghazra">@anuraghazra</a><br>
 <a href="https://github.com/gautamkrishnar/blog-post-workflow">Blog Post Workflow</a> by <a href="https://github.com/gautamkrishnar">@gautamkrishnar</a><br>
 <a href="https://github.com/lowlighter/metrics">Metrics</a> by <a href="https://github.com/lowlighter">@lowlighter</a><br>
 Shields by <a href="https://shields.io">shields.io</a><br>
 Activity recorded by <a href="https://wakatime.com">wakatime.com</a>
 
-©️ [Gregor7008](https://github.com/Gregor7008) - 2022
+#### ©️ [Gregor7008](https://github.com/Gregor7008) - 2022
