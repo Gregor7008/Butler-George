@@ -76,18 +76,6 @@ public class Embed implements SlashCommandEventHandler {
 		   	   .setGuildOnly(true);
 		return command;
 	}
-
-	@Override
-	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 	
 	private void startEmbedConfiguration(Message message) {
 		EmbedBuilder eb = new EmbedBuilder();

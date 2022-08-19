@@ -51,7 +51,8 @@ public class Bot {
 		this.performPreStartupOperations(serverIP, port, databaseName, username, password);
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(new EventProcessor(), new EventAwaiter());
-		builder.addEventListeners(ServerUtilsList.getEngines().values());
+		Object[] serverUtils = ServerUtilsList.getEngines().values().toArray();
+		builder.addEventListeners(serverUtils);
 		builder.setRawEventsEnabled(true);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);

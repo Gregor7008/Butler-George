@@ -52,18 +52,6 @@ public class Rolesorting implements SlashCommandEventHandler {
 		channel.deleteMessages(messages).queue();
 	}
 
-	@Override
-	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	private void definegroup() {
 		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definegroup")).complete());
 		AwaitTask.forMessageReceival(guild, user, channel, null,

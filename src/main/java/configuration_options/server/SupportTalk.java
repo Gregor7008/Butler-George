@@ -1,5 +1,7 @@
 package configuration_options.server;
 
+import java.util.List;
+
 import base.assets.AwaitTask;
 import base.engines.LanguageEngine;
 import base.engines.configs.ConfigLoader;
@@ -7,9 +9,9 @@ import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 
 public class SupportTalk implements ConfigurationEventHandler {
@@ -41,22 +43,16 @@ public class SupportTalk implements ConfigurationEventHandler {
 	public ConfigurationOptionData initialize() {
 		ConfigurationOptionData configurationOptionData = new ConfigurationOptionData(this).setName("SupportTalk")
 															 .setInfo("Configure a voice channel for voice support")
-															 .setSubOperations(new ConfigurationSubOptionData[] {
+															 .setSubOptions(new ConfigurationSubOptionData[] {
 																	 new ConfigurationSubOptionData("set", "Set a voice channel as the support talk"),
 																	 new ConfigurationSubOptionData("clear", "Undefine the support talk")
-															 });
+															 })
+															 .setRequiredPermissions(Permission.MANAGE_SERVER, Permission.MANAGE_CHANNEL);
 		return configurationOptionData;
 	}
 
 	@Override
-	public boolean checkBotPermissions(ConfigurationEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
+	public List<Permission> getRequiredPermissions() {
+		return List.of(Permission.VOICE_MOVE_OTHERS);
 	}
 }

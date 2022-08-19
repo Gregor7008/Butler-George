@@ -13,9 +13,9 @@ import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -63,25 +63,19 @@ public class Join2CreateChannels implements ConfigurationEventHandler {
 	public ConfigurationOptionData initialize() {
 		ConfigurationOptionData configurationOptionData = new ConfigurationOptionData(this).setName("Join2CreateChannels")
 													.setInfo("Configure Join2Create channels for your server")
-													.setSubOperations(new ConfigurationSubOptionData[] {
+													.setSubOptions(new ConfigurationSubOptionData[] {
 															new ConfigurationSubOptionData("add", "Activate one or more channels as Join2Create channels"),
 				  											new ConfigurationSubOptionData("delete", "Deactivate one channel from the active ones"),
 				  											new ConfigurationSubOptionData("remove", "Deactivate all channels"),
 				  											new ConfigurationSubOptionData("list", "List all active channels")
-													});
+													})
+													.setRequiredPermissions(Permission.MANAGE_SERVER, Permission.MANAGE_CHANNEL);
 		return configurationOptionData;
 	}
 
 	@Override
-	public boolean checkBotPermissions(ConfigurationEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
+	public List<Permission> getRequiredPermissions() {
+		return List.of(Permission.MANAGE_CHANNEL, Permission.VOICE_MOVE_OTHERS);
 	}
 	
 	private void listJoin2Creates(ConfigurationEvent event) {

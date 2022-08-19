@@ -77,18 +77,6 @@ public class Queue implements SlashCommandEventHandler {
 		return command;
 	}
 
-	@Override
-	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	private String formatTime(long timeInMillis) {
 		final long hours = timeInMillis / TimeUnit.HOURS.toMillis(1);
 		final long minutes = timeInMillis / TimeUnit.MINUTES.toMillis(1);

@@ -1,12 +1,15 @@
 package configuration_options.assets;
 
-import net.dv8tion.jda.api.entities.Member;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.dv8tion.jda.api.Permission;
 
 public interface ConfigurationEventHandler {
 	
 	public void execute(ConfigurationEvent event);
 	public ConfigurationOptionData initialize();
-	public boolean checkBotPermissions(ConfigurationEvent event);
-	public boolean isAvailableTo(Member member);
-
+	public default List<Permission> getRequiredPermissions() {
+		return new ArrayList<Permission>();
+	}
 }

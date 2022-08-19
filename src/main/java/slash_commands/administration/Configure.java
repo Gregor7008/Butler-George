@@ -12,7 +12,6 @@ import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -45,25 +44,44 @@ public class Configure implements SlashCommandEventHandler {
 		SelectMenu menu = menuBuilder1.build();
 		Message msg = event.replyEmbeds(eb1.build()).addActionRow(menu).complete().retrieveOriginal().complete();
 		AwaitTask.forSelectMenuInteraction(guild, user, msg,
-				e -> {ConfigurationOptionData data = ServerConfigurationOptionsList.getConfigurationOptionData(e.getSelectedOptions().get(0).getValue());
-					  ConfigurationSubOptionData[] subOperations = data.getSubOperations();
-					  if (subOperations != null) {
-						List<Button> buttons = new ArrayList<>();
-						EmbedBuilder eb2 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selsub"));
-						for (int i = 0; i < subOperations.length; i++) {
-							buttons.add(Button.secondary(String.valueOf(i), subOperations[i].getName()));
-								eb2.addField("`" + subOperations[i].getName() + "`", subOperations[i].getInfo(), true);
+				e -> {
+					ConfigurationOptionData data = ServerConfigurationOptionsList.getConfigurationOptionData(e.getSelectedOptions().get(0).getValue());
+					List<Permission> requiredBotPermissions = data.getConfigurationEventHandler().getRequiredPermissions();
+					boolean insufficientPermissions = false;
+					StringBuilder sB = new StringBuilder();
+					for (int i = 0; i < requiredBotPermissions.size(); i++) {
+						sB.append(requiredBotPermissions.get(i).getName().toLowerCase());
+						if (i + 1 != requiredBotPermissions.size()) {
+							sB.append(", ");
 						}
-						e.editMessageEmbeds(eb2.build()).setActionRow(buttons).queue();
-						AwaitTask.forButtonInteraction(guild, user, msg,
-								s -> {
-									s.editMessageEmbeds(s.getMessage().getEmbeds()).setActionRows().queue(onCompletion -> {
-										data.getOperationEventHandler().execute(new ConfigurationEvent(event.getMember(), s, subOperations[Integer.valueOf(s.getButton().getId())]));
-									});
-								}).append();
-					} else {
-						data.getOperationEventHandler().execute(new ConfigurationEvent(event.getMember(), e, null));
+						if (!event.getGuild().getSelfMember().hasPermission(requiredBotPermissions.get(i))) {
+							insufficientPermissions = true;
+						}
 					}
+					if (!event.getMember().hasPermission(data.getRequiredPermissions())) {
+						e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "nopermission"));
+					} else if (insufficientPermissions && !event.getMember().isOwner() && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+						e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "insufficientperms").replaceDescription("{permissions}", sB.toString())).queue();
+					} else {
+						ConfigurationSubOptionData[] subOperations = data.getSubOptions();
+						if (subOperations != null) {
+							List<Button> buttons = new ArrayList<>();
+							EmbedBuilder eb2 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selsub"));
+							for (int i = 0; i < subOperations.length; i++) {
+								buttons.add(Button.secondary(String.valueOf(i), subOperations[i].getName()));
+								eb2.addField("`" + subOperations[i].getName() + "`", subOperations[i].getInfo(), true);
+							}
+							e.editMessageEmbeds(eb2.build()).setActionRow(buttons).queue();
+							AwaitTask.forButtonInteraction(guild, user, msg,
+									s -> {
+										s.editMessageEmbeds(s.getMessage().getEmbeds()).setActionRows().queue(onCompletion -> {
+											data.getConfigurationEventHandler().execute(new ConfigurationEvent(event.getMember(), s, subOperations[Integer.valueOf(s.getButton().getId())]));
+										});
+									}).append();	
+						} else {
+							data.getConfigurationEventHandler().execute(new ConfigurationEvent(event.getMember(), e, null));
+						}
+					}  
 				}).addValidComponents(menu.getId()).append();
 	}
 
@@ -74,17 +92,5 @@ public class Configure implements SlashCommandEventHandler {
 		command.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER))
 			   .setGuildOnly(true);
 		return command;
-	}
-	
-	@Override
-	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

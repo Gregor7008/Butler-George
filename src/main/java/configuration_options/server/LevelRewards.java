@@ -1,5 +1,7 @@
 package configuration_options.server;
 
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,8 +12,8 @@ import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 
 public class LevelRewards implements ConfigurationEventHandler {
@@ -78,25 +80,19 @@ public class LevelRewards implements ConfigurationEventHandler {
 	public ConfigurationOptionData initialize() {
 		ConfigurationOptionData configurationOptionData = new ConfigurationOptionData(this).setName("LevelRewards")
 													.setInfo("Configure rewards for leveling up")
-													.setSubOperations(new ConfigurationSubOptionData[] {
+													.setSubOptions(new ConfigurationSubOptionData[] {
 															new ConfigurationSubOptionData("add", "Add a level reward"),
 															new ConfigurationSubOptionData("delete", "Deactivate one level reward"),
 															new ConfigurationSubOptionData("remove", "Remove all active level rewards"),
 															new ConfigurationSubOptionData("list", "List all active level rewards")
-													});
+													})
+													.setRequiredPermissions(Permission.MANAGE_SERVER, Permission.MANAGE_ROLES);
 		return configurationOptionData;
 	}
 
 	@Override
-	public boolean checkBotPermissions(ConfigurationEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
+	public List<Permission> getRequiredPermissions() {
+		return List.of(Permission.MANAGE_ROLES);
 	}
 	
 	private void listrewards(ConfigurationEvent event, JSONObject levelrewards) {

@@ -15,8 +15,8 @@ import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -74,25 +74,19 @@ public class ReactionRoles implements ConfigurationEventHandler {
 	public ConfigurationOptionData initialize() {
 		ConfigurationOptionData configurationOptionData = new ConfigurationOptionData(this).setName("ReactionRoles")
 													.setInfo("Configure reactions to give or remove a role")
-													.setSubOperations(new ConfigurationSubOptionData[] {
+													.setSubOptions(new ConfigurationSubOptionData[] {
 														new ConfigurationSubOptionData("add", "Add new reactionroles to a message"),
 														new ConfigurationSubOptionData("delete", "Deactivate and delete a reactionrole from a message"),
 														new ConfigurationSubOptionData("remove", "Remove all reactionroles from a message"),
 														new ConfigurationSubOptionData("list", "List all active reactionroles")
-													});
+													})
+													.setRequiredPermissions(Permission.MANAGE_ROLES);
 		return configurationOptionData;
 	}
 	
 	@Override
-	public boolean checkBotPermissions(ConfigurationEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
+	public List<Permission> getRequiredPermissions() {
+		return List.of(Permission.MANAGE_ROLES, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_MANAGE);
 	}
 
 	private void defineAddRoles() {

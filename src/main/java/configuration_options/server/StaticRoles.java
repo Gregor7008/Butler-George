@@ -13,8 +13,8 @@ import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -75,25 +75,14 @@ public class StaticRoles implements ConfigurationEventHandler {
 	public ConfigurationOptionData initialize() {
 		ConfigurationOptionData configurationOptionData = new ConfigurationOptionData(this).setName("StaticRoles")
 													.setInfo("Configure the roles for different areas of responsibility")
-													.setSubOperations(new ConfigurationSubOptionData[] {
+													.setSubOptions(new ConfigurationSubOptionData[] {
 				  											new ConfigurationSubOptionData("add", "Add one or more roles"),
 				  											new ConfigurationSubOptionData("delete", "Delete one role from the active ones"),
 				  											new ConfigurationSubOptionData("remove", "Remove all roles"),
 				  											new ConfigurationSubOptionData("list", "List all active roles")
-				  									});
+				  									})
+													.setRequiredPermissions(Permission.MANAGE_SERVER, Permission.MANAGE_ROLES);
 		return configurationOptionData;
-	}
-
-	@Override
-	public boolean checkBotPermissions(ConfigurationEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
 	private void listroles(ButtonInteractionEvent event, String type) {

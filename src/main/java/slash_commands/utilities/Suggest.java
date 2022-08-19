@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+
 import base.engines.LanguageEngine;
 import base.engines.configs.ConfigLoader;
 import base.engines.configs.ConfigManager;
@@ -49,18 +50,6 @@ public class Suggest implements SlashCommandEventHandler {
 		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
 		   .setGuildOnly(true);
 		return command;
-	}
-
-	@Override
-	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
 	public void sendsuggestion(Guild guild, Member member, String idea) {

@@ -1,7 +1,6 @@
 package slash_commands.utilities;
 
 import base.engines.LanguageEngine;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -57,18 +56,6 @@ public class Modmail implements SlashCommandEventHandler {
 								new SubcommandData("select", "Select a modmail ticket"),
 								new SubcommandData("close", "Close a modmail ticket"));
 		return command;
-	}
-
-	@Override
-	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	private void openOnGuild(SlashCommandInteractionEvent event) {

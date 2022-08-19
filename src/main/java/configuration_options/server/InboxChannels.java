@@ -7,8 +7,8 @@ import configuration_options.assets.ConfigurationEvent;
 import configuration_options.assets.ConfigurationEventHandler;
 import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -54,22 +54,11 @@ public class InboxChannels implements ConfigurationEventHandler {
 	public ConfigurationOptionData initialize() {
 		ConfigurationOptionData configurationOptionData = new ConfigurationOptionData(this).setName("InboxChannels")
 													.setInfo("Configure inbox channels for different receivers/purposes")
-													.setSubOperations(new ConfigurationSubOptionData[] {
+													.setSubOptions(new ConfigurationSubOptionData[] {
 															new ConfigurationSubOptionData("set", "Set an inbox channel for a selected use case"),
 															new ConfigurationSubOptionData("clear", "Undefine an inbox channel")
-													});
+													})
+													.setRequiredPermissions(Permission.MANAGE_SERVER);
 		return configurationOptionData;
-	}
-	
-	@Override
-	public boolean checkBotPermissions(ConfigurationEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

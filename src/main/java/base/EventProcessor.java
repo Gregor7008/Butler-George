@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -35,6 +36,7 @@ import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateBoostTimeEvent;
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
@@ -45,6 +47,7 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import slash_commands.SlashCommandList;
@@ -63,7 +66,7 @@ public class EventProcessor extends ListenerAdapter {
 		UserContextCommandList.getCommandData().forEach(data -> {
 			clua.addCommands(data);
 		});
-		UserContextCommandList.getCommandData().forEach(data -> {
+		MessageContextCommandList.getCommandData().forEach(data -> {
 			clua.addCommands(data);
 		});
 		clua.queue();
@@ -88,11 +91,21 @@ public class EventProcessor extends ListenerAdapter {
 		GUI.INSTANCE.increaseExecutionsCounter();
 		SlashCommandEventHandler slashCommandEventHandler = SlashCommandList.getHandler(event.getName().toLowerCase());
 		if (slashCommandEventHandler != null) {
-			slashCommandEventHandler.execute(event);
+			try {
+				slashCommandEventHandler.execute(event);
+			} catch (InsufficientPermissionException e) {
+				MessageEmbed embed = LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), null, "insufficientperms")
+						.replaceDescription("{permissions}", e.getPermission().getName().toLowerCase());
+				if (event.isAcknowledged()) {
+					event.getHook().retrieveOriginal().complete().editMessageEmbeds(embed).queue();
+				} else {
+					event.replyEmbeds(embed).queue();
+				}
+			}
 		}
 		LevelEngine.getInstance().slashcommand(event);
 	}
-	
+
 	@Override
 	public void onUserContextInteraction(UserContextInteractionEvent event) {
 		if (event.getUser().isBot()) {
@@ -101,10 +114,20 @@ public class EventProcessor extends ListenerAdapter {
 		GUI.INSTANCE.increaseExecutionsCounter();
 		UserContextEventHandler userContextEventHandler = UserContextCommandList.getHandler(event.getName().toLowerCase());
 		if (userContextEventHandler != null) {
-			userContextEventHandler.execute(event);
+			try {
+				userContextEventHandler.execute(event);
+			} catch (InsufficientPermissionException e) {
+				MessageEmbed embed = LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), null, "insufficientperms")
+						.replaceDescription("{permissions}", e.getPermission().getName().toLowerCase());
+				if (event.isAcknowledged()) {
+					event.getHook().retrieveOriginal().complete().editMessageEmbeds(embed).queue();
+				} else {
+					event.replyEmbeds(embed).queue();
+				}
+			}
 		}
 	}
-	
+
 	@Override
 	public void onMessageContextInteraction(MessageContextInteractionEvent event) {
 		if (event.getUser().isBot()) {
@@ -114,7 +137,17 @@ public class EventProcessor extends ListenerAdapter {
 			GUI.INSTANCE.increaseExecutionsCounter();
 			MessageContextEventHandler messageContextEventHandler = MessageContextCommandList.getHandler(event.getName().toLowerCase());
 			if (messageContextEventHandler != null) {
-				messageContextEventHandler.execute(event);
+				try {
+					messageContextEventHandler.execute(event);
+				} catch (InsufficientPermissionException e) {
+					MessageEmbed embed = LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), null, "insufficientperms")
+							.replaceDescription("{permissions}", e.getPermission().getName().toLowerCase());
+					if (event.isAcknowledged()) {
+						event.getHook().retrieveOriginal().complete().editMessageEmbeds(embed).queue();
+					} else {
+						event.replyEmbeds(embed).queue();
+					}
+				}
 			}
 		}
 	}
@@ -286,6 +319,21 @@ public class EventProcessor extends ListenerAdapter {
 		new Thread(() -> {
 			ConfigVerifier.RUN.guildCheck(event.getGuild());
 		}).start();
+	}
+	
+	@Override
+	public void onGuildMemberUpdateTimeOut(GuildMemberUpdateTimeOutEvent event) {
+		if (event.getUser().isBot()) {
+			return;
+		}
+		JSONObject targetconfig = ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), event.getEntity().getUser());
+		if (event.getNewTimeOutEnd() == null) {
+			targetconfig.put("muted", false);
+			targetconfig.put("tempmuted", false);
+		} else {
+			targetconfig.put("muted", false);
+			targetconfig.put("tempmuted", true);
+		}
 	}
 	
 	//Tool methods

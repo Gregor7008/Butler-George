@@ -5,11 +5,12 @@ import org.json.JSONObject;
 import base.engines.LanguageEngine;
 import base.engines.configs.ConfigLoader;
 import context_menu_commands.assets.UserContextEventHandler;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import slash_commands.engines.ModController;
@@ -37,19 +38,8 @@ public class Unmute implements UserContextEventHandler {
 
 	@Override
 	public CommandData initialize() {
-		CommandData context = Commands.context(Command.Type.USER, "Unmute").setGuildOnly(true);
+		CommandData context = Commands.context(Command.Type.USER, "Unmute");
+		context.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MODERATE_MEMBERS)).setGuildOnly(true);
 		return context;
-	}
-
-	@Override
-	public boolean checkBotPermissions(UserContextInteractionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

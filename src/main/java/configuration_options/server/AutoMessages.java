@@ -15,7 +15,6 @@ import configuration_options.assets.ConfigurationOptionData;
 import configuration_options.assets.ConfigurationSubOptionData;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -132,24 +131,13 @@ public class AutoMessages implements ConfigurationEventHandler {
 	public ConfigurationOptionData initialize() {
 		ConfigurationOptionData configurationOptionData = new ConfigurationOptionData(this).setName("AutoMessages")
 													.setInfo("Configure messages sent on a user leaving/joining")
-													.setSubOperations(new ConfigurationSubOptionData[] {
+													.setSubOptions(new ConfigurationSubOptionData[] {
 															new ConfigurationSubOptionData("set", "Set a goodbye message for leaving members"),
 															new ConfigurationSubOptionData("on", "Activate (and set if not already done) the goodbye message"),
 															new ConfigurationSubOptionData("off", "Deactivate the goodbye message"),
 															new ConfigurationSubOptionData("test", "Test the currently set goodbye message")
-													});
+													})
+													.setRequiredPermissions(Permission.MANAGE_SERVER);
 		return configurationOptionData;
-	}
-
-	@Override
-	public boolean checkBotPermissions(ConfigurationEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

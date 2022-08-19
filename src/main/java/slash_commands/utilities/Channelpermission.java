@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.IPermissionHolder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.User;
@@ -84,18 +83,6 @@ public class Channelpermission implements SlashCommandEventHandler {
 		command.setDefaultPermissions(DefaultMemberPermissions.DISABLED)
 		   .setGuildOnly(true);
 		return command;
-	}
-
-	@Override
-	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
 	private void defineEdit(String selected, SlashCommandInteractionEvent event, SelectMenuInteractionEvent sme, boolean action) {

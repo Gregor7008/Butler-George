@@ -22,7 +22,6 @@ import base.engines.configs.ConfigLoader;
 import base.engines.logging.ConsoleEngine;
 import base.engines.logging.Logger;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -64,18 +63,6 @@ public class Level implements SlashCommandEventHandler {
 		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
 		   .setGuildOnly(true);
 		return command;
-	}
-
-	@Override
-	public boolean checkBotPermissions(SlashCommandInteractionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAvailableTo(Member member) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
 	public File renderLevelcard(User iuser, Guild guild) {
