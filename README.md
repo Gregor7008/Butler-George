@@ -31,7 +31,7 @@
 **Butler George** is a complex [Discord](https://discord.com) bot including not only all commonly used functions of popular Discord bots, but also everything else you will ever need.<br>
 Combined neatly into one single bot, so no one can ever complain about too many bots on your server!
 
-### 📈 Functions
+## 📈 Functions
 The newest version of **Butler George** will feature:
   - **Hosting**:
     - GUI for easier access and controlling of the bot
@@ -126,7 +126,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 
 5. #### New lines
    As **Butler George** is dependent on the keyword-value structure and therefore searches every line of a file for this structure, you can't create a new line in the final message by just pressing `Enter`, but have to use the regex notation.<br>
-   Explaining this would be way beyong the scope of this text, but for the purpose of translating the replies of this bot you only need to know `\n`, which would be the regex expression for a new line.<br>
+   Explaining this would be way beyond the scope of this text, but for the purpose of translating the replies of this bot you only need to know `\n`, which would be the regex expression for a new line.<br>
    For the english version I used `\n` sometimes, when the line got too long, or the topic changed drastically.<br>
    You may use `\n` at your own discretion!
 
