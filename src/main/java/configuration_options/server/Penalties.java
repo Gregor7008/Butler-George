@@ -97,7 +97,7 @@ public class Penalties implements ConfigurationEventHandler {
 				.addOption("Temporary ban", "tb")
 				.addOption("Permanent ban", "pb")
 				.build();
-		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add1")).setActionRows(ActionRow.of(menu)).queue();
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add1")).setComponents(ActionRow.of(menu)).queue();
 		AwaitTask.forSelectMenuInteraction(guild, user, event.getMessage(),
 				e -> {String plannedpunish = e.getSelectedOptions().get(0).getValue();
 					  this.addpenalties2(plannedpunish, e, event);})
@@ -105,7 +105,7 @@ public class Penalties implements ConfigurationEventHandler {
 	}
 	
 	private void addpenalties2(String plannedpunish, SelectMenuInteractionEvent event, ConfigurationEvent op) {
-			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add2")).setActionRows().queue();
+			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add2")).setComponents().queue();
 			AwaitTask.forMessageReceival(guild, user, op.getChannel(),
 					e -> {try {
 						      Integer.valueOf(e.getMessage().getContentRaw());

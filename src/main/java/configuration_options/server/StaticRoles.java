@@ -43,10 +43,10 @@ public class StaticRoles implements ConfigurationEventHandler {
 					}
 					if (event.getSubOperation().equals("remove")) {
 						ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(type).clear();
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess").replaceDescription("{type}", type)).setActionRows().queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess").replaceDescription("{type}", type)).setComponents().queue();
 						return;
 					}
-					b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).setActionRows().queue();
+					b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).setComponents().queue();
 					AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 							e -> {

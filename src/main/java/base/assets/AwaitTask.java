@@ -158,9 +158,9 @@ public class AwaitTask<T extends GenericEvent> {
 						keyword = "invalid";
 					}
 					if (message != null) {
-						message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setActionRows().queue();
+						message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setComponents().queue();
 					} else {
-						channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setActionRows().queue();
+						channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setComponents().queue();
 					}
 				}
 			}

@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.utils.FileUpload;
+import slash_commands.SlashCommandList;
 import slash_commands.assets.SlashCommandEventHandler;
 
 public class Levelbackground implements SlashCommandEventHandler {
@@ -22,12 +24,12 @@ public class Levelbackground implements SlashCommandEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (event.getSubcommandName().equals("set")) {
-			Level lv = new Level();
+			Level lv = (Level) SlashCommandList.getHandler("level");
 			if (Integer.parseInt(event.getOption("number").getAsString()) > 4 || Integer.parseInt(event.getOption("number").getAsString()) < 0) {
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "wrongarg")).queue();
 			} else {
 				ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("levelbackground", event.getOption("number").getAsInt());
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).addFile(lv.renderLevelcard(user, guild)).queue();
+				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).addFiles(FileUpload.fromData(lv.renderLevelcard(user, guild))).queue();
 			}
 			return;
 		}
@@ -79,14 +81,15 @@ public class Levelbackground implements SlashCommandEventHandler {
 			eb3.setImage("attachment://3.png");
 			eb4.setImage("attachment://4.png");
 			event.replyEmbeds(eb0.build(), eb1.build(), eb2.build(), eb3.build(), eb4.build())
-				.addFile(file0, "0.png")
-				.addFile(file1, "1.png")
-				.addFile(file2, "2.png")
-				.addFile(file3, "3.png")
-				.addFile(file4, "4.png")
-				.queue();
-			return;
-		} catch (Exception e) {}
-		event.replyEmbeds(LanguageEngine.fetchMessage(null, null, null, "fatal")).queue();
+				 .addFiles(FileUpload.fromData(file0, "0.png"),
+						   FileUpload.fromData(file1, "1.png"),
+						   FileUpload.fromData(file2, "2.png"),
+						   FileUpload.fromData(file3, "3.png"),
+						   FileUpload.fromData(file4, "4.png"))
+				 .queue();
+		} catch (Exception e) {
+			e.printStackTrace();
+			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, null, "fatal")).queue();
+		}
 	}
 }

@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.FileUpload;
 import slash_commands.assets.SlashCommandEventHandler;
 import slash_commands.engines.LevelEngine;
 
@@ -52,7 +53,7 @@ public class Level implements SlashCommandEventHandler {
         if (finalimage == null) {
         	event.getHook().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal")).queue();
         } else {
-        	event.getHook().sendMessage("").addFile(finalimage).queue();
+        	event.getHook().sendMessage("").addFiles(FileUpload.fromData(finalimage)).queue();
         }
 	}
 

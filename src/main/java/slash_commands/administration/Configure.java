@@ -74,7 +74,7 @@ public class Configure implements SlashCommandEventHandler {
 							e.editMessageEmbeds(eb2.build()).setActionRow(buttons).queue();
 							AwaitTask.forButtonInteraction(guild, user, msg,
 									s -> {
-										s.editMessageEmbeds(s.getMessage().getEmbeds()).setActionRows().queue(onCompletion -> {
+										s.editMessageEmbeds(s.getMessage().getEmbeds()).setComponents().queue(onCompletion -> {
 											data.getConfigurationEventHandler().execute(new ConfigurationEvent(event.getMember(), s, subOperations[Integer.valueOf(s.getButton().getId())]));
 										});
 									}).append();	

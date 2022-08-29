@@ -22,7 +22,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public abstract class Toolbox {
 
@@ -46,10 +47,10 @@ public abstract class Toolbox {
 				files.add(file);
 			}
 		}
-		MessageAction messageAction = target.sendMessage(source);
+		MessageCreateAction messageAction = target.sendMessage(source.getContentRaw());
 		for (int i = 0; i < files.size(); i++) {
 			File file = files.get(i);
-			messageAction.addFile(file, names.get(i));
+			messageAction.addFiles(FileUpload.fromData(file));
 		}
 		messageAction.queue(e -> files.forEach(f -> f.delete()));
 	}

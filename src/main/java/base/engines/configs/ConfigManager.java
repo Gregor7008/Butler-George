@@ -106,8 +106,9 @@ public class ConfigManager {
 			public void run() {
 				if (executions > 1 && !Bot.INSTANCE.hasErrorOccurred()) {
 					pushCache();
+					GUI.INSTANCE.increasePushCounter();
 				}
-				GUI.INSTANCE.increasePushCounter();
+				executions++;
 			}
 		}, 5*60*1000);
 	}

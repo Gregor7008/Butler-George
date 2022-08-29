@@ -126,14 +126,14 @@ public class Join2CreateChannels implements ConfigurationEventHandler {
 													  .put("limit", limit)
 													  .put("configurable", Boolean.valueOf(e.getButton().getId())));
 											  if (channels.size() == 1) {
-												  e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defsuccesso")).setActionRows().queue();
+												  e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defsuccesso")).setComponents().queue();
 											  } else {
 												  if (progress + 1 < channels.size()) {
-													  e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "preparingnext")).setActionRows().queue(r -> {
+													  e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "preparingnext")).setComponents().queue(r -> {
 														  this.configNewChannels(event.setMessage(e.getMessage()), channels, progress + 1);
 													  });
 												  } else {
-													  e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defsuccessm")).setActionRows().queue();
+													  e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defsuccessm")).setComponents().queue();
 												  }
 											  }
 										  }).append();

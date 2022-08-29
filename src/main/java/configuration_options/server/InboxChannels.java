@@ -27,7 +27,7 @@ public class InboxChannels implements ConfigurationEventHandler {
 				b -> {
 					final String selection = b.getComponentId();
 					if (event.getSubOperation().equals("set")) {
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel").replaceDescription("{selection}", selection)).setActionRows().queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel").replaceDescription("{selection}", selection)).setComponents().queue();
 						AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 								e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
 									return guild.getTextChannelById(e.getMessage().getMentions().getChannels().get(0).getIdLong()) != null;
@@ -45,7 +45,7 @@ public class InboxChannels implements ConfigurationEventHandler {
 					}
 					if (event.getSubOperation().equals("clear")) {
 						ConfigLoader.INSTANCE.getGuildConfig(guild).put("communityinbox", 0L);
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "clearsuccess").replaceDescription("{selection}", selection)).setActionRows().queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "clearsuccess").replaceDescription("{selection}", selection)).setComponents().queue();
 					}
 				}).append();
 	}

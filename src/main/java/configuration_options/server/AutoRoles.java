@@ -41,10 +41,10 @@ public class AutoRoles implements ConfigurationEventHandler {
 					}
 					if (event.getSubOperation().equals("remove")) {
 						ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(selection + "autoroles").clear();
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).setActionRows().queue();
+						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).setComponents().queue();
 						return;
 					}
-					b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).setActionRows().queue();
+					b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).setComponents().queue();
 					AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 							e -> {
