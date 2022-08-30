@@ -119,7 +119,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
    You may translate everything before and behind the `; `. **DO NOT CHANGE** the `; ‎` itself, as well as the space behind it!
 
 4. #### Variables
-   In some instances **Butler George** has to variate the message, depending on who is repsponsible for an event (i.e. when a user joins a server).<br>
+   In some instances **Butler George** has to variate the message, depending on who is responsible for an event (i.e. when a user joins a server).<br>
    For that we choose the format `{variable}`, where `variable` would be the name of the variable. This name is choosen in correlation to what the variable will be replaced with (i.e. a variating user would have the variable `{user}`).<br>
    You may translate everything before and behind the variable. **DO NOT CHANGE** the variables name!
 
