@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import base.assets.AwaitTask;
+import base.engines.logging.ConsoleEngine;
+import base.engines.logging.Logger;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -16,6 +18,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class EventAwaiter extends ListenerAdapter {
 
 	public static EventAwaiter INSTANCE;
+	
+	private static Logger LOG = ConsoleEngine.getLogger(EventAwaiter.class);
 	
 	private List<AwaitTask<MessageReceivedEvent>> awaitingMessageReceival = new ArrayList<>();
 	private List<AwaitTask<MessageReactionAddEvent>> awaitingReactionAdding = new ArrayList<>();
@@ -31,7 +35,7 @@ public class EventAwaiter extends ListenerAdapter {
 	@Override
 	public String toString() {
 		StringBuilder sB = new StringBuilder();
-		String prefix = "";
+		String prefix = null;
 		if (awaitingMessageReceival.size() > 0) {
 			sB.append("Awaiting message receival (" + awaitingMessageReceival.size() + "):");
 			awaitingMessageReceival.forEach(task -> {
@@ -72,11 +76,34 @@ public class EventAwaiter extends ListenerAdapter {
 			awaitingModalInteraction.forEach(task -> {
 				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
 			});
+			prefix = "\n";
 		}
-		if (prefix.isBlank()) {
+		if (prefix == null) {
 			sB.append("The EventAwaiter instance doesn't wait for any events at the moment!");
 		}
 		return sB.toString();
+	}
+	
+	public void clear() {
+		for (int i = 0; i < awaitingButtonInteraction.size(); i++) {
+			awaitingButtonInteraction.get(0).cancel();
+		}
+		for (int i = 0; i < awaitingReactionAdding.size(); i++) {
+			awaitingReactionAdding.get(0).cancel();
+		}
+		for (int i = 0; i < awaitingReactionRemoval.size(); i++) {
+			awaitingReactionRemoval.get(0).cancel();
+		}
+		for (int i = 0; i < awaitingMessageReceival.size(); i++) {
+			awaitingMessageReceival.get(0).cancel();
+		}
+		for (int i = 0; i < awaitingModalInteraction.size(); i++) {
+			awaitingModalInteraction.get(0).cancel();
+		}
+		for (int i = 0; i < awaitingSelectMenuInteraction.size(); i++) {
+			awaitingSelectMenuInteraction.get(0).cancel();
+		}
+		LOG.info("EventAwaiter successfully cleared!");
 	}
 	
 	@SuppressWarnings("unchecked")

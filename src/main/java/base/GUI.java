@@ -225,7 +225,9 @@ public class GUI extends JFrame implements FocusListener {
 				{"warn", "[Guild ID]  [User ID]"},
 				{"pushCache", ""},
 				{"printCache", ""},
-				{"clearCache", ""}
+				{"clearCache", ""},
+				{"printEventAwaiter", ""},
+				{"clearEventAwaiter", ""}
 			},
 			new String[] {
 				"key", "value"

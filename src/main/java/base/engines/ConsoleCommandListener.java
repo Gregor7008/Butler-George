@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import base.Bot;
-import base.GUI;
 import base.Bot.ShutdownReason;
+import base.GUI;
 import base.engines.configs.ConfigLoader;
 import base.engines.configs.ConfigManager;
 import base.engines.logging.ConsoleEngine;
@@ -40,8 +40,12 @@ public class ConsoleCommandListener implements ActionListener {
 				System.exit(0);
 				break;
 			case "warn":
-				ConfigLoader.INSTANCE.getMemberConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2])).getJSONArray("warnings").put("Administrative actions");
-				LOG.info("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
+				try {
+					ConfigLoader.INSTANCE.getMemberConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2])).getJSONArray("warnings").put("Administrative actions");
+					LOG.info("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
+				} catch (IndexOutOfBoundsException e) {
+					LOG.error("Invalid arguments - Please try again!");
+				}
 				break;
 			case "pushCache":
 				if (ConfigLoader.INSTANCE.manager.pushCache()) {
@@ -71,6 +75,9 @@ public class ConsoleCommandListener implements ActionListener {
 				break;
 			case "printEventAwaiter":
 				ConsoleEngine.getLogger(EventAwaiter.class).info(EventAwaiter.INSTANCE.toString());
+				break;
+			case "clearEventAwaiter":
+				EventAwaiter.INSTANCE.clear();
 				break;
 			default:
 				LOG.error("Unknown command!");

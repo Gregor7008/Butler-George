@@ -25,7 +25,9 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 	
 	private ByteArrayOutputStream errStream = new ByteArrayOutputStream();
 	private ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-	private DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm:ss");
+	private DateTimeFormatter hourFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
+	private DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE - dd.MM.uuuu");
+	private OffsetDateTime currentDay = OffsetDateTime.now();
 	private ConcurrentHashMap<String, Logger> loggerCache = new ConcurrentHashMap<>();
 	
 	public static ConsoleEngine getInstance() {
@@ -45,7 +47,7 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 	public ConsoleEngine() {
 		System.setOut(new PrintStream(outStream));
 		System.setErr(new PrintStream(errStream));
-		this.print(null, null, "----------------------------->| Console Engine V1.0 |<-----------------------------", false);
+		this.print(null, null, currentDay.format(dayFormat) + " " + "-".repeat(10) + ">| Console Engine V1.0 |<" + "-".repeat(32), false);
 		this.checkStreams();
 	}
 	
@@ -65,14 +67,23 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 	}
 	
 	public void print(@Nullable Level level, @Nullable String callerName, @Nullable String message) {
-		this.print(level.toString(), callerName, message, true);
+		if (level == null) {
+			this.print(null, callerName, message, true);
+		} else {
+			this.print(level.toString(), callerName, message, true);
+		}
 	}
 	
 	public void print(@Nullable String prefix, @Nullable String callerName, @Nullable String message, boolean timeCode) {
 		String timeCodeText = "";
 		String callerNameText = "";
+		OffsetDateTime now = OffsetDateTime.now();
+		if (currentDay.getDayOfMonth() != now.getDayOfMonth()) {
+			currentDay = now;
+			this.print(null, null, currentDay.format(dayFormat) + " " + "-".repeat(68), false);
+		}
 		if (timeCode)
-			timeCodeText = OffsetDateTime.now().format(format) + " | ";
+			timeCodeText = now.format(hourFormat) + " | ";
 		if (prefix == null) {
 			prefix = "";
 		} else {
@@ -100,7 +111,7 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 			@Override
 			public void run() {
 				if (errStream.size() > 0) {
-					print(Level.ERROR, "ConsoleEngine", errStream.toString());
+					LOG.error(errStream.toString());
 					errStream.reset();
 				}
 				if (outStream.size() > 0) {

@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import base.Bot;
 import base.engines.EventAwaiter;
 import base.engines.LanguageEngine;
+import base.engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -143,36 +144,14 @@ public class AwaitTask<T extends GenericEvent> {
 	}
 	
 	public AwaitTask<T> append() {
-		AwaitTask<T> self = this;
-		EventAwaiter.INSTANCE.appendTask(self);
+		EventAwaiter.INSTANCE.appendTask(this);
 		this.timeoutTask = new TimerTask() {
 			@Override
 			public void run() {
-				EventAwaiter.INSTANCE.removeTask(self);
-				cancelled = true;
-				if (timeoutRunnable != null) {
-					timeoutRunnable.run();
-				} else {
-					String keyword = "timeout";
-					if (invalidInputReceived) {
-						keyword = "invalid";
-					}
-					if (message != null) {
-						message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setComponents().queue();
-					} else {
-						channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setComponents().queue();
-					}
-				}
+				timeout();
 			}
 		};
 		Bot.INSTANCE.getTimer().schedule(timeoutTask, TimeUnit.MINUTES.toMillis(1));
-		return this;
-	}
-	
-	public AwaitTask<T> cancel() {
-		EventAwaiter.INSTANCE.removeTask(this);
-		this.timeoutTask.cancel();
-		this.cancelled = true;
 		return this;
 	}
 	
@@ -190,7 +169,37 @@ public class AwaitTask<T extends GenericEvent> {
 			this.eventConsumer.accept(event);
 		}
 		return true;
-	}	
+	}
+	
+	private AwaitTask<T> timeout() {
+		EventAwaiter.INSTANCE.removeTask(this);
+		cancelled = true;
+		if (timeoutRunnable != null) {
+			timeoutRunnable.run();
+		} else {
+			String keyword = "timeout";
+			if (invalidInputReceived) {
+				keyword = "invalid";
+			}
+			Consumer<? super Throwable> failureConsumer = f -> {
+				ConsoleEngine.getLogger(this).error("Timeout attempt failed - Aborting await task on " + guild.getName() + " for " + awaitedEvent.name());
+				EventAwaiter.INSTANCE.removeTask(this);
+				this.cancelled = true;
+			};
+			if (message != null) {
+				message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setComponents().queue(s -> {}, failureConsumer);
+			} else {
+				channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setComponents().queue(s -> {}, failureConsumer);
+			}
+		}
+		return this;
+	}
+	
+	public AwaitTask<T> cancel() {
+		this.timeoutTask.cancel();
+		this.timeout();
+		return this;
+	}
 	
 	public Guild getGuild() {
 		return this.guild;
