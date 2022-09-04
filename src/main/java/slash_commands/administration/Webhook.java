@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import slash_commands.assets.SlashCommandEventHandler;
-import slash_commands.engines.WebhookBuilder;
+import slash_commands.assets.WebhookMessage;
 
 public class Webhook implements SlashCommandEventHandler {
 
@@ -21,10 +21,10 @@ public class Webhook implements SlashCommandEventHandler {
 	public void execute(SlashCommandInteractionEvent event) {
 		User user = event.getUser();
 		Guild guild = event.getGuild();
-		WebhookBuilder wB = new WebhookBuilder(event.getOption("link").getAsString());
+		WebhookMessage wB = new WebhookMessage(event.getOption("link").getAsString());
 		wB.setContent(event.getOption("message").getAsString());
 		try {
-			wB.execute();
+			wB.send();
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 		} catch (IOException | IllegalArgumentException e) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "elink")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));

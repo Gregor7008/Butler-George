@@ -316,9 +316,7 @@ public class EventProcessor extends ListenerAdapter {
 	
 	@Override
 	public void onRoleDelete(RoleDeleteEvent event) {
-		new Thread(() -> {
-			ConfigVerifier.RUN.guildCheck(event.getGuild());
-		}).start();
+		ConfigVerifier.RUN.guildCheck(event.getGuild());
 	}
 	
 	@Override

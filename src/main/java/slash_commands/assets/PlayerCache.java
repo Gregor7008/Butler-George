@@ -1,4 +1,4 @@
-package slash_commands.engines;
+package slash_commands.assets;
 
 import java.util.concurrent.ConcurrentHashMap;
 

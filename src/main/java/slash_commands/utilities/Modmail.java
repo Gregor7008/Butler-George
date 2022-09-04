@@ -11,7 +11,7 @@ public class Modmail implements SlashCommandEventHandler {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		if (event.getGuild() == null) {
+		if (event.isFromGuild()) {
 			switch (event.getSubcommandName()) {
 			case "open":
 				this.openOnGuild(event);
@@ -61,7 +61,6 @@ public class Modmail implements SlashCommandEventHandler {
 	private void openOnGuild(SlashCommandInteractionEvent event) {
 		//Reply with modal and ask for title and description, open ticket on valid input
 	}
-
 
 	private void selectOnGuild(SlashCommandInteractionEvent event) {
 		//List tickets from guild and add select menu, select selected ticket
