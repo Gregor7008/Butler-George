@@ -236,8 +236,10 @@ public class ConfigManager {
 		newConfig.put("level",						0);
 		newConfig.put("levelbackground",			0);
 		newConfig.put("levelspamcount",				0);
+		newConfig.put("modmails",					new JSONObject());
 		newConfig.put("muted",						false);
 		newConfig.put("penaltycount",				0);
+		newConfig.put("selectedticket",				0);
 		newConfig.put("tempbanneduntil", 			"");
 		newConfig.put("tempbanned",					false);
 		newConfig.put("tempmuted",					false);
@@ -265,6 +267,7 @@ public class ConfigManager {
 		newConfig.put("levelmsg",					"");
 		newConfig.put("moderationroles",			new JSONArray());
 		newConfig.put("moderationinbox",			0L);
+		newConfig.put("modmailcategory",			0L);
 		newConfig.put("offlinemsg",					new JSONArray());
 		newConfig.put("penalties",					new JSONObject());
 		newConfig.put("suggestioninbox",			0L);

@@ -151,7 +151,7 @@ public class AwaitTask<T extends GenericEvent> {
 				timeout();
 			}
 		};
-		Bot.INSTANCE.getTimer().schedule(timeoutTask, TimeUnit.MINUTES.toMillis(1));
+		Bot.INSTANCE.getTimer().schedule(timeoutTask, TimeUnit.MINUTES.toMillis(5));
 		return this;
 	}
 	
