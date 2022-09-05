@@ -6,6 +6,7 @@ import java.util.List;
 import base.assets.AwaitTask;
 import base.engines.logging.ConsoleEngine;
 import base.engines.logging.Logger;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -38,44 +39,32 @@ public class EventAwaiter extends ListenerAdapter {
 		String prefix = null;
 		if (awaitingMessageReceival.size() > 0) {
 			sB.append("Awaiting message receival (" + awaitingMessageReceival.size() + "):");
-			awaitingMessageReceival.forEach(task -> {
-				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
-			});
+			this.cacheToString(awaitingMessageReceival, sB);
 			prefix = "\n";
 		}
 		if (awaitingReactionAdding.size() > 0) {
 			sB.append(prefix + "Awaiting reaction adding (" + awaitingReactionAdding.size() + "):");
-			awaitingReactionAdding.forEach(task -> {
-				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
-			});
+			this.cacheToString(awaitingReactionAdding, sB);
 			prefix = "\n";
 		}
 		if (awaitingReactionRemoval.size() > 0) {
 			sB.append(prefix + "Awaiting reaction removal (" + awaitingReactionRemoval.size() + "):");
-			awaitingReactionRemoval.forEach(task -> {
-				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
-			});
+			this.cacheToString(awaitingReactionRemoval, sB);
 			prefix = "\n";
 		}
 		if (awaitingButtonInteraction.size() > 0) {
 			sB.append(prefix + "Awaiting button interaction (" + awaitingButtonInteraction.size() + "):");
-			awaitingButtonInteraction.forEach(task -> {
-				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
-			});
+			this.cacheToString(awaitingButtonInteraction, sB);
 			prefix = "\n";
 		}
 		if (awaitingSelectMenuInteraction.size() > 0) {
 			sB.append(prefix + "Awaiting select menu interaction (" + awaitingSelectMenuInteraction.size() + "):");
-			awaitingSelectMenuInteraction.forEach(task -> {
-				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
-			});
+			this.cacheToString(awaitingSelectMenuInteraction, sB);
 			prefix = "\n";
 		}
 		if (awaitingModalInteraction.size() > 0) {
 			sB.append(prefix + "Awaiting modal interaction (" + awaitingModalInteraction.size() + "):");
-			awaitingModalInteraction.forEach(task -> {
-				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
-			});
+			this.cacheToString(awaitingModalInteraction, sB);
 			prefix = "\n";
 		}
 		if (prefix == null) {
@@ -163,10 +152,11 @@ public class EventAwaiter extends ListenerAdapter {
 		for (int i = 0; i < listCopy.size(); i++) {
 			AwaitTask<MessageReceivedEvent> task = listCopy.get(i);
 			if (!event.getAuthor().isBot()
-					&& event.getGuild().getId().equals(task.getGuild().getId())
 					&& event.getAuthor().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())) {
-				task.complete(event);
+				if (this.checkGuildOnEvent(task, event.getGuild())) {
+					task.complete(event);
+				}
 			}
 		}
 	}
@@ -176,11 +166,13 @@ public class EventAwaiter extends ListenerAdapter {
 		List<AwaitTask<MessageReactionAddEvent>> listCopy = List.copyOf(awaitingReactionAdding);
 		for (int i = 0; i < listCopy.size(); i++) {
 			AwaitTask<MessageReactionAddEvent> task = listCopy.get(i);
-			if (event.getGuild().getId().equals(task.getGuild().getId())
+			if (!event.getUser().isBot()
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
 					&& event.getMessageId().equals(task.getMessage().getId())) {
-				task.complete(event);
+				if (this.checkGuildOnEvent(task, event.getGuild())) {
+					task.complete(event);
+				}
 			}
 		}
 	}
@@ -190,11 +182,13 @@ public class EventAwaiter extends ListenerAdapter {
 		List<AwaitTask<MessageReactionRemoveEvent>> listCopy = List.copyOf(awaitingReactionRemoval);
 		for (int i = 0; i < listCopy.size(); i++) {
 			AwaitTask<MessageReactionRemoveEvent> task = listCopy.get(i);
-			if (!event.getGuild().getId().equals(task.getGuild().getId())
+			if (!event.getUser().isBot()
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
 					&& event.getMessageId().equals(task.getMessage().getId())) {
-				task.complete(event);
+				if (this.checkGuildOnEvent(task, event.getGuild())) {
+					task.complete(event);
+				}
 			}
 		}
 	}
@@ -204,15 +198,15 @@ public class EventAwaiter extends ListenerAdapter {
 		List<AwaitTask<ButtonInteractionEvent>> listCopy = List.copyOf(awaitingButtonInteraction);
 		for (int i = 0; i < listCopy.size(); i++) {
 			AwaitTask<ButtonInteractionEvent> task = listCopy.get(i);
-			if (event.getGuild().getId().equals(task.getGuild().getId())
+			if (!event.getUser().isBot()
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
 					&& event.getMessageId().equals(task.getMessage().getId())) {
 				if (task.getComponentIds() != null) {
-					if (task.getComponentIds().contains(event.getComponentId())) {
+					if (task.getComponentIds().contains(event.getComponentId()) && this.checkGuildOnEvent(task, event.getGuild())) {
 						task.complete(event);
 					}
-				} else {
+				} else if (this.checkGuildOnEvent(task, event.getGuild())) {
 					task.complete(event);
 				}
 			}
@@ -224,15 +218,15 @@ public class EventAwaiter extends ListenerAdapter {
 		List<AwaitTask<SelectMenuInteractionEvent>> listCopy = List.copyOf(awaitingSelectMenuInteraction);
 		for (int i = 0; i < listCopy.size(); i++) {
 			AwaitTask<SelectMenuInteractionEvent> task = listCopy.get(i);
-			if (event.getGuild().getId().equals(task.getGuild().getId())
+			if (!event.getUser().isBot()
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
 					&& event.getMessageId().equals(task.getMessage().getId())) {
 				if (task.getComponentIds() != null) {
-					if (task.getComponentIds().contains(event.getComponentId())) {
+					if (task.getComponentIds().contains(event.getComponentId()) && this.checkGuildOnEvent(task, event.getGuild())) {
 						task.complete(event);
 					}
-				} else {
+				} else if (this.checkGuildOnEvent(task, event.getGuild())) {
 					task.complete(event);
 				}
 			}
@@ -244,17 +238,39 @@ public class EventAwaiter extends ListenerAdapter {
 		List<AwaitTask<ModalInteractionEvent>> listCopy = List.copyOf(awaitingModalInteraction);
 		for (int i = 0; i < listCopy.size(); i++) {
 			AwaitTask<ModalInteractionEvent> task = listCopy.get(i);
-			if (event.getGuild().getId().equals(task.getGuild().getId())
+			if (!event.getUser().isBot()
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())) {
 				if (task.getComponentIds() != null) {
-					if (task.getComponentIds().contains(event.getModalId())) {
+					if (task.getComponentIds().contains(event.getModalId()) && this.checkGuildOnEvent(task, event.getGuild())) {
 						task.complete(event);
 					}
-				} else {
+				} else if (this.checkGuildOnEvent(task, event.getGuild())) {
 					task.complete(event);
 				}
 			}
+		}
+	}
+	
+	private <T extends GenericEvent> void cacheToString(List<AwaitTask<T>> cache, StringBuilder sB) {
+		cache.forEach(task -> {
+			if (task.getGuild() == null) {
+				sB.append("\n Private Messages, " + task.getUser().getName());
+			} else {
+				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
+			}
+		});
+	}
+	
+	private <T extends GenericEvent> boolean checkGuildOnEvent(AwaitTask<T> task, Guild guild) {
+		if (task.getGuild() != null) {
+			if (guild != null && guild.getId().equals(task.getGuild().getId())) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
 		}
 	}
 }
