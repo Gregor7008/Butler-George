@@ -9,16 +9,18 @@ import javax.security.auth.login.LoginException;
 
 import org.json.JSONObject;
 
-import base.engines.EventAwaiter;
-import base.engines.LanguageEngine;
-import base.engines.configs.ConfigLoader;
-import base.engines.configs.ConfigVerifier;
-import base.engines.logging.ConsoleEngine;
-import base.engines.logging.Logger;
-import configuration_options.ServerConfigurationOptionsList;
-import context_menu_commands.MessageContextCommandList;
-import context_menu_commands.UserContextCommandList;
-import miscellaneous.ServerUtilsList;
+import assets.logging.Logger;
+import engines.base.EventAwaiter;
+import engines.base.LanguageEngine;
+import engines.configs.ConfigLoader;
+import engines.configs.ConfigVerifier;
+import engines.functions.ModController;
+import engines.logging.ConsoleEngine;
+import functions.configuration_options.ServerConfigurationOptionsList;
+import functions.context_menu_commands.MessageContextCommandList;
+import functions.context_menu_commands.UserContextCommandList;
+import functions.guild_utilities.GuildUtilitiesList;
+import functions.slash_commands.SlashCommandList;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -27,8 +29,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import slash_commands.SlashCommandList;
-import slash_commands.engines.ModController;
 
 public class Bot {
 	
@@ -51,7 +51,7 @@ public class Bot {
 		this.performPreStartupOperations(serverIP, port, databaseName, username, password);
 		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(new EventProcessor(), new EventAwaiter());
-		Object[] serverUtils = ServerUtilsList.getEngines().values().toArray();
+		Object[] serverUtils = GuildUtilitiesList.getEngines().values().toArray();
 		builder.addEventListeners(serverUtils);
 		builder.setRawEventsEnabled(true);
 		builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT);
@@ -70,7 +70,7 @@ public class Bot {
 	    ServerConfigurationOptionsList.create();
 	    MessageContextCommandList.create();
 	    UserContextCommandList.create();
-	    ServerUtilsList.create();
+	    GuildUtilitiesList.create();
 	    SlashCommandList.create();
 //	    Debug logging
 	    LOG.debug("Pre-Startup operations completed");
@@ -85,7 +85,7 @@ public class Bot {
 	    new ModController();
 //	    Startup operations
     	checkConfigs();
-    	ServerUtilsList.getEngines().forEach((id, handler) -> handler.onStartup());
+    	GuildUtilitiesList.getEngines().forEach((id, handler) -> handler.onStartup());
 //    	GUI
     	GUI.INSTANCE.setBotRunning(true);
     	GUI.INSTANCE.updateStatistics();
@@ -137,7 +137,7 @@ public class Bot {
 //		Stop period operations
 		timer.cancel();
 //		Shutdown operations
-		ServerUtilsList.getEngines().forEach((id, handler) -> handler.onShutdown(reason));
+		GuildUtilitiesList.getEngines().forEach((id, handler) -> handler.onShutdown(reason));
 //		Shutdown bot
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();

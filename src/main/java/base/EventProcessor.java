@@ -9,14 +9,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import base.engines.LanguageEngine;
-import base.engines.Toolbox;
-import base.engines.configs.ConfigLoader;
-import base.engines.configs.ConfigVerifier;
-import context_menu_commands.MessageContextCommandList;
-import context_menu_commands.UserContextCommandList;
-import context_menu_commands.assets.MessageContextEventHandler;
-import context_menu_commands.assets.UserContextEventHandler;
+import assets.functions.MessageContextEventHandler;
+import assets.functions.SlashCommandEventHandler;
+import assets.functions.UserContextEventHandler;
+import engines.base.LanguageEngine;
+import engines.base.Toolbox;
+import engines.configs.ConfigLoader;
+import engines.configs.ConfigVerifier;
+import engines.functions.LevelEngine;
+import functions.context_menu_commands.MessageContextCommandList;
+import functions.context_menu_commands.UserContextCommandList;
+import functions.slash_commands.SlashCommandList;
+import functions.slash_commands.music.Stop;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Category;
@@ -50,10 +54,6 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import slash_commands.SlashCommandList;
-import slash_commands.assets.SlashCommandEventHandler;
-import slash_commands.engines.LevelEngine;
-import slash_commands.music.Stop;
 
 public class EventProcessor extends ListenerAdapter {
 	

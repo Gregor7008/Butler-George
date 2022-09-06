@@ -30,9 +30,8 @@ import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
 import base.Bot.ShutdownReason;
-import base.assets.ShutdownWindow;
-import base.engines.ConsoleCommandListener;
-import base.engines.logging.ConsoleEngine;
+import engines.base.ConsoleCommandListener;
+import engines.logging.ConsoleEngine;
 import net.miginfocom.swing.MigLayout;
 
 public class GUI extends JFrame implements FocusListener {
