@@ -90,6 +90,7 @@ public class Bot {
     	GUI.INSTANCE.setBotRunning(true);
     	GUI.INSTANCE.updateStatistics();
     	GUI.INSTANCE.startRuntimeMeasuring();
+    	GUI.INSTANCE.updateBotBoolean();
 //    	Debug logging
     	LOG.debug("Post-Startup operations completed");
 	}

@@ -103,7 +103,9 @@ public class EventProcessor extends ListenerAdapter {
 				}
 			}
 		}
-		LevelEngine.getInstance().slashcommand(event);
+		if (event.isFromGuild()) {
+			LevelEngine.getInstance().slashcommand(event);
+		}
 	}
 
 	@Override

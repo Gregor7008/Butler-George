@@ -15,6 +15,7 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.event.Level;
 
 import assets.logging.Logger;
+import base.Bot;
 import base.GUI;
 
 public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
@@ -64,6 +65,7 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
+		Bot.INSTANCE.onErrorOccurrence();
 		e.printStackTrace();
 	}
 	
