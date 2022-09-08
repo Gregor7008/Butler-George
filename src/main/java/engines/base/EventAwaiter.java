@@ -6,7 +6,6 @@ import java.util.List;
 import assets.base.AwaitTask;
 import assets.logging.Logger;
 import engines.logging.ConsoleEngine;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -154,7 +153,11 @@ public class EventAwaiter extends ListenerAdapter {
 			if (!event.getAuthor().isBot()
 					&& event.getAuthor().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())) {
-				if (this.checkGuildOnEvent(task, event.getGuild())) {
+				if (event.isFromGuild()) {
+					if (event.getGuild().getId().equals(task.getGuild().getId())) {
+						task.complete(event);
+					}
+				} else {
 					task.complete(event);
 				}
 			}
@@ -170,7 +173,11 @@ public class EventAwaiter extends ListenerAdapter {
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
 					&& event.getMessageId().equals(task.getMessage().getId())) {
-				if (this.checkGuildOnEvent(task, event.getGuild())) {
+				if (event.isFromGuild()) {
+					if (event.getGuild().getId().equals(task.getGuild().getId())) {
+						task.complete(event);
+					}
+				} else {
 					task.complete(event);
 				}
 			}
@@ -186,7 +193,11 @@ public class EventAwaiter extends ListenerAdapter {
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
 					&& event.getMessageId().equals(task.getMessage().getId())) {
-				if (this.checkGuildOnEvent(task, event.getGuild())) {
+				if (event.isFromGuild()) {
+					if (event.getGuild().getId().equals(task.getGuild().getId())) {
+						task.complete(event);
+					}
+				} else {
 					task.complete(event);
 				}
 			}
@@ -202,13 +213,26 @@ public class EventAwaiter extends ListenerAdapter {
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
 					&& event.getMessageId().equals(task.getMessage().getId())) {
-				if (task.getComponentIds() != null) {
-					if (task.getComponentIds().contains(event.getComponentId()) && this.checkGuildOnEvent(task, event.getGuild())) {
+				if (event.isFromGuild()) {
+					if (event.getGuild().getId().equals(task.getGuild().getId())) {
+						if (task.getComponentIds() != null) {
+							if (task.getComponentIds().contains(event.getComponentId())) {
+								task.complete(event);
+							}
+						} else {
+							task.complete(event);
+						}
+					}
+				} else {
+					if (task.getComponentIds() != null) {
+						if (task.getComponentIds().contains(event.getComponentId())) {
+							task.complete(event);
+						}
+					} else {
 						task.complete(event);
 					}
-				} else if (this.checkGuildOnEvent(task, event.getGuild())) {
-					task.complete(event);
 				}
+				
 			}
 		}
 	}
@@ -222,12 +246,24 @@ public class EventAwaiter extends ListenerAdapter {
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())
 					&& event.getMessageId().equals(task.getMessage().getId())) {
-				if (task.getComponentIds() != null) {
-					if (task.getComponentIds().contains(event.getComponentId()) && this.checkGuildOnEvent(task, event.getGuild())) {
+				if (event.isFromGuild()) {
+					if (event.getGuild().getId().equals(task.getGuild().getId())) {
+						if (task.getComponentIds() != null) {
+							if (task.getComponentIds().contains(event.getComponentId())) {
+								task.complete(event);
+							}
+						} else {
+							task.complete(event);
+						}
+					}
+				} else {
+					if (task.getComponentIds() != null) {
+						if (task.getComponentIds().contains(event.getComponentId())) {
+							task.complete(event);
+						}
+					} else {
 						task.complete(event);
 					}
-				} else if (this.checkGuildOnEvent(task, event.getGuild())) {
-					task.complete(event);
 				}
 			}
 		}
@@ -241,12 +277,24 @@ public class EventAwaiter extends ListenerAdapter {
 			if (!event.getUser().isBot()
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())) {
-				if (task.getComponentIds() != null) {
-					if (task.getComponentIds().contains(event.getModalId()) && this.checkGuildOnEvent(task, event.getGuild())) {
+				if (event.isFromGuild()) {
+					if (event.getGuild().getId().equals(task.getGuild().getId())) {
+						if (task.getComponentIds() != null) {
+							if (task.getComponentIds().contains(event.getModalId())) {
+								task.complete(event);
+							}
+						} else {
+							task.complete(event);
+						}
+					}
+				} else {
+					if (task.getComponentIds() != null) {
+						if (task.getComponentIds().contains(event.getModalId())) {
+							task.complete(event);
+						}
+					} else {
 						task.complete(event);
 					}
-				} else if (this.checkGuildOnEvent(task, event.getGuild())) {
-					task.complete(event);
 				}
 			}
 		}
@@ -260,17 +308,5 @@ public class EventAwaiter extends ListenerAdapter {
 				sB.append("\n" + task.getGuild().getName() + ", " + task.getUser().getName());
 			}
 		});
-	}
-	
-	private <T extends GenericEvent> boolean checkGuildOnEvent(AwaitTask<T> task, Guild guild) {
-		if (task.getGuild() != null) {
-			if (guild != null && guild.getId().equals(task.getGuild().getId())) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
 	}
 }

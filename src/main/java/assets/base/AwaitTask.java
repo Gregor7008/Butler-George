@@ -16,6 +16,7 @@ import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -24,6 +25,9 @@ import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 public class AwaitTask<T extends GenericEvent> {
 	
@@ -166,7 +170,20 @@ public class AwaitTask<T extends GenericEvent> {
 			EventAwaiter.INSTANCE.removeTask(this);
 			this.timeoutTask.cancel();
 			this.executed = true;
-			this.eventConsumer.accept(event);
+			try {
+				this.eventConsumer.accept(event);
+			} catch (InsufficientPermissionException e) {
+				MessageEmbed embed = LanguageEngine.fetchMessage(null, null, null, "insufficientperms")
+						.replaceDescription("{permissions}", e.getPermission().getName().toLowerCase());
+				if (event instanceof IMessageEditCallback) {
+					IMessageEditCallback messageEditCallbackEvent = (IMessageEditCallback) event;
+					messageEditCallbackEvent.deferEdit().queue();
+				} else if (event instanceof IReplyCallback) {
+					IReplyCallback replyCallbackEvent = (IReplyCallback) event;
+					replyCallbackEvent.deferReply().queue();
+				}
+				channel.sendMessageEmbeds(embed).queue();
+			}
 		}
 		return true;
 	}
