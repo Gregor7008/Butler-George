@@ -217,6 +217,7 @@ public class ConfigManager {
 		JSONObject newConfig = new JSONObject();
 		//Simple values
 		newConfig.put("id",							user.getIdLong());
+		newConfig.put("selected_ticketee",			new JSONArray());
 		
 		userConfigCache.put(user.getIdLong(), newConfig);
 		return newConfig;
@@ -239,7 +240,6 @@ public class ConfigManager {
 		newConfig.put("modmails",					new JSONObject());
 		newConfig.put("muted",						false);
 		newConfig.put("penaltycount",				0);
-		newConfig.put("selectedticket",				0);
 		newConfig.put("tempbanneduntil", 			"");
 		newConfig.put("tempbanned",					false);
 		newConfig.put("tempmuted",					false);
@@ -268,6 +268,7 @@ public class ConfigManager {
 		newConfig.put("moderationroles",			new JSONArray());
 		newConfig.put("moderationinbox",			0L);
 		newConfig.put("modmailcategory",			0L);
+		newConfig.put("modmails",					new JSONObject());
 		newConfig.put("offlinemsg",					new JSONArray());
 		newConfig.put("penalties",					new JSONObject());
 		newConfig.put("suggestioninbox",			0L);
@@ -275,7 +276,6 @@ public class ConfigManager {
 		newConfig.put("supporttalk",				0L);
 		newConfig.put("welcomemsg",					new JSONArray());
 		//Deep-nested values (2 layers or more)
-		newConfig.put("modmails",					new JSONObject());
 		newConfig.put("polls",						new JSONObject());
 		newConfig.put("reactionroles",				new JSONObject());
 		
