@@ -34,7 +34,7 @@ public class Stop implements SlashCommandEventHandler {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
 			return;
 		}
-		Stop.stopandleave(guild);
+		this.stopandleave(guild);
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "stopped")).queue();
 	}
 
@@ -46,7 +46,7 @@ public class Stop implements SlashCommandEventHandler {
 		return command;
 	}
 	
-	public static  void stopandleave(Guild guild) {
+	public void stopandleave(Guild guild) {
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		musicManager.scheduler.player.stopTrack();
 		musicManager.scheduler.queue.clear();

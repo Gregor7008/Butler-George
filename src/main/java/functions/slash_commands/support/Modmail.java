@@ -2,7 +2,9 @@ package functions.slash_commands.support;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 import javax.annotation.Nullable;
@@ -25,6 +27,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
@@ -45,27 +48,29 @@ public class Modmail implements SlashCommandEventHandler {
 	public void execute(SlashCommandInteractionEvent event) {
 		if (event.isFromGuild()) {
 			event.getUser().openPrivateChannel().complete().sendMessageEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), this, "testing")).queue(
-					message -> {},
+					message -> {
+						message.delete().queueAfter(1, TimeUnit.SECONDS);
+						switch (event.getSubcommandName()) {
+						case "open":
+							this.open(event, event.getUser(), event.getGuild());
+							break;
+						case "list":
+							this.listOnGuild(event);
+							break;
+						case "select":
+							this.selectOnGuild(event);
+							break;
+						case "close":
+							this.closeOnGuild(event);
+							break;
+						default:
+							event.replyEmbeds(LanguageEngine.fetchMessage(null, null, null, "fatal")).queue();
+						}
+					},
 					error -> {
 						event.replyEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), this, "testerror")).queue();
 						return;
 					});
-			switch (event.getSubcommandName()) {
-			case "open":
-				this.open(event, event.getUser(), event.getGuild());
-				break;
-			case "list":
-				this.listOnGuild(event);
-				break;
-			case "select":
-				this.selectOnGuild(event);
-				break;
-			case "close":
-				this.closeOnGuild(event);
-				break;
-			default:
-				event.replyEmbeds(LanguageEngine.fetchMessage(null, null, null, "fatal")).queue();
-			}
 		} else {
 			switch (event.getSubcommandName()) {
 			case "open":
@@ -128,13 +133,14 @@ public class Modmail implements SlashCommandEventHandler {
 							.replaceDescription("{title}", ConfigLoader.INSTANCE
 									.getMemberConfig(finalGuild, user)
 									.getJSONObject("modmails")
-									.getJSONArray(selection[1]).getString(1))
+									.getJSONArray(selection[1])
+									.getString(1))
 							.replaceDescription("{guild}", finalGuild.getName());
 					if (newEvent instanceof SlashCommandInteractionEvent) {
-						event.replyEmbeds(embed).queue();
+						event.replyEmbeds(embed).setComponents().queue();
 					} else if (newEvent instanceof SelectMenuInteractionEvent){
 						SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) newEvent;
-						castedEvent.editMessageEmbeds(embed).queue();
+						castedEvent.editMessageEmbeds(embed).setComponents().queue();
 					}
 				});
 	}
@@ -150,13 +156,14 @@ public class Modmail implements SlashCommandEventHandler {
 							.replaceDescription("{title}", ConfigLoader.INSTANCE
 									.getMemberConfig(finalGuild, user)
 									.getJSONObject("modmails")
-									.getJSONArray(selection[1]).getString(1))
+									.getJSONArray(selection[1])
+									.getString(1))
 							.replaceDescription("{guild}", finalGuild.getName());
 					if (newEvent instanceof SlashCommandInteractionEvent) {
-						event.replyEmbeds(embed).queue();
+						event.replyEmbeds(embed).setComponents().queue();
 					} else if (newEvent instanceof SelectMenuInteractionEvent){
 						SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) newEvent;
-						castedEvent.editMessageEmbeds(embed).queue();
+						castedEvent.editMessageEmbeds(embed).setComponents().queue();
 					}
 				});
 	}
@@ -172,8 +179,12 @@ public class Modmail implements SlashCommandEventHandler {
 	}
 
 	private void closeOnPrivate(SlashCommandInteractionEvent event) {
-		//If option valid, close - else list tickets by guild and add select menu, close selected ticket
-		event.replyEmbeds(LanguageEngine.fetchMessage(null, event.getUser(), null, "unsupportedBG")).queue();
+		final User user = event.getUser();
+		this.ticketSelection(event, user, null,
+				(newEvent, selection) -> {
+					final Guild finalGuild = newEvent.getJDA().getGuildById(selection[0]);
+					this.close(newEvent, finalGuild, user, selection[1]);
+				});
 	}
 
 	private void closeOnGuild(SlashCommandInteractionEvent event) {
@@ -181,11 +192,8 @@ public class Modmail implements SlashCommandEventHandler {
 		final User user = event.getUser();
 		this.ticketSelection(event, user, guild,
 				(newEvent, selection) -> {
-					JSONArray selectedTicket = ConfigLoader.INSTANCE.getUserConfig(user).getJSONArray("selected_ticket");
-					if (selectedTicket.getLong(0) == Long.valueOf(selection[0]) && selectedTicket.getLong(1) == Long.valueOf(selection[1])) {
-						selectedTicket.clear();
-					};
-					//Continue work here
+					final Guild finalGuild = newEvent.getJDA().getGuildById(selection[0]);
+					this.close(newEvent, finalGuild, user, selection[1]);
 				});
 	}
 	
@@ -229,20 +237,27 @@ public class Modmail implements SlashCommandEventHandler {
 							.replaceDescription("{user}", user.getName())
 							.replaceDescription("{mention}", guild.getPublicRole().getAsMention())
 							.replaceDescription("{addon}", addon))
-							.setActionRow(Button.secondary(String.valueOf(ticketChannel.getIdLong() + guild.getIdLong()), Emoji.fromUnicode("\uD83D\uDD12"))).complete();
+							.setActionRow(Button.secondary(String.valueOf(ticketChannel.getIdLong() + guild.getIdLong()) + "_close", Emoji.fromUnicode("\uD83D\uDD12"))).complete();
 					ticketChannel.sendMessage("**" + mi.getValue("title").getAsString() + "**\n\n" + mi.getValue("message").getAsString()).queue();
 					guildModmail.put(ticketChannel.getId(), new JSONArray().put(user.getIdLong()).put(id).put(initialMessage.getIdLong()));
 					userModmail.put(String.valueOf(id), new JSONArray().put(ticketChannel.getIdLong()).put(mi.getValue("title").getAsString()));
 					ConfigLoader.INSTANCE.getUserConfig(user).put("selected_ticket", new JSONArray().put(guild.getIdLong()).put(id));
 					if (event instanceof SelectMenuInteractionEvent) {
-						mi.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "openSuccess")
-								.replaceDescription("{guild}", guild.getName())
-								.replaceDescription("{title}", mi.getValue("title").getAsString())).setComponents().queue();
+						mi.editMessageEmbeds(
+								LanguageEngine.fetchMessage(guild, user, this, "openSuccess")
+											  .replaceDescription("{guild}", guild.getName())
+											  .replaceDescription("{title}", mi.getValue("title").getAsString()),
+								LanguageEngine.fetchMessage(guild, user, this, "selectSuccess")
+											  .replaceDescription("{guild}", guild.getName())
+								  		      .replaceDescription("{title}", mi.getValue("title").getAsString())).setComponents().queue();
 					} else if (event instanceof SlashCommandInteractionEvent) {
 						mi.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "openSuccess")
 								.replaceDescription("{guild}", guild.getName())
-								.replaceDescription("{title}", mi.getValue("title").getAsString())).queue();
-						user.openPrivateChannel().complete().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selectSuccess")).queue();
+								.replaceDescription("{title}", mi.getValue("title").getAsString())).setComponents().queue();
+						user.openPrivateChannel().complete().sendMessageEmbeds(
+								LanguageEngine.fetchMessage(guild, user, this, "selectSuccess")
+											   .replaceDescription("{guild}", guild.getName())
+								  			   .replaceDescription("{title}", mi.getValue("title").getAsString())).queue();
 					}
 				}).addValidComponents(modal.getId()).append();
 	}
@@ -252,7 +267,7 @@ public class Modmail implements SlashCommandEventHandler {
 		SelectMenu.Builder menu = SelectMenu.create("selticket")
 				.setPlaceholder("Select ticket")
 				.setRequiredRange(1, 1);
-		String list = this.list(user, null, menu);
+		String list = this.list(user, guild, menu);
 		if (list.equals("")) {
 			if (guild != null) {
 				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noticketsguild")).queue();
@@ -330,5 +345,56 @@ public class Modmail implements SlashCommandEventHandler {
 			}
 		}
 		return sB.toString();
+	}
+	
+	public void close(GenericInteractionCreateEvent event, Guild ticketGuild, User ticketUser, String ticketID) {
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
+		JSONArray selectedTicket = ConfigLoader.INSTANCE.getUserConfig(ticketUser).getJSONArray("selected_ticket");
+		JSONArray userTicketData = ConfigLoader.INSTANCE.getMemberConfig(ticketGuild, ticketUser).getJSONObject("modmails").getJSONArray(ticketID);
+		String ticketTitle = userTicketData.getString(1);
+		TextChannel ticketChannel = ticketGuild.getTextChannelById(userTicketData.getLong(0));
+		String buttonCriteria = String.valueOf(ticketChannel.getIdLong() + ticketGuild.getIdLong());
+		if (selectedTicket.getLong(0) == Long.valueOf(ticketID) && selectedTicket.getLong(1) == Long.valueOf(ticketID)) {
+			selectedTicket.clear();
+		};
+		if (event.isFromGuild()) {
+			ticketUser.openPrivateChannel().complete().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "awaitConfirm")
+					.replaceDescription("{guild}", ticketGuild.getName())
+					.replaceDescription("{title}", ticketTitle)).queue();
+		}
+		if (event instanceof ButtonInteractionEvent) {
+			ButtonInteractionEvent castedEvent = (ButtonInteractionEvent) event;
+			castedEvent.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "closeSuccessAdmin")
+					.replaceDescription("{guild}", ticketGuild.getName())
+					.replaceDescription("{title}", ticketTitle)).queue();
+			Bot.INSTANCE.getTimer().schedule(new TimerTask() {
+				@Override
+				public void run() {
+					castedEvent.getChannel().delete().queue();
+				}
+			}, TimeUnit.SECONDS.toMillis(5));
+			return;
+		} else if (event instanceof SlashCommandInteractionEvent) {
+			SlashCommandInteractionEvent castedEvent = (SlashCommandInteractionEvent) event;
+			castedEvent.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "awaitConfirm")
+					.replaceDescription("{guild}", ticketGuild.getName())
+					.replaceDescription("{title}", ticketTitle)).queue();
+
+		} else if (event instanceof SelectMenuInteractionEvent) {
+			SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) event;
+			castedEvent.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "awaitConfirm")
+					.replaceDescription("{guild}", ticketGuild.getName())
+					.replaceDescription("{title}", ticketTitle)).queue();
+		}
+		ticketChannel.sendMessageEmbeds(LanguageEngine.fetchMessage(null, null, this, "closeConfirmation")
+				.replaceDescription("{user}", ticketUser.getName()))
+		.setActionRow(Button.secondary(buttonCriteria + "_confirmclose", Emoji.fromUnicode("\u2705")),
+				Button.secondary(String.valueOf(buttonCriteria + "_denyclose"), Emoji.fromUnicode("\u274C"))).queue();
+		//TODO Implement saving of user feedback message id for later use
+	}
+	
+	public void confirmclose(GenericInteractionCreateEvent event, Guild guild, User user, String ticketID) {
+		//TODO Implement confirm close function
 	}
 }

@@ -21,6 +21,7 @@ import functions.context_menu_commands.MessageContextCommandList;
 import functions.context_menu_commands.UserContextCommandList;
 import functions.slash_commands.SlashCommandList;
 import functions.slash_commands.music.Stop;
+import functions.slash_commands.support.Modmail;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Category;
@@ -47,6 +48,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
@@ -167,7 +169,7 @@ public class EventProcessor extends ListenerAdapter {
 				}
 			}
 		} else {
-			JSONArray autoroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("autoroles");
+			JSONArray autoroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("userautoroles");
 			if (!autoroles.isEmpty()) {
 				for (int i = 0; i < autoroles.length(); i++) {
 					Role role = guild.getRoleById(autoroles.getLong(i));
@@ -191,8 +193,8 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
-		Guild guild = event.getGuild();
-		User user = event.getUser();
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
 		JSONArray goodbyemsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("goodbyemsg");
 		if (!goodbyemsg.isEmpty()) {
 			if (goodbyemsg.getBoolean(3)) {
@@ -217,8 +219,8 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
-		Guild guild = event.getGuild();
-		User user = event.getUser();
+		final Guild guild = event.getGuild();
+		final User user = event.getUser();
 		if (event.getNewTimeBoosted() != null) {
 			JSONArray boostmsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("boostmsg");
 			if (!boostmsg.isEmpty()) {
@@ -306,7 +308,7 @@ public class EventProcessor extends ListenerAdapter {
 	
 	@Override
 	public void onChannelDelete(ChannelDeleteEvent event) {
-		Guild guild = event.getGuild();
+		final Guild guild = event.getGuild();
 		ConfigVerifier.RUN.guildCheck(guild);
 		if (event.isFromType(ChannelType.CATEGORY)) {
 			Category ctg = (Category) event.getChannel();
@@ -333,6 +335,34 @@ public class EventProcessor extends ListenerAdapter {
 		} else {
 			targetconfig.put("muted", false);
 			targetconfig.put("tempmuted", true);
+		}
+	}
+	
+	@Override
+	public void onButtonInteraction(ButtonInteractionEvent event) {
+		if (event.getUser().isBot()) {
+			return;
+		}
+		if (event.isFromGuild()) {
+			final Guild guild = event.getGuild();
+			final JSONObject modmails = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("modmails");
+			final String channelID = event.getChannel().getId();
+			if (modmails.keySet().contains(channelID)) {
+				String buttonIdCriteria = String.valueOf(event.getChannel().getIdLong() + guild.getIdLong());
+				JSONArray channelProperties = modmails.getJSONArray(channelID);
+				Modmail modmailCommandHandler = (Modmail) SlashCommandList.getHandler("modmail");
+				if (event.getMessageIdLong() == channelProperties.getLong(2)) {
+					if (event.getComponentId().equals(buttonIdCriteria + "_close")) {
+						modmailCommandHandler.close(event, guild, event.getJDA().getUserById(channelProperties.getLong(0)), String.valueOf(channelProperties.getLong(1)));
+					} else if (event.getComponentId().equals(buttonIdCriteria + "_confirmclose")) {
+						modmailCommandHandler.confirmclose(event, guild, event.getJDA().getUserById(channelProperties.getLong(0)), String.valueOf(channelProperties.getLong(1)));
+					} else if (event.getComponentId().equals(buttonIdCriteria + "_denyclose")) {
+						event.getMessage().delete().queue();
+						//TODO Implement ticket user feedback
+					}
+				}
+			}
+			
 		}
 	}
 	
@@ -384,7 +414,8 @@ public class EventProcessor extends ListenerAdapter {
 		int conmemb = audioChannel.getMembers().size();
 		if (conmemb == 1) {
 			if (audioChannel.getMembers().get(0).equals(guild.getSelfMember())) {
-				Stop.stopandleave(guild);
+				Stop stopCommandHandler = (Stop) SlashCommandList.getHandler("stop");
+				stopCommandHandler.stopandleave(guild);
 				conmemb--;
 			}
 		}
