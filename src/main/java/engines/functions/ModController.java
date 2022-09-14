@@ -133,11 +133,11 @@ public class ModController {
 					OffsetDateTime until = OffsetDateTime.now().plusDays(Integer.valueOf(penalty.getString(1)));
 					ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
 					ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("tempbanned", true);
-					guild.getMember(user).ban(0).queue();
+					guild.getMember(user).ban(0, TimeUnit.DAYS).reason("Too many warnings").queue();
 					this.userModCheck(guild, user);
 					break;
 				case ("pb"):
-					member.ban(0, "Too many warnings").queue();
+					member.ban(0, TimeUnit.DAYS).reason("Too many warnings").queue();
 					break;
 				default:
 					return;

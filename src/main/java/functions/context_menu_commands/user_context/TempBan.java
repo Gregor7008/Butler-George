@@ -1,6 +1,7 @@
 package functions.context_menu_commands.user_context;
 
 import java.time.OffsetDateTime;
+import java.util.concurrent.TimeUnit;
 
 import assets.base.AwaitTask;
 import assets.functions.UserContextEventHandler;
@@ -42,7 +43,7 @@ public class TempBan implements UserContextEventHandler {
 					        OffsetDateTime until = OffsetDateTime.now().plusDays(days);
 							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
 							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanned", true);
-							guild.getMember(target).ban(0).queue();
+							guild.getMember(target).ban(0, TimeUnit.DAYS).queue();
 							ModController.RUN.userModCheck(guild, target);
 							d.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
 									.replaceDescription("{user}", target.getName())

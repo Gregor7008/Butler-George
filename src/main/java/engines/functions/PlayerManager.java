@@ -15,8 +15,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import assets.functions.AudioPlayerCache;
 import engines.base.LanguageEngine;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class PlayerManager {

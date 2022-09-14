@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import assets.functions.AudioPlayerCache;
+import functions.slash_commands.SlashCommandList;
 import functions.slash_commands.music.Stop;
 
 public class TrackScheduler extends AudioEventAdapter {
@@ -31,7 +32,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		if (this.queue.poll() != null) {
 			this.player.startTrack(this.queue.poll(), false);
 		} else {
-			Stop.stopandleave(AudioPlayerCache.getInstance().getGuild(player));
+			((Stop) SlashCommandList.getHandler("stop")).stopandleave(AudioPlayerCache.getInstance().getGuild(player));
 		}
 	}
 	

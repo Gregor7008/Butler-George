@@ -23,17 +23,17 @@ import functions.slash_commands.SlashCommandList;
 import functions.slash_commands.music.Stop;
 import functions.slash_commands.support.Modmail;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.AudioChannel;
-import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildChannel;
-import net.dv8tion.jda.api.entities.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -414,8 +414,7 @@ public class EventProcessor extends ListenerAdapter {
 		int conmemb = audioChannel.getMembers().size();
 		if (conmemb == 1) {
 			if (audioChannel.getMembers().get(0).equals(guild.getSelfMember())) {
-				Stop stopCommandHandler = (Stop) SlashCommandList.getHandler("stop");
-				stopCommandHandler.stopandleave(guild);
+				((Stop) SlashCommandList.getHandler("stop")).stopandleave(guild);
 				conmemb--;
 			}
 		}
