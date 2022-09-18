@@ -67,7 +67,7 @@ public class ModController {
 				}
 			}
 			if (ConfigLoader.INSTANCE.getMemberConfig(guild, user).getBoolean("tempbanned")) {
-				OffsetDateTime tbuntil = OffsetDateTime.parse(memberConfig.getString("tempbanneduntil"), ConfigManager.dateTimeFormatter);
+				OffsetDateTime tbuntil = OffsetDateTime.parse(memberConfig.getString("tempbanneduntil"), ConfigManager.DATE_TIME_FORMATTER);
 				OffsetDateTime now = OffsetDateTime.now();
 				long difference = Duration.between(now, tbuntil).toSeconds();
 				if (difference <= 0) {
@@ -131,7 +131,7 @@ public class ModController {
 					break;
 				case ("tb"):
 					OffsetDateTime until = OffsetDateTime.now().plusDays(Integer.valueOf(penalty.getString(1)));
-					ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("tempbanneduntil", until.format(ConfigManager.dateTimeFormatter));
+					ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("tempbanneduntil", until.format(ConfigManager.DATE_TIME_FORMATTER));
 					ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("tempbanned", true);
 					guild.getMember(user).ban(0, TimeUnit.DAYS).reason("Too many warnings").queue();
 					this.userModCheck(guild, user);

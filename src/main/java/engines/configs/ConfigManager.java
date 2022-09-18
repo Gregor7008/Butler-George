@@ -34,7 +34,7 @@ import net.dv8tion.jda.api.entities.User;
 
 public class ConfigManager {
 
-	public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
+	public static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
 	
 	private static Logger LOG = ConsoleEngine.getLogger(ConfigManager.class);
 	
@@ -231,9 +231,9 @@ public class ConfigManager {
 		newConfig.put("customchannelcategory",		0L);
 		newConfig.put("experience",					0);
 		newConfig.put("language",					"en");
-		newConfig.put("lastmail", 					OffsetDateTime.now().minusDays(1).format(dateTimeFormatter));
-		newConfig.put("lastsuggestion", 			OffsetDateTime.now().minusDays(1).format(dateTimeFormatter));
-		newConfig.put("lastxpgotten", 				OffsetDateTime.now().minusDays(1).format(dateTimeFormatter));
+		newConfig.put("lastmail", 					OffsetDateTime.now().minusDays(1).format(DATE_TIME_FORMATTER));
+		newConfig.put("lastsuggestion", 			OffsetDateTime.now().minusDays(1).format(DATE_TIME_FORMATTER));
+		newConfig.put("lastxpgotten", 				OffsetDateTime.now().minusDays(1).format(DATE_TIME_FORMATTER));
 		newConfig.put("level",						0);
 		newConfig.put("levelbackground",			0);
 		newConfig.put("levelspamcount",				0);
@@ -299,7 +299,7 @@ public class ConfigManager {
 		newConfig.put("answercount",				0);
 		newConfig.put("answers",					new JSONObject());
 		newConfig.put("channel",					Long.valueOf(channelID));
-		newConfig.put("creationdate",				OffsetDateTime.now().format(dateTimeFormatter));
+		newConfig.put("creationdate",				OffsetDateTime.now().format(DATE_TIME_FORMATTER));
 		newConfig.put("daysopen",					0);
 		newConfig.put("description",				"");
 		newConfig.put("footer",						"");
