@@ -31,6 +31,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
@@ -348,21 +349,28 @@ public class EventProcessor extends ListenerAdapter {
 			final JSONObject modmails = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("modmails");
 			final String channelID = event.getChannel().getId();
 			if (modmails.keySet().contains(channelID)) {
-				String buttonIdCriteria = String.valueOf(event.getChannel().getIdLong() + guild.getIdLong());
-				JSONArray channelProperties = modmails.getJSONArray(channelID);
-				Modmail modmailCommandHandler = (Modmail) SlashCommandList.getHandler("modmail");
-				if (event.getMessageIdLong() == channelProperties.getLong(2)) {
-					if (event.getComponentId().equals(buttonIdCriteria + "_close")) {
-						modmailCommandHandler.close(event, guild, event.getJDA().getUserById(channelProperties.getLong(0)), String.valueOf(channelProperties.getLong(1)));
-					} else if (event.getComponentId().equals(buttonIdCriteria + "_confirmclose")) {
-						modmailCommandHandler.confirmclose(event, guild, event.getJDA().getUserById(channelProperties.getLong(0)), String.valueOf(channelProperties.getLong(1)));
-					} else if (event.getComponentId().equals(buttonIdCriteria + "_denyclose")) {
-						event.getMessage().delete().queue();
-						//TODO Implement ticket user feedback
-					}
+				final String buttonIdCriteria = String.valueOf(event.getChannel().getIdLong() + guild.getIdLong());
+				final String buttonId = event.getComponentId();
+				final JSONArray channelProperties = modmails.getJSONArray(channelID);
+				final Modmail modmailCommandHandler = (Modmail) SlashCommandList.getHandler("modmail");
+				final User targetUser = event.getJDA().getUserById(channelProperties.getLong(0));
+				if (buttonId.equals(buttonIdCriteria + "_close")) {
+					modmailCommandHandler.close(event, guild, targetUser, String.valueOf(channelProperties.getLong(1)));
+				} else if (buttonId.equals(buttonIdCriteria + "_confirmclose")) {
+					modmailCommandHandler.confirmclose(event, guild, targetUser, String.valueOf(channelProperties.getLong(1)));
+				} else if (buttonId.equals(buttonIdCriteria + "_denyclose")) {
+					final PrivateChannel userChannel = targetUser.openPrivateChannel().complete();
+					userChannel.retrieveMessageById(channelProperties.getLong(3)).complete().delete().queue();
+					userChannel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, targetUser, modmailCommandHandler, "closeDeniedPrivate")
+							.replaceDescription("{guild}", guild.getName())
+							.replaceDescription("{title}", ConfigLoader.INSTANCE.getMemberConfig(guild, targetUser)
+									.getJSONObject("modmails")
+									.getJSONArray(String.valueOf(channelProperties.getLong(1)))
+									.getString(1)))
+					.queue();
+					event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, event.getUser(), modmailCommandHandler, "closeDeniedAdmin")).setComponents().queue();
 				}
-			}
-			
+			}			
 		}
 	}
 	

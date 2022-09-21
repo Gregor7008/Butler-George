@@ -72,7 +72,7 @@ public abstract class LanguageEngine {
 			//lang = ConfigLoader.INSTANCE.getUserConfig(guild, user).getString("language"); <= Deactivated as translations are not ready
 		}
 		String path = "general";
-		if (requester != null && path.equals("general")) {
+		if (requester != null) {
 			path = requester.getClass().getName().replace('.', '/').toLowerCase();
 		}
 		String fullpath = "languages/" + lang + "/" + path + ".properties";
