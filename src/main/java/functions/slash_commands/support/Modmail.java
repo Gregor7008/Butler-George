@@ -130,7 +130,10 @@ public class Modmail implements SlashCommandEventHandler {
 		this.ticketSelection(event, user, null,
 				(newEvent, selection) -> {
 					final Guild finalGuild = newEvent.getJDA().getGuildById(selection[0]);
-					ConfigLoader.INSTANCE.getUserConfig(user).put("selected_ticket", new JSONArray().put(finalGuild.getIdLong()).put(Long.valueOf(selection[1])));
+					final JSONObject userConfig = ConfigLoader.INSTANCE.getUserConfig(user); 
+					final JSONArray ticketConfig = ConfigLoader.INSTANCE.getMemberConfig(finalGuild, user).getJSONObject("modmails").getJSONArray(String.valueOf(userConfig.getJSONArray("selected_ticket").getLong(1)));
+					ticketConfig.put(2, finalGuild.getTextChannelById(ticketConfig.getLong(0)).getLatestMessageIdLong());
+					userConfig.put("selected_ticket", new JSONArray().put(finalGuild.getIdLong()).put(Long.valueOf(selection[1])));
 					MessageEmbed embed = LanguageEngine.fetchMessage(finalGuild, user, this, "selectSuccess")
 							.replaceDescription("{title}", ConfigLoader.INSTANCE
 									.getMemberConfig(finalGuild, user)
@@ -144,6 +147,7 @@ public class Modmail implements SlashCommandEventHandler {
 						SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) newEvent;
 						castedEvent.editMessageEmbeds(embed).setComponents().queue();
 					}
+//					TODO Send missed messages
 				});
 	}
 
@@ -153,7 +157,10 @@ public class Modmail implements SlashCommandEventHandler {
 		this.ticketSelection(event, user, guild,
 				(newEvent, selection) -> {
 					final Guild finalGuild = newEvent.getJDA().getGuildById(selection[0]);
-					ConfigLoader.INSTANCE.getUserConfig(user).put("selected_ticket", new JSONArray().put(guild.getIdLong()).put(Long.valueOf(selection[1])));
+					final JSONObject userConfig = ConfigLoader.INSTANCE.getUserConfig(user); 
+					final JSONArray ticketConfig = ConfigLoader.INSTANCE.getMemberConfig(finalGuild, user).getJSONObject("modmails").getJSONArray(String.valueOf(userConfig.getJSONArray("selected_ticket").getLong(1)));
+					ticketConfig.put(2, finalGuild.getTextChannelById(ticketConfig.getLong(0)).getLatestMessageIdLong());
+					userConfig.put("selected_ticket", new JSONArray().put(guild.getIdLong()).put(Long.valueOf(selection[1])));
 					MessageEmbed embed = LanguageEngine.fetchMessage(finalGuild, user, this, "selectSuccess")
 							.replaceDescription("{title}", ConfigLoader.INSTANCE
 									.getMemberConfig(finalGuild, user)
@@ -167,6 +174,7 @@ public class Modmail implements SlashCommandEventHandler {
 						SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) newEvent;
 						castedEvent.editMessageEmbeds(embed).setComponents().queue();
 					}
+//					TODO Send missed messages
 				});
 	}
 
@@ -357,6 +365,7 @@ public class Modmail implements SlashCommandEventHandler {
 						menu.addOption(ticket[0], key + ";" + ticket[0], ticket[1]);
 					}
 					sB.append("`#" + ticket[0] + "` " + ticket[1] + "\n");
+//					TODO List missed message count
 				}
 			}
 		}
@@ -405,7 +414,7 @@ public class Modmail implements SlashCommandEventHandler {
 				Button.secondary(buttonCriteria + "_denyclose", Emoji.fromUnicode("\u274C")))
 		.queue();
 		if (feedbackMessage != null) {
-			ConfigLoader.INSTANCE.getGuildConfig(ticketGuild).getJSONObject("modmails").getJSONArray(ticketChannel.getId()).put(3, feedbackMessage.getIdLong());
+			ConfigLoader.INSTANCE.getGuildConfig(ticketGuild).getJSONObject("modmails").getJSONArray(ticketChannel.getId()).put(2, feedbackMessage.getIdLong());
 		}
 	}
 	
@@ -417,7 +426,7 @@ public class Modmail implements SlashCommandEventHandler {
 		final PrivateChannel userChannel = user.openPrivateChannel().complete();
 		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, event.getUser(), this, "closeSuccessAdmin")).setComponents().queue();
 		try {
-			userChannel.retrieveMessageById(channelProperties.getLong(3)).complete().delete().queue();
+			userChannel.retrieveMessageById(channelProperties.getLong(2)).complete().delete().queue();
 		} catch (JSONException e) {}
 		userChannel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "closeSuccessPrivate")
 				.replaceDescription("{guild}", guild.getName())

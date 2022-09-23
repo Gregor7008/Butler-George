@@ -27,7 +27,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 
 public abstract class Toolbox {
 
-	public static void resendMessage(MessageChannel target, Message source) {
+	public static void forwardMessage(MessageChannel target, Message source) {
 		List<Attachment> attachements = source.getAttachments();
 		List<File> files = new ArrayList<>();
 		List<String> names = new ArrayList<>();

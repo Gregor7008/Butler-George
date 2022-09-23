@@ -360,7 +360,7 @@ public class EventProcessor extends ListenerAdapter {
 					modmailCommandHandler.confirmclose(event, guild, targetUser, String.valueOf(channelProperties.getLong(1)));
 				} else if (buttonId.equals(buttonIdCriteria + "_denyclose")) {
 					final PrivateChannel userChannel = targetUser.openPrivateChannel().complete();
-					userChannel.retrieveMessageById(channelProperties.getLong(3)).complete().delete().queue();
+					userChannel.retrieveMessageById(channelProperties.getLong(2)).complete().delete().queue();
 					userChannel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, targetUser, modmailCommandHandler, "closeDeniedPrivate")
 							.replaceDescription("{guild}", guild.getName())
 							.replaceDescription("{title}", ConfigLoader.INSTANCE.getMemberConfig(guild, targetUser)
