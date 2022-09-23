@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.entities.User;
 public abstract class LanguageEngine {
 	
 	public static String footer = "Made with ❤️ by Gregor7008";
-	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
+	public static DateTimeFormatter ODT_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
 	public static int color = 56575;
 	
 	private static Logger LOG = ConsoleEngine.getLogger(ConfigManager.class);
@@ -73,7 +73,14 @@ public abstract class LanguageEngine {
 		}
 		String path = "general";
 		if (requester != null) {
-			path = requester.getClass().getName().replace('.', '/').toLowerCase();
+			String requesterName = "";
+			if (requester instanceof Class) {
+				Class<?> castedRequester = (Class<?>) requester;
+				requesterName = castedRequester.getName();
+			} else {
+				requesterName = requester.getClass().getName();
+			}
+			path = requesterName.replace('.', '/').replace("$1", "").toLowerCase();
 		}
 		String fullpath = "languages/" + lang + "/" + path + ".properties";
 		Properties properties = new Properties();

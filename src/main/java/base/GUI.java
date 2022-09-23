@@ -248,7 +248,7 @@ public class GUI extends JFrame implements FocusListener {
 		setVisible(true);
 		
 		try {
-			if (Boolean.parseBoolean(args[5])) {
+			if (Boolean.parseBoolean(args[6])) {
 				this.startBot();
 			}
 		} catch (IndexOutOfBoundsException e) {}

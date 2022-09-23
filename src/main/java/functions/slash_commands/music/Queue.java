@@ -38,35 +38,28 @@ public class Queue implements SlashCommandEventHandler {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
 			return;
 		}
-		if (queue.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noqueue")).queue();
-			return;
-		}
-		
-		final int trackCount = Math.min(queue.size(), 20);
+		final int trackCount = Math.min(queue.size(), 10);
 		final List<AudioTrack> trackList = new ArrayList<>(queue);
 		final StringBuilder sB = new StringBuilder();
-		final String temp1[] = LanguageEngine.getRaw(guild, user, this, "list").split(";");
 		
 		for (int i = 0; i < trackCount; i++) {
 			final AudioTrack track = trackList.get(i);
-			final AudioTrackInfo info = track.getInfo();
-			
 			sB.append('#')
 			  .append(String.valueOf(i+1) + " ")
-			  .append(temp1[0].replace("{title}", info.title).replace("{author}", info.author))
-			  .append("[")
-			  .append(formatTime(track.getDuration()));
-		   if (i+1 != trackCount) {
-			   sB.append("]\n");
-		   } else {
-			   sB.append("]");
+			  .append(this.formatTrackInfo(guild, user, track));
+		   if (i+1 < trackCount) {
+			   sB.append("\n");
 		   }
 		}
-		if(trackList.size() > trackCount) {
-			sB.append(temp1[1].replace("{count}", String.valueOf(trackList.size() - trackCount)));
+		if (trackList.size() > trackCount) {
+			sB.append(LanguageEngine.getRaw(guild, user, this, "list").split(";")[1].replace("{count}", String.valueOf(trackList.size() - trackCount)));
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "queue").replaceDescription("{list}", sB.toString())).queue();
+		if (sB.toString().equals("")) {
+			sB.append(LanguageEngine.getRaw(guild, user, this, "queueempty"));
+		}
+		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "queue")
+				.replaceDescription("{list}", sB.toString())
+				.replaceDescription("{current}", this.formatTrackInfo(guild, user, musicManager.audioPlayer.getPlayingTrack()))).queue();
 	}
 
 	@Override
@@ -75,6 +68,14 @@ public class Queue implements SlashCommandEventHandler {
 		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
 		   .setGuildOnly(true);
 		return command;
+	}
+	
+	private String formatTrackInfo(Guild guild, User user, AudioTrack track) {
+		final String temp1 = LanguageEngine.getRaw(guild, user, Queue.class, "list").split(";")[0];
+		final AudioTrackInfo info = track.getInfo();
+		return temp1.replace("{title}", info.title)
+		  		    .replace("{author}", info.author)
+		  		    .replace("{time}", this.formatTime(track.getDuration()));
 	}
 
 	private String formatTime(long timeInMillis) {

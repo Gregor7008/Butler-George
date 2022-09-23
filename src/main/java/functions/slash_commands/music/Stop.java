@@ -2,12 +2,10 @@ package functions.slash_commands.music;
 
 import assets.functions.SlashCommandEventHandler;
 import engines.base.LanguageEngine;
-import engines.functions.GuildMusicManager;
-import engines.functions.PlayerManager;
+import engines.base.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -34,7 +32,7 @@ public class Stop implements SlashCommandEventHandler {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
 			return;
 		}
-		this.stopandleave(guild);
+		Toolbox.stopMusicAndLeaveOn(guild);
 		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "stopped")).queue();
 	}
 
@@ -44,16 +42,5 @@ public class Stop implements SlashCommandEventHandler {
 		command.setDefaultPermissions(DefaultMemberPermissions.ENABLED)
 		   .setGuildOnly(true);
 		return command;
-	}
-	
-	public void stopandleave(Guild guild) {
-		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
-		musicManager.scheduler.player.stopTrack();
-		musicManager.scheduler.queue.clear();
-		VoiceChannel vc = (VoiceChannel) guild.getSelfMember().getVoiceState().getChannel();
-		guild.getAudioManager().closeAudioConnection();
-		if (vc.getUserLimit() != 0) {
-			vc.getManager().setUserLimit(vc.getUserLimit() - 1).queue();
-		}
 	}
 }

@@ -11,7 +11,6 @@ import functions.slash_commands.administration.Webhook;
 import functions.slash_commands.moderation.Clear;
 import functions.slash_commands.moderation.Move;
 import functions.slash_commands.moderation.Warning;
-import functions.slash_commands.music.Nowplaying;
 import functions.slash_commands.music.Play;
 import functions.slash_commands.music.Queue;
 import functions.slash_commands.music.Skip;
@@ -48,7 +47,6 @@ public abstract class SlashCommandList {
 		add(new Warning());
 		
 		//Music
-		add(new Nowplaying());
 		add(new Play());
 		add(new Queue());
 		add(new Skip());

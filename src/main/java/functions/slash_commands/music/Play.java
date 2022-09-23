@@ -36,7 +36,7 @@ public class Play implements SlashCommandEventHandler {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noVCdefined")).queue();
 			return;
 		}
-		if (self.getVoiceState().inAudioChannel()) {
+		if (self.getVoiceState().inAudioChannel() && self.getVoiceState().getChannel().getIdLong() != member.getVoiceState().getChannel().getIdLong()) {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "alreadyinuse")).queue();
 			return;
 		}

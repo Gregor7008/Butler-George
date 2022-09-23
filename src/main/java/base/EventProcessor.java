@@ -20,7 +20,6 @@ import engines.functions.LevelEngine;
 import functions.context_menu_commands.MessageContextCommandList;
 import functions.context_menu_commands.UserContextCommandList;
 import functions.slash_commands.SlashCommandList;
-import functions.slash_commands.music.Stop;
 import functions.slash_commands.support.Modmail;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -422,7 +421,7 @@ public class EventProcessor extends ListenerAdapter {
 		int conmemb = audioChannel.getMembers().size();
 		if (conmemb == 1) {
 			if (audioChannel.getMembers().get(0).equals(guild.getSelfMember())) {
-				((Stop) SlashCommandList.getHandler("stop")).stopandleave(guild);
+				Toolbox.stopMusicAndLeaveOn(guild);
 				conmemb--;
 			}
 		}
