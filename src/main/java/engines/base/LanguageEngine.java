@@ -1,6 +1,7 @@
 package engines.base;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
@@ -8,7 +9,7 @@ import javax.annotation.Nullable;
 
 import assets.base.CustomMessageEmbed;
 import assets.logging.Logger;
-import engines.configs.ConfigManager;
+import base.Bot;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,11 +17,11 @@ import net.dv8tion.jda.api.entities.User;
 
 public abstract class LanguageEngine {
 	
-	public static String footer = "Made with ❤️ by Gregor7008";
-	public static DateTimeFormatter ODT_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
-	public static int color = 56575;
+	public static DateTimeFormatter DEFAULT_TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
+	public static DateTimeFormatter SHORTENED_TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.");
+	public static int EMBED_DEFAULT_COLOR = 56575;
 	
-	private static Logger LOG = ConsoleEngine.getLogger(ConfigManager.class);
+	private static Logger LOG = ConsoleEngine.getLogger(LanguageEngine.class);
 	
 	public static CustomMessageEmbed fetchMessage(Guild guild, User user, Object requester, String key)  {
 		String raw = LanguageEngine.getRaw(guild, user, requester, key);
@@ -35,10 +36,10 @@ public abstract class LanguageEngine {
 	public static CustomMessageEmbed buildMessage(String title, String description, @Nullable String opFooter) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setTitle(title);
-		eb.setColor(color);
+		eb.setColor(EMBED_DEFAULT_COLOR);
 		eb.setDescription(description);
 		if (opFooter == null) {
-			eb.setFooter(footer);
+			eb.setFooter(LanguageEngine.getDefaultFooter());
 		} else {
 			eb.setFooter(opFooter);
 		}
@@ -64,6 +65,15 @@ public abstract class LanguageEngine {
 		} catch (IndexOutOfBoundsException e) {
 			return null;
 		}
+	}
+	
+	public static String getDefaultFooter() {
+		String footer = Bot.DEFAULT_FOOTER
+				.replace("{time}", OffsetDateTime.now().format(SHORTENED_TIME_FORMAT))
+				.replace("{bot_name}", Bot.NAME)
+				.replace("{bot_version}", Bot.VERSION);
+//				.replace("{}", ""); -> Additional variables may be added later
+		return footer;
 	}
 	
 	public static String getRaw(Guild guild, User user, Object requester, String key) {

@@ -82,11 +82,6 @@ public class Logger implements org.slf4j.Logger {
 			ConsoleEngine.getInstance().print(level, name, sB.toString());
 		}
 	}
-	
-	public void title(String title) {
-		if (this.infoEnabled)
-			ConsoleEngine.getInstance().print(Level.INFO, name, "---------| " + title + " |---------");
-	}
 
 	@Override
 	public String getName() {

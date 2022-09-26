@@ -6,10 +6,10 @@ import java.awt.event.ActionListener;
 import assets.logging.Logger;
 import base.Bot;
 import base.Bot.ShutdownReason;
+import base.GUI;
 import engines.configs.ConfigLoader;
 import engines.configs.ConfigManager;
 import engines.logging.ConsoleEngine;
-import base.GUI;
 import net.dv8tion.jda.api.JDA;
 
 public class ConsoleCommandListener implements ActionListener {
@@ -53,20 +53,7 @@ public class ConsoleCommandListener implements ActionListener {
 				}
 				break;
 			case "printCache":
-				ConsoleEngine.getLogger(ConfigManager.class).title("User-Cache");
-				ConfigLoader.INSTANCE.manager.getUserCache().forEach((id, obj) -> {
-					ConsoleEngine.getLogger(ConfigManager.class).info("->" + Bot.INSTANCE.jda.getUserById(id).getName());
-				});
-				if (ConfigLoader.INSTANCE.manager.getUserCache().isEmpty()) {
-					ConsoleEngine.getLogger(ConfigManager.class).info("EMPTY");
-				}
-				ConsoleEngine.getLogger(ConfigManager.class).title("Guild-Cache");
-				ConfigLoader.INSTANCE.manager.getGuildCache().forEach((id, obj) -> {
-					ConsoleEngine.getLogger(ConfigManager.class).info("->" + Bot.INSTANCE.jda.getGuildById(id).getName());
-				});
-				if (ConfigLoader.INSTANCE.manager.getGuildCache().isEmpty()) {
-					ConsoleEngine.getLogger(ConfigManager.class).info("EMPTY");
-				}
+				ConfigLoader.INSTANCE.manager.log();
 				break;
 			case "clearCache":
 				ConfigLoader.INSTANCE.manager.getGuildCache().clear();
@@ -74,7 +61,7 @@ public class ConsoleCommandListener implements ActionListener {
 				ConsoleEngine.getLogger(ConfigManager.class).info("Cache cleared successfully!");
 				break;
 			case "printEventAwaiter":
-				ConsoleEngine.getLogger(EventAwaiter.class).info(EventAwaiter.INSTANCE.toString());
+				EventAwaiter.INSTANCE.log();
 				break;
 			case "clearEventAwaiter":
 				EventAwaiter.INSTANCE.clear();

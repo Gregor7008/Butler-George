@@ -32,10 +32,9 @@ public class EventAwaiter extends ListenerAdapter {
 		INSTANCE = this;
 	}
 	
-	@Override
-	public String toString() {
+	public void log() {
 		StringBuilder sB = new StringBuilder();
-		String prefix = null;
+		String prefix = "";
 		if (awaitingMessageReceival.size() > 0) {
 			sB.append("Awaiting message receival (" + awaitingMessageReceival.size() + "):");
 			this.cacheToString(awaitingMessageReceival, sB);
@@ -66,10 +65,10 @@ public class EventAwaiter extends ListenerAdapter {
 			this.cacheToString(awaitingModalInteraction, sB);
 			prefix = "\n";
 		}
-		if (prefix == null) {
+		if (prefix.equals("")) {
 			sB.append("The EventAwaiter instance doesn't wait for any events at the moment!");
 		}
-		return sB.toString();
+		LOG.info(sB.toString());
 	}
 	
 	public void clear() {
