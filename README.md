@@ -58,7 +58,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 <img src="https://raw.githubusercontent.com/Gregor7008/Gregor7008/main/resources/actions/butler-george-metrics.svg" alt="Metric Stats"><br>
 
 #### 🧮 Code:
-![Code lines](https://img.shields.io/badge/lines-8.3k-blue?style=flat-square)
+![Code lines](https://img.shields.io/badge/lines-8.7k-blue?style=flat-square)
 ![Project size][storagesizeshield]<br>
 ![Java Version][javashield]
 ![Platforms][platformshield]
