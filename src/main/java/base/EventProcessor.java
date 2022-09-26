@@ -49,6 +49,7 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
@@ -152,6 +153,38 @@ public class EventProcessor extends ListenerAdapter {
 						event.replyEmbeds(embed).queue();
 					}
 				}
+			}
+		}
+	}
+	
+	@Override
+	public void onMessageReceived(MessageReceivedEvent event) {
+		if (event.getAuthor().isBot()) {
+			return;
+		}
+		final User user = event.getAuthor();
+		if (event.isFromGuild()) {
+			final Guild guild = event.getGuild();
+			final JSONObject modmailsData = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("modmails");
+			if (modmailsData.keySet().contains(event.getGuildChannel().getId())) {
+				final JSONArray modmailData = modmailsData.getJSONArray(event.getGuildChannel().getId());
+				final User ticketOwner = event.getJDA().getUserById(modmailData.getLong(0));
+				final JSONArray selectedTicketData = ConfigLoader.INSTANCE.getUserConfig(ticketOwner).getJSONArray("selected_ticket");
+				if (!selectedTicketData.isEmpty()
+						&& selectedTicketData.getLong(0) == guild.getIdLong()
+						&& selectedTicketData.getLong(1) == modmailData.getLong(1)) {
+					Toolbox.forwardMessage(ticketOwner.openPrivateChannel().complete(), event.getMessage());
+				}
+			}
+		} else {
+			final JSONArray selectedTicketData = ConfigLoader.INSTANCE.getUserConfig(user).getJSONArray("selected_ticket");
+			if (selectedTicketData.isEmpty()) {
+				event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(null, user, this, "noticket")).queue();
+			} else {
+				final Guild guild = event.getJDA().getGuildById(selectedTicketData.getLong(0));
+				final long ticketID = selectedTicketData.getLong(1);
+				final long channelID = ConfigLoader.INSTANCE.getMemberConfig(guild, user).getJSONObject("modmails").getJSONArray(String.valueOf(ticketID)).getLong(0);
+				Toolbox.forwardMessage(guild.getTextChannelById(channelID), event.getMessage());
 			}
 		}
 	}

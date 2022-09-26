@@ -80,7 +80,7 @@ public class Embed implements SlashCommandEventHandler {
 	
 	private void startEmbedConfiguration(Message message) {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setColor(LanguageEngine.color);
+		eb.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
 		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "author"))
 			 .setActionRow(Button.secondary("true", Emoji.fromUnicode("\u2705")),
 					  	   Button.secondary("false", Emoji.fromUnicode("\u274C"))).queue();

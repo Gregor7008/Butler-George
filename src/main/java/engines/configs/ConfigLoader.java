@@ -29,12 +29,12 @@ public class ConfigLoader {
 		}
 	}
 	
-	public JSONObject getFirstMemberLayerConfig(Guild guild, User user, String key) {
+	public JSONObject getMemberConfig(Guild guild, User user, String key) {
 		return this.getMemberConfig(guild, user).getJSONObject(key);
 	}
 	
-	public JSONObject getSecondMemberLayerConfig(Guild guild, User user, String key, String subKey) {
-		return this.getFirstMemberLayerConfig(guild, user, key).getJSONObject(subKey);
+	public JSONObject getMemberConfig(Guild guild, User user, String key, String subKey) {
+		return this.getMemberConfig(guild, user, key).getJSONObject(subKey);
 	}
 	
 	//Guild configs
@@ -42,16 +42,16 @@ public class ConfigLoader {
 		return manager.getGuildConfig(guild);
 	}
 	
-	public JSONObject getFirstGuildLayerConfig(Guild guild, String firstKey) {
+	public JSONObject getGuildConfig(Guild guild, String firstKey) {
 		return this.getGuildConfig(guild).getJSONObject(firstKey);
 	}
 	
-	public JSONObject getSecondGuildLayerConfig(Guild guild, String key, String subKey) {
-		return this.getFirstGuildLayerConfig(guild, key).getJSONObject(subKey);
+	public JSONObject getGuildConfig(Guild guild, String key, String subKey) {
+		return this.getGuildConfig(guild, key).getJSONObject(subKey);
 	}
 	
 	public JSONObject getThirdGuildLayerConfig(Guild guild, String key, String subKey, String subSubKey) {
-		return this.getSecondGuildLayerConfig(guild, key, subKey).getJSONObject(subSubKey);
+		return this.getGuildConfig(guild, key, subKey).getJSONObject(subSubKey);
 	}
 	
 	//Poll configs
@@ -87,7 +87,7 @@ public class ConfigLoader {
 	public JSONObject getReactionChannelConfig(Guild guild, String channelID) {
 		JSONObject config = null;
 		try {
-			config = this.getSecondGuildLayerConfig(guild, "reactionroles", channelID);
+			config = this.getGuildConfig(guild, "reactionroles", channelID);
 		} catch (JSONException e) {}
 		return config;
 	}

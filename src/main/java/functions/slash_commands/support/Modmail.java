@@ -130,35 +130,7 @@ public class Modmail implements SlashCommandEventHandler {
 		final User user = event.getUser();
 		this.ticketSelection(event, user, null,
 				(newEvent, selection) -> {
-					final Guild finalGuild = newEvent.getJDA().getGuildById(selection[0]);
-					final PrivateChannel privateChannel = user.openPrivateChannel().complete();
-					final JSONObject userConfig = ConfigLoader.INSTANCE.getUserConfig(user); 
-					final JSONArray currentTicketData = ConfigLoader.INSTANCE.getMemberConfig(finalGuild, user).getJSONObject("modmails").getJSONArray(String.valueOf(userConfig.getJSONArray("selected_ticket").getLong(1)));
-					final JSONArray newTicketData = ConfigLoader.INSTANCE.getMemberConfig(finalGuild, user).getJSONObject("modmails").getJSONArray(selection[1]);
-					currentTicketData.put(2, finalGuild.getTextChannelById(currentTicketData.getLong(0)).getLatestMessageIdLong());
-					userConfig.put("selected_ticket", new JSONArray().put(finalGuild.getIdLong()).put(Long.valueOf(selection[1])));
-					MessageEmbed embed = LanguageEngine.fetchMessage(finalGuild, user, this, "selectSuccess")
-							.replaceDescription("{title}", ConfigLoader.INSTANCE
-									.getMemberConfig(finalGuild, user)
-									.getJSONObject("modmails")
-									.getJSONArray(selection[1])
-									.getString(1))
-							.replaceDescription("{guild}", finalGuild.getName());
-					if (newEvent instanceof SlashCommandInteractionEvent) {
-						event.replyEmbeds(embed).setComponents().queue();
-					} else if (newEvent instanceof SelectMenuInteractionEvent){
-						SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) newEvent;
-						castedEvent.editMessageEmbeds(embed).setComponents().queue();
-					}
-					List<Message> missedMessages = null;
-					try {
-						missedMessages = finalGuild.getTextChannelById(newTicketData.getLong(0)).getHistoryAfter(newTicketData.getLong(2), 100).complete().getRetrievedHistory();
-					} catch (JSONException e) {}
-					if (missedMessages != null) {
-						for (int i = 0; i < missedMessages.size(); i++) {
-							Toolbox.forwardMessage(privateChannel, missedMessages.get(i));
-						}
-					}
+					this.select(newEvent, event, selection, user);
 				});
 	}
 
@@ -167,35 +139,7 @@ public class Modmail implements SlashCommandEventHandler {
 		final User user = event.getUser();
 		this.ticketSelection(event, user, guild,
 				(newEvent, selection) -> {
-					final Guild finalGuild = newEvent.getJDA().getGuildById(selection[0]);
-					final PrivateChannel privateChannel = user.openPrivateChannel().complete();
-					final JSONObject userConfig = ConfigLoader.INSTANCE.getUserConfig(user); 
-					final JSONArray currentTicketData = ConfigLoader.INSTANCE.getMemberConfig(finalGuild, user).getJSONObject("modmails").getJSONArray(String.valueOf(userConfig.getJSONArray("selected_ticket").getLong(1)));
-					final JSONArray newTicketData = ConfigLoader.INSTANCE.getMemberConfig(finalGuild, user).getJSONObject("modmails").getJSONArray(selection[1]);
-					currentTicketData.put(2, finalGuild.getTextChannelById(currentTicketData.getLong(0)).getLatestMessageIdLong());
-					userConfig.put("selected_ticket", new JSONArray().put(guild.getIdLong()).put(Long.valueOf(selection[1])));
-					MessageEmbed embed = LanguageEngine.fetchMessage(finalGuild, user, this, "selectSuccess")
-							.replaceDescription("{title}", ConfigLoader.INSTANCE
-									.getMemberConfig(finalGuild, user)
-									.getJSONObject("modmails")
-									.getJSONArray(selection[1])
-									.getString(1))
-							.replaceDescription("{guild}", finalGuild.getName());
-					if (newEvent instanceof SlashCommandInteractionEvent) {
-						event.replyEmbeds(embed).setComponents().queue();
-					} else if (newEvent instanceof SelectMenuInteractionEvent){
-						SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) newEvent;
-						castedEvent.editMessageEmbeds(embed).setComponents().queue();
-					}
-					List<Message> missedMessages = null;
-					try {
-						missedMessages = finalGuild.getTextChannelById(newTicketData.getLong(0)).getHistoryAfter(newTicketData.getLong(2), 100).complete().getRetrievedHistory();
-					} catch (JSONException e) {}
-					if (missedMessages != null) {
-						for (int i = 0; i < missedMessages.size(); i++) {
-							Toolbox.forwardMessage(privateChannel, missedMessages.get(i));
-						}
-					}
+					this.select(newEvent, event, selection, user);
 				});
 	}
 
@@ -253,25 +197,27 @@ public class Modmail implements SlashCommandEventHandler {
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessageChannel(),
 				mi -> {
-					JSONObject guildModmail = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("modmails");
-					JSONObject userModmail = ConfigLoader.INSTANCE.getMemberConfig(guild, user).getJSONObject("modmails");
+					JSONObject guildConfig = ConfigLoader.INSTANCE.getGuildConfig(guild);
+					JSONObject guildModmail = guildConfig.getJSONObject("modmails");
+					JSONObject userModmail = ConfigLoader.INSTANCE.getMemberConfig(guild, user, "modmails");
 					long id = ThreadLocalRandom.current().nextLong(1000,10000);
 					while (guildModmail.keySet().contains(String.valueOf(id)) || userModmail.keySet().contains(String.valueOf(id))) {
 						id = ThreadLocalRandom.current().nextLong(1000,10000);
 					}
 					Category modmailCategory;
-					if (ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("modmailcategory") == 0) {
+					
+					if (guildConfig.getLong("modmailcategory") == 0) {
 						modmailCategory = guild.createCategory("----------📝 ModMail ------------").complete();
-						ConfigLoader.INSTANCE.getGuildConfig(guild).put("modmailcategory", modmailCategory.getIdLong());
+						guildConfig.put("modmailcategory", modmailCategory.getIdLong());
 					} else {
-						modmailCategory = guild.getCategoryById(ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("modmailcategory"));
+						modmailCategory = guild.getCategoryById(guildConfig.getLong("modmailcategory"));
 					}
 					TextChannel ticketChannel = modmailCategory.createTextChannel(user.getName() + "-" + String.valueOf(id)).complete();
 					ticketChannel.upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VIEW_CHANNEL).queue();
 
 					String addon = "";
-					if (!ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("supportroles").isEmpty()) {
-						ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("supportroles").forEach(sr -> {
+					if (!guildConfig.getJSONArray("supportroles").isEmpty()) {
+						guildConfig.getJSONArray("supportroles").forEach(sr -> {
 							ticketChannel.upsertPermissionOverride(guild.getRoleById((long) sr)).grant(Permission.VIEW_CHANNEL).queue();
 						});
 					} else {
@@ -284,16 +230,13 @@ public class Modmail implements SlashCommandEventHandler {
 							.setActionRow(Button.secondary(String.valueOf(ticketChannel.getIdLong() + guild.getIdLong()) + "_close", Emoji.fromUnicode("\uD83D\uDD12"))).queue();
 					ticketChannel.sendMessage("**" + mi.getValue("title").getAsString() + "**\n\n" + mi.getValue("message").getAsString()).queue();
 					guildModmail.put(ticketChannel.getId(), new JSONArray().put(user.getIdLong()).put(id));
-					userModmail.put(String.valueOf(id), new JSONArray().put(ticketChannel.getIdLong()).put(mi.getValue("title").getAsString()));
+					userModmail.put(String.valueOf(id), new JSONArray().put(ticketChannel.getIdLong()).put(mi.getValue("title").getAsString()).put(0L));
 					ConfigLoader.INSTANCE.getUserConfig(user).put("selected_ticket", new JSONArray().put(guild.getIdLong()).put(id));
 					if (event instanceof SelectMenuInteractionEvent) {
 						mi.editMessageEmbeds(
 								LanguageEngine.fetchMessage(guild, user, this, "openSuccess")
 											  .replaceDescription("{guild}", guild.getName())
-											  .replaceDescription("{title}", mi.getValue("title").getAsString()),
-								LanguageEngine.fetchMessage(guild, user, this, "selectSuccess")
-											  .replaceDescription("{guild}", guild.getName())
-								  		      .replaceDescription("{title}", mi.getValue("title").getAsString())).setComponents().queue();
+											  .replaceDescription("{title}", mi.getValue("title").getAsString())).setComponents().queue();
 					} else if (event instanceof SlashCommandInteractionEvent) {
 						mi.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "openSuccess")
 								.replaceDescription("{guild}", guild.getName())
@@ -328,7 +271,7 @@ public class Modmail implements SlashCommandEventHandler {
 						guildFromKey = event.getJDA().getGuildById(k);
 					} catch (NumberFormatException e) {}
 					if (guildFromKey != null) {
-						JSONObject modmailsOpt = ConfigLoader.INSTANCE.getMemberConfig(guildFromKey, user).getJSONObject("modmails");
+						JSONObject modmailsOpt = ConfigLoader.INSTANCE.getMemberConfig(guildFromKey, user, "modmails");
 						return modmailsOpt.keySet().contains(event.getOption("ticketid").getAsString());
 					}
 					return false;
@@ -351,6 +294,42 @@ public class Modmail implements SlashCommandEventHandler {
 					String[] selectedValue = sm.getSelectedOptions().get(0).getValue().split(";");
 					onSelection.accept(sm, selectedValue);
 				}).addValidComponents(menu.getId()).append();
+	}
+	
+	private void select(GenericInteractionCreateEvent newEvent, SlashCommandInteractionEvent event, String[] selection, User user) {
+		final Guild finalGuild = newEvent.getJDA().getGuildById(selection[0]);
+		final PrivateChannel privateChannel = user.openPrivateChannel().complete();
+		final JSONObject userConfig = ConfigLoader.INSTANCE.getUserConfig(user); 
+		final JSONArray currentTicketData = ConfigLoader.INSTANCE.getMemberConfig(finalGuild, user, "modmails").getJSONArray(String.valueOf(userConfig.getJSONArray("selected_ticket").getLong(1)));
+		final JSONArray newTicketData = ConfigLoader.INSTANCE.getMemberConfig(finalGuild, user, "modmails").getJSONArray(selection[1]);
+		currentTicketData.put(2, finalGuild.getTextChannelById(currentTicketData.getLong(0)).getLatestMessageIdLong());
+		userConfig.put("selected_ticket", new JSONArray().put(finalGuild.getIdLong()).put(Long.valueOf(selection[1])));
+		MessageEmbed embed = LanguageEngine.fetchMessage(finalGuild, user, this, "selectSuccess")
+				.replaceDescription("{title}", ConfigLoader.INSTANCE
+						.getMemberConfig(finalGuild, user, "modmails")
+						.getJSONArray(selection[1])
+						.getString(1))
+				.replaceDescription("{guild}", finalGuild.getName());
+		if (newEvent instanceof SlashCommandInteractionEvent) {
+			event.replyEmbeds(embed).setComponents().queue();
+		} else if (newEvent instanceof SelectMenuInteractionEvent){
+			SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) newEvent;
+			castedEvent.editMessageEmbeds(embed).setComponents().queue();
+		}
+		List<Message> missedMessages = null;
+		try {
+			if (newTicketData.getLong(2) != 0) {
+				missedMessages = finalGuild.getTextChannelById(newTicketData.getLong(0)).getHistoryAfter(newTicketData.getLong(2), 100).complete().getRetrievedHistory();
+			}
+		} catch (JSONException e) {}
+		if (missedMessages != null) {
+			for (int i = missedMessages.size() - 1; i >= 0; i--) {
+				if (!missedMessages.get(i).getAuthor().isBot()) {
+					Toolbox.forwardMessage(privateChannel, missedMessages.get(i));
+				}
+			}
+		}
+		newTicketData.put(2, 0L);
 	}
 	
 	private String list(User user, @Nullable Guild guild, @Nullable SelectMenu.Builder menu) {
@@ -387,11 +366,13 @@ public class Modmail implements SlashCommandEventHandler {
 					}
 					int missedMessages = 0;
 					try {
-						missedMessages = guild.getTextChannelById(ticketData.getLong(0)).getHistoryAfter(ticketData.getLong(2), 100).complete().size();
+						if (ticketData.getLong(2) != 0) {
+							missedMessages = guild.getTextChannelById(ticketData.getLong(0)).getHistoryAfter(ticketData.getLong(2), 100).complete().size();
+						}
 					} catch (JSONException e) {}
 					sB.append("`#" + ticket + "` " + ticketData.getString(1));
 					if (missedMessages > 0) {
-						sB.append(" :bell: x" + String.valueOf(missedMessages));
+						sB.append(" :mailbox_with_mail:**x" + String.valueOf(missedMessages) + "**");
 					}
 					sB.append("\n");
 				}
@@ -404,11 +385,13 @@ public class Modmail implements SlashCommandEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final JSONArray selectedTicket = ConfigLoader.INSTANCE.getUserConfig(ticketUser).getJSONArray("selected_ticket");
-		final JSONArray userTicketData = ConfigLoader.INSTANCE.getMemberConfig(ticketGuild, ticketUser).getJSONObject("modmails").getJSONArray(ticketID);
+		final JSONArray userTicketData = ConfigLoader.INSTANCE.getMemberConfig(ticketGuild, ticketUser, "modmails").getJSONArray(ticketID);
 		final String ticketTitle = userTicketData.getString(1);
 		final TextChannel ticketChannel = ticketGuild.getTextChannelById(userTicketData.getLong(0));
 		final String buttonCriteria = String.valueOf(ticketChannel.getIdLong() + ticketGuild.getIdLong());
-		if (selectedTicket.getLong(0) == Long.valueOf(ticketID) && selectedTicket.getLong(1) == Long.valueOf(ticketID)) {
+		if (!selectedTicket.isEmpty() 
+				&& selectedTicket.getLong(0) == ticketGuild.getIdLong()
+				&& selectedTicket.getLong(1) == Long.valueOf(ticketID)) {
 			selectedTicket.clear();
 		};
 		Message feedbackMessage = null;
@@ -442,12 +425,12 @@ public class Modmail implements SlashCommandEventHandler {
 				Button.secondary(buttonCriteria + "_denyclose", Emoji.fromUnicode("\u274C")))
 		.queue();
 		if (feedbackMessage != null) {
-			ConfigLoader.INSTANCE.getGuildConfig(ticketGuild).getJSONObject("modmails").getJSONArray(ticketChannel.getId()).put(2, feedbackMessage.getIdLong());
+			ConfigLoader.INSTANCE.getGuildConfig(ticketGuild, "modmails").getJSONArray(ticketChannel.getId()).put(2, feedbackMessage.getIdLong());
 		}
 	}
 	
 	public void confirmclose(ButtonInteractionEvent event, Guild guild, User user, String ticketID) {
-		final JSONObject modmails = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("modmails");
+		final JSONObject modmails = ConfigLoader.INSTANCE.getGuildConfig(guild, "modmails");
 		final String channelID = event.getChannel().getId();
 		final JSONArray channelProperties = modmails.getJSONArray(channelID);
 		final JSONArray selectedTicket = ConfigLoader.INSTANCE.getUserConfig(user).getJSONArray("selected_ticket");
@@ -458,16 +441,18 @@ public class Modmail implements SlashCommandEventHandler {
 		} catch (JSONException e) {}
 		userChannel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "closeSuccessPrivate")
 				.replaceDescription("{guild}", guild.getName())
-				.replaceDescription("{title}", ConfigLoader.INSTANCE.getMemberConfig(guild, user)
-						.getJSONObject("modmails")
+				.replaceDescription("{title}", ConfigLoader.INSTANCE
+						.getMemberConfig(guild, user, "modmails")
 						.getJSONArray(String.valueOf(channelProperties.getLong(1)))
 						.getString(1)))
 		.queue();
-		if (selectedTicket.getLong(0) == guild.getIdLong() && selectedTicket.getLong(1) == Long.valueOf(ticketID)) {
+		if (!selectedTicket.isEmpty() 
+				&& selectedTicket.getLong(0) == guild.getIdLong()
+				&& selectedTicket.getLong(1) == Long.valueOf(ticketID)) {
 			selectedTicket.clear();
 		};
 		modmails.remove(channelID);
-		ConfigLoader.INSTANCE.getMemberConfig(guild, user).getJSONObject("modmails").remove(ticketID);
+		ConfigLoader.INSTANCE.getMemberConfig(guild, user, "modmails").remove(ticketID);
 		event.getChannel().delete().queueAfter(5, TimeUnit.SECONDS);
 	}
 }

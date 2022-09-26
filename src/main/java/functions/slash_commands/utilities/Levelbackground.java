@@ -62,11 +62,11 @@ public class Levelbackground implements SlashCommandEventHandler {
 		eb3.setTitle("Levelbackground 3");
 		eb4.setTitle("Levelbackground 4");
 		
-		eb0.setColor(LanguageEngine.color);
-		eb1.setColor(LanguageEngine.color);
-		eb2.setColor(LanguageEngine.color);
-		eb3.setColor(LanguageEngine.color);
-		eb4.setColor(LanguageEngine.color);
+		eb0.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
+		eb1.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
+		eb2.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
+		eb3.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
+		eb4.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
 		
 		try {
 			File file0 = new File(this.getClass().getClassLoader().getResource("levelcards/0.png").toURI());

@@ -82,7 +82,7 @@ public class Leave implements SlashCommandEventHandler {
 	
 	private User checkCategory(Category category, Guild guild) {
 		try {
-			return Bot.INSTANCE.jda.getUserById(ConfigLoader.INSTANCE.getFirstGuildLayerConfig(guild, "customchannelcategories").getLong(category.getId()));
+			return Bot.INSTANCE.jda.getUserById(ConfigLoader.INSTANCE.getGuildConfig(guild, "customchannelcategories").getLong(category.getId()));
 		} catch (JSONException e) {
 			return null;
 		}

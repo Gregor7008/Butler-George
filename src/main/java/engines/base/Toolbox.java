@@ -52,8 +52,7 @@ public abstract class Toolbox {
 		}
 		MessageCreateAction messageAction = target.sendMessage(source.getContentRaw());
 		for (int i = 0; i < files.size(); i++) {
-			File file = files.get(i);
-			messageAction.addFiles(FileUpload.fromData(file));
+			messageAction.addFiles(FileUpload.fromData(files.get(i), names.get(i)));
 		}
 		messageAction.queue(e -> files.forEach(f -> f.delete()));
 	}
@@ -103,7 +102,7 @@ public abstract class Toolbox {
 	
 	public static User checkCategory(Category category, Guild guild) {
 		try {
-			return Bot.INSTANCE.jda.getUserById(ConfigLoader.INSTANCE.getFirstGuildLayerConfig(guild, "customchannelcategories").getLong(category.getId()));
+			return Bot.INSTANCE.jda.getUserById(ConfigLoader.INSTANCE.getGuildConfig(guild, "customchannelcategories").getLong(category.getId()));
 		} catch (JSONException e) {
 			return null;
 		}
@@ -112,7 +111,7 @@ public abstract class Toolbox {
 	public static String processAutoMessage(String input, Guild guild, User user, boolean mentions) {
 		String output =  input.replace("{server}", guild.getName())
 				.replace("{membercount}", Integer.toString(guild.getMemberCount()))
-				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.ODT_FORMATTER))
+				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.DEFAULT_TIME_FORMAT))
 				.replace("{boosts}", String.valueOf(guild.getBoostCount()))
 				.replace("{level}", String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getInt("level")));
 		if (mentions) {

@@ -58,7 +58,7 @@ public class Userinfo implements SlashCommandEventHandler {
 		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(LanguageEngine.footer);
+		eb.setFooter(LanguageEngine.getDefaultFooter());
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getUser().getName() + "`", true);

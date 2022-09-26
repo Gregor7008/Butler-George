@@ -34,14 +34,14 @@ import net.dv8tion.jda.api.entities.User;
 
 public class ConfigManager {
 
-	public static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
+	public static DateTimeFormatter CONFIG_TIME_SAVE_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
 	
 	private static Logger LOG = ConsoleEngine.getLogger(ConfigManager.class);
 	
 	private MongoClient client;
 	private MongoDatabase database;
-	private MongoCollection<Document> userconfigs;
-	private MongoCollection<Document> guildconfigs;
+	private MongoCollection<Document> userConfigs;
+	private MongoCollection<Document> guildConfigs;
 	private ConcurrentHashMap<Long, JSONObject> userConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	private ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	
@@ -80,19 +80,19 @@ public class ConfigManager {
 			client = MongoClients.create(setting);
 			database = client.getDatabase(databaseName);
 			try {
-				userconfigs = database.getCollection("user");
+				userConfigs = database.getCollection("user");
 			} catch (IllegalArgumentException e) {
 				database.createCollection("user");
-				userconfigs = database.getCollection("user");
+				userConfigs = database.getCollection("user");
 			}
 			try {
-				guildconfigs = database.getCollection("guild");
+				guildConfigs = database.getCollection("guild");
 			} catch (IllegalArgumentException e) {
 				database.createCollection("guild");
-				guildconfigs = database.getCollection("guild");
+				guildConfigs = database.getCollection("guild");
 			}
 			try {
-				userconfigs.find(new Document("id", 475974084937646080L)).first();
+				userConfigs.find(new Document("id", 475974084937646080L)).first();
 			} catch (MongoSecurityException | MongoQueryException e) {
 				client.close();
 				throw new IllegalArgumentException("Authentication data invalid!");
@@ -121,24 +121,41 @@ public class ConfigManager {
 		}
 	}
 	
+	public void log() {
+		LOG.info("---------| User-Cache |---------");
+		userConfigCache.forEach((id, obj) -> {
+			LOG.info("-> " + Bot.INSTANCE.jda.retrieveUserById(id).complete().getName());
+		});
+		if (userConfigCache.isEmpty()) {
+			LOG.info("EMPTY");
+		}
+		LOG.info("---------| Guild-Cache |--------");
+		guildConfigCache.forEach((id, obj) -> {
+			LOG.info("-> " + Bot.INSTANCE.jda.getGuildById(id).getName());
+		});
+		if (guildConfigCache.isEmpty()) {
+			LOG.info("EMPTY");
+		}
+	}
+	
 	//Manage cache	
 	public boolean pushCache() {
 		try {
 			userConfigCache.forEach((id, obj) -> {
-				Document searchresult = userconfigs.find(new Document("id", Long.valueOf(id))).first();
+				Document searchresult = userConfigs.find(new Document("id", Long.valueOf(id))).first();
 				if (searchresult != null) {
-					userconfigs.replaceOne(searchresult, Document.parse(obj.toString()));
+					userConfigs.replaceOne(searchresult, Document.parse(obj.toString()));
 				} else {
-					userconfigs.insertOne(Document.parse(obj.toString()));
+					userConfigs.insertOne(Document.parse(obj.toString()));
 				}
 			});
 			userConfigCache.clear();
 			guildConfigCache.forEach((id, obj) -> {
-				Document searchresult = guildconfigs.find(new Document("id", Long.valueOf(id))).first();
+				Document searchresult = guildConfigs.find(new Document("id", Long.valueOf(id))).first();
 				if (searchresult != null) {
-					guildconfigs.replaceOne(searchresult, Document.parse(obj.toString()));
+					guildConfigs.replaceOne(searchresult, Document.parse(obj.toString()));
 				} else {
-					guildconfigs.insertOne(Document.parse(obj.toString()));
+					guildConfigs.insertOne(Document.parse(obj.toString()));
 				}
 			});
 			guildConfigCache.clear();
@@ -158,21 +175,13 @@ public class ConfigManager {
 		return guildConfigCache;
 	}
 	
-	public MongoCollection<Document> getUserCollection() {
-		return userconfigs;
-	}
-	
-	public MongoCollection<Document> getGuildCollection() {
-		return guildconfigs;
-	}
-	
 	//Get JSONObjects
 	@NonNull
 	public JSONObject getUserConfig(User user) {
 		JSONObject config = null;
 		config = userConfigCache.get(user.getIdLong());
 		if (config == null) {
-			Document doc = userconfigs.find(new Document("id", user.getIdLong())).first();
+			Document doc = userConfigs.find(new Document("id", user.getIdLong())).first();
 			if (doc != null) {
 				userConfigCache.put(user.getIdLong(), new JSONObject(doc.toJson()));
 				config = userConfigCache.get(user.getIdLong());
@@ -191,6 +200,7 @@ public class ConfigManager {
 			config = this.getUserConfig(user).getJSONObject(guild.getId());
 		} catch (JSONException e) {
 			config = this.createMemberConfig(guild, user);
+			ConfigVerifier.RUN.userCheck(guild, user);
 		}
 		return config;
 	}
@@ -200,10 +210,11 @@ public class ConfigManager {
 		JSONObject config = null;
 		config = guildConfigCache.get(guild.getIdLong());
 		if (config == null) {
-			Document doc = guildconfigs.find(new Document("id", guild.getIdLong())).first();
+			Document doc = guildConfigs.find(new Document("id", guild.getIdLong())).first();
 			if (doc != null) {
 				guildConfigCache.put(guild.getIdLong(), new JSONObject(doc.toJson()));
 				config = guildConfigCache.get(guild.getIdLong());
+				ConfigVerifier.RUN.guildCheck(guild);
 			}
 		}
 		if (config == null) {
@@ -212,7 +223,6 @@ public class ConfigManager {
 		return config;
 	}
 	
-	//Create JSONObjects
 	private JSONObject createUserConfig(User user) {
 		JSONObject newConfig = new JSONObject();
 		//Simple values
@@ -231,9 +241,9 @@ public class ConfigManager {
 		newConfig.put("customchannelcategory",		0L);
 		newConfig.put("experience",					0);
 		newConfig.put("language",					"en");
-		newConfig.put("lastmail", 					OffsetDateTime.now().minusDays(1).format(DATE_TIME_FORMATTER));
-		newConfig.put("lastsuggestion", 			OffsetDateTime.now().minusDays(1).format(DATE_TIME_FORMATTER));
-		newConfig.put("lastxpgotten", 				OffsetDateTime.now().minusDays(1).format(DATE_TIME_FORMATTER));
+		newConfig.put("lastmail", 					OffsetDateTime.now().minusDays(1).format(CONFIG_TIME_SAVE_FORMAT));
+		newConfig.put("lastsuggestion", 			OffsetDateTime.now().minusDays(1).format(CONFIG_TIME_SAVE_FORMAT));
+		newConfig.put("lastxpgotten", 				OffsetDateTime.now().minusDays(1).format(CONFIG_TIME_SAVE_FORMAT));
 		newConfig.put("level",						0);
 		newConfig.put("levelbackground",			0);
 		newConfig.put("levelspamcount",				0);
@@ -299,7 +309,7 @@ public class ConfigManager {
 		newConfig.put("answercount",				0);
 		newConfig.put("answers",					new JSONObject());
 		newConfig.put("channel",					Long.valueOf(channelID));
-		newConfig.put("creationdate",				OffsetDateTime.now().format(DATE_TIME_FORMATTER));
+		newConfig.put("creationdate",				OffsetDateTime.now().format(CONFIG_TIME_SAVE_FORMAT));
 		newConfig.put("daysopen",					0);
 		newConfig.put("description",				"");
 		newConfig.put("footer",						"");

@@ -23,7 +23,7 @@ public class Serverinfo implements SlashCommandEventHandler {
 		eb.setTitle(titles[0] + "\s" + guild.getName());
 		eb.setThumbnail(guild.getIconUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(LanguageEngine.footer);
+		eb.setFooter(LanguageEngine.getDefaultFooter());
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[1], "`" + guild.getName() + "`", true);
