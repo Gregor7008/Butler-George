@@ -90,7 +90,7 @@ public abstract class LanguageEngine {
 			} else {
 				requesterName = requester.getClass().getName();
 			}
-			path = requesterName.replace('.', '/').replace("$1", "").toLowerCase();
+			path = requesterName.replace('.', '/').replaceAll("\\$[0-9]+", "").toLowerCase();
 		}
 		String fullpath = "languages/" + lang + "/" + path + ".properties";
 		Properties properties = new Properties();

@@ -1,10 +1,12 @@
 package functions.configuration_options.server;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import assets.base.AwaitTask;
@@ -20,9 +22,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 
 public class ReactionRoles implements ConfigurationEventHandler {
 
@@ -36,22 +39,38 @@ public class ReactionRoles implements ConfigurationEventHandler {
 	public void execute(ConfigurationEvent event) {
 		this.guild = event.getGuild();
 		this.user = event.getUser();
-		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel")).queue();
-		//TODO Adept selection system to select menus
-		AwaitTask.forMessageReceival(guild, user, event.getChannel(),
+		SelectMenu.Builder menu = SelectMenu.create("selchnl")
+				.setPlaceholder("Select a channel")
+				.setRequiredRange(1, 1);
+		List<TextChannel> availableChannels = guild.getTextChannels().stream().filter(channel -> guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_ADD_REACTION)).toList();
+		availableChannels.forEach(channel -> {
+			if (channel.getTopic() != null) {
+				menu.addOption(channel.getName(), channel.getId(), channel.getTopic());
+			} else {
+				menu.addOption(channel.getName(), channel.getId());
+			}
+		});
+		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel")).setActionRow(menu.build()).queue();
+		AwaitTask.forSelectMenuInteraction(guild, user, event.getMessage(),
 				e -> {
-					if (!e.getMessage().getMentions().getChannels().isEmpty()) {
-							return e.getMessage().getMentions().getChannels().get(0).getType() == ChannelType.TEXT;
-						} else {
-							return false;
-						}
-					},
-				e -> {
-					this.channel = (TextChannel) e.getMessage().getMentions().getChannels().get(0);
+					this.channel = guild.getTextChannelById(e.getSelectedOptions().get(0).getValue());
 					if (event.getSubOperation().equals("list")) {
-						//TODO Implement list of reactionroles
+						JSONObject channelConfig = ConfigLoader.INSTANCE.getReactionChannelConfig(guild, channel.getId());
+						if (channelConfig != null) {
+							e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list")
+									.replaceDescription("{list}", this.listReactionroles(channel, null))).setComponents().queue();
+						} else {
+							e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noreactionrole")).setComponents().queue();
+						}
 					} else {
-						event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defmessage")).queue();
+						if (!event.getSubOperation().equals("add")) {
+							JSONObject channelConfig = ConfigLoader.INSTANCE.getReactionChannelConfig(guild, channel.getId());
+							if (channelConfig == null) {
+								event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noreactionrole")).queue();
+								return;
+							}
+						}
+						e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defmessage")).setComponents().queue();
 						AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 								m -> {
 									try {
@@ -62,41 +81,49 @@ public class ReactionRoles implements ConfigurationEventHandler {
 								m -> {
 									if (event.getSubOperation().equals("add")) {
 										this.defineAddRoles(event.getMessage());
-									} else if (event.getSubOperation().equals("remove")) {
-										ConfigLoader.INSTANCE.getReactionChannelConfig(guild, channel.getId()).remove(message.getId());
-										event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
-										channel.retrieveMessageById(message.getId()).complete().clearReactions().queue();
-									} else if (event.getSubOperation().equals("delete")) {
-										event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineDelEmoji")).queue();
-										AwaitTask.forReactionAdding(guild, user, event.getMessage(),
-												r -> {
-													event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
-															.replaceDescription("{emoji}", r.getReaction().getEmoji().getFormatted())).queue(a -> a.delete().queueAfter(3, TimeUnit.SECONDS));
-													JSONObject actions = ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channel.getId(), message.getId());
-													actions.remove(r.getReaction().getEmoji().getFormatted());
-													channel.retrieveMessageById(message.getId()).complete().clearReactions(r.getReaction().getEmoji()).queue();
-												}).append();
+									} else {
+										try {
+											ConfigLoader.INSTANCE.getReactionChannelConfig(guild, channel.getId()).getJSONObject(message.getId());
+										} catch (JSONException ex) {
+											event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "norrmessage")).queue();
+											return;
+										}
+										if (event.getSubOperation().equals("remove")) {
+											ConfigLoader.INSTANCE.getReactionChannelConfig(guild, channel.getId()).remove(message.getId());
+											event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));
+											channel.retrieveMessageById(message.getId()).complete().clearReactions().queue();
+										} else if (event.getSubOperation().equals("delete")) {
+											event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineDelEmoji")
+													.replaceDescription("{list}", this.listReactionroles(channel, message))).queue();
+											AwaitTask.forReactionAdding(guild, user, event.getMessage(),
+													r -> {
+														event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "delsuccess")
+																.replaceDescription("{emoji}", r.getReaction().getEmoji().getFormatted())).queue(a -> a.delete().queueAfter(3, TimeUnit.SECONDS));
+														JSONObject actions = ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channel.getId(), message.getId());
+														actions.remove(r.getReaction().getEmoji().getFormatted());
+														channel.retrieveMessageById(message.getId()).complete().clearReactions(r.getReaction().getEmoji()).queue();
+													}).append();
+										}
 									}
 								}, null).append();
 					}
-
-				}, null).append();
+				}).append();
 	}
 
 	@Override
 	public ConfigurationOptionData initialize() {
 		ConfigurationOptionData configurationOptionData = new ConfigurationOptionData(this).setName("ReactionRoles")
-													.setInfo("Configure reactions to give or remove a role")
-													.setSubOptions(new ConfigurationSubOptionData[] {
-														new ConfigurationSubOptionData("add", "Add new reactionroles to a message"),
-														new ConfigurationSubOptionData("delete", "Deactivate and delete a reactionrole from a message"),
-														new ConfigurationSubOptionData("remove", "Remove all reactionroles from a message"),
-														new ConfigurationSubOptionData("list", "List all active reactionroles")
-													})
-													.setRequiredPermissions(Permission.MANAGE_ROLES);
+																						   .setInfo("Configure reactions to give or remove a role")
+																						   .setSubOptions(new ConfigurationSubOptionData[] {
+																								          new ConfigurationSubOptionData("add", "Add new reactionroles to a message"),
+																								          new ConfigurationSubOptionData("delete", "Deactivate and delete a reactionrole from a message"),
+																								          new ConfigurationSubOptionData("remove", "Remove all reactionroles from a message"),
+																								          new ConfigurationSubOptionData("list", "List all active reactionroles")
+																						   })
+																						   .setRequiredPermissions(Permission.MANAGE_ROLES);
 		return configurationOptionData;
 	}
-	
+
 	@Override
 	public List<Permission> getRequiredPermissions() {
 		return List.of(Permission.MANAGE_ROLES, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_MANAGE);
@@ -106,34 +133,87 @@ public class ReactionRoles implements ConfigurationEventHandler {
 		msg.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddRoles")).complete();
 		ConfigLoader.INSTANCE.createReactionMessageConfig(guild, channel.getId(), message.getId());
 		AwaitTask.forMessageReceival(guild, user, message.getChannel(),
-							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
-							e -> {List<Role> roles = e.getMessage().getMentions().getRoles();
-								  this.defineAddEmojis(roles, msg);}, null).append();
+				e -> {
+					return !e.getMessage().getMentions().getRoles().isEmpty();
+				},
+				e -> {
+					List<Role> roles = e.getMessage().getMentions().getRoles();
+					this.defineAddEmojis(roles, msg);
+				}, null).append();
 	}
-	
+
 	private void defineAddEmojis(List<Role> roles, Message msg) {
 		Role role = roles.get(progress);
 		Message response = msg.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defineAddEmojis").replaceDescription("{role}", role.getAsMention())).complete();
 		AwaitTask.forReactionAdding(guild, user, response,
-				e -> {ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channel.getId(), message.getId()).put(e.getReaction().getEmoji().getFormatted(), role.getId());
-					  progress++;
-					  response.clearReactions().queue();
-					  if (progress < roles.size()) {
-						  this.defineAddEmojis(roles, response);
-					  } else {
-						  this.addReactions(response);
-					  }}).append();		
+				e -> {
+					response.clearReactions().queue();
+					CustomEmoji customEmoji = null;
+					boolean validEmoji = true;
+					try {
+						customEmoji = e.getReaction().getEmoji().asCustom();
+					} catch (IllegalStateException ex) {}
+					if (customEmoji != null) {
+						if (e.getJDA().getEmojiById(customEmoji.getIdLong()) == null) {
+							validEmoji = false;
+						}
+					}
+					if (validEmoji) {
+						ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channel.getId(), message.getId()).put(e.getReaction().getEmoji().getFormatted(), role.getIdLong());
+						progress++;
+						if (progress < roles.size()) {
+							this.defineAddEmojis(roles, response);
+						} else {
+							this.addReactions(response);
+						}
+					} else {
+						response.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalidEmoji")).queue();
+						Bot.INSTANCE.getTimer().schedule(new TimerTask() {
+							@Override
+							public void run() {
+								defineAddEmojis(roles, response);
+							}
+						}, 1500);
+					}
+				}).append();		
 	}
-	
+
 	private void addReactions(Message msg) {
 		Message response = msg.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "adding")).complete();
 		Set<String> actions = ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channel.getId(), message.getId()).keySet();
-		actions.forEach(e -> channel.retrieveMessageById(message.getId()).complete().addReaction(Emoji.fromUnicode(e)).queue());
+		actions.forEach(e -> channel.retrieveMessageById(message.getId()).complete().addReaction(Emoji.fromFormatted(e)).queue());
 		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				response.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue();
 			}
 		}, 1500);
+	}
+
+	private String listReactionroles(TextChannel channel, Message message) {
+		StringBuilder sB = new StringBuilder();
+		JSONObject channelConfig = ConfigLoader.INSTANCE.getReactionChannelConfig(guild, channel.getId());
+		List<String> messageIDs = new ArrayList<>();
+		if (message != null) {
+			messageIDs.add(message.getId());
+		} else {
+			messageIDs.addAll(channelConfig.keySet());
+		}
+		for (int a = 0; a < messageIDs.size(); a++) {
+			String messageID = messageIDs.get(a);
+			sB.append("\n**" + messageID + ":**\n");
+			JSONObject messageConfig = channelConfig.getJSONObject(messageID);
+			List<String> reactionRoleEmojis = new ArrayList<>();
+			reactionRoleEmojis.addAll(messageConfig.keySet());
+			for (int i = 0; i < reactionRoleEmojis.size(); i++) {
+				String reactionRoleEmoji = reactionRoleEmojis.get(i);
+				sB.append("#" + String.valueOf(i+1) + " ");
+				sB.append(reactionRoleEmoji + " => " + guild.getRoleById(messageConfig.getLong(reactionRoleEmoji)).getAsMention());
+				if (i + 1 < reactionRoleEmojis.size()) {
+					sB.append("\n");
+				}
+			}
+		}
+		return sB.toString();
 	}
 }

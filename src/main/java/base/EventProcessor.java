@@ -317,7 +317,7 @@ public class EventProcessor extends ListenerAdapter {
 		if (ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channelID, msgID) != null) {
 			JSONObject actions = ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channelID, msgID);
 			try {
-				guild.addRoleToMember(user, guild.getRoleById(actions.getString(event.getReaction().getEmoji().getFormatted()))).queue();
+				guild.addRoleToMember(user, guild.getRoleById(actions.getLong(event.getReaction().getEmoji().getFormatted()))).queue();
 			} catch (JSONException e) {}
 		}
 	}
