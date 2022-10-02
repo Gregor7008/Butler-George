@@ -3,7 +3,6 @@ package functions.configuration_options.server;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
@@ -14,8 +13,8 @@ import assets.functions.ConfigurationEvent;
 import assets.functions.ConfigurationEventHandler;
 import assets.functions.ConfigurationOptionData;
 import assets.functions.ConfigurationSubOptionData;
-import base.Bot;
 import engines.base.LanguageEngine;
+import engines.base.Toolbox;
 import engines.configs.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -168,12 +167,7 @@ public class ReactionRoles implements ConfigurationEventHandler {
 						}
 					} else {
 						response.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalidEmoji")).queue();
-						Bot.INSTANCE.getTimer().schedule(new TimerTask() {
-							@Override
-							public void run() {
-								defineAddEmojis(roles, response);
-							}
-						}, 1500);
+						Toolbox.scheduleOperation(() -> defineAddEmojis(roles, response), 1500);
 					}
 				}).append();		
 	}
@@ -182,12 +176,7 @@ public class ReactionRoles implements ConfigurationEventHandler {
 		Message response = msg.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "adding")).complete();
 		Set<String> actions = ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channel.getId(), message.getId()).keySet();
 		actions.forEach(e -> channel.retrieveMessageById(message.getId()).complete().addReaction(Emoji.fromFormatted(e)).queue());
-		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
-			@Override
-			public void run() {
-				response.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue();
-			}
-		}, 1500);
+		Toolbox.scheduleOperation(() -> response.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue(), 1500);
 	}
 
 	private String listReactionroles(TextChannel channel, Message message) {

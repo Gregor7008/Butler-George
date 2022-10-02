@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import base.Bot;
 import engines.configs.ConfigLoader;
@@ -64,29 +63,6 @@ public abstract class Toolbox {
 		} catch (MalformedURLException e) {
 			return false;
 		}
-	}
-	
-	public static void clearValueOfJSONObject(JSONObject jObject, String key) {
-		try {
-			jObject.getString(key);
-			jObject.put(key, "");
-			return;
-		} catch (JSONException e) {}
-		try {
-			jObject.getJSONArray(key);
-			jObject.put(key, new JSONArray());
-			return;
-		} catch (JSONException e) {}
-		try {
-			jObject.getInt(key);
-			jObject.put(key, 0);
-			return;
-		} catch (JSONException e) {}
-		try {
-			jObject.getLong(key);
-			jObject.put(key, 0L);
-			return;
-		} catch (JSONException e) {}
 	}
 	
 	public static boolean removeValueFromArray(JSONArray current, Object value) {

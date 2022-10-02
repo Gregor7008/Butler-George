@@ -110,7 +110,7 @@ public class ConfigManager {
 				}
 				executions++;
 			}
-		}, 5*60*1000);
+		}, TimeUnit.MINUTES.toMillis(5));
 	}
 	
 	private String encodeToURL(String input) {

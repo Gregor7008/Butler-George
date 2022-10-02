@@ -12,7 +12,9 @@ public abstract class MessageContextCommandList {
 	private static final HashMap<String, MessageContextEventHandler> handlers = new HashMap<>();
 	private static final HashMap<String, CommandData> data = new HashMap<>();
 	
-	public static void create() {}
+	public static void create() {
+		
+	}
 	
 	public static void add(MessageContextEventHandler handler) {
 		CommandData commandData = handler.initialize();

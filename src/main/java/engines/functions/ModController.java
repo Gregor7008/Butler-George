@@ -3,7 +3,6 @@ package engines.functions;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -12,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import base.Bot;
+import engines.base.Toolbox;
 import engines.configs.ConfigLoader;
 import engines.configs.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,15 +24,12 @@ public class ModController {
 
 	public ModController() {
 		RUN = this;
-		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
-			@Override
-			public void run() {
-				List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
-				for (int i = 0; i < guilds.size(); i++) {
-					guildModCheck(guilds.get(i));
-				}
+		Toolbox.scheduleOperation(() -> {
+			List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
+			for (int i = 0; i < guilds.size(); i++) {
+				guildModCheck(guilds.get(i));
 			}
-		}, 5*60*1000);
+		}, TimeUnit.MINUTES.toMillis(5));
 	}
 	
 	public void guildModCheck(Guild guild) {
