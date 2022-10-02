@@ -7,10 +7,10 @@
 [versionshield]: https://img.shields.io/badge/version-v2.0--dev-brightgreen?style=flat-square
 [javashield]: https://img.shields.io/badge/java-18-brightgreen?style=flat-square
 [platformshield]: https://img.shields.io/badge/platform-win%20%7C%20linux%20%7C%20osx-brightgreen?style=flat-square
-[activityshield]: https://img.shields.io/github/commit-activity/w/Gregor7008/Butler-George/V2-CommandRework?style=flat-square
-[commitssincereleaseshield]: https://img.shields.io/github/commits-since/Gregor7008/Butler-George/v1.3-beta/V2-CommandRework?style=flat-square
+[activityshield]: https://img.shields.io/github/commit-activity/w/Gregor7008/Butler-George/V2?style=flat-square
+[commitssincereleaseshield]: https://img.shields.io/github/commits-since/Gregor7008/Butler-George/v1.3-beta/V2?style=flat-square
 [contributorsshield]: https://img.shields.io/github/contributors/Gregor7008/Butler-George?style=flat-square&color=red
-[lastcommitshield]: https://img.shields.io/github/last-commit/Gregor7008/Butler-George/V2-CommandRework?style=flat-square&color=blue
+[lastcommitshield]: https://img.shields.io/github/last-commit/Gregor7008/Butler-George/V2?style=flat-square&color=blue
 [discordinvite]: https://discord.gg/6FBK9d2dDZ
 
 
@@ -99,7 +99,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
 ## 🈯 About Translating
 
  ℹ️ We're assuming you are familiar with using GitHub and have already cloned this GitHub repository!<br>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If you aren't familiar with GitHub: [Reach out](https://github.com/Gregor7008/Butler-George/tree/V2-CommandRework#-contact-us) to us we're grateful to help!<br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If you aren't familiar with GitHub: [Reach out](https://github.com/Gregor7008/Butler-George/tree/V2#-contact-us) to us we're grateful to help!<br>
 
 1. #### Quick Start
    We currently have 5 languages to choose from: English (`en`), German (`de`), Spanish (`es`), French (`fr`) and Dutch (`nl`).<br>
@@ -147,7 +147,7 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
    So... <ins>**DO NOT CHANGE THE FOLDER STRUCTURE!!!**</ins>
 
 8. #### Contributing
-   To finally commit your changes, you have three options: You may either [open a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request), send the changed files directly to a [developement team](https://github.com/Gregor7008/Butler-George/tree/V2-CommandRework#-the-team) member (contact details are on their profiles) or use one of the [contact options](https://github.com/Gregor7008/Butler-George/tree/V2-CommandRework#-contact-us) to hand over the files.
+   To finally commit your changes, you have three options: You may either [open a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request), send the changed files directly to a [developement team](https://github.com/Gregor7008/Butler-George/tree/V2#-the-team) member (contact details are on their profiles) or use one of the [contact options](https://github.com/Gregor7008/Butler-George/tree/V2#-contact-us) to hand over the files.
    
    If you want to get credit for the translations you made, please tell us when commiting the changes as well as who to credit. This may be a Discord user, a GitHub organization or a private person.
 
