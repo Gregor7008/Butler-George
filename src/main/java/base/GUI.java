@@ -1,19 +1,24 @@
 package base;
 
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JProgressBar;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -21,35 +26,47 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
-import components.base.ConsoleEngine;
+import base.Bot.ShutdownReason;
+import engines.base.ConsoleCommandListener;
+import engines.logging.ConsoleEngine;
 import net.miginfocom.swing.MigLayout;
 
-public class GUI extends JFrame implements WindowListener{
+public class GUI extends JFrame implements FocusListener {
 	
-	public static GUI get;
+	public static GUI INSTANCE;
 	private static final long serialVersionUID = 5923282583431103590L;
+	private TimerTask runtimeMeasuringTask;
 	
-	public static JTextArea console = new JTextArea();
-	public static JLabel greenLED = new JLabel();
-	public static JLabel redLED = new JLabel();
-	public static JTextField token = new JTextField();
-	public static JButton startButton = new JButton("Start");
-	public static JButton stopButton = new JButton("Stop");
-	public static JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-	public static JTextField consoleIn = new JTextField();
-	public static JProgressBar progressBar = new JProgressBar();
-	public static JLabel progressLabel = new JLabel("0%");
-	public static JTable infoTable = new JTable();
-	public static JTable commandTable = new JTable();
+	private final JLabel greenLED = new JLabel();
+	private final JLabel redLED = new JLabel();
+	private final JButton startButton = new JButton("Start");
+	private final JButton stopButton = new JButton("Stop");
+	private final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+	private final JTable infoTable = new JTable();
+	private final JTable commandTable = new JTable();
+	private final JButton showPassword = new JButton("");
+	private final JCheckBox shutdownWindowBox = new JCheckBox("");
+	private final JLabel sdWLabel = new JLabel("Custom shutdown reason:");
 	
-	private Timer runtimeRefresher;
+	public final JTextArea console = new JTextArea();
+	public final JTextField consoleIn = new JTextField();
+	
+	public final JTextField databaseIP = new JTextField();
+	public final JTextField databaseName = new JTextField();
+	public final JTextField botToken = new JTextField();
+	public final JTextField databasePort = new JTextField();
+	public final JTextField username = new JTextField();
+	public final JPasswordField password = new JPasswordField();
+	
 	public ImageIcon greenLEDOn;
 	public ImageIcon greenLEDOff;
 	public ImageIcon redLEDOn;
 	public ImageIcon redLEDOff;
-	
+	public ImageIcon eyeIconRaw;
+	public ImageIcon windowIcon;
 	
 	public static void main(String[] args) {
 		try {
@@ -61,80 +78,137 @@ public class GUI extends JFrame implements WindowListener{
 	}
 	
 	public GUI(String[] args) {
-		get = this;
+		INSTANCE = this;
+		
+		ClassLoader loader = this.getClass().getClassLoader();
 		try {
-			greenLEDOn = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/green_on.png").readAllBytes());
-			greenLEDOff = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/green_off.png").readAllBytes());
-			redLEDOn = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/red_on.png").readAllBytes());
-			redLEDOff = new ImageIcon(this.getClass().getClassLoader().getResourceAsStream("gui/red_off.png").readAllBytes());
+			greenLEDOn = new ImageIcon(loader.getResourceAsStream("gui/green_on.png").readAllBytes());
+			greenLEDOff = new ImageIcon(loader.getResourceAsStream("gui/green_off.png").readAllBytes());
+			redLEDOn = new ImageIcon(loader.getResourceAsStream("gui/red_on.png").readAllBytes());
+			redLEDOff = new ImageIcon(loader.getResourceAsStream("gui/red_off.png").readAllBytes());
+			eyeIconRaw = new ImageIcon(loader.getResourceAsStream("gui/eye_icon.png").readAllBytes());
+			windowIcon = new ImageIcon(loader.getResourceAsStream("misc/self_avatar.png").readAllBytes());
 		} catch (IOException e) {}
 		
+		setIconImage(windowIcon.getImage());
 		setSize(1200, 600);
-		setTitle(Bot.name + " - " + Bot.version);
-		setResizable(false);
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		addWindowListener(this);
-		getContentPane().setLayout(new MigLayout("", "[600,grow][200:200:200][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][510][20:n]"));
-		
-		console.setEditable(false);
+		setTitle(Bot.NAME + " - " + Bot.VERSION);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		getContentPane().setLayout(new MigLayout("", "[600,grow][125:125:125][75:75:75][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][20:n][20:n][510,grow][20:n]"));
 		
 		JScrollPane consoleScrollPane = new JScrollPane(console);
 		consoleScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		consoleScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		getContentPane().add(consoleScrollPane, "flowx,cell 0 0 1 4,grow");
-		
+		console.setEditable(false);
+		getContentPane().add(consoleScrollPane, "flowx,cell 0 0 1 6,grow");
+
 		greenLED.setIcon(greenLEDOff);
-		getContentPane().add(greenLED, "cell 3 0");
+		getContentPane().add(greenLED, "cell 4 0,alignx center");
 		
 		redLED.setIcon(redLEDOn);
-		getContentPane().add(redLED, "flowx,cell 4 0");
+		getContentPane().add(redLED, "flowx,cell 5 0,alignx center");
 		
-		token.setText("");
-		try {
-			token.setText(args[0]);
-		} catch (IndexOutOfBoundsException e) {}
-		getContentPane().add(token, "cell 1 1 4 1,grow");
-		token.setColumns(10);
+		this.setupTextField(args, databaseIP, "Server IP", 0);
+		getContentPane().add(databaseIP, "cell 1 0,growx,aligny bottom");
 		
-		startButton.addActionListener(e -> {
-			if (Bot.run == null) {
-				try {
-					new Bot(token.getText());
-				} catch (LoginException | InterruptedException | IOException e1) {
-					e1.printStackTrace();
+		this.setupTextField(args, databasePort, "Port", 1);
+		getContentPane().add(databasePort, "cell 2 0,growx,aligny bottom");
+		
+		this.setupTextField(args, databaseName, "Database name", 2);
+		getContentPane().add(databaseName, "cell 3 0,growx,aligny bottom");
+		
+		this.setupTextField(args, username, "Username", 3);
+		getContentPane().add(username, "cell 1 1 2 1,grow");
+		
+		password.setEchoChar((char) 0);
+		password.setForeground(Color.GRAY);
+		password.setName("Password");
+		password.setText(password.getName());
+		password.addFocusListener(new FocusListener() {		
+			@Override
+			public void focusLost(FocusEvent e) {
+				JPasswordField field = (JPasswordField) e.getComponent();
+				if (String.copyValueOf(field.getPassword()).equals("")) {
+					field.setText(field.getName());
+					field.setForeground(Color.GRAY);
+					field.setEchoChar((char) 0);
+				}
+			}
+			@Override
+			public void focusGained(FocusEvent e) {
+				JPasswordField field = (JPasswordField) e.getComponent();
+				if (String.copyValueOf(field.getPassword()).equals(field.getName())) {
+					field.setText("");
+					field.setForeground(Color.BLACK);
+					field.setEchoChar('*');
 				}
 			}
 		});
-		getContentPane().add(startButton, "flowx,cell 1 2,growx,aligny center");
+		try {
+			password.setText(args[4]);
+			password.setForeground(Color.BLACK);
+			password.setEchoChar('*');
+		} catch (IndexOutOfBoundsException e) {}
+		getContentPane().add(password, "cell 3 1 2 1,grow");
+		
+		showPassword.setSize(30, 20);
+		showPassword.setMargin(new Insets(0,0,0,0));
+		Image eyeIconRescaled = eyeIconRaw.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		showPassword.setIcon(new ImageIcon(eyeIconRescaled));
+		showPassword.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				password.setEchoChar((char) 0);
+	        }
+			@Override
+	        public void mouseReleased(MouseEvent e) {
+				password.setEchoChar('*');
+	        }
+		});
+		getContentPane().add(showPassword, "cell 5 1,alignx left");
+		
+		this.setupTextField(args, botToken, "Bot Token", 5);
+		getContentPane().add(botToken, "cell 1 2 5 1,grow");
+		
+		startButton.addActionListener(e -> {
+			this.startBot();
+		});
+		getContentPane().add(startButton, "flowx,cell 1 3 2 1,grow");
 		
 		stopButton.addActionListener(e -> {
-			if (Bot.run != null && Bot.run.jda != null) {
-				Bot.run.shutdown(true);	
+			if (shutdownWindowBox.isSelected()) {
+				new ShutdownWindow((reasons, additionalMessage) -> this.shutdownBot(reasons.get(0), additionalMessage));
+			} else {
+				this.shutdownBot(ShutdownReason.OFFLINE, null);
 			}
 		});
-		getContentPane().add(stopButton, "cell 2 2 3 1,growx,aligny center");
+		stopButton.setEnabled(false);
+		getContentPane().add(stopButton, "cell 3 3 3 1,grow");
 		
-		getContentPane().add(tabbedPane, "cell 1 3 4 1,grow");
+		getContentPane().add(sdWLabel, "cell 3 4 2 1,alignx right,aligny center");
+		
+		getContentPane().add(shutdownWindowBox, "cell 5 4,alignx left,aligny center");
 		
 		infoTable.setShowGrid(false);
 		infoTable.setModel(new DefaultTableModel(
 			new Object[][] {
-				{"Name:", Bot.name},
-				{"Version:", Bot.version},
-				{"ID:", Bot.id},
+				{"Name:", Bot.NAME},
+				{"Version:", Bot.VERSION},
+				{"ID:", Bot.ID},
 				{"Runtime:", "00:00:00:00"},
 				{"Errors:", 0},
 				{"Executions:", 0},
 				{"Servers:", 0},
 				{"Users:", 0},
 				{"Push Paused:", false},
-				{"Timer Cycles:", 0}
+				{"Total Pushs:", 0}
 			},
 			new String[] {
 				"key", "value"
 			}
 		) {private static final long serialVersionUID = 4012626449837340333L;
-		
+			
 		   public boolean isCellEditable(int row, int column) {
 				return false;
 		   }
@@ -147,14 +221,12 @@ public class GUI extends JFrame implements WindowListener{
 			new Object[][] {
 				{"stop", ""},
 				{"exit", ""},
-				{"giverole", "[Guild ID]  [User ID]  [Role ID]"},
-				{"removerole", "[Guild ID]  [User ID]  [Role ID]"},
-				{"kick", "[Guild ID]  [User ID]"},
-				{"ban", "[Guild ID]  [User ID]"},
-				{"unban", "[Guild ID]  [User ID]"},
 				{"warn", "[Guild ID]  [User ID]"},
 				{"pushCache", ""},
-				{"printCache", ""}
+				{"printCache", ""},
+				{"clearCache", ""},
+				{"printEventAwaiter", ""},
+				{"clearEventAwaiter", ""}
 			},
 			new String[] {
 				"key", "value"
@@ -166,17 +238,52 @@ public class GUI extends JFrame implements WindowListener{
 		   }
 		});
 		commandTable.getColumnModel().getColumn(0).setResizable(false);
+		
 		tabbedPane.addTab("Commands", null, commandTable, null);
+		getContentPane().add(tabbedPane, "cell 1 5 5 2,grow");
 		
-		getContentPane().add(consoleIn, "cell 0 4,growx,aligny center");
-		consoleIn.setColumns(10);
-		consoleIn.addActionListener(new ConsoleEngine());
-		
-		getContentPane().add(progressBar, "cell 1 4 3 1,growx,aligny center");
-		
-		getContentPane().add(progressLabel, "cell 4 4,alignx left");
+		consoleIn.addActionListener(new ConsoleCommandListener());
+		getContentPane().add(consoleIn, "cell 0 6,growx,aligny center");
 		
 		setVisible(true);
+		
+		try {
+			if (Boolean.parseBoolean(args[6])) {
+				this.startBot();
+			}
+		} catch (IndexOutOfBoundsException e) {}
+	}
+
+	private void startBot() {
+		if (Bot.INSTANCE == null || Bot.INSTANCE.isShutdown()) {
+			try {
+				new Bot(botToken.getText(), databaseIP.getText(), databasePort.getText(), databaseName.getText(), username.getText(), String.copyValueOf(password.getPassword()));
+			} catch (LoginException | InterruptedException | IOException e) {
+				ConsoleEngine.getLogger(Bot.class).error("Bot instanciation failed - Check token validity!");
+				Bot.INSTANCE.kill();
+			} catch (IllegalArgumentException e) {
+				ConsoleEngine.getLogger(Bot.class).error("Bot instanciation failed - " + e.getMessage());
+				Bot.INSTANCE.kill();
+			}
+		}
+	}
+	
+	private void setupTextField(String[] args, JTextField textField, String name, int argsIndex) {
+		textField.setForeground(Color.GRAY);
+		textField.setName(name);
+		textField.setText(name);
+		textField.addFocusListener(this);
+		try {
+			textField.setText(args[argsIndex]);
+			textField.setForeground(Color.BLACK);
+		} catch (IndexOutOfBoundsException e) {}
+	}
+	
+	public void shutdownBot(ShutdownReason reason, String additionalMessage) {
+		if (Bot.INSTANCE != null && !Bot.INSTANCE.isShutdown()) {
+			Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
+			Bot.INSTANCE.shutdown(reason, additionalMessage);
+		}
 	}
 	
 	public void setBotRunning(boolean status) {
@@ -187,13 +294,8 @@ public class GUI extends JFrame implements WindowListener{
 			redLED.setIcon(redLEDOn);
 			greenLED.setIcon(greenLEDOff);
 		}
-	}
-	
-	public void setProgress(int progress) {
-		if (0 <= progress && progress <= 100) {
-			progressBar.setValue(progress);
-			progressLabel.setText(String.valueOf(progress) + "%");
-		}
+		stopButton.setEnabled(status);
+		startButton.setEnabled(!status);
 	}
 	
 	public void increaseErrorCounter() {
@@ -204,34 +306,45 @@ public class GUI extends JFrame implements WindowListener{
 		this.setTableValue(5, (int) this.getTableValue(5) + 1);
 	}
 	
-	public void increaseCyclesCounter() {
+	public void increasePushCounter() {
 		this.setTableValue(9, (int) this.getTableValue(9) + 1);
 	}
 	
+	public void increaseMemberCounter() {
+		this.setTableValue(7, (int) this.getTableValue(7) + 1);
+	}
+	
+	public void decreaseMemberCounter() {
+		this.setTableValue(7, (int) this.getTableValue(7) - 1);
+	}
+	
+	public void updateBotBoolean() {
+		this.setTableValue(8, Bot.INSTANCE.hasErrorOccurred());
+	}
+	
 	public void updateStatistics() {
-		GUI.get.setTableValue(6, Bot.run.jda.getGuilds().size());
-		GUI.get.setTableValue(7, Bot.run.jda.getUsers().size());
+		this.setTableValue(6, Bot.INSTANCE.jda.getGuilds().size());
+		this.setTableValue(7, Bot.INSTANCE.jda.getUsers().size());
 	}
 	
 	public void startRuntimeMeasuring() {
 		OffsetDateTime startTime = OffsetDateTime.now();
-		runtimeRefresher = new Timer();
-		runtimeRefresher.schedule(new TimerTask() {
+		runtimeMeasuringTask = new TimerTask() {
 			@Override
 			public void run() {
 				Duration diff = Duration.between(startTime, OffsetDateTime.now());
-				GUI.get.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
+				GUI.INSTANCE.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
 						diff.toDays(),
-                        diff.toHours(), 
-                        diff.toMinutesPart(), 
-                        diff.toSecondsPart()));
+	                    diff.toHours(), 
+	                    diff.toMinutesPart(), 
+	                    diff.toSecondsPart()));
 			}
-		}, 0, 1000);
+		};
+		Bot.INSTANCE.getTimer().schedule(runtimeMeasuringTask, 0, 1000);
 	}
 	
 	public void stopRuntimeMeasuring() {
-		runtimeRefresher.cancel();
-		runtimeRefresher = null;
+		runtimeMeasuringTask.cancel();
 	}
 	
 	public void setTableValue(int row, Object value) {
@@ -242,32 +355,22 @@ public class GUI extends JFrame implements WindowListener{
 	public Object getTableValue(int row) {
 		return infoTable.getModel().getValueAt(row, 1);
 	}
-
+	
 	@Override
-	public void windowOpened(WindowEvent e) {}
-
-	@Override
-	public void windowClosing(WindowEvent e) {
-		if (Bot.run != null && Bot.run.jda != null) {
-			Bot.run.shutdown(true);	
+	public void focusGained(FocusEvent e) {
+		JTextField textField = (JTextField) e.getComponent();
+		if (textField.getText().equals(textField.getName())) {
+			textField.setForeground(Color.BLACK);
+			textField.setText("");
 		}
-		e.getWindow().dispose();
 	}
 
 	@Override
-	public void windowClosed(WindowEvent e) {
-		System.exit(0);
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {}
-
-	@Override
-	public void windowActivated(WindowEvent e) {}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {}	
+	public void focusLost(FocusEvent e) {
+		JTextField textField = (JTextField) e.getComponent();
+		if (textField.getText().equals(textField.getName()) || textField.getText().equals("")) {
+			textField.setForeground(Color.GRAY);
+			textField.setText(textField.getName());
+		}
+	}	
 }

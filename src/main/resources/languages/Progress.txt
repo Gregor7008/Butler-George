@@ -1,5 +1,0 @@
-de => not started
-en => completed by default
-es => not started
-fr => not started
-nl => not started
