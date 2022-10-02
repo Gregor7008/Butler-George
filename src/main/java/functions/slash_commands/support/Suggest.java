@@ -7,8 +7,8 @@ import java.time.format.DateTimeFormatter;
 
 import assets.functions.SlashCommandEventHandler;
 import engines.base.LanguageEngine;
-import engines.configs.ConfigLoader;
-import engines.configs.ConfigManager;
+import engines.data.ConfigLoader;
+import engines.data.ConfigManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

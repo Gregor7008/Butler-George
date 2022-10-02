@@ -1,4 +1,4 @@
-package engines.configs;
+package engines.data;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -227,7 +227,7 @@ public class ConfigManager {
 		JSONObject newConfig = new JSONObject();
 		//Simple values
 		newConfig.put("id",							user.getIdLong());
-		newConfig.put("selected_ticketee",			new JSONArray());
+		newConfig.put("selected_ticket",			new JSONArray());
 		
 		userConfigCache.put(user.getIdLong(), newConfig);
 		return newConfig;

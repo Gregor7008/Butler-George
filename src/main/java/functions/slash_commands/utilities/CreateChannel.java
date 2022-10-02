@@ -7,7 +7,7 @@ import org.json.JSONArray;
 
 import assets.functions.SlashCommandEventHandler;
 import engines.base.LanguageEngine;
-import engines.configs.ConfigLoader;
+import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;

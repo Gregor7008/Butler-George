@@ -1,4 +1,4 @@
-package engines.configs;
+package engines.data;
 
 import java.util.ArrayList;
 import java.util.List;

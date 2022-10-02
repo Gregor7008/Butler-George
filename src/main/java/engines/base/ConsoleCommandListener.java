@@ -7,8 +7,8 @@ import assets.logging.Logger;
 import base.Bot;
 import base.Bot.ShutdownReason;
 import base.GUI;
-import engines.configs.ConfigLoader;
-import engines.configs.ConfigManager;
+import engines.data.ConfigLoader;
+import engines.data.ConfigManager;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.JDA;
 

@@ -14,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import base.Bot;
-import engines.configs.ConfigLoader;
+import engines.data.ConfigLoader;
 import engines.functions.GuildMusicManager;
 import engines.functions.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;

@@ -8,7 +8,7 @@ import org.json.JSONException;
 import assets.functions.SlashCommandEventHandler;
 import base.Bot;
 import engines.base.LanguageEngine;
-import engines.configs.ConfigLoader;
+import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;

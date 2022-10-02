@@ -12,7 +12,7 @@ import assets.functions.ConfigurationOptionData;
 import assets.functions.ConfigurationSubOptionData;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
-import engines.configs.ConfigLoader;
+import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -33,7 +33,7 @@ public class StaticRoles implements ConfigurationEventHandler {
 				Button.secondary("adminroles", Emoji.fromUnicode("\u2696")),
 				Button.secondary("moderationroles", Emoji.fromUnicode("\uD83D\uDC6E")),
 				Button.secondary("supportroles", Emoji.fromUnicode("\uD83D\uDEA8")),
-				Button.secondary("customchannelaccessroles", Emoji.fromUnicode("\uD83D\uDD12"))).queue();
+				Button.secondary("customchannelpolicingroles", Emoji.fromUnicode("\uD83D\uDD12"))).queue();
 		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
 				b -> {
 					String type = b.getComponentId();

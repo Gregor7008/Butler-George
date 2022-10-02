@@ -20,7 +20,7 @@ import org.apache.commons.io.FileUtils;
 import assets.functions.SlashCommandEventHandler;
 import assets.logging.Logger;
 import engines.base.LanguageEngine;
-import engines.configs.ConfigLoader;
+import engines.data.ConfigLoader;
 import engines.functions.LevelEngine;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;

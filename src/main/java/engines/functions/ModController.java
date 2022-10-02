@@ -12,8 +12,8 @@ import org.json.JSONObject;
 
 import base.Bot;
 import engines.base.Toolbox;
-import engines.configs.ConfigLoader;
-import engines.configs.ConfigManager;
+import engines.data.ConfigLoader;
+import engines.data.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
