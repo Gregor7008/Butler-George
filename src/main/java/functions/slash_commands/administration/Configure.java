@@ -2,6 +2,7 @@ package functions.slash_commands.administration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import assets.base.AwaitTask;
 import assets.functions.ConfigurationEvent;
@@ -10,6 +11,7 @@ import assets.functions.ConfigurationSubOptionData;
 import assets.functions.SlashCommandEventHandler;
 import engines.base.LanguageEngine;
 import functions.configuration_options.ServerConfigurationOptionsList;
+import functions.configuration_options.UserConfigurationOptionsList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -39,13 +41,27 @@ public class Configure implements SlashCommandEventHandler {
 				menuBuilder1.addOption(name, name);
 				eb1.addField("`" + name + "`", data.getInfo(), true);
 			});
+		} else if (event.getSubcommandName().equals("user")) {
+//			UserConfigurationOptionsList.getConfigurationOptionData().forEach(data -> {
+//				String name = data.getName();
+//				menuBuilder1.addOption(name, name);
+//				eb1.addField("`" + name + "`", data.getInfo(), true);
+//			});
+			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, null, "unsupportedBG")).queue();
+			return;
 		}
 		
 		SelectMenu menu = menuBuilder1.build();
 		Message msg = event.replyEmbeds(eb1.build()).addActionRow(menu).complete().retrieveOriginal().complete();
 		AwaitTask.forSelectMenuInteraction(guild, user, msg,
 				e -> {
-					ConfigurationOptionData data = ServerConfigurationOptionsList.getConfigurationOptionData(e.getSelectedOptions().get(0).getValue());
+					AtomicReference<ConfigurationOptionData> dataBlocker = new AtomicReference<>();
+					if (event.getSubcommandName().equals("server")) {
+						dataBlocker.set(ServerConfigurationOptionsList.getConfigurationOptionData(e.getSelectedOptions().get(0).getValue()));
+					} else if (event.getSubcommandName().equals("user")) {
+						dataBlocker.set(UserConfigurationOptionsList.getConfigurationOptionData(e.getSelectedOptions().get(0).getValue()));
+					}
+					ConfigurationOptionData data = dataBlocker.get();
 					List<Permission> requiredBotPermissions = data.getConfigurationEventHandler().getRequiredPermissions();
 					boolean insufficientPermissions = false;
 					StringBuilder sB = new StringBuilder();
@@ -88,7 +104,8 @@ public class Configure implements SlashCommandEventHandler {
 	@Override
 	public CommandData initialize() {
 		CommandData command = Commands.slash("configure", "0")
-									  .addSubcommands(new SubcommandData("server", "Configure channels, roles and auto actions for your server!"));
+									  .addSubcommands(new SubcommandData("server", "Configure channels, roles and auto actions for your server!"))
+									  .addSubcommands(new SubcommandData("user", "Configure warnings, experience and penalties for a user!"));
 		command.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER))
 			   .setGuildOnly(true);
 		return command;

@@ -21,6 +21,7 @@ import engines.configs.ConfigVerifier;
 import engines.functions.ModController;
 import engines.logging.ConsoleEngine;
 import functions.configuration_options.ServerConfigurationOptionsList;
+import functions.configuration_options.UserConfigurationOptionsList;
 import functions.context_menu_commands.MessageContextCommandList;
 import functions.context_menu_commands.UserContextCommandList;
 import functions.guild_utilities.GuildUtilitiesList;
@@ -76,6 +77,7 @@ public class Bot {
 		new ConfigVerifier();
 //	    Lists
 	    ServerConfigurationOptionsList.create();
+	    UserConfigurationOptionsList.create();
 	    MessageContextCommandList.create();
 	    UserContextCommandList.create();
 	    GuildUtilitiesList.create();
