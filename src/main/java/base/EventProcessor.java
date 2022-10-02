@@ -446,7 +446,7 @@ public class EventProcessor extends ListenerAdapter {
 				nc.getManager().setUserLimit(channelConfig.getInt("limit")).queue();
 			}
 			guild.moveVoiceMember(member, nc).queue();
-			createdChannels.getJSONObject(audioChannel.getId()).put(nc.getId(), new JSONArray().put(0, member.getUser().getIdLong()).put(1, index));
+			createdChannels.getJSONObject(audioChannel.getId()).put(nc.getId(), new JSONArray().put(member.getUser().getIdLong()).put(index));
 		}
 	}
 	
@@ -478,11 +478,17 @@ public class EventProcessor extends ListenerAdapter {
 						JSONArray subChannelData = parentChannelData.getJSONArray(subChannels.get(a));
 						VoiceChannel target = guild.getVoiceChannelById(subChannels.get(a));
 						int currentIndex = subChannelData.getInt(1);
+						Member owner = guild.retrieveMemberById(subChannelData.getLong(0)).complete();
+						String namePattern = parentChannelConfig.getString("name");
+						String name = namePattern.replace("{member}",owner.getEffectiveName())
+								.replace("{number}", String.valueOf(currentIndex));
+						String newName = namePattern .replace("{member}", owner.getEffectiveName())
+								.replace("{number}", String.valueOf(currentIndex - 1));
 						if (subChannelData.getInt(1) > index
-								&& parentChannelConfig.getString("name").contains("{number}")
-								&& target.getName().contains(String.valueOf(currentIndex))) {
-							target.getManager().setName(target.getName().replaceFirst(String.valueOf(currentIndex), String.valueOf(currentIndex - 1))).queue();
-							subChannelData.put(1, currentIndex + 1);
+								&& namePattern.contains("{number}")
+								&& target.getName().equals(name)) {
+							target.getManager().setName(newName).queue();
+							subChannelData.put(1, currentIndex - 1);
 						}
 					}				
 				} else {
