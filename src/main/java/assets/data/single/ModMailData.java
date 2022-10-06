@@ -4,12 +4,11 @@ import org.json.JSONObject;
 
 import assets.data.DataContainer;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-public class PollData implements DataContainer {
+public class ModMailData implements DataContainer {
 
-	public PollData(Guild guild, JSONObject rawData) {
+	public ModMailData(Guild guild, JSONObject rawData) {
 
 	}
 
@@ -18,11 +17,7 @@ public class PollData implements DataContainer {
         return null;
     }
 
-    public TextChannel getChannel() {
-        return null;
-    }
-
-    public Message getMessage() {
+    public TextChannel getGuildChannel() {
         return null;
     }
 }
