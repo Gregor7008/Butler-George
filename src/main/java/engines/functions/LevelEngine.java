@@ -14,8 +14,7 @@ import engines.data.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -40,12 +39,12 @@ public class LevelEngine {
 		this.givexp(event.getGuild(), event.getUser(), time, 20, 30);
 	}
 
-	public void voicejoin(GuildVoiceJoinEvent event) {
+	public void voicejoin(GuildVoiceUpdateEvent event) {
 		OffsetDateTime time = java.time.OffsetDateTime.now();
 		this.givexp(event.getGuild(), event.getMember().getUser(), time, 50, 600);
 	}
 	
-	public void voicemove(GuildVoiceMoveEvent event) {
+	public void voicemove(GuildVoiceUpdateEvent event) {
 		OffsetDateTime time = java.time.OffsetDateTime.now();
 		this.givexp(event.getGuild(), event.getMember().getUser(), time, 50, 600);
 	}

@@ -34,7 +34,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -42,9 +41,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateBoostTimeEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
@@ -53,6 +50,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -277,32 +275,18 @@ public class EventProcessor extends ListenerAdapter {
 	}
 	
 	@Override
-	public void onGuildVoiceMove(GuildVoiceMoveEvent event) {
+	public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
 		if (event.getMember().getUser().isBot()) {
 			return;
 		}
-		this.managej2cjoin(event.getGuild(), event.getMember(), event.getChannelJoined());
-		this.managej2cleave(event.getGuild(), event.getMember().getUser(), event.getChannelLeft());
+		if (event.getChannelJoined() != null) {
+		    this.managej2cjoin(event.getGuild(), event.getMember(), event.getChannelJoined());
+		    LevelEngine.getInstance().voicejoin(event);
+		} else if (event.getChannelLeft() != null) {
+		    this.managej2cleave(event.getGuild(), event.getMember().getUser(), event.getChannelLeft());
+		    LevelEngine.getInstance().voicemove(event);
+		}
 		
-		LevelEngine.getInstance().voicemove(event);
-	}
-	
-	@Override
-	public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
-		if (event.getMember().getUser().isBot()) {
-			return;
-		}
-		this.managej2cjoin(event.getGuild(), event.getMember(), event.getChannelJoined());
-		
-		LevelEngine.getInstance().voicejoin(event);
-	}
-	
-	@Override
-	public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
-		if (event.getMember().getUser().isBot()) {
-			return;
-		}
-		this.managej2cleave(event.getGuild(), event.getMember().getUser(), event.getChannelLeft());
 	}
 	
 	@Override

@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import com.mongodb.lang.Nullable;
 
 import base.Bot;
 import engines.base.EventAwaiter;
@@ -53,7 +53,7 @@ public class AwaitTask<T extends GenericEvent> {
 	}
 	
 	public static AwaitTask<MessageReceivedEvent> forMessageReceival(Guild guild, User user, MessageChannel channel,
-			@Nullable Predicate<MessageReceivedEvent> additionalPredicate, Consumer<MessageReceivedEvent> onSuccess, @Nullable Runnable onTimeout) {
+			@Nullable Predicate<MessageReceivedEvent> additionalPredicate, Consumer<MessageReceivedEvent> onSuccess, @com.mongodb.lang.Nullable Runnable onTimeout) {
 		return new AwaitTask<MessageReceivedEvent>(AwaitedEvent.MESSAGE_RECEIVED_EVENT, guild, user, channel, additionalPredicate, onSuccess, onTimeout);
 	}
 	

@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
-import javax.annotation.Nullable;
+import com.mongodb.lang.Nullable;
 
 import assets.base.CustomMessageEmbed;
 import assets.logging.Logger;
