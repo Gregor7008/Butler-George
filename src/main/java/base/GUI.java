@@ -334,8 +334,8 @@ public class GUI extends JFrame implements FocusListener {
 			public void run() {
 				Duration diff = Duration.between(startTime, OffsetDateTime.now());
 				GUI.INSTANCE.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
-						diff.toDays(),
-	                    diff.toHours(), 
+						diff.toDaysPart(),
+	                    diff.toHoursPart(), 
 	                    diff.toMinutesPart(), 
 	                    diff.toSecondsPart()));
 			}
