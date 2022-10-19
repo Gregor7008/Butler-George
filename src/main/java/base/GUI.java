@@ -32,6 +32,7 @@ import javax.swing.table.DefaultTableModel;
 import base.Bot.ShutdownReason;
 import engines.base.ConsoleCommandListener;
 import engines.logging.ConsoleEngine;
+import net.dv8tion.jda.api.entities.Guild;
 import net.miginfocom.swing.MigLayout;
 
 public class GUI extends JFrame implements FocusListener {
@@ -323,8 +324,14 @@ public class GUI extends JFrame implements FocusListener {
 	}
 	
 	public void updateStatistics() {
-		this.setTableValue(6, Bot.INSTANCE.jda.getGuilds().size());
-		this.setTableValue(7, Bot.INSTANCE.jda.getUsers().size());
+		int guildCount = 0;
+		int userCount = 0;
+		for (Guild guild : Bot.INSTANCE.jda.getGuilds()) {
+			guildCount++;
+			userCount += guild.getMemberCount();
+		}
+		this.setTableValue(6, guildCount);
+		this.setTableValue(7, userCount);
 	}
 	
 	public void startRuntimeMeasuring() {
