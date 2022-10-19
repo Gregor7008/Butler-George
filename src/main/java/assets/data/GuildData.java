@@ -26,94 +26,101 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 public class GuildData implements DataContainer {
 
 	private final Guild guild;
-	private List<Role> admin_roles, custom_channel_policing_roles, moderation_roles, support_roles, bot_auto_roles, user_auto_roles;
+	private List<Role> admin_roles = new LinkedList<>();
+	private List<Role> custom_channel_policing_roles = new LinkedList<>();
+	private List<Role> moderation_roles = new LinkedList<>();
+	private List<Role> support_roles = new LinkedList<>();
+	private List<Role> bot_auto_roles = new LinkedList<>();
+	private List<Role> user_auto_roles = new LinkedList<>();
 	private AutoMessageData boost_message, goodbye_message, level_up_message, welcome_message;
 	private TextChannel community_inbox_channel, moderation_inbox_channel, suggestion_inbox_channel;
 	private VoiceChannel support_talk;
-	private ConcurrentHashMap<VoiceChannel, Join2CreateChannelData> join2create_channels;
-	private ConcurrentHashMap<VoiceChannel, VoiceChannel> join2create_channel_links;
-	private ConcurrentHashMap<Category, Member> custom_channel_categories;
 	private Message offline_message;
-	private ConcurrentHashMap<Integer, Role> level_rewards;
-	private ConcurrentHashMap<Integer, PenaltyData> penalties;
-	private ConcurrentHashMap<TextChannel, ModMailData> modmails;
-	private ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, PollData>> polls;
-	private ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, ReactionRoleData>> reaction_roles;
+	private ConcurrentHashMap<VoiceChannel, Join2CreateChannelData> join2create_channels = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<VoiceChannel, VoiceChannel> join2create_channel_links = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Category, Member> custom_channel_categories = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Integer, Role> level_rewards = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Integer, PenaltyData> penalties = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<TextChannel, ModMailData> modmails = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, PollData>> polls = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, ReactionRoleData>> reaction_roles = new ConcurrentHashMap<>();
 
 	public GuildData(JSONObject data) {
-		this.guild = Bot.INSTANCE.jda.getGuildById(data.getLong(DataKey.GUILD_ID));
-
-		this.admin_roles = this.getRolesFromArrayKeys(DataKey.STATIC_ROLES, DataKey.ADMIN_ROLES, data);
-		this.custom_channel_policing_roles = this.getRolesFromArrayKeys(DataKey.STATIC_ROLES, DataKey.CUSTOM_CHANNEL_POLICING_ROLES, data);
-		this.moderation_roles = this.getRolesFromArrayKeys(DataKey.STATIC_ROLES, DataKey.MODERATION_ROLES, data);
-		this.support_roles = this.getRolesFromArrayKeys(DataKey.STATIC_ROLES, DataKey.SUPPORT_ROLES, data);
-		this.bot_auto_roles = this.getRolesFromArrayKeys(DataKey.AUTO_ROLES, DataKey.BOT_AUTO_ROLES, data);
-		this.user_auto_roles = this.getRolesFromArrayKeys(DataKey.AUTO_ROLES, DataKey.USER_AUTO_ROLES, data);
-
-		JSONObject auto_messages = data.getJSONObject(DataKey.AUTO_MESSAGES);
-		this.boost_message = new AutoMessageData(guild, auto_messages.getJSONObject(DataKey.BOOST_MESSAGE));
-		this.goodbye_message = new AutoMessageData(guild, auto_messages.getJSONObject(DataKey.GOODBYE_MESSAGE));
-		this.level_up_message = new AutoMessageData(guild, auto_messages.getJSONObject(DataKey.LEVEL_UP_MESSAGE));
-		this.welcome_message = new AutoMessageData(guild, auto_messages.getJSONObject(DataKey.WELCOME_MESSAGE));
-
-		JSONObject static_channels = data.getJSONObject(DataKey.STATIC_CHANNELS);
-		this.community_inbox_channel = guild.getTextChannelById(static_channels.getLong(DataKey.COMMUNITY_INBOX_CHANNEL));
-		this.moderation_inbox_channel = guild.getTextChannelById(static_channels.getLong(DataKey.MODERATION_INBOX_CHANNEL));
-		this.suggestion_inbox_channel = guild.getTextChannelById(static_channels.getLong(DataKey.SUGGESTION_INBOX_CHANNEL));
-
-		this.support_talk = guild.getVoiceChannelById(static_channels.getLong(DataKey.SUPPORT_TALK));
-
-		JSONArray offline_message_data = data.getJSONObject(DataKey.STATIC_MESSAGES).getJSONArray(DataKey.OFFLINE_MESSAGE);
-		this.offline_message = guild.getTextChannelById(offline_message_data.getLong(1)).retrieveMessageById(offline_message_data.getLong(0)).complete();
-
-		this.join2create_channels = new ConcurrentHashMap<>();
-		JSONObject j2c_channels_data = data.getJSONObject(DataKey.AUTO_CHANNELS).getJSONObject(DataKey.JOIN2CREATE_CHANNELS);
-		j2c_channels_data.keySet().forEach(channelId -> join2create_channels.put(guild.getVoiceChannelById(channelId), new Join2CreateChannelData(guild, j2c_channels_data.getJSONObject(channelId))));
-
-		this.join2create_channel_links = new ConcurrentHashMap<>();
-		JSONObject j2c_channels_link_data = data.getJSONObject(DataKey.AUTO_CHANNELS).getJSONObject(DataKey.JOIN2CREATE_CHANNEL_LINKS);
-		j2c_channels_link_data.keySet().forEach(channelId -> join2create_channel_links.put(guild.getVoiceChannelById(channelId), guild.getVoiceChannelById(j2c_channels_data.getLong(channelId))));
-
-		this.custom_channel_categories = new ConcurrentHashMap<>();
-		JSONObject cc_categories_data = data.getJSONObject(DataKey.AUTO_CHANNELS).getJSONObject(DataKey.CUSTOM_CHANNEL_CATEGORIES);
-		cc_categories_data.keySet().forEach(categoryId -> custom_channel_categories.put(guild.getCategoryById(categoryId), guild.getMemberById(cc_categories_data.getLong(categoryId))));
-
-		this.level_rewards = new ConcurrentHashMap<>();
-		JSONObject lvl_reward_data = data.getJSONObject(DataKey.OTHER).getJSONObject(DataKey.LEVEL_REWARDS);
-		lvl_reward_data.keySet().forEach(level_count -> level_rewards.put(Integer.valueOf(level_count), guild.getRoleById(lvl_reward_data.getLong(level_count))));
-
-		this.penalties = new ConcurrentHashMap<>();
-		JSONObject penalties_data = data.getJSONObject(DataKey.OTHER).getJSONObject(DataKey.PENALTIES);
-		penalties_data.keySet().forEach(warning_count -> penalties.put(Integer.valueOf(warning_count), new PenaltyData(guild, penalties_data.getJSONObject(warning_count))));
-
-		this.modmails = new ConcurrentHashMap<>();
-		JSONObject modmails_data = data.getJSONObject(DataKey.OTHER).getJSONObject(DataKey.MODMAILS);
-		modmails_data.keySet().forEach(channelId -> modmails.put(guild.getTextChannelById(channelId), new ModMailData(guild, modmails_data.getJSONObject(channelId))));
-
-		this.polls = new ConcurrentHashMap<>();
-		JSONObject polls_data = data.getJSONObject(DataKey.OTHER).getJSONObject(DataKey.POLLS);
-		polls_data.keySet().forEach(channelId -> {
-			TextChannel channel = guild.getTextChannelById(channelId);
-			ConcurrentHashMap<Message, PollData> pollSubMap = new ConcurrentHashMap<>();
-			JSONObject polls_sub_data = polls_data.getJSONObject(channelId);
-			polls_sub_data.keySet().forEach(messageId -> {
-				pollSubMap.put(channel.retrieveMessageById(messageId).complete(), new PollData(guild, polls_sub_data.getJSONObject(messageId)));
-			});
-			polls.put(channel, pollSubMap);
-		});
-
-		this.reaction_roles = new ConcurrentHashMap<>();
-		JSONObject reaction_roles_data = data.getJSONObject(DataKey.OTHER).getJSONObject(DataKey.REACTION_ROLES);
-		reaction_roles_data.keySet().forEach(channelId -> {
-			TextChannel channel = guild.getTextChannelById(channelId);
-			ConcurrentHashMap<Message, ReactionRoleData> reactionRoleSubMap = new ConcurrentHashMap<>();
-			JSONObject reaction_role_sub_data = reaction_roles_data.getJSONObject(channelId);
-			reaction_role_sub_data.keySet().forEach(messageId -> {
-				reactionRoleSubMap.put(channel.retrieveMessageById(messageId).complete(), new ReactionRoleData(guild, reaction_role_sub_data.getJSONObject(messageId)));
-			});
-			reaction_roles.put(channel, reactionRoleSubMap);
-		});
+		this.guild = Bot.INSTANCE.jda.getGuildById(data.getLong(DataKey.Guild.GUILD_ID));
+		this.instanciateFromJSON(data);
 	}
+	
+	public GuildData(Guild guild) {
+	    this.guild = guild;
+	}
+
+    @Override
+    public DataContainer instanciateFromJSON(JSONObject data) {
+        this.admin_roles = this.getRolesFromArrayKeys(DataKey.Guild.STATIC_ROLES, DataKey.Guild.ADMIN_ROLES, data);
+        this.custom_channel_policing_roles = this.getRolesFromArrayKeys(DataKey.Guild.STATIC_ROLES, DataKey.Guild.CUSTOM_CHANNEL_POLICING_ROLES, data);
+        this.moderation_roles = this.getRolesFromArrayKeys(DataKey.Guild.STATIC_ROLES, DataKey.Guild.MODERATION_ROLES, data);
+        this.support_roles = this.getRolesFromArrayKeys(DataKey.Guild.STATIC_ROLES, DataKey.Guild.SUPPORT_ROLES, data);
+        this.bot_auto_roles = this.getRolesFromArrayKeys(DataKey.Guild.AUTO_ROLES, DataKey.Guild.BOT_AUTO_ROLES, data);
+        this.user_auto_roles = this.getRolesFromArrayKeys(DataKey.Guild.AUTO_ROLES, DataKey.Guild.USER_AUTO_ROLES, data);
+
+        JSONObject auto_messages = data.getJSONObject(DataKey.Guild.AUTO_MESSAGES);
+        this.boost_message = new AutoMessageData(guild, auto_messages.getJSONObject(DataKey.Guild.BOOST_MESSAGE));
+        this.goodbye_message = new AutoMessageData(guild, auto_messages.getJSONObject(DataKey.Guild.GOODBYE_MESSAGE));
+        this.level_up_message = new AutoMessageData(guild, auto_messages.getJSONObject(DataKey.Guild.LEVEL_UP_MESSAGE));
+        this.welcome_message = new AutoMessageData(guild, auto_messages.getJSONObject(DataKey.Guild.WELCOME_MESSAGE));
+
+        JSONObject static_channels = data.getJSONObject(DataKey.Guild.STATIC_CHANNELS);
+        this.community_inbox_channel = guild.getTextChannelById(static_channels.getLong(DataKey.Guild.COMMUNITY_INBOX_CHANNEL));
+        this.moderation_inbox_channel = guild.getTextChannelById(static_channels.getLong(DataKey.Guild.MODERATION_INBOX_CHANNEL));
+        this.suggestion_inbox_channel = guild.getTextChannelById(static_channels.getLong(DataKey.Guild.SUGGESTION_INBOX_CHANNEL));
+
+        this.support_talk = guild.getVoiceChannelById(static_channels.getLong(DataKey.Guild.SUPPORT_TALK));
+
+        JSONArray offline_message_data = data.getJSONObject(DataKey.Guild.STATIC_MESSAGES).getJSONArray(DataKey.Guild.OFFLINE_MESSAGE);
+        this.offline_message = guild.getTextChannelById(offline_message_data.getLong(1)).retrieveMessageById(offline_message_data.getLong(0)).complete();
+
+        JSONObject j2c_channels_data = data.getJSONObject(DataKey.Guild.AUTO_CHANNELS).getJSONObject(DataKey.Guild.JOIN2CREATE_CHANNELS);
+        j2c_channels_data.keySet().forEach(channelId -> join2create_channels.put(guild.getVoiceChannelById(channelId), new Join2CreateChannelData(guild, j2c_channels_data.getJSONObject(channelId))));
+
+        JSONObject j2c_channels_link_data = data.getJSONObject(DataKey.Guild.AUTO_CHANNELS).getJSONObject(DataKey.Guild.JOIN2CREATE_CHANNEL_LINKS);
+        j2c_channels_link_data.keySet().forEach(channelId -> join2create_channel_links.put(guild.getVoiceChannelById(channelId), guild.getVoiceChannelById(j2c_channels_data.getLong(channelId))));
+
+        JSONObject cc_categories_data = data.getJSONObject(DataKey.Guild.AUTO_CHANNELS).getJSONObject(DataKey.Guild.CUSTOM_CHANNEL_CATEGORIES);
+        cc_categories_data.keySet().forEach(categoryId -> custom_channel_categories.put(guild.getCategoryById(categoryId), guild.getMemberById(cc_categories_data.getLong(categoryId))));
+
+        JSONObject lvl_reward_data = data.getJSONObject(DataKey.Guild.OTHER).getJSONObject(DataKey.Guild.LEVEL_REWARDS);
+        lvl_reward_data.keySet().forEach(level_count -> level_rewards.put(Integer.valueOf(level_count), guild.getRoleById(lvl_reward_data.getLong(level_count))));
+
+        JSONObject penalties_data = data.getJSONObject(DataKey.Guild.OTHER).getJSONObject(DataKey.Guild.PENALTIES);
+        penalties_data.keySet().forEach(warning_count -> penalties.put(Integer.valueOf(warning_count), new PenaltyData(guild, penalties_data.getJSONObject(warning_count))));
+
+        JSONObject modmails_data = data.getJSONObject(DataKey.Guild.OTHER).getJSONObject(DataKey.Guild.MODMAILS);
+        modmails_data.keySet().forEach(channelId -> modmails.put(guild.getTextChannelById(channelId), new ModMailData(guild, modmails_data.getJSONObject(channelId))));
+
+        JSONObject polls_data = data.getJSONObject(DataKey.Guild.OTHER).getJSONObject(DataKey.Guild.POLLS);
+        polls_data.keySet().forEach(channelId -> {
+            TextChannel channel = guild.getTextChannelById(channelId);
+            ConcurrentHashMap<Message, PollData> pollSubMap = new ConcurrentHashMap<>();
+            JSONObject polls_sub_data = polls_data.getJSONObject(channelId);
+            polls_sub_data.keySet().forEach(messageId -> {
+                pollSubMap.put(channel.retrieveMessageById(messageId).complete(), new PollData(guild, polls_sub_data.getJSONObject(messageId)));
+            });
+            polls.put(channel, pollSubMap);
+        });
+
+
+        JSONObject reaction_roles_data = data.getJSONObject(DataKey.Guild.OTHER).getJSONObject(DataKey.Guild.REACTION_ROLES);
+        reaction_roles_data.keySet().forEach(channelId -> {
+            TextChannel channel = guild.getTextChannelById(channelId);
+            ConcurrentHashMap<Message, ReactionRoleData> reactionRoleSubMap = new ConcurrentHashMap<>();
+            JSONObject reaction_role_sub_data = reaction_roles_data.getJSONObject(channelId);
+            reaction_role_sub_data.keySet().forEach(messageId -> {
+                reactionRoleSubMap.put(channel.retrieveMessageById(messageId).complete(), new ReactionRoleData(guild, reaction_role_sub_data.getJSONObject(messageId)));
+            });
+            reaction_roles.put(channel, reactionRoleSubMap);
+        });
+        return this;
+    }
 	
 	@Override
 	public JSONObject compileToJSON() {
@@ -127,87 +134,128 @@ public class GuildData implements DataContainer {
 	    JSONObject auto_channels = new JSONObject();
 	    JSONObject other = new JSONObject();
 	    
-	    static_roles.put(DataKey.ADMIN_ROLES, 
+	    static_roles.put(DataKey.Guild.ADMIN_ROLES, 
 	            new JSONArray(admin_roles.stream().map(role -> {return role.getIdLong();}).toList()));
-	    static_roles.put(DataKey.CUSTOM_CHANNEL_POLICING_ROLES, 
+	    static_roles.put(DataKey.Guild.CUSTOM_CHANNEL_POLICING_ROLES, 
                 new JSONArray(custom_channel_policing_roles.stream().map(role -> {return role.getIdLong();}).toList()));
-	    static_roles.put(DataKey.MODERATION_ROLES, 
+	    static_roles.put(DataKey.Guild.MODERATION_ROLES, 
                 new JSONArray(moderation_roles.stream().map(role -> {return role.getIdLong();}).toList()));
-	    static_roles.put(DataKey.SUPPORT_ROLES, 
+	    static_roles.put(DataKey.Guild.SUPPORT_ROLES, 
                 new JSONArray(support_roles.stream().map(role -> {return role.getIdLong();}).toList()));
 	    
-	    auto_roles.put(DataKey.BOT_AUTO_ROLES, 
+	    auto_roles.put(DataKey.Guild.BOT_AUTO_ROLES, 
                 new JSONArray(bot_auto_roles.stream().map(role -> {return role.getIdLong();}).toList()));
-	    auto_roles.put(DataKey.USER_AUTO_ROLES, 
+	    auto_roles.put(DataKey.Guild.USER_AUTO_ROLES, 
                 new JSONArray(user_auto_roles.stream().map(role -> {return role.getIdLong();}).toList()));
 	    
-	    static_messages.put(DataKey.OFFLINE_MESSAGE,
-	            new JSONArray(List.of(offline_message.getIdLong(), offline_message.getChannel().getIdLong())));
+	    if (offline_message != null) {
+	        static_messages.put(DataKey.Guild.OFFLINE_MESSAGE,
+	                new JSONArray(List.of(offline_message.getIdLong(), offline_message.getChannel().getIdLong())));
+	    } else {
+	        static_messages.put(DataKey.Guild.OFFLINE_MESSAGE, new JSONArray());
+	    }
 	    
-	    auto_messages.put(DataKey.BOOST_MESSAGE,
-	            boost_message.compileToJSON());
-	    auto_messages.put(DataKey.GOODBYE_MESSAGE,
-                goodbye_message.compileToJSON());
-	    auto_messages.put(DataKey.LEVEL_UP_MESSAGE,
-                level_up_message.compileToJSON());
-	    auto_messages.put(DataKey.WELCOME_MESSAGE,
-                welcome_message.compileToJSON());
+	    if (boost_message != null) {
+	        auto_messages.put(DataKey.Guild.BOOST_MESSAGE,
+	                boost_message.compileToJSON());
+	    } else {
+	        auto_messages.put(DataKey.Guild.BOOST_MESSAGE, new JSONObject());
+	    }
+	    if (goodbye_message != null) {
+	        auto_messages.put(DataKey.Guild.GOODBYE_MESSAGE,
+	                goodbye_message.compileToJSON());
+        } else {
+            auto_messages.put(DataKey.Guild.GOODBYE_MESSAGE, new JSONObject());
+        }
+	    if (level_up_message != null) {
+	        auto_messages.put(DataKey.Guild.LEVEL_UP_MESSAGE,
+	                level_up_message.compileToJSON());
+        } else {
+            auto_messages.put(DataKey.Guild.LEVEL_UP_MESSAGE, new JSONObject());
+        }
+	    if (welcome_message != null) {
+	        auto_messages.put(DataKey.Guild.WELCOME_MESSAGE,
+	                welcome_message.compileToJSON());
+        } else {
+            auto_messages.put(DataKey.Guild.WELCOME_MESSAGE, new JSONObject());
+        }
 	    
-	    static_channels.put(DataKey.COMMUNITY_INBOX_CHANNEL,
-	            community_inbox_channel.getIdLong());
-	    static_channels.put(DataKey.MODERATION_INBOX_CHANNEL,
-                moderation_inbox_channel.getIdLong());
-	    static_channels.put(DataKey.SUGGESTION_INBOX_CHANNEL,
-                suggestion_inbox_channel.getIdLong());
-	    static_channels.put(DataKey.SUPPORT_TALK,
-                support_talk.getIdLong());
+	    if (community_inbox_channel != null) {
+	        static_channels.put(DataKey.Guild.COMMUNITY_INBOX_CHANNEL,
+	                community_inbox_channel.getIdLong());
+	    } else {
+	        static_channels.put(DataKey.Guild.COMMUNITY_INBOX_CHANNEL, 0L);
+	    }
+	    if (moderation_inbox_channel != null) {
+	        static_channels.put(DataKey.Guild.MODERATION_INBOX_CHANNEL,
+	                moderation_inbox_channel.getIdLong());
+        } else {
+            static_channels.put(DataKey.Guild.MODERATION_INBOX_CHANNEL, 0L);
+        }
+	    if (suggestion_inbox_channel != null) {
+	        static_channels.put(DataKey.Guild.SUGGESTION_INBOX_CHANNEL,
+	                suggestion_inbox_channel.getIdLong());
+        } else {
+            static_channels.put(DataKey.Guild.SUGGESTION_INBOX_CHANNEL, 0L);
+        }
+	    if (support_talk != null) {
+	        static_channels.put(DataKey.Guild.SUPPORT_TALK,
+	                support_talk.getIdLong());
+        } else {
+            static_channels.put(DataKey.Guild.SUPPORT_TALK, 0L);
+        }
 	    
 	    JSONObject join2create_channels_object = new JSONObject();
 	    join2create_channels.forEach((channel, data) -> join2create_channels_object.put(channel.getId(), data.compileToJSON()));
-	    auto_channels.put(DataKey.JOIN2CREATE_CHANNELS, join2create_channels_object);
+	    auto_channels.put(DataKey.Guild.JOIN2CREATE_CHANNELS, join2create_channels_object);
 	    
 	    JSONObject join2create_channel_links_object = new JSONObject();
 	    join2create_channel_links.forEach((channel, parent) -> join2create_channels_object.put(channel.getId(), parent.getIdLong()));
-	    auto_channels.put(DataKey.JOIN2CREATE_CHANNEL_LINKS, join2create_channel_links_object);
+	    auto_channels.put(DataKey.Guild.JOIN2CREATE_CHANNEL_LINKS, join2create_channel_links_object);
 	    
 	    JSONObject custom_channel_categories_object = new JSONObject();
 	    custom_channel_categories.forEach((category, owner) -> custom_channel_categories_object.put(category.getId(), owner.getIdLong()));
-	    auto_channels.put(DataKey.CUSTOM_CHANNEL_CATEGORIES, custom_channel_categories_object);
+	    auto_channels.put(DataKey.Guild.CUSTOM_CHANNEL_CATEGORIES, custom_channel_categories_object);
 	    
 	    JSONObject level_rewards_object = new JSONObject();
 	    level_rewards.forEach((level_count, reward_role) -> level_rewards_object.put(String.valueOf(level_count), reward_role.getIdLong()));
-	    other.put(DataKey.LEVEL_REWARDS, level_rewards_object);
+	    other.put(DataKey.Guild.LEVEL_REWARDS, level_rewards_object);
 	    
 	    JSONObject penalties_object = new JSONObject();
 	    penalties.forEach((warning_count, data) -> penalties_object.put(String.valueOf(warning_count), data.compileToJSON()));
-	    other.put(DataKey.PENALTIES, penalties_object);
+	    other.put(DataKey.Guild.PENALTIES, penalties_object);
 	    
 	    JSONObject modmails_object = new JSONObject();
 	    modmails.forEach((channel, data) -> modmails_object.put(channel.getId(), data.compileToJSON()));
-	    other.put(DataKey.MODMAILS, modmails_object);
+	    other.put(DataKey.Guild.MODMAILS, modmails_object);
 	    
 	    JSONObject polls_object = new JSONObject();
 	    polls.forEach((channel, message_map) -> {
 	        JSONObject message_map_object = new JSONObject();
 	        message_map.forEach((message, data) -> message_map_object.put(message.getId(), data.compileToJSON()));
-	        polls_object.put(channel.getId(), message_map_object);
+	        if (!message_map_object.isEmpty()) {
+	            polls_object.put(channel.getId(), message_map_object);
+	        }
 	    });
 	    
 	    JSONObject reaction_roles_object = new JSONObject();
         reaction_roles.forEach((channel, message_map) -> {
             JSONObject message_map_object = new JSONObject();
             message_map.forEach((message, data) -> message_map_object.put(message.getId(), data.compileToJSON()));
-            reaction_roles_object.put(channel.getId(), message_map_object);
+            if (!message_map_object.isEmpty()) {
+                reaction_roles_object.put(channel.getId(), message_map_object);
+            }
         });
 
-        dataObject.put(DataKey.GUILD_ID, guild.getIdLong());
-        dataObject.put(DataKey.STATIC_ROLES, static_roles);
-        dataObject.put(DataKey.AUTO_ROLES, auto_roles);
-        dataObject.put(DataKey.STATIC_MESSAGES, static_messages);
-        dataObject.put(DataKey.AUTO_MESSAGES, auto_messages);
-        dataObject.put(DataKey.STATIC_CHANNELS, static_channels);
-        dataObject.put(DataKey.AUTO_CHANNELS, auto_channels);
-        dataObject.put(DataKey.OTHER, other);
+        dataObject.put(DataKey.Guild.GUILD_ID, guild.getIdLong());
+        dataObject.put(DataKey.Guild.GUILD_NAME, guild.getName());
+        dataObject.put(DataKey.Guild.STATIC_ROLES, static_roles);
+        dataObject.put(DataKey.Guild.AUTO_ROLES, auto_roles);
+        dataObject.put(DataKey.Guild.STATIC_MESSAGES, static_messages);
+        dataObject.put(DataKey.Guild.AUTO_MESSAGES, auto_messages);
+        dataObject.put(DataKey.Guild.STATIC_CHANNELS, static_channels);
+        dataObject.put(DataKey.Guild.AUTO_CHANNELS, auto_channels);
+        dataObject.put(DataKey.Guild.OTHER, other);
 	    
 	    return dataObject;
 	}
