@@ -1,4 +1,4 @@
-package assets.base;
+package assets.functions;
 
 import java.awt.Color;
 import java.io.IOException;

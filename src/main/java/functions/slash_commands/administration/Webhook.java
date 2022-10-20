@@ -3,8 +3,8 @@ package functions.slash_commands.administration;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import assets.base.WebhookMessage;
 import assets.functions.SlashCommandEventHandler;
+import assets.functions.WebhookMessage;
 import engines.base.LanguageEngine;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
