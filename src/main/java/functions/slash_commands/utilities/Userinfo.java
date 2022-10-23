@@ -75,13 +75,12 @@ public class Userinfo implements SlashCommandEventHandler {
 		eb.addField(":calendar:" + titles[8], "`" + member.getTimeJoined().format(formatter) + "`", true);
 		if(moderator) {eb.addField(":calendar:" + titles[9], "`" + member.getUser().getTimeCreated().format(formatter) + "`", true);
 					   eb.addField(":warning:" + titles[10], "`" + String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), member.getUser()).getJSONArray("warnings").length()) + "`", true);
-					   eb.addField(":clock11:" + titles[16], "`" + timeoutEnd + "`", true);}
+					   eb.addField(":clock11:" + titles[15], "`" + timeoutEnd + "`", true);}
 		eb.addField(":card_index:" + titles[11], "`" + String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), member.getUser()).getInt("experience")) + "`", true);
 		eb.addField(":pager:" + titles[12], "`" + String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), member.getUser()).getInt("level")) + "`", true);
-		eb.addField(":alarm_clock:" + titles[13], "`" + member.getOnlineStatus().toString() + "`", true);
-		eb.addField(":abacus:" + titles[14], "`" + String.valueOf(member.getRoles().size()) + "`", true);
+		eb.addField(":abacus:" + titles[13], "`" + String.valueOf(member.getRoles().size()) + "`", true);
 		if (member.getRoles().size() > 0) {
-			eb.addField(":arrow_up:" + titles[15], "`" + member.getRoles().get(0).getName() + "`", true);
+			eb.addField(":arrow_up:" + titles[14], "`" + member.getRoles().get(0).getName() + "`", true);
 		}
 		event.replyEmbeds(eb.build()).queue();
 	}
