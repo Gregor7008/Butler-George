@@ -28,7 +28,7 @@ public class Serverinfo implements SlashCommandEventHandler {
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[1], "`" + guild.getName() + "`", true);
 		eb.addField(":registered:" + titles[2], "`" + guild.getId() + "`", true);
-		eb.addField(":sunglasses:" + titles[3], "`" + guild.getOwner().getEffectiveName() + "`", true);
+		eb.addField(":sunglasses:" + titles[3], "`" + guild.retrieveOwner().complete().getEffectiveName() + "`", true);
 		eb.addField(":calendar:" + titles[4], "`" + guild.getTimeCreated().format(formatter) + "`", true);
 		eb.addField(":rocket:" + titles[5], "`" + guild.getBoostCount() + "`", true);
 		eb.addField(":trackball:" + titles[6], "`" + guild.getBoostTier() + "`", true);		

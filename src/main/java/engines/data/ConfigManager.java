@@ -277,7 +277,7 @@ public class ConfigManager {
 		newConfig.put("goodbyemsg",					new JSONArray());
 		newConfig.put("join2createchannels",		new JSONObject());
 		newConfig.put("levelrewards",				new JSONObject());
-		newConfig.put("levelmsg",					"");
+		newConfig.put("levelmsg",					new JSONArray());
 		newConfig.put("moderationroles",			new JSONArray());
 		newConfig.put("moderationinbox",			0L);
 		newConfig.put("modmailcategory",			0L);
