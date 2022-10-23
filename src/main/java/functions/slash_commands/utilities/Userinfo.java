@@ -38,7 +38,7 @@ public class Userinfo implements SlashCommandEventHandler {
 	private void listInfo (SlashCommandInteractionEvent event, boolean moderator) {
 		EmbedBuilder eb = new EmbedBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
-		String booster;
+		String booster, timeoutEnd;
 		Member member;
 		String[] titles = LanguageEngine.getRaw(event.getGuild(), event.getUser(), this, "titles").split(",");
 		if (event.getOption("user") == null) {
@@ -55,6 +55,11 @@ public class Userinfo implements SlashCommandEventHandler {
 		} else {
 			booster = titles[0] + "\s" + member.getTimeBoosted().format(formatter) + "\s:heart:";
 		}
+		 if (member.getTimeOutEnd() == null) {
+		     timeoutEnd = "--";
+		 } else {
+		     timeoutEnd = member.getTimeOutEnd().format(formatter);
+		 }
 		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
@@ -70,7 +75,7 @@ public class Userinfo implements SlashCommandEventHandler {
 		eb.addField(":calendar:" + titles[8], "`" + member.getTimeJoined().format(formatter) + "`", true);
 		if(moderator) {eb.addField(":calendar:" + titles[9], "`" + member.getUser().getTimeCreated().format(formatter) + "`", true);
 					   eb.addField(":warning:" + titles[10], "`" + String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), member.getUser()).getJSONArray("warnings").length()) + "`", true);
-					   eb.addField(":clock11:" + titles[16], "`" + member.getTimeOutEnd().format(formatter) + "`", true);}
+					   eb.addField(":clock11:" + titles[16], "`" + timeoutEnd + "`", true);}
 		eb.addField(":card_index:" + titles[11], "`" + String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), member.getUser()).getInt("experience")) + "`", true);
 		eb.addField(":pager:" + titles[12], "`" + String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), member.getUser()).getInt("level")) + "`", true);
 		eb.addField(":alarm_clock:" + titles[13], "`" + member.getOnlineStatus().toString() + "`", true);
