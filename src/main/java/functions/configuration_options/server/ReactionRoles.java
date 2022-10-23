@@ -24,7 +24,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class ReactionRoles implements ConfigurationEventHandler {
 
@@ -38,7 +38,7 @@ public class ReactionRoles implements ConfigurationEventHandler {
 	public void execute(ConfigurationEvent event) {
 		this.guild = event.getGuild();
 		this.user = event.getUser();
-		SelectMenu.Builder menu = SelectMenu.create("selchnl")
+		StringSelectMenu.Builder menu = StringSelectMenu.create("selchnl")
 				.setPlaceholder("Select a channel")
 				.setRequiredRange(1, 1);
 		List<TextChannel> availableChannels = guild.getTextChannels().stream().filter(channel -> guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_ADD_REACTION)).toList();
@@ -50,7 +50,7 @@ public class ReactionRoles implements ConfigurationEventHandler {
 			}
 		});
 		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel")).setActionRow(menu.build()).queue();
-		AwaitTask.forSelectMenuInteraction(guild, user, event.getMessage(),
+		AwaitTask.forStringSelectInteraction(guild, user, event.getMessage(),
 				e -> {
 					this.channel = guild.getTextChannelById(e.getSelectedOptions().get(0).getValue());
 					if (event.getSubOperation().equals("list")) {

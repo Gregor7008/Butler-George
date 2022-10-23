@@ -15,7 +15,6 @@ import org.slf4j.event.Level;
 import com.mongodb.lang.Nullable;
 
 import assets.logging.Logger;
-import base.Bot;
 import base.GUI;
 
 public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
@@ -65,7 +64,8 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
-		Bot.INSTANCE.onErrorOccurrence();
+		GUI.INSTANCE.updateErrorBoolean(true);
+		GUI.INSTANCE.increaseErrorCounter();
 		e.printStackTrace();
 	}
 	
@@ -103,6 +103,10 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 		}
 		if (message == null)
 			message = "No message";
+		String exceptionString = message.toLowerCase();
+		if (exceptionString.contains(" exception") || exceptionString.contains(" error")) {
+		    GUI.INSTANCE.increaseErrorCounter();
+		}
 		String[] messageParts = message.split("\n");
 		for (int i = 0; i < messageParts.length; i++) {
 			GUI.INSTANCE.console.append(timeCodeText + prefix + callerNameText + messageParts[i] + "\n");

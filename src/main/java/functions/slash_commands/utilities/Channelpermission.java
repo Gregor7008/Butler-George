@@ -18,14 +18,14 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class Channelpermission implements SlashCommandEventHandler {
 	
@@ -40,7 +40,7 @@ public class Channelpermission implements SlashCommandEventHandler {
 			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
-		SelectMenu menu = SelectMenu.create("permselection")
+		StringSelectMenu menu = StringSelectMenu.create("permselection")
 				.setPlaceholder("Select the wanted permission")
 				.setRequiredRange(1, 1)
 				.addOption("View Channel", "vc")
@@ -61,7 +61,7 @@ public class Channelpermission implements SlashCommandEventHandler {
 		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selperm"))
 				.addActionRow(menu)
 				.complete();
-		AwaitTask.forSelectMenuInteraction(guild, user, reply.retrieveOriginal().complete(), null,
+		AwaitTask.forStringSelectInteraction(guild, user, reply.retrieveOriginal().complete(), null,
 				e -> {if (event.getSubcommandName().equals("grant")) {
 						  this.defineEdit(e.getSelectedOptions().get(0).getValue(), event, e, true);
 					  } else {
@@ -85,7 +85,7 @@ public class Channelpermission implements SlashCommandEventHandler {
 		return command;
 	}
 	
-	private void defineEdit(String selected, SlashCommandInteractionEvent event, SelectMenuInteractionEvent sme, boolean action) {
+	private void defineEdit(String selected, SlashCommandInteractionEvent event, StringSelectInteractionEvent sme, boolean action) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		IPermissionHolder pholder = guild.getMember(event.getOption("user").getAsUser());

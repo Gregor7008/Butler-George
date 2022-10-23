@@ -30,7 +30,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.callbacks.IModalCallback;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -38,11 +38,11 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 
 public class Modmail implements SlashCommandEventHandler {
 
@@ -106,7 +106,7 @@ public class Modmail implements SlashCommandEventHandler {
 
 	private void openOnPrivate(SlashCommandInteractionEvent event) {
 		final User user = event.getUser();
-		SelectMenu.Builder menu = SelectMenu.create("selguild")
+		StringSelectMenu.Builder menu = StringSelectMenu.create("selguild")
 				.setRequiredRange(1, 1)
 				.setPlaceholder("Select server");
 		List<Guild> availableGuilds = event.getJDA().getGuilds().stream().filter(g -> {
@@ -120,7 +120,7 @@ public class Modmail implements SlashCommandEventHandler {
 		Message response = event.replyEmbeds(LanguageEngine.fetchMessage(null, event.getUser(), this, "selguild"))
 				.setActionRow(menu.build())
 				.complete().retrieveOriginal().complete();
-		AwaitTask.forSelectMenuInteraction(null, user, response,
+		AwaitTask.forStringSelectInteraction(null, user, response,
 				sm -> {
 					this.open(sm, user, event.getJDA().getGuildById(sm.getSelectedOptions().get(0).getValue()));
 				}).addValidComponents(menu.getId()).append();
@@ -232,7 +232,7 @@ public class Modmail implements SlashCommandEventHandler {
 					guildModmail.put(ticketChannel.getId(), new JSONArray().put(user.getIdLong()).put(id));
 					userModmail.put(String.valueOf(id), new JSONArray().put(ticketChannel.getIdLong()).put(mi.getValue("title").getAsString()).put(0L));
 					ConfigLoader.INSTANCE.getUserConfig(user).put("selected_ticket", new JSONArray().put(guild.getIdLong()).put(id));
-					if (event instanceof SelectMenuInteractionEvent) {
+					if (event instanceof StringSelectInteractionEvent) {
 						mi.editMessageEmbeds(
 								LanguageEngine.fetchMessage(guild, user, this, "openSuccess")
 											  .replaceDescription("{guild}", guild.getName())
@@ -250,7 +250,7 @@ public class Modmail implements SlashCommandEventHandler {
 	}
 	
 	private void ticketSelection(SlashCommandInteractionEvent event, User user, @Nullable Guild guild, BiConsumer<GenericInteractionCreateEvent, String[]> onSelection) {
-		SelectMenu.Builder menu = SelectMenu.create("selticket")
+	    StringSelectMenu.Builder menu = StringSelectMenu.create("selticket")
 				.setPlaceholder("Select ticket")
 				.setRequiredRange(1, 1);
 		String list = this.list(user, guild, menu);
@@ -289,7 +289,7 @@ public class Modmail implements SlashCommandEventHandler {
 				.replaceDescription("{tickets}", list))
 				.setActionRow(menu.build())
 				.complete().retrieveOriginal().complete();
-		AwaitTask.forSelectMenuInteraction(null, user, response,
+		AwaitTask.forStringSelectInteraction(null, user, response,
 				sm -> {
 					String[] selectedValue = sm.getSelectedOptions().get(0).getValue().split(";");
 					onSelection.accept(sm, selectedValue);
@@ -312,8 +312,8 @@ public class Modmail implements SlashCommandEventHandler {
 				.replaceDescription("{guild}", finalGuild.getName());
 		if (newEvent instanceof SlashCommandInteractionEvent) {
 			event.replyEmbeds(embed).setComponents().queue();
-		} else if (newEvent instanceof SelectMenuInteractionEvent){
-			SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) newEvent;
+		} else if (newEvent instanceof StringSelectInteractionEvent){
+			StringSelectInteractionEvent castedEvent = (StringSelectInteractionEvent) newEvent;
 			castedEvent.editMessageEmbeds(embed).setComponents().queue();
 		}
 		List<Message> missedMessages = null;
@@ -332,7 +332,7 @@ public class Modmail implements SlashCommandEventHandler {
 		newTicketData.put(2, 0L);
 	}
 	
-	private String list(User user, @Nullable Guild guild, @Nullable SelectMenu.Builder menu) {
+	private String list(User user, @Nullable Guild guild, @Nullable StringSelectMenu.Builder menu) {
 		JSONObject userConfig = ConfigLoader.INSTANCE.getUserConfig(user);
 		List<String> validkeys = new ArrayList<>();
 		userConfig.keySet().stream().filter(k -> {
@@ -405,8 +405,8 @@ public class Modmail implements SlashCommandEventHandler {
 					.replaceDescription("{title}", ticketTitle))
 			.setComponents().complete().retrieveOriginal().complete();
 
-		} else if (event instanceof SelectMenuInteractionEvent) {
-			SelectMenuInteractionEvent castedEvent = (SelectMenuInteractionEvent) event;
+		} else if (event instanceof StringSelectInteractionEvent) {
+		    StringSelectInteractionEvent castedEvent = (StringSelectInteractionEvent) event;
 			feedbackMessage = castedEvent.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "awaitConfirm")
 					.replaceDescription("{guild}", ticketGuild.getName())
 					.replaceDescription("{title}", ticketTitle))

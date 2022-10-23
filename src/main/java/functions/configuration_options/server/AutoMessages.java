@@ -20,11 +20,12 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 
 public class AutoMessages implements ConfigurationEventHandler {
 
@@ -48,7 +49,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 					} catch (JSONException e) {}
 					if (event.getSubOperation().equals("set")) {
 						//Implement menu
-						SelectMenu.Builder menuBuilder = SelectMenu.create("channel")
+					    StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("channel")
 								.setPlaceholder("Select channel")
 								.setRequiredRange(1, 1);
 						List<TextChannel> availableChannels = guild.getTextChannels().stream().filter(
@@ -64,7 +65,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 						SelectMenu menu = menuBuilder.build();
 						MessageEmbed firstReplyEmbed = LanguageEngine.fetchMessage(guild, user, this, "selchannel").replaceDescription("{type}", type);
 						b.editMessageEmbeds(firstReplyEmbed).setComponents(ActionRow.of(menu)).queue();
-						AwaitTask.forSelectMenuInteraction(guild, user, event.getMessage(),
+						AwaitTask.forStringSelectInteraction(guild, user, event.getMessage(),
 								s -> {
 									long selChannelId = Long.valueOf(s.getSelectedOptions().get(0).getValue());
 									TextInput titleInput = TextInput.create("title", "Title", TextInputStyle.SHORT)

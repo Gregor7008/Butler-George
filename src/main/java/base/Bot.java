@@ -53,7 +53,6 @@ public class Bot {
 	
 	private Timer timer = new Timer();
 	private Thread shutdownThread = null;
-	private boolean errorOccured = false;
 	private boolean shutdown = false;
 	
 	public Bot(String token, String serverIP, String port, String databaseName, String username, String password) throws LoginException, InterruptedException, IOException {
@@ -97,7 +96,6 @@ public class Bot {
     	GUI.INSTANCE.setBotRunning(true);
     	GUI.INSTANCE.updateStatistics();
     	GUI.INSTANCE.startRuntimeMeasuring();
-    	GUI.INSTANCE.updateBotBoolean();
 //	    Startup operations
     	GuildUtilitiesList.getEngines().forEach((id, handler) -> handler.onStartup());
     	this.processMissedModMailMessages();
@@ -194,7 +192,7 @@ public class Bot {
     			offlineMessageBuilder.append(additionalMessage);
     		}
     		long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.buildMessageFromRaw(offlineMessageBuilder.toString(), null)).complete().getIdLong();
-    		ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").put(0, msgid).put(1, chid);
+    		ConfigLoader.INSTANCE.getGuildConfig(guild).put("offlinemsg", new JSONArray().put(msgid).put(chid));
 //    		Save ModMail status
     		JSONObject modmailDataSet = ConfigLoader.INSTANCE.getGuildConfig(guild, "modmails");
     		modmailDataSet.keySet().forEach(ticketChannelId -> {
@@ -220,9 +218,7 @@ public class Bot {
 		jda.shutdown();
 		GUI.INSTANCE.setBotRunning(false);
 		GUI.INSTANCE.stopRuntimeMeasuring();
-		if (!errorOccured) {
-			ConfigLoader.INSTANCE.manager.pushCache();
-		}
+		ConfigLoader.INSTANCE.manager.pushCache();
 		shutdown = true;
 //		Debug logging
 		LOG.debug("Bot offline");
@@ -241,16 +237,6 @@ public class Bot {
 			});
 		}
 		return shutdownThread;
-	}
-	
-	public void onErrorOccurrence() {
-		errorOccured = true;
-		GUI.INSTANCE.increaseErrorCounter();
-		GUI.INSTANCE.updateBotBoolean();
-	}
-	
-	public boolean hasErrorOccurred() {
-		return errorOccured;
 	}
 	
 	public boolean isShutdown() {

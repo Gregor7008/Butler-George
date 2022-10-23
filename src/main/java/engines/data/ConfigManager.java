@@ -104,9 +104,8 @@ public class ConfigManager {
 			private int executions = 0;
 			@Override
 			public void run() {
-				if (executions > 1 && !Bot.INSTANCE.hasErrorOccurred()) {
+				if (executions > 1) {
 					pushCache();
-					GUI.INSTANCE.increasePushCounter();
 				}
 				executions++;
 			}
@@ -140,7 +139,10 @@ public class ConfigManager {
 	
 	//Manage cache	
 	public boolean pushCache() {
-		try {
+	    if (GUI.INSTANCE.getErrorBoolean()) {
+	        return false;
+	    }
+	    try {
 			userConfigCache.forEach((id, obj) -> {
 				Document searchresult = userConfigs.find(new Document("id", Long.valueOf(id))).first();
 				if (searchresult != null) {
@@ -159,6 +161,7 @@ public class ConfigManager {
 				}
 			});
 			guildConfigCache.clear();
+			GUI.INSTANCE.increasePushCounter();
 			return true;
 		} catch (Exception e) {
 			LOG.error("Push failed!");

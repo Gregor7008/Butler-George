@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class Configure implements SlashCommandEventHandler {
 
@@ -32,7 +33,7 @@ public class Configure implements SlashCommandEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		
-		SelectMenu.Builder menuBuilder1 = SelectMenu.create("selVal").setRequiredRange(1, 1).setPlaceholder("Select a value");
+		StringSelectMenu.Builder menuBuilder1 = StringSelectMenu.create("selVal").setRequiredRange(1, 1).setPlaceholder("Select a value");
 		EmbedBuilder eb1 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selval"));
 		
 		if (event.getSubcommandName().equals("server")) {
@@ -53,7 +54,7 @@ public class Configure implements SlashCommandEventHandler {
 		
 		SelectMenu menu = menuBuilder1.build();
 		Message msg = event.replyEmbeds(eb1.build()).addActionRow(menu).complete().retrieveOriginal().complete();
-		AwaitTask.forSelectMenuInteraction(guild, user, msg,
+		AwaitTask.forStringSelectInteraction(guild, user, msg,
 				e -> {
 					AtomicReference<ConfigurationOptionData> dataBlocker = new AtomicReference<>();
 					if (event.getSubcommandName().equals("server")) {

@@ -319,8 +319,12 @@ public class GUI extends JFrame implements FocusListener {
 		this.setTableValue(7, (int) this.getTableValue(7) - 1);
 	}
 	
-	public void updateBotBoolean() {
-		this.setTableValue(8, Bot.INSTANCE.hasErrorOccurred());
+	public void updateErrorBoolean(boolean newValue) {
+		this.setTableValue(8, newValue);
+	}
+	
+	public boolean getErrorBoolean() {
+	    return (boolean) this.getTableValue(8);
 	}
 	
 	public void updateStatistics() {
@@ -334,12 +338,15 @@ public class GUI extends JFrame implements FocusListener {
 		this.setTableValue(7, userCount);
 	}
 	
+	OffsetDateTime startTime = null;
+	Duration additional = Duration.ZERO;
+	
 	public void startRuntimeMeasuring() {
-		OffsetDateTime startTime = OffsetDateTime.now();
+		startTime = OffsetDateTime.now();
 		runtimeMeasuringTask = new TimerTask() {
 			@Override
 			public void run() {
-				Duration diff = Duration.between(startTime, OffsetDateTime.now());
+				Duration diff = Duration.between(startTime, OffsetDateTime.now()).plus(additional);
 				GUI.INSTANCE.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
 						diff.toDaysPart(),
 	                    diff.toHoursPart(), 
@@ -351,6 +358,9 @@ public class GUI extends JFrame implements FocusListener {
 	}
 	
 	public void stopRuntimeMeasuring() {
+	    if (startTime != null) {
+	        additional = Duration.between(startTime, OffsetDateTime.now());
+	    }
 		runtimeMeasuringTask.cancel();
 	}
 	

@@ -16,9 +16,9 @@ import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class Penalties implements ConfigurationEventHandler {
 
@@ -89,7 +89,7 @@ public class Penalties implements ConfigurationEventHandler {
 	}
 	
 	private void addpenalties1(ConfigurationEvent event) {
-		SelectMenu menu = SelectMenu.create("selpen")
+	    StringSelectMenu menu = StringSelectMenu.create("selpen")
 				.addOption("Removal of role", "rr")
 				.addOption("Temporary mute", "tm")
 				.addOption("Permanent mute", "pm")
@@ -98,13 +98,13 @@ public class Penalties implements ConfigurationEventHandler {
 				.addOption("Permanent ban", "pb")
 				.build();
 		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add1")).setComponents(ActionRow.of(menu)).queue();
-		AwaitTask.forSelectMenuInteraction(guild, user, event.getMessage(),
+		AwaitTask.forStringSelectInteraction(guild, user, event.getMessage(),
 				e -> {String plannedpunish = e.getSelectedOptions().get(0).getValue();
 					  this.addpenalties2(plannedpunish, e, event);})
 		.addValidComponents(menu.getId()).append();;
 	}
 	
-	private void addpenalties2(String plannedpunish, SelectMenuInteractionEvent event, ConfigurationEvent op) {
+	private void addpenalties2(String plannedpunish, StringSelectInteractionEvent event, ConfigurationEvent op) {
 			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "add2")).setComponents().queue();
 			AwaitTask.forMessageReceival(guild, user, op.getChannel(),
 					e -> {try {
