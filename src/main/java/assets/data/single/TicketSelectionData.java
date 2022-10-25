@@ -4,25 +4,21 @@ import org.json.JSONObject;
 
 import assets.data.DataContainer;
 
-public class PenaltyData implements DataContainer {
-
-	public PenaltyData(JSONObject data) {
-	    this.instanciateFromJSON(data);
-	}
-	
-	public PenaltyData() {}
-
+public class TicketSelectionData implements DataContainer {
+    
+    public TicketSelectionData(JSONObject data) {
+        this.instanciateFromJSON(data);
+    }
+    
+    public TicketSelectionData() {}
+    
     @Override
     public DataContainer instanciateFromJSON(JSONObject data) {
-        return this;
+        return null;
     }
-
+    
     @Override
     public JSONObject compileToJSON() {
         return null;
-    }
-
-    public int getWarningCount() {
-        return 0;
     }
 }

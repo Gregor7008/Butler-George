@@ -3,13 +3,14 @@ package assets.data.single;
 import org.json.JSONObject;
 
 import assets.data.DataContainer;
-import net.dv8tion.jda.api.entities.Guild;
 
 public class AutoMessageData implements DataContainer {
 
-	public AutoMessageData(Guild guild, JSONObject rawData) {
-		
+	public AutoMessageData(JSONObject data) {
+	    this.instanciateFromJSON(data);
 	}
+	
+	public AutoMessageData() {}
 
     @Override
     public DataContainer instanciateFromJSON(JSONObject data) {

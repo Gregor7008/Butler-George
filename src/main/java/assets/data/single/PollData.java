@@ -3,15 +3,16 @@ package assets.data.single;
 import org.json.JSONObject;
 
 import assets.data.DataContainer;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class PollData implements DataContainer {
 
-	public PollData(Guild guild, JSONObject rawData) {
-
+	public PollData(JSONObject data) {
+	    this.instanciateFromJSON(data);
 	}
+	
+	public PollData() {}
 
     @Override
     public DataContainer instanciateFromJSON(JSONObject data) {
