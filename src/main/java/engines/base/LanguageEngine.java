@@ -77,34 +77,42 @@ public abstract class LanguageEngine {
 	}
 	
 	public static String getRaw(Guild guild, User user, Object requester, String key) {
-		String lang = "en";
+		Language language = Language.ENGLISH;
 		if (user != null && guild != null) {
 			//lang = ConfigLoader.INSTANCE.getUserConfig(guild, user).getString("language"); <= Deactivated as translations are not ready
 		}
-		String path = "general";
-		if (requester != null) {
-			String requesterName = "";
-			if (requester instanceof Class) {
-				Class<?> castedRequester = (Class<?>) requester;
-				requesterName = castedRequester.getName();
-			} else {
-				requesterName = requester.getClass().getName();
-			}
-			path = requesterName.replace('.', '/').replaceAll("\\$[0-9]+", "").toLowerCase();
-		}
-		String fullpath = "languages/" + lang + "/" + path + ".properties";
-		Properties properties = new Properties();
-		try {
-			properties.load(LanguageEngine.class.getClassLoader().getResourceAsStream(fullpath));
-			String temp2 = properties.getProperty(key);
-			if (temp2 == null) {
-				throw new NullPointerException();
-			} else {
-				return temp2;
-			}
-		} catch (NullPointerException | IOException e) {
-			LOG.error("Couldn't find language file for " + fullpath + ":" + key);
-			return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
-		}
+		return LanguageEngine.getRaw(language, requester, key);
+	}
+	
+	public static String getRaw(Language language, Object requester, String key) {
+	    String path = "general";
+        if (requester != null) {
+            String requesterName = "";
+            if (requester instanceof Class) {
+                Class<?> castedRequester = (Class<?>) requester;
+                requesterName = castedRequester.getName();
+            } else {
+                requesterName = requester.getClass().getName();
+            }
+            path = requesterName.replace('.', '/').replaceAll("\\$[0-9]+", "").toLowerCase();
+        }
+        String fullpath = "languages/" + language.toString().toLowerCase() + "/" + path + ".properties";
+        Properties properties = new Properties();
+        try {
+            properties.load(LanguageEngine.class.getClassLoader().getResourceAsStream(fullpath));
+            String temp2 = properties.getProperty(key);
+            if (temp2 == null) {
+                throw new NullPointerException();
+            } else {
+                return temp2;
+            }
+        } catch (NullPointerException | IOException e) {
+            LOG.error("Couldn't find language file for " + fullpath + ":" + key);
+            return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
+        }
+	}
+	
+	public static enum Language {
+	   ENGLISH;
 	}
 }

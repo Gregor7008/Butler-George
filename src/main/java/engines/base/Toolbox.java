@@ -18,8 +18,10 @@ import engines.data.ConfigLoader;
 import engines.functions.GuildMusicManager;
 import engines.functions.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -88,13 +90,16 @@ public abstract class Toolbox {
 		String output =  input.replace("{server}", guild.getName())
 				.replace("{membercount}", Integer.toString(guild.getMemberCount()))
 				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.DEFAULT_TIME_FORMAT))
-				.replace("{boosts}", String.valueOf(guild.getBoostCount()))
-				.replace("{level}", String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getInt("level")));
-		if (mentions) {
-			return output.replace("{user}", user.getAsMention());
-		} else {
-			return output.replace("{user}", user.getName());
+				.replace("{boosts}", String.valueOf(guild.getBoostCount()));
+		if (user != null) {
+		    output = output.replace("{level}", String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getInt("level")));
+	        if (mentions) {
+	            output = output.replace("{user}", user.getAsMention());
+	        } else {
+	            output = output.replace("{user}", user.getName());
+	        }
 		}
+		return output;
 	}
 	
 	public static void scheduleOperation(Runnable operation, long delay) {
@@ -116,4 +121,21 @@ public abstract class Toolbox {
 			vc.getManager().setUserLimit(vc.getUserLimit() - 1).queue();
 		}
 	}
+	
+
+    
+    public static void sortRoles(Guild guild, Member member, List<Role> sorting_roles, Role group_role) {
+            int match = 0;
+            for (int i = 0; i < member.getRoles().size(); i++) {
+                if (sorting_roles.contains(member.getRoles().get(i))) {
+                    match++;
+                }
+            }
+            if (match > 0 && !member.getRoles().contains(group_role)) {
+                guild.addRoleToMember(member, group_role).queue();
+            }
+            if (match == 0 && member.getRoles().contains(group_role)) {
+                guild.removeRoleFromMember(member, group_role).queue();
+            }
+    }
 }

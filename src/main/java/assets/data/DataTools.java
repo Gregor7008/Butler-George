@@ -58,5 +58,4 @@ public abstract class DataTools {
             map.remove(keysToRemove.get(i));
         }
     }
-
 }

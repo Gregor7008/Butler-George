@@ -6,6 +6,7 @@ import java.util.List;
 
 import assets.functions.ConfigurationEventHandler;
 import assets.functions.ConfigurationOptionData;
+import functions.configuration_options.server.AutoMessages;
 import functions.configuration_options.server.AutoRoles;
 import functions.configuration_options.server.InboxChannels;
 import functions.configuration_options.server.Join2CreateChannels;
@@ -21,6 +22,7 @@ public abstract class ServerConfigurationOptionsList {
 	private static final HashMap<String, ConfigurationOptionData> data = new HashMap<>();
 	
 	public static void create() {
+	    add(new AutoMessages());
 		add(new AutoRoles());
 		add(new InboxChannels());
 		add(new Join2CreateChannels());

@@ -66,19 +66,19 @@ public class GuildData implements DataContainer {
         JSONObject auto_messages = data.getJSONObject(Key.AUTO_MESSAGES);
         JSONObject boost_message_data = auto_messages.getJSONObject(Key.BOOST_MESSAGE);
         if (!boost_message_data.isEmpty()) {
-            this.boost_message = new AutoMessageData(boost_message_data);
+            this.boost_message = new AutoMessageData(guild, boost_message_data);
         }
         JSONObject goodbye_message_data = auto_messages.getJSONObject(Key.GOODBYE_MESSAGE);
         if (!goodbye_message_data.isEmpty()) {
-            this.goodbye_message = new AutoMessageData(goodbye_message_data);
+            this.goodbye_message = new AutoMessageData(guild, goodbye_message_data);
         }
         JSONObject level_up_message_data = auto_messages.getJSONObject(Key.LEVEL_UP_MESSAGE);
         if (!level_up_message_data.isEmpty()) {
-            this.level_up_message = new AutoMessageData(level_up_message_data);
+            this.level_up_message = new AutoMessageData(guild, level_up_message_data);
         }
         JSONObject welcome_message_data = auto_messages.getJSONObject(Key.WELCOME_MESSAGE);
         if (!welcome_message_data.isEmpty()) {
-            this.welcome_message = new AutoMessageData(welcome_message_data);
+            this.welcome_message = new AutoMessageData(guild, welcome_message_data);
         }
 
         JSONObject static_channels = data.getJSONObject(Key.STATIC_CHANNELS);
@@ -92,7 +92,7 @@ public class GuildData implements DataContainer {
         this.offline_message = guild.getTextChannelById(offline_message_data.getLong(1)).retrieveMessageById(offline_message_data.getLong(0)).complete();
 
         JSONObject j2c_channels_data = data.getJSONObject(Key.AUTO_CHANNELS).getJSONObject(Key.JOIN2CREATE_CHANNELS);
-        j2c_channels_data.keySet().forEach(channelId -> join2create_channels.put(guild.getVoiceChannelById(channelId), new Join2CreateChannelData(j2c_channels_data.getJSONObject(channelId))));
+        j2c_channels_data.keySet().forEach(channelId -> join2create_channels.put(guild.getVoiceChannelById(channelId), new Join2CreateChannelData(guild, j2c_channels_data.getJSONObject(channelId))));
         join2create_channels.values().removeAll(Collections.singleton(null));
         
         JSONObject j2c_channels_link_data = data.getJSONObject(Key.AUTO_CHANNELS).getJSONObject(Key.JOIN2CREATE_CHANNEL_LINKS);
@@ -124,7 +124,6 @@ public class GuildData implements DataContainer {
             });
             polls.put(channel, pollSubMap);
         });
-
 
         JSONObject reaction_roles_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.REACTION_ROLES);
         reaction_roles_data.keySet().forEach(channelId -> {
@@ -276,6 +275,10 @@ public class GuildData implements DataContainer {
 	    
 	    return compiledData;
 	}
+    
+    public Guild getGuild() {
+        return this.guild;
+    }
 //  Static Roles
 	public List<Role> getAdminRoles() {
 		return this.admin_roles;
@@ -291,13 +294,13 @@ public class GuildData implements DataContainer {
         return this;
     }
     
-    public GuildData removeAdminRoles(Role... roles) {
-        this.admin_roles.removeAll(List.of(roles));
+    public GuildData removeAdminRoles(int... indices) {
+        DataTools.removeFromList(this.admin_roles, indices);
         return this;
     }
     
-    public GuildData removeAdminRoles(int... indices) {
-        DataTools.removeFromList(this.admin_roles, indices);
+    public GuildData removeAdminRolesByRole(Role... roles) {
+        this.admin_roles.removeAll(List.of(roles));
         return this;
     }
     
@@ -315,13 +318,13 @@ public class GuildData implements DataContainer {
         return this;
     }
     
-    public GuildData removeCustomChannelPolicingRoles(Role... roles) {
-        this.custom_channel_policing_roles.removeAll(List.of(roles));
+    public GuildData removeCustomChannelPolicingRoles(int... indices) {
+        DataTools.removeFromList(this.custom_channel_policing_roles, indices);
         return this;
     }
     
-    public GuildData removeCustomChannelPolicingRoles(int... indices) {
-        DataTools.removeFromList(this.custom_channel_policing_roles, indices);
+    public GuildData removeCustomChannelPolicingRolesByRole(Role... roles) {
+        this.custom_channel_policing_roles.removeAll(List.of(roles));
         return this;
     }
 
@@ -339,13 +342,13 @@ public class GuildData implements DataContainer {
         return this;
     }
     
-    public GuildData removeModerationRoles(Role... roles) {
-        this.moderation_roles.removeAll(List.of(roles));
+    public GuildData removeModerationRoles(int... indices) {
+        DataTools.removeFromList(this.moderation_roles, indices);
         return this;
     }
     
-    public GuildData removeModerationRoles(int... indices) {
-        DataTools.removeFromList(this.moderation_roles, indices);
+    public GuildData removeModerationRolesByRole(Role... roles) {
+        this.moderation_roles.removeAll(List.of(roles));
         return this;
     }
 
@@ -363,15 +366,16 @@ public class GuildData implements DataContainer {
         return this;
     }
     
-    public GuildData removeSupportRoles(Role... roles) {
-        this.support_roles.removeAll(List.of(roles));
-        return this;
-    }
-    
     public GuildData removeSupportRoles(int... indices) {
         DataTools.removeFromList(this.support_roles, indices);
         return this;
     }
+    
+    public GuildData removeSupportRolesByRole(Role... roles) {
+        this.support_roles.removeAll(List.of(roles));
+        return this;
+    }
+    
 //  Auto Roles
 	public List<Role> getBotAutoRoles() {
 		return this.bot_auto_roles;
@@ -793,7 +797,7 @@ public class GuildData implements DataContainer {
 	    return this;
 	}
     
-    private class Key {
+    private static abstract class Key {
         public static final String GUILD_ID = "id";
         public static final String GUILD_NAME = "name";
         public static final String STATIC_ROLES = "static_roles";

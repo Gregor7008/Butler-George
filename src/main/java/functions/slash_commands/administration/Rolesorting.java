@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import assets.base.AwaitTask;
 import assets.functions.SlashCommandEventHandler;
 import engines.base.LanguageEngine;
+import engines.base.Toolbox;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -84,24 +85,9 @@ public class Rolesorting implements SlashCommandEventHandler {
 	
 	private void rolesorter() {
 		for (int e = 0; e<members.size(); e++) {
-			this.sorter(guild, members.get(e), subroles, grouprole);
+			Toolbox.sortRoles(guild, members.get(e), subroles, grouprole);
 		}
 		this.cleanup();
 		channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue(response -> response.delete().queueAfter(10, TimeUnit.SECONDS));
-	}
-	
-	public void sorter(Guild iguild, Member mb, List<Role> sr, Role gr) {
-			int match = 0;
-			for (int i = 0; i < mb.getRoles().size(); i++) {
-				if (sr.contains(mb.getRoles().get(i))) {
-					match++;
-				}
-			}
-			if (match > 0 && !mb.getRoles().contains(gr)) {
-				iguild.addRoleToMember(mb, gr).queue();
-			}
-			if (match == 0 && mb.getRoles().contains(gr)) {
-				iguild.removeRoleFromMember(mb, gr).queue();
-			}
 	}
 }

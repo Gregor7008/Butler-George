@@ -3,6 +3,7 @@ package engines.data;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import assets.data.GuildData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -91,4 +92,9 @@ public class ConfigLoader {
 		} catch (JSONException e) {}
 		return config;
 	}
+	
+	//NEW SYSTEM
+    public GuildData getGuildData(Guild guild) {
+        return null;
+    }
  }

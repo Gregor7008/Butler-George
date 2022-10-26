@@ -6,7 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONObject;
 
-import assets.data.single.TicketSelectionData;
+import assets.data.single.ModMailData;
+import assets.data.single.ModMailSelectionData;
 import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -14,7 +15,7 @@ import net.dv8tion.jda.api.entities.User;
 public class UserData implements DataContainer {
 
     private final User user;
-    private TicketSelectionData ticket_selection;
+    private ModMailData modmail_selection;
     private ConcurrentHashMap<Guild, MemberData> member_datas = new ConcurrentHashMap<>();
     
 	public UserData(JSONObject data) {
@@ -27,12 +28,7 @@ public class UserData implements DataContainer {
     }
 
     @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
-        JSONObject ticket_selection_data = data.getJSONObject(Key.TICKET_SELECTION);
-        if (!ticket_selection_data.isEmpty()) {
-            this.ticket_selection = new TicketSelectionData(ticket_selection_data);
-        }
-        
+    public DataContainer instanciateFromJSON(JSONObject data) {        
         List<Guild> saved_guilds = new LinkedList<>();
         data.keySet().forEach(key -> {
             try {
@@ -42,7 +38,13 @@ public class UserData implements DataContainer {
                 }
             } catch (NumberFormatException e) {}
         });
-        saved_guilds.forEach(guild -> member_datas.put(guild, new MemberData(data.getJSONObject(guild.getId()))));
+        saved_guilds.forEach(guild -> member_datas.put(guild, new MemberData(guild, data.getJSONObject(guild.getId()))));
+
+        JSONObject modmail_selection_data = data.getJSONObject(Key.MODMAIL_SELECTION);
+        if (!modmail_selection_data.isEmpty()) {
+            ModMailSelectionData selection_data = new ModMailSelectionData(modmail_selection_data);
+            this.modmail_selection = member_datas.get(selection_data.getGuild()).getModmail(selection_data.getTicketId());
+        }
         return this;
     }
 
@@ -55,17 +57,31 @@ public class UserData implements DataContainer {
         compiledData.put(Key.USER_ID, user.getIdLong());
         compiledData.put(Key.USER_NAME, user.getName());
         compiledData.put(Key.USER_DISCRIMINATOR, user.getDiscriminator());
-        compiledData.put(Key.TICKET_SELECTION, this.ticket_selection.compileToJSON());
+        
+        ModMailSelectionData modmail_selection_data = new ModMailSelectionData();
+        if (modmail_selection != null) {
+            modmail_selection_data.setGuild(modmail_selection.getGuild()).setTicketId(modmail_selection.getTicketId());            
+        }
+        compiledData.put(Key.MODMAIL_SELECTION, modmail_selection_data);
         
         return compiledData;
     }
     
-    public TicketSelectionData getSelectedTicket() {
-        return this.ticket_selection;
+    public User getUser() {
+        return this.user;
     }
     
-    public UserData setSelectedTicket(TicketSelectionData ticket_selection) {
-        this.ticket_selection = ticket_selection;
+    public ModMailData getSelectedModMail() {
+        return this.modmail_selection;
+    }
+    
+    public UserData setSelectedModMail(ModMailData ticket_selection) {
+        this.modmail_selection = ticket_selection;
+        return this;
+    }
+    
+    public UserData setSelectedModMail(Guild guild, int ticket_id) {
+        this.modmail_selection = member_datas.get(guild).getModmail(ticket_id);
         return this;
     }
     
@@ -104,10 +120,10 @@ public class UserData implements DataContainer {
         return this;
     }
     
-    private static class Key {
+    private static abstract class Key {
         public static final String USER_ID = "id";
         public static final String USER_NAME = "name";
         public static final String USER_DISCRIMINATOR = "discriminator";
-        public static final String TICKET_SELECTION = "ticket_selection";
+        public static final String MODMAIL_SELECTION = "modmail_selection";
     }
 }
