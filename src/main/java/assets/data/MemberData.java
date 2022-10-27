@@ -16,6 +16,7 @@ import engines.data.ConfigLoader;
 import engines.data.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class MemberData implements DataContainer {
     
@@ -57,7 +58,12 @@ public class MemberData implements DataContainer {
         permanently_muted = data.getBoolean(Key.PERMANENTLY_MUTED);
         
         JSONObject modmails_object = data.getJSONObject(Key.MODMAILS);
-        modmails_object.keySet().forEach(key -> modmails.put(Integer.parseInt(key), ConfigLoader.INSTANCE.getGuildData(guild).getModMail(guild.getTextChannelById(modmails_object.getLong(key)))));
+        modmails_object.keySet().forEach(key -> {
+           TextChannel channel = guild.getTextChannelById(modmails_object.getLong(key));
+           if (channel != null) {
+               modmails.put(Integer.parseInt(key), ConfigLoader.INSTANCE.getGuildData(guild).getModMail(channel));
+           }
+        });
         modmails.values().removeAll(Collections.singleton(null));
         
         JSONArray warnings_array = data.getJSONArray(Key.WARNINGS);

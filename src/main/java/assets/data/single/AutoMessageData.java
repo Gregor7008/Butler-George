@@ -104,10 +104,10 @@ public class AutoMessageData implements DataContainer {
     }
     
     public MessageCreateAction buildMessage(User user) {
-        if (this.activated && (!title.isBlank() || !message.isBlank())) {
+        if (activated && (!title.isBlank() || !message.isBlank()) && text_channel != null) {
             String title_edit = Toolbox.processAutoMessage(title, guild, user, false);
             String message_edit = Toolbox.processAutoMessage(message, guild, user, true);
-            if (this.embedded) {
+            if (embedded) {
                 return text_channel.sendMessageEmbeds(LanguageEngine.buildMessage(title_edit, message_edit, null));
             } else {
                 StringBuilder sB = new StringBuilder();

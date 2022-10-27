@@ -37,7 +37,6 @@ public class GuildData implements DataContainer {
 	private VoiceChannel support_talk;
 	private Message offline_message;
 	private ConcurrentHashMap<VoiceChannel, Join2CreateChannelData> join2create_channels = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<VoiceChannel, VoiceChannel> join2create_channel_links = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Category, Member> custom_categories = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Integer, Role> level_rewards = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Integer, PenaltyData> penalties = new ConcurrentHashMap<>();
@@ -89,20 +88,29 @@ public class GuildData implements DataContainer {
         this.support_talk = guild.getVoiceChannelById(static_channels.getLong(Key.SUPPORT_TALK));
 
         JSONArray offline_message_data = data.getJSONObject(Key.STATIC_MESSAGES).getJSONArray(Key.OFFLINE_MESSAGE);
-        this.offline_message = guild.getTextChannelById(offline_message_data.getLong(1)).retrieveMessageById(offline_message_data.getLong(0)).complete();
+        if (!offline_message_data.isEmpty()) {
+            TextChannel channel = guild.getTextChannelById(offline_message_data.getLong(1));
+            if (channel != null) {
+                this.offline_message = channel.retrieveMessageById(offline_message_data.getLong(0)).complete();
+            }
+        }
 
         JSONObject j2c_channels_data = data.getJSONObject(Key.AUTO_CHANNELS).getJSONObject(Key.JOIN2CREATE_CHANNELS);
-        j2c_channels_data.keySet().forEach(channelId -> join2create_channels.put(guild.getVoiceChannelById(channelId), new Join2CreateChannelData(guild, j2c_channels_data.getJSONObject(channelId))));
-        join2create_channels.values().removeAll(Collections.singleton(null));
-        
-        JSONObject j2c_channels_link_data = data.getJSONObject(Key.AUTO_CHANNELS).getJSONObject(Key.JOIN2CREATE_CHANNEL_LINKS);
-        j2c_channels_link_data.keySet().forEach(channelId -> join2create_channel_links.put(guild.getVoiceChannelById(channelId), guild.getVoiceChannelById(j2c_channels_data.getLong(channelId))));
-        join2create_channel_links.values().removeAll(Collections.singleton(null));
+        j2c_channels_data.keySet().forEach(channelId -> {
+            VoiceChannel channel = guild.getVoiceChannelById(channelId);
+            if (channel != null) {
+                join2create_channels.put(channel, new Join2CreateChannelData(channel, j2c_channels_data.getJSONObject(channelId)));
+            }
+        });
 
         JSONObject custom_categories_data = data.getJSONObject(Key.AUTO_CHANNELS).getJSONObject(Key.CUSTOM_CATEGORIES);
-        custom_categories_data.keySet().forEach(categoryId -> custom_categories.put(guild.getCategoryById(categoryId), guild.getMemberById(custom_categories_data.getLong(categoryId))));
-        custom_categories.values().removeAll(Collections.singleton(null));
-        custom_categories.keySet().removeAll(Collections.singleton(null));
+        custom_categories_data.keySet().forEach(categoryId -> {
+            Category category = guild.getCategoryById(categoryId);
+            Member member = guild.retrieveMemberById(custom_categories_data.getLong(categoryId)).complete();
+            if (category != null) {
+                custom_categories.put(category, member);
+            }
+        });
 
         JSONObject lvl_reward_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.LEVEL_REWARDS);
         lvl_reward_data.keySet().forEach(level_count -> level_rewards.put(Integer.valueOf(level_count), guild.getRoleById(lvl_reward_data.getLong(level_count))));
@@ -112,28 +120,47 @@ public class GuildData implements DataContainer {
         penalties_data.keySet().forEach(warning_count -> penalties.put(Integer.valueOf(warning_count), new PenaltyData(penalties_data.getJSONObject(warning_count))));
 
         JSONObject modmails_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.MODMAILS);
-        modmails_data.keySet().forEach(channelId -> modmails.put(guild.getTextChannelById(channelId), new ModMailData(modmails_data.getJSONObject(channelId))));
+        modmails_data.keySet().forEach(channelId -> {
+            TextChannel channel = guild.getTextChannelById(channelId);
+            if (channel != null) {
+                modmails.put(channel, new ModMailData(modmails_data.getJSONObject(channelId)));
+            }
+        });
 
         JSONObject polls_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.POLLS);
         polls_data.keySet().forEach(channelId -> {
             TextChannel channel = guild.getTextChannelById(channelId);
-            ConcurrentHashMap<Message, PollData> pollSubMap = new ConcurrentHashMap<>();
-            JSONObject polls_sub_data = polls_data.getJSONObject(channelId);
-            polls_sub_data.keySet().forEach(messageId -> {
-                pollSubMap.put(channel.retrieveMessageById(messageId).complete(), new PollData(polls_sub_data.getJSONObject(messageId)));
-            });
-            polls.put(channel, pollSubMap);
+            if (channel != null) {
+                ConcurrentHashMap<Message, PollData> pollSubMap = new ConcurrentHashMap<>();
+                JSONObject polls_sub_data = polls_data.getJSONObject(channelId);
+                polls_sub_data.keySet().forEach(messageId -> {
+                    Message message = channel.retrieveMessageById(messageId).complete();
+                    if (message != null) {
+                        pollSubMap.put(message, new PollData(polls_sub_data.getJSONObject(messageId)));
+                    }
+                });
+                if (!pollSubMap.isEmpty()) {
+                    polls.put(channel, pollSubMap);
+                }
+            }
         });
 
         JSONObject reaction_roles_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.REACTION_ROLES);
         reaction_roles_data.keySet().forEach(channelId -> {
             TextChannel channel = guild.getTextChannelById(channelId);
-            ConcurrentHashMap<Message, ReactionRoleData> reactionRoleSubMap = new ConcurrentHashMap<>();
-            JSONObject reaction_role_sub_data = reaction_roles_data.getJSONObject(channelId);
-            reaction_role_sub_data.keySet().forEach(messageId -> {
-                reactionRoleSubMap.put(channel.retrieveMessageById(messageId).complete(), new ReactionRoleData(reaction_role_sub_data.getJSONObject(messageId)));
-            });
-            reaction_roles.put(channel, reactionRoleSubMap);
+            if (channel != null) {
+                ConcurrentHashMap<Message, ReactionRoleData> reactionRoleSubMap = new ConcurrentHashMap<>();
+                JSONObject reaction_role_sub_data = reaction_roles_data.getJSONObject(channelId);
+                reaction_role_sub_data.keySet().forEach(messageId -> {
+                    Message message = channel.retrieveMessageById(messageId).complete();
+                    if (message != null) {
+                        reactionRoleSubMap.put(message, new ReactionRoleData(reaction_role_sub_data.getJSONObject(messageId)));
+                    }
+                });
+                if (!reactionRoleSubMap.isEmpty()) {
+                    reaction_roles.put(channel, reactionRoleSubMap);
+                }
+            }
         });
         return this;
     }
@@ -224,10 +251,6 @@ public class GuildData implements DataContainer {
 	    JSONObject join2create_channels_object = new JSONObject();
 	    join2create_channels.forEach((channel, data) -> join2create_channels_object.put(channel.getId(), data.compileToJSON()));
 	    auto_channels.put(Key.JOIN2CREATE_CHANNELS, join2create_channels_object);
-	    
-	    JSONObject join2create_channel_links_object = new JSONObject();
-	    join2create_channel_links.forEach((channel, parent) -> join2create_channels_object.put(channel.getId(), parent.getIdLong()));
-	    auto_channels.put(Key.JOIN2CREATE_CHANNEL_LINKS, join2create_channel_links_object);
 	    
 	    JSONObject custom_channel_categories_object = new JSONObject();
 	    custom_categories.forEach((category, owner) -> custom_channel_categories_object.put(category.getId(), owner.getIdLong()));
@@ -537,45 +560,6 @@ public class GuildData implements DataContainer {
 	    }
         return this;
 	}
-	
-	public ConcurrentHashMap<VoiceChannel, VoiceChannel> getJoin2CreateChannelLinks() {
-		return this.join2create_channel_links;
-	}
-	
-	public VoiceChannel getParentJoin2CreateChannel(VoiceChannel channel) {
-	    return this.join2create_channel_links.get(channel);
-	}
-	
-	public Join2CreateChannelData getParentJoin2CreateChannelData(VoiceChannel channel) {
-	    return this.getJoin2CreateChannelData(this.getParentJoin2CreateChannel(channel));
-	}
-	
-	public GuildData setJoin2CreateChannelLinks(ConcurrentHashMap<VoiceChannel, VoiceChannel> join2create_channel_links) {
-	    DataTools.setMap(this.join2create_channel_links, join2create_channel_links);
-        return this;
-	}
-	
-	public GuildData addParentJoin2CreateChannel(VoiceChannel channel, VoiceChannel parent) {
-	    this.join2create_channel_links.put(channel, parent);
-        return this;
-	}
-	
-	public GuildData addParentJoin2CreateChannels(ConcurrentHashMap<VoiceChannel, VoiceChannel> join2create_channel_links) {
-	    this.join2create_channel_links.putAll(join2create_channel_links);
-        return this;
-	}
-	
-	public GuildData removeJoin2CreateChannelLinks(VoiceChannel... channels) {
-	    for (int i = 0; i < channels.length; i++) {
-            this.join2create_channel_links.remove(channels[i]);
-        }
-        return this;
-	}
-    
-    public GuildData removeJoin2CreateChannelLinksByParents(VoiceChannel... parents) {
-        DataTools.removeFromMap(this.join2create_channel_links, parents);
-        return this;
-    }
 
 	public ConcurrentHashMap<Category, Member> getCustomCategories() {
 		return this.custom_categories;
@@ -822,7 +806,6 @@ public class GuildData implements DataContainer {
             public static final String SUPPORT_TALK = "support_talk";
         public static final String AUTO_CHANNELS = "auto_channels";
             public static final String JOIN2CREATE_CHANNELS = "join2create_channels";
-            public static final String JOIN2CREATE_CHANNEL_LINKS = "join2create_channel_links";
             public static final String CUSTOM_CATEGORIES = "custom_categories";
         public static final String OTHER = "other";
             public static final String LEVEL_REWARDS = "level_rewards";

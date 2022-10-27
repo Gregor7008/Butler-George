@@ -1,6 +1,7 @@
 package assets.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +29,7 @@ public abstract class DataTools {
             target.clear();
         } else {
             target = replacement;
+            target.removeAll(Collections.singleton(null));
         }
     }
     
@@ -35,6 +37,7 @@ public abstract class DataTools {
         for (int i = 0; i < indices.length; i++) {
             list.remove(indices[i]);
         }
+        list.removeAll(Collections.singleton(null));
     }
     
     public static <K, V> void setMap(ConcurrentHashMap<K, V> target, ConcurrentHashMap<K, V> replacement) {
@@ -42,6 +45,8 @@ public abstract class DataTools {
             target.clear();
         } else {
             target = replacement;
+            target.values().removeAll(Collections.singleton(null));
+            target.keySet().removeAll(Collections.singleton(null));
         }
     }
     
@@ -57,5 +62,7 @@ public abstract class DataTools {
         for (int i = 0; i < keysToRemove.size(); i++) {
             map.remove(keysToRemove.get(i));
         }
+        map.values().removeAll(Collections.singleton(null));
+        map.keySet().removeAll(Collections.singleton(null));
     }
 }
