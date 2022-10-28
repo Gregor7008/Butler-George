@@ -6,6 +6,7 @@ import engines.base.LanguageEngine;
 import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -22,40 +23,40 @@ public class Language implements SlashCommandEventHandler {
 		StringSelectMenu menu = StringSelectMenu.create("sellang")
 				.setPlaceholder("Select your language")
 				.setRequiredRange(1, 1)
-				.addOption("English", "en")
-				.addOption("Deutsch", "de")
-				.addOption("Español", "es")
-				.addOption("Français", "fr")
-				.addOption("Dutch", "nl")
+				.addOption("English", "en", Emoji.fromUnicode("\uD83C\uDDEC\uD83C\uDDE7"))
+				.addOption("Deutsch", "de", Emoji.fromUnicode("\uD83C\uDDE9\uD83C\uDDEA"))
+				.addOption("Español", "es", Emoji.fromUnicode("\uD83C\uDDEA\uD83C\uDDF8"))
+				.addOption("Français", "fr", Emoji.fromUnicode("\uD83C\uDDEB\uD83C\uDDF7"))
+				.addOption("Dutch", "nl", Emoji.fromUnicode("\uD83C\uDDF3\uD83C\uDDF1"))
 				.build();
-		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "chooselang"))
+		InteractionHook reply = event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "chooselang"))
 				.addActionRow(menu)
 				.complete();
 		AwaitTask.forStringSelectInteraction(guild, user, reply.retrieveOriginal().complete(),
 				e -> {e.editSelectMenu(menu.asDisabled()).queue();
 					  switch (e.getSelectedOptions().get(0).getValue()) {
 				      	case "en":
-				      		ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("language", "en");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successen")).queue();
+				      		ConfigLoader.INSTANCE.getMemberData(guild, user).setLanguage(LanguageEngine.Language.ENGLISH);
+				      		e.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "successen")).queue();
 				      		break;
 				      	case "de":
-				      		ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("language", "de");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successde")).queue();
+				      		ConfigLoader.INSTANCE.getMemberData(guild, user).setLanguage(LanguageEngine.Language.GERMAN);
+				      		e.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "successde")).queue();
 				      		break;
 				      	case "es":
-				      		ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("language", "es");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successes")).queue();
+				      		ConfigLoader.INSTANCE.getMemberData(guild, user).setLanguage(LanguageEngine.Language.SPANISH);
+				      		e.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "successes")).queue();
 				      		break;
 				      	case "fr":
-				      		ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("language", "fr");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successfr")).queue();
+				      		ConfigLoader.INSTANCE.getMemberData(guild, user).setLanguage(LanguageEngine.Language.FRENCH);
+				      		e.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "successfr")).queue();
 				      		break;
 				      	case "nl":
-				      		ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("language", "nl");
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "successnl")).queue();
+				      		ConfigLoader.INSTANCE.getMemberData(guild, user).setLanguage(LanguageEngine.Language.DUTCH);
+				      		e.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "successnl")).queue();
 				      		break;
 				      	default:
-				      		e.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal")).queue();
+				      		e.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "fatal")).queue();
 						}
 					})
 		.addValidComponents(menu.getId()).append();

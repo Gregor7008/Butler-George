@@ -37,7 +37,7 @@ public class Channelpermission implements SlashCommandEventHandler {
 		final Guild guild = event.getGuild();
 		Long ctgid = ConfigLoader.INSTANCE.getMemberConfig(guild, user).getLong("customchannelcategory");
 		if (ctgid == 0 || !event.getGuildChannel().asStandardGuildMessageChannel().getParentCategory().equals(guild.getCategoryById(ctgid))) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nopermission")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		StringSelectMenu menu = StringSelectMenu.create("permselection")
@@ -58,7 +58,7 @@ public class Channelpermission implements SlashCommandEventHandler {
 				.addOption("Use Slash-Commands", "usc")
 				.addOption("All Permissions", "apm")
 				.build();
-		InteractionHook reply = event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selperm"))
+		InteractionHook reply = event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "selperm"))
 				.addActionRow(menu)
 				.complete();
 		AwaitTask.forStringSelectInteraction(guild, user, reply.retrieveOriginal().complete(), null,
@@ -67,7 +67,7 @@ public class Channelpermission implements SlashCommandEventHandler {
 					  } else {
 						  this.defineEdit(e.getSelectedOptions().get(0).getValue(), event, e, false);
 					  }},
-				() -> {event.getHook().editOriginalEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));})
+				() -> {event.getHook().editOriginalEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "timeout")).queue(r -> r.delete().queueAfter(3, TimeUnit.SECONDS));})
 		.addValidComponents(menu.getId()).append();	
 	}
 	
@@ -92,7 +92,7 @@ public class Channelpermission implements SlashCommandEventHandler {
 		GuildChannel channel = guild.getGuildChannelById(event.getOption("channel_or_category").getAsLong());
 		Category category = guild.getCategoryById(event.getOption("channel_or_category").getAsLong());
 		if (pholder.equals(guild.getSelfMember()) && !action) {
-			sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "1")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			sme.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "1")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (category != null) {
@@ -102,22 +102,22 @@ public class Channelpermission implements SlashCommandEventHandler {
 			}
 			this.updateCategoryPerms(pholder, category, selected, action);
 			if (action) {
-				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
+				sme.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "addsuccess")).queue();
 			} else {
-				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
+				sme.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "remsuccess")).queue();
 			}
 			return;
 		}
 		if (channel != null) {
 			this.updateChannelPerms(pholder, channel, selected, action);
 			if (action) {
-				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "addsuccess")).queue();
+				sme.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "addsuccess")).queue();
 			} else {
-				sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).queue();
+				sme.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "remsuccess")).queue();
 			}
 			return;
 		}
-		sme.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal")).queue();
+		sme.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "fatal")).queue();
 	}
 	
 	private void updateChannelPerms(IPermissionHolder pholder, GuildChannel channel, String selected, boolean action) {

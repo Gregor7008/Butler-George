@@ -4,6 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import assets.data.GuildData;
+import assets.data.MemberData;
+import assets.data.UserData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -95,6 +97,14 @@ public class ConfigLoader {
 	
 	//NEW SYSTEM
     public GuildData getGuildData(Guild guild) {
+        return null;
+    }
+    
+    public UserData getUserData(User user) {
+        return null;
+    }
+    
+    public MemberData getMemberData(Guild guild, User user) {
         return null;
     }
  }

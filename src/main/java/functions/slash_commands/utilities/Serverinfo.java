@@ -4,6 +4,7 @@ package functions.slash_commands.utilities;
 import java.time.format.DateTimeFormatter;
 
 import assets.functions.SlashCommandEventHandler;
+import base.Bot;
 import engines.base.LanguageEngine;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,7 +24,7 @@ public class Serverinfo implements SlashCommandEventHandler {
 		eb.setTitle(titles[0] + "\s" + guild.getName());
 		eb.setThumbnail(guild.getIconUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(LanguageEngine.getDefaultFooter());
+		eb.setFooter(LanguageEngine.buildFooter(Bot.DEFAULT_FOOTER));
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[1], "`" + guild.getName() + "`", true);

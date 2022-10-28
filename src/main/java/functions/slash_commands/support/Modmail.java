@@ -52,7 +52,7 @@ public class Modmail implements SlashCommandEventHandler {
 			if (event.getSubcommandName().equals("list")) {
 				this.listOnGuild(event);
 			} else {
-				event.getUser().openPrivateChannel().complete().sendMessageEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), this, "testing")).queue(
+				event.getUser().openPrivateChannel().complete().sendMessageEmbeds(LanguageEngine.getMessageEmbed(event.getGuild(), event.getUser(), this, "testing")).queue(
 						message -> {
 							message.delete().queueAfter(1, TimeUnit.SECONDS);
 							switch (event.getSubcommandName()) {
@@ -66,11 +66,11 @@ public class Modmail implements SlashCommandEventHandler {
 								this.closeOnGuild(event);
 								break;
 							default:
-								event.replyEmbeds(LanguageEngine.fetchMessage(null, null, null, "fatal")).queue();
+								event.replyEmbeds(LanguageEngine.getMessageEmbed(null, null, null, "fatal")).queue();
 							}
 						},
 						error -> {
-							event.replyEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), this, "testerror")).queue();
+							event.replyEmbeds(LanguageEngine.getMessageEmbed(event.getGuild(), event.getUser(), this, "testerror")).queue();
 							return;
 						});
 			}
@@ -89,7 +89,7 @@ public class Modmail implements SlashCommandEventHandler {
 				this.closeOnPrivate(event);
 				break;
 			default:
-				event.replyEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), null, "fatal")).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(event.getGuild(), event.getUser(), null, "fatal")).queue();
 			}
 		}
 	}
@@ -117,7 +117,7 @@ public class Modmail implements SlashCommandEventHandler {
 			return g.isMember(user);
 		}).toList();
 		availableGuilds.forEach(g -> menu.addOption(g.getName(), g.getId(), g.getDescription()));
-		Message response = event.replyEmbeds(LanguageEngine.fetchMessage(null, event.getUser(), this, "selguild"))
+		Message response = event.replyEmbeds(LanguageEngine.getMessageEmbed(null, event.getUser(), this, "selguild"))
 				.setActionRow(menu.build())
 				.complete().retrieveOriginal().complete();
 		AwaitTask.forStringSelectInteraction(null, user, response,
@@ -148,9 +148,9 @@ public class Modmail implements SlashCommandEventHandler {
 		final User user = event.getUser();
 		String list = this.list(user, guild, null);
 		if (list.equals("")) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noticketsguild")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "noticketsguild")).queue();
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list")
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "list")
 					.replaceDescription("{tickets}", list)).queue();
 		}
 	}
@@ -159,9 +159,9 @@ public class Modmail implements SlashCommandEventHandler {
 		final User user = event.getUser();
 		String list = this.list(user, null, null);
 		if (list.equals("")) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(null, user, this, "noticketsguild")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(null, user, this, "noticketsguild")).queue();
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(null, user, this, "list")
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(null, user, this, "list")
 					.replaceDescription("{tickets}", list)).queue();
 		}
 	}
@@ -223,7 +223,7 @@ public class Modmail implements SlashCommandEventHandler {
 					} else {
 						addon = LanguageEngine.getRaw(guild, user, this, "setsupportrole");
 					}
-					ticketChannel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "newticket")
+					ticketChannel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "newticket")
 							.replaceDescription("{user}", user.getName())
 							.replaceDescription("{mention}", guild.getPublicRole().getAsMention())
 							.replaceDescription("{addon}", addon))
@@ -234,15 +234,15 @@ public class Modmail implements SlashCommandEventHandler {
 					ConfigLoader.INSTANCE.getUserConfig(user).put("selected_ticket", new JSONArray().put(guild.getIdLong()).put(id));
 					if (event instanceof StringSelectInteractionEvent) {
 						mi.editMessageEmbeds(
-								LanguageEngine.fetchMessage(guild, user, this, "openSuccess")
+								LanguageEngine.getMessageEmbed(guild, user, this, "openSuccess")
 											  .replaceDescription("{guild}", guild.getName())
 											  .replaceDescription("{title}", mi.getValue("title").getAsString())).setComponents().queue();
 					} else if (event instanceof SlashCommandInteractionEvent) {
-						mi.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "openSuccess")
+						mi.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "openSuccess")
 								.replaceDescription("{guild}", guild.getName())
 								.replaceDescription("{title}", mi.getValue("title").getAsString())).setComponents().setEphemeral(true).queue();
 						user.openPrivateChannel().complete().sendMessageEmbeds(
-								LanguageEngine.fetchMessage(guild, user, this, "selectSuccess")
+								LanguageEngine.getMessageEmbed(guild, user, this, "selectSuccess")
 											   .replaceDescription("{guild}", guild.getName())
 								  			   .replaceDescription("{title}", mi.getValue("title").getAsString())).queue();
 					}
@@ -256,9 +256,9 @@ public class Modmail implements SlashCommandEventHandler {
 		String list = this.list(user, guild, menu);
 		if (list.equals("")) {
 			if (guild != null) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noticketsguild")).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "noticketsguild")).queue();
 			} else {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noticketsprivate")).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "noticketsprivate")).queue();
 			}
 			return;
 		}
@@ -285,7 +285,7 @@ public class Modmail implements SlashCommandEventHandler {
 				return;
 			}
 		}
-		Message response = event.replyEmbeds(LanguageEngine.fetchMessage(null, user, this, "selticket")
+		Message response = event.replyEmbeds(LanguageEngine.getMessageEmbed(null, user, this, "selticket")
 				.replaceDescription("{tickets}", list))
 				.setActionRow(menu.build())
 				.complete().retrieveOriginal().complete();
@@ -304,7 +304,7 @@ public class Modmail implements SlashCommandEventHandler {
 		final JSONArray newTicketData = ConfigLoader.INSTANCE.getMemberConfig(finalGuild, user, "modmails").getJSONArray(selection[1]);
 		currentTicketData.put(2, finalGuild.getTextChannelById(currentTicketData.getLong(0)).getLatestMessageIdLong());
 		userConfig.put("selected_ticket", new JSONArray().put(finalGuild.getIdLong()).put(Long.valueOf(selection[1])));
-		MessageEmbed embed = LanguageEngine.fetchMessage(finalGuild, user, this, "selectSuccess")
+		MessageEmbed embed = LanguageEngine.getMessageEmbed(finalGuild, user, this, "selectSuccess")
 				.replaceDescription("{title}", ConfigLoader.INSTANCE
 						.getMemberConfig(finalGuild, user, "modmails")
 						.getJSONArray(selection[1])
@@ -400,25 +400,25 @@ public class Modmail implements SlashCommandEventHandler {
 			return;
 		} else if (event instanceof SlashCommandInteractionEvent) {
 			SlashCommandInteractionEvent castedEvent = (SlashCommandInteractionEvent) event;
-			feedbackMessage = castedEvent.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "awaitConfirm")
+			feedbackMessage = castedEvent.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "awaitConfirm")
 					.replaceDescription("{guild}", ticketGuild.getName())
 					.replaceDescription("{title}", ticketTitle))
 			.setComponents().complete().retrieveOriginal().complete();
 
 		} else if (event instanceof StringSelectInteractionEvent) {
 		    StringSelectInteractionEvent castedEvent = (StringSelectInteractionEvent) event;
-			feedbackMessage = castedEvent.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "awaitConfirm")
+			feedbackMessage = castedEvent.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "awaitConfirm")
 					.replaceDescription("{guild}", ticketGuild.getName())
 					.replaceDescription("{title}", ticketTitle))
 			.setComponents().complete().retrieveOriginal().complete();
 		}
 		if (event.isFromGuild()) {
-			ticketUser.openPrivateChannel().complete().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "awaitConfirm")
+			ticketUser.openPrivateChannel().complete().sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "awaitConfirm")
 					.replaceDescription("{guild}", ticketGuild.getName())
 					.replaceDescription("{title}", ticketTitle))
 			.setComponents().queue();
 		}
-		ticketChannel.sendMessageEmbeds(LanguageEngine.fetchMessage(null, null, this, "closeConfirmation")
+		ticketChannel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(null, null, this, "closeConfirmation")
 				.replaceDescription("{user}", ticketUser.getName()))
 		.setActionRow(
 				Button.secondary(buttonCriteria + "_confirmclose", Emoji.fromUnicode("\u2705")),
@@ -435,11 +435,11 @@ public class Modmail implements SlashCommandEventHandler {
 		final JSONArray channelProperties = modmails.getJSONArray(channelID);
 		final JSONArray selectedTicket = ConfigLoader.INSTANCE.getUserConfig(user).getJSONArray("selected_ticket");
 		final PrivateChannel userChannel = user.openPrivateChannel().complete();
-		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, event.getUser(), this, "closeSuccessAdmin")).setComponents().queue();
+		event.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, event.getUser(), this, "closeSuccessAdmin")).setComponents().queue();
 		try {
 			userChannel.retrieveMessageById(channelProperties.getLong(2)).complete().delete().queue();
 		} catch (JSONException e) {}
-		userChannel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "closeSuccessPrivate")
+		userChannel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "closeSuccessPrivate")
 				.replaceDescription("{guild}", guild.getName())
 				.replaceDescription("{title}", ConfigLoader.INSTANCE
 						.getMemberConfig(guild, user, "modmails")

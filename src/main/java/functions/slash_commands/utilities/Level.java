@@ -45,13 +45,13 @@ public class Level implements SlashCommandEventHandler {
 			user = event.getOption("user").getAsUser();
 		}
 		if (guild.getMember(user).equals(guild.getSelfMember())) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "3")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "3")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		event.deferReply().queue();
 		File finalimage = this.renderLevelcard(user, guild);
         if (finalimage == null) {
-        	event.getHook().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fatal")).queue();
+        	event.getHook().sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "fatal")).queue();
         } else {
         	event.getHook().sendMessage("").addFiles(FileUpload.fromData(finalimage)).queue();
         }

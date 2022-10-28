@@ -32,11 +32,11 @@ public class Warning implements SlashCommandEventHandler {
 				reason = event.getOption("reason").getAsString();
 			}
 			ConfigLoader.INSTANCE.getMemberConfig(guild, iuser).getJSONArray("warnings").put(reason);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")).queue();
 			try {
 				final String repl = reason;
 				iuser.openPrivateChannel().queue(channel -> {
-					channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, iuser, this, "pm")
+					channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, iuser, this, "pm")
 							.replaceDescription("{guild}", guild.getName())
 							.replaceDescription("{reason}", repl)).queue();
 				});
@@ -47,7 +47,7 @@ public class Warning implements SlashCommandEventHandler {
 		}
 		if (event.getSubcommandName().equals("remove")) {
 			if (this.listwarnings(event)) {
-				event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsel")).queue();
+				event.getChannel().sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "remsel")).queue();
 				TextChannel channel = guild.getTextChannelById(event.getMessageChannel().getIdLong());
 				AwaitTask.forMessageReceival(guild, user, channel,
 						e -> {try {
@@ -56,7 +56,7 @@ public class Warning implements SlashCommandEventHandler {
 							  } catch (NumberFormatException ex) {return false;}},
 						e -> {JSONArray warnings = ConfigLoader.INSTANCE.getMemberConfig(guild, iuser).getJSONArray("warnings");
 							  int w = Integer.parseInt(e.getMessage().getContentRaw());
-							  channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")
+							  channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "remsuccess")
 									  .replaceDescription("{warning}", "`" + warnings.getString(w-1) + "`")
 									  .replaceDescription("{user}", guild.getMember(iuser).getEffectiveName())).queue();
 							  warnings.remove(w-1);}, null).append();
@@ -86,7 +86,7 @@ public class Warning implements SlashCommandEventHandler {
 		final User iuser = event.getOption("user").getAsUser();
 		JSONArray warnings = ConfigLoader.INSTANCE.getMemberConfig(guild, iuser).getJSONArray("warnings");
 		if (warnings.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nowarnings")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nowarnings")).queue();
 			return false;
 		}
 		StringBuilder sB = new StringBuilder();
@@ -99,7 +99,7 @@ public class Warning implements SlashCommandEventHandler {
 				sB.append("\n");
 			} else {}
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list")
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "list")
 				.replaceTitle("{user}", guild.getMemberById(iuser.getId()).getEffectiveName())
 				.replaceDescription("{list}", sB.toString())).queue();
 		return true;

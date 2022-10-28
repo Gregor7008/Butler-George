@@ -122,8 +122,6 @@ public abstract class Toolbox {
 		}
 	}
 	
-
-    
     public static void sortRoles(Guild guild, Member member, List<Role> sorting_roles, Role group_role) {
             int match = 0;
             for (int i = 0; i < member.getRoles().size(); i++) {

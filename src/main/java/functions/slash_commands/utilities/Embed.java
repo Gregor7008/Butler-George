@@ -63,10 +63,10 @@ public class Embed implements SlashCommandEventHandler {
 			this.target = this.channel;
 		}
 		if (!member.hasPermission(target, Permission.MESSAGE_SEND)) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "invalid")).queue();
 			return;
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setup")).queue();
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "setup")).queue();
 		this.startEmbedConfiguration(event.getHook().retrieveOriginal().complete());
 	}
 
@@ -82,7 +82,7 @@ public class Embed implements SlashCommandEventHandler {
 	private void startEmbedConfiguration(Message message) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
-		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "author"))
+		message.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "author"))
 			 .setActionRow(Button.secondary("true", Emoji.fromUnicode("\u2705")),
 					  	   Button.secondary("false", Emoji.fromUnicode("\u274C"))).queue();
 		AwaitTask.forButtonInteraction(guild, user, message,
@@ -115,7 +115,7 @@ public class Embed implements SlashCommandEventHandler {
 			 						    Button.secondary("cancel", Emoji.fromUnicode("\u274C"))));
 			messageAddon = LanguageEngine.getRaw(guild, user, this, "addon");
 		}
-		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selvalue").replaceDescription("{addon}", messageAddon)).setComponents(actionRows).queue();
+		message.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "selvalue").replaceDescription("{addon}", messageAddon)).setComponents(actionRows).queue();
 		AtomicReference<AwaitTask<ButtonInteractionEvent>> buttonInteractionTask = new AtomicReference<>(null);
 		AwaitTask<StringSelectInteractionEvent> selectionMenuTask = AwaitTask.forStringSelectInteraction(guild, user, message,
 				s -> {
@@ -142,7 +142,7 @@ public class Embed implements SlashCommandEventHandler {
 						this.configureFields(menu, eb, s);
 						break;
 					default:
-						s.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "fatal")).queue();
+						s.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, null, "fatal")).queue();
 					}
 				}).addValidComponents(menu.getId()).append();
 		if (!firstCall) {
@@ -158,9 +158,9 @@ public class Embed implements SlashCommandEventHandler {
 							});
 							sendAction.queue();
 							embedCache.clear();
-							mecAction = b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "sendsuccess")).setComponents();
+							mecAction = b.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "sendsuccess")).setComponents();
 						} else if (b.getButton().getId().equals("cancel")) {
-							mecAction = b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "cancelsuccess")).setComponents();
+							mecAction = b.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "cancelsuccess")).setComponents();
 						} else if (b.getButton().getId().equals("again")) {
 							embedCache.add(eb.build());
 							b.deferEdit().queue();
@@ -262,7 +262,7 @@ public class Embed implements SlashCommandEventHandler {
 	}
 	
 	private void configureThumbnail(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
-		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "configthumbnail")).setComponents().queue();
+		event.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "configthumbnail")).setComponents().queue();
 		AwaitTask.forMessageReceival(guild, user, channel,
 				m -> {
 					return !m.getMessage().getAttachments().stream().filter(a -> a.isImage()).toList().isEmpty();
@@ -287,7 +287,7 @@ public class Embed implements SlashCommandEventHandler {
 	}
 	
 	private void configureImage(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
-		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "configthumbnail")).setComponents().queue();
+		event.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "configthumbnail")).setComponents().queue();
 		AwaitTask.forMessageReceival(guild, user, channel,
 				m -> {
 					return !m.getMessage().getAttachments().stream().filter(a -> a.isImage()).toList().isEmpty();
@@ -321,7 +321,7 @@ public class Embed implements SlashCommandEventHandler {
 			for (int i = 0; i < fields.size(); i++) {
 				menuBuilder.addOption(fields.get(i).getName(), String.valueOf(i));
 			}
-			event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selfield")).setActionRow(menuBuilder.build()).queue();
+			event.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "selfield")).setActionRow(menuBuilder.build()).queue();
 			AwaitTask.forStringSelectInteraction(guild, user, event.getMessage(), null,
 					sm -> {
 						String value = sm.getSelectedOptions().get(0).getValue();
@@ -357,7 +357,7 @@ public class Embed implements SlashCommandEventHandler {
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
 				mi -> {
-					mi.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selinline"))
+					mi.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "selinline"))
 							.setActionRow(Button.secondary("true", Emoji.fromUnicode("\u2705")),
 										  Button.secondary("false", Emoji.fromUnicode("\u274C"))).queue();
 					AwaitTask.forButtonInteraction(guild, user, event.getMessage(), null,
@@ -384,18 +384,18 @@ public class Embed implements SlashCommandEventHandler {
 	}
 	
 	private void defaultConsumer(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event, String key, String input) {
-		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, key + "success")
+		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, key + "success")
 				.replaceDescription("{" + key + "}", input)).setComponents().complete();
 		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
 	}
 	
 	private void errorConsumer(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
-		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).setComponents().complete();
+		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "error")).setComponents().complete();
 		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
 	}
 	
 	private void defaultTimeout(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
-		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).setComponents().complete();
+		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "timeout")).setComponents().complete();
 		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
 	}
 }

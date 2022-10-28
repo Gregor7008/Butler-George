@@ -173,7 +173,7 @@ public class AwaitTask<T extends GenericEvent> {
 			try {
 				this.eventConsumer.accept(event);
 			} catch (InsufficientPermissionException e) {
-				MessageEmbed embed = LanguageEngine.fetchMessage(null, null, null, "insufficientperms")
+				MessageEmbed embed = LanguageEngine.getMessageEmbed(null, null, null, "insufficientperms")
 						.replaceDescription("{permissions}", e.getPermission().getName().toLowerCase());
 				if (event instanceof IMessageEditCallback) {
 					IMessageEditCallback messageEditCallbackEvent = (IMessageEditCallback) event;
@@ -204,9 +204,9 @@ public class AwaitTask<T extends GenericEvent> {
 				this.cancelled = true;
 			};
 			if (message != null) {
-				message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setComponents().queue(s -> {}, failureConsumer);
+				message.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, null, keyword)).setComponents().queue(s -> {}, failureConsumer);
 			} else {
-				channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, keyword)).setComponents().queue(s -> {}, failureConsumer);
+				channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, null, keyword)).setComponents().queue(s -> {}, failureConsumer);
 			}
 		}
 		return this;

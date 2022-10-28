@@ -68,7 +68,7 @@ public class Leave implements SlashCommandEventHandler {
 				}
 			}
 		} catch (ClassCastException e) {}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "invalid")).queue();
 	}
 
 	@Override

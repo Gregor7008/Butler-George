@@ -29,7 +29,7 @@ public class AutoRoles implements ConfigurationEventHandler {
 	public void execute(ConfigurationEvent event) {
 		guild = event.getGuild();
 		user = event.getUser();
-		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selacc"))
+		event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "selacc"))
 				.setActionRow(Button.secondary("user", Emoji.fromUnicode("\uD83D\uDEB9")),
 							  Button.secondary("bot", Emoji.fromUnicode("\uD83E\uDD16"))).queue();
 		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
@@ -41,10 +41,10 @@ public class AutoRoles implements ConfigurationEventHandler {
 					}
 					if (event.getSubOperation().equals("remove")) {
 						ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(selection + "autoroles").clear();
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "remsuccess")).setComponents().queue();
+						b.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "remsuccess")).setComponents().queue();
 						return;
 					}
-					b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defroles")).setComponents().queue();
+					b.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "defroles")).setComponents().queue();
 					AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 							e -> {return !e.getMessage().getMentions().getRoles().isEmpty();},
 							e -> {
@@ -57,13 +57,13 @@ public class AutoRoles implements ConfigurationEventHandler {
 											autoroles.put(roleIDs.get(i));
 										}
 									}
-									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "addsuccess")).queue();
+									event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, selection + "addsuccess")).queue();
 								}
 								if (event.getSubOperation().equals("delete")) {
 									for (int i = 0; i < roleIDs.size(); i++) {
 										Toolbox.removeValueFromArray(autoroles, roleIDs.get(i));
 									}
-									event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "delsuccess")).queue();
+									event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, selection + "delsuccess")).queue();
 								}
 							}, null).append();
 				}).append();
@@ -87,7 +87,7 @@ public class AutoRoles implements ConfigurationEventHandler {
 		StringBuilder sB = new StringBuilder();
 		JSONArray autoroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray(selection + "autoroles");
 		if (autoroles.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, selection + "noautoroles")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, selection + "noautoroles")).queue();
 			return;
 		}
 		for (int i = 0; i < autoroles.length(); i++) {
@@ -99,7 +99,7 @@ public class AutoRoles implements ConfigurationEventHandler {
 				sB.append(guild.getRoleById(autoroles.getLong(i)).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user,  this, selection + "list").replaceDescription("{list}", sB.toString())).queue();
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user,  this, selection + "list").replaceDescription("{list}", sB.toString())).queue();
 	}
 
 	@Override

@@ -20,20 +20,20 @@ public class Stop implements SlashCommandEventHandler {
 		final Member self = guild.getSelfMember();
 		final User user = event.getUser();
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nopermission")).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nopermission")).queue();
 			return;
 		}
 		Toolbox.stopMusicAndLeaveOn(guild);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "stopped")).queue();
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "stopped")).queue();
 	}
 
 	@Override

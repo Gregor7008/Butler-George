@@ -108,16 +108,9 @@ public class AutoMessageData implements DataContainer {
             String title_edit = Toolbox.processAutoMessage(title, guild, user, false);
             String message_edit = Toolbox.processAutoMessage(message, guild, user, true);
             if (embedded) {
-                return text_channel.sendMessageEmbeds(LanguageEngine.buildMessage(title_edit, message_edit, null));
+                return text_channel.sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title_edit, message_edit));
             } else {
-                StringBuilder sB = new StringBuilder();
-                if (!title.isBlank()) {
-                    sB.append("**" + title_edit + "**\n");
-                }
-                if (!message.isBlank()) {
-                    sB.append(message_edit);
-                }
-                return text_channel.sendMessage(sB.toString());
+                return text_channel.sendMessage(LanguageEngine.buildMessage(title_edit, message_edit));
             }
         } else {
             return null;

@@ -54,33 +54,33 @@ public class Rolesorting implements SlashCommandEventHandler {
 	}
 
 	private void definegroup() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definegroup")).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "definegroup")).complete());
 		AwaitTask.forMessageReceival(guild, user, channel, null,
 				e -> {messages.add(e.getMessage());
 				      grouprole = e.getMessage().getMentions().getRoles().get(0);
 				      this.definesub();},
 			   () -> {this.cleanup();
-				   	  channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
+				   	  channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
 	}
 	
 	private void definesub() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definesub")).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "definesub")).complete());
 		AwaitTask.forMessageReceival(guild, user, channel, null,
 							e -> {messages.add(e.getMessage());
 								  subroles = e.getMessage().getMentions().getRoles();
 								  this.definemember();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
+								   channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
 	}
 
 	private void definemember() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "definemember")).complete());
+		messages.add(channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "definemember")).complete());
 		AwaitTask.forMessageReceival(guild, user, channel, null,
 							e -> {messages.add(e.getMessage());
 								  members = e.getMessage().getMentions().getMembers();
 								  this.rolesorter();},
 							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
+								   channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
 	}
 	
 	private void rolesorter() {
@@ -88,6 +88,6 @@ public class Rolesorting implements SlashCommandEventHandler {
 			Toolbox.sortRoles(guild, members.get(e), subroles, grouprole);
 		}
 		this.cleanup();
-		channel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue(response -> response.delete().queueAfter(10, TimeUnit.SECONDS));
+		channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")).queue(response -> response.delete().queueAfter(10, TimeUnit.SECONDS));
 	}
 }

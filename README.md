@@ -102,8 +102,8 @@ On the [29th of August 2021](https://github.com/Gregor7008/Butler-George/commit/
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If you aren't familiar with GitHub: [Reach out](https://github.com/Gregor7008/Butler-George/tree/V2#-contact-us) to us we're grateful to help!<br>
 
 1. #### Quick Start
-   We currently have 5 languages to choose from: English (`en`), German (`de`), Spanish (`es`), French (`fr`) and Dutch (`nl`).<br>
-   To start translating, please copy the default `en` folder in `src/main/resources/languages` and rename it to either one of the already supported abbreviations or to the two letter abbreviation of a new language.<br>
+   We currently have 5 languages to choose from: English , German , Spanish , French and Dutch .<br>
+   To start translating, please copy the default `english` folder in `src/main/resources/languages` and rename it to either one of the already supported languages (lower case only) or any new language.<br>
    <ins>**Please note:**</ins> A new language will not be available as soon as the folder is created, as we have add it to the bots internal list!
 
 2. #### Keywords

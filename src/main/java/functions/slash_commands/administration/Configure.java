@@ -34,7 +34,7 @@ public class Configure implements SlashCommandEventHandler {
 		final User user = event.getUser();
 		
 		StringSelectMenu.Builder menuBuilder1 = StringSelectMenu.create("selVal").setRequiredRange(1, 1).setPlaceholder("Select a value");
-		EmbedBuilder eb1 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selval"));
+		EmbedBuilder eb1 = new EmbedBuilder(LanguageEngine.getMessageEmbed(guild, user, this, "selval"));
 		
 		if (event.getSubcommandName().equals("server")) {
 			ServerConfigurationOptionsList.getConfigurationOptionData().forEach(data -> {
@@ -48,7 +48,7 @@ public class Configure implements SlashCommandEventHandler {
 //				menuBuilder1.addOption(name, name);
 //				eb1.addField("`" + name + "`", data.getInfo(), true);
 //			});
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, null, "unsupportedBG")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, null, "unsupportedBG")).queue();
 			return;
 		}
 		
@@ -76,14 +76,14 @@ public class Configure implements SlashCommandEventHandler {
 						}
 					}
 					if (!event.getMember().hasPermission(data.getRequiredPermissions())) {
-						e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "nopermission"));
+						e.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, null, "nopermission"));
 					} else if (insufficientPermissions && !event.getMember().isOwner() && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-						e.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, null, "insufficientperms").replaceDescription("{permissions}", sB.toString())).queue();
+						e.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, null, "insufficientperms").replaceDescription("{permissions}", sB.toString())).queue();
 					} else {
 						ConfigurationSubOptionData[] subOperations = data.getSubOptions();
 						if (subOperations != null) {
 							List<Button> buttons = new ArrayList<>();
-							EmbedBuilder eb2 = new EmbedBuilder(LanguageEngine.fetchMessage(guild, user, this, "selsub"));
+							EmbedBuilder eb2 = new EmbedBuilder(LanguageEngine.getMessageEmbed(guild, user, this, "selsub"));
 							for (int i = 0; i < subOperations.length; i++) {
 								buttons.add(Button.secondary(String.valueOf(i), subOperations[i].getName()));
 								eb2.addField("`" + subOperations[i].getName() + "`", subOperations[i].getInfo(), true);

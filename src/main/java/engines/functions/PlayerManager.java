@@ -58,7 +58,7 @@ public class PlayerManager {
 			@Override
 			public void trackLoaded(AudioTrack track) {
 				musicManager.scheduler.queue(track);
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "track")
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "track")
 						.replaceDescription("{track}", track.getInfo().title)
 						.replaceDescription("{author}", track.getInfo().author)).queue();
 			}
@@ -70,13 +70,13 @@ public class PlayerManager {
 					for (final AudioTrack track : tracks) {
 						musicManager.scheduler.queue.add(track);
 					}
-					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "list")
+					event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "list")
 							.replaceDescription("{name}", playlist.getName())
 							.replaceDescription("{size}", String.valueOf(playlist.getTracks().size()))).queue();
 				} else {
 					AudioTrack track = tracks.get(0);
 					musicManager.scheduler.queue(track);
-					event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "track")
+					event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "track")
 							.replaceDescription("{track}", track.getInfo().title)
 							.replaceDescription("{author}", track.getInfo().author)).queue();
 				}
@@ -84,13 +84,13 @@ public class PlayerManager {
 			
 			@Override
 			public void noMatches() {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nomatch")).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nomatch")).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			}
 			
 			@Override
 			public void loadFailed(FriendlyException exception) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "fail")).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "fail")).queue();
 				channel.getGuild().getAudioManager().closeAudioConnection();
 			}
 		});

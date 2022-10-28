@@ -30,7 +30,7 @@ public class Clear implements SlashCommandEventHandler {
 //															   System.out.println(duration);
 //															   return duration < 14;}).toList();
 		if (messages.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "invalid")).queue();
 			return;
 		}
 		if (messages.size() == 1) {
@@ -40,10 +40,10 @@ public class Clear implements SlashCommandEventHandler {
 		try {
 			channel.deleteMessages(messages).queue();
 		} catch (IllegalArgumentException e) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "invalid")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "invalid")).queue();
 			return;
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "done")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "done")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 }
 
 	@Override

@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import assets.functions.SlashCommandEventHandler;
+import base.Bot;
 import engines.base.LanguageEngine;
 import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -47,7 +48,7 @@ public class Userinfo implements SlashCommandEventHandler {
 			member = event.getGuild().getMember(event.getOption("user").getAsUser());
 		}
 		if (member.equals(event.getGuild().getSelfMember())) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), this, "6")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(event.getGuild(), event.getUser(), this, "6")).queue(r -> r.deleteOriginal().queueAfter(3, TimeUnit.SECONDS));
 			return;
 		}
 		if (member.getTimeBoosted() == null) {
@@ -63,7 +64,7 @@ public class Userinfo implements SlashCommandEventHandler {
 		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
 		eb.setThumbnail(member.getUser().getAvatarUrl());
 		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(LanguageEngine.getDefaultFooter());
+		eb.setFooter(LanguageEngine.buildFooter(Bot.DEFAULT_FOOTER));
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getUser().getName() + "`", true);

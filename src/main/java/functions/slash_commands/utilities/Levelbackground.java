@@ -26,10 +26,10 @@ public class Levelbackground implements SlashCommandEventHandler {
 		if (event.getSubcommandName().equals("set")) {
 			Level lv = (Level) SlashCommandList.getHandler("level");
 			if (Integer.parseInt(event.getOption("number").getAsString()) > 4 || Integer.parseInt(event.getOption("number").getAsString()) < 0) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "wrongarg")).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "wrongarg")).queue();
 			} else {
 				ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("levelbackground", event.getOption("number").getAsInt());
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).addFiles(FileUpload.fromData(lv.renderLevelcard(user, guild))).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")).addFiles(FileUpload.fromData(lv.renderLevelcard(user, guild))).queue();
 			}
 			return;
 		}
@@ -89,7 +89,7 @@ public class Levelbackground implements SlashCommandEventHandler {
 				 .queue();
 		} catch (Exception e) {
 			e.printStackTrace();
-			event.replyEmbeds(LanguageEngine.fetchMessage(null, null, null, "fatal")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(null, null, null, "fatal")).queue();
 		}
 	}
 }

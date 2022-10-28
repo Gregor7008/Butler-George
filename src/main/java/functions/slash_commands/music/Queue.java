@@ -31,11 +31,11 @@ public class Queue implements SlashCommandEventHandler {
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nopermission")).queue();
 			return;
 		}
 		final int trackCount = Math.min(queue.size(), 10);
@@ -57,7 +57,7 @@ public class Queue implements SlashCommandEventHandler {
 		if (sB.toString().equals("")) {
 			sB.append(LanguageEngine.getRaw(guild, user, this, "queueempty"));
 		}
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "queue")
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "queue")
 				.replaceDescription("{list}", sB.toString())
 				.replaceDescription("{current}", this.formatTrackInfo(guild, user, musicManager.audioPlayer.getPlayingTrack()))).queue();
 	}

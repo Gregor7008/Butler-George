@@ -39,11 +39,11 @@ public class TempMute implements UserContextEventHandler {
 					try {
 						int days = Integer.parseInt(d.getValue("duration").getAsString());
 						this.tempmute(days, guild, target);
-						event.getMessageChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
+						event.getMessageChannel().sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")
 								.replaceDescription("{user}", target.getAsMention())
 								.replaceDescription("{time}", String.valueOf(days))).queue();
 					} catch (NumberFormatException e) {
-						d.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).setEphemeral(true).queue();
+						d.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "error")).setEphemeral(true).queue();
 					}
 				}).append();
 	}

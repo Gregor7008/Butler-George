@@ -20,25 +20,25 @@ public class Move implements SlashCommandEventHandler {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		if (ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("supporttalk") == 0) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nochannel")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nochannel")).queue();
 			return;
 		}
 		if (!guild.getMember(event.getOption("member").getAsUser()).getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "memnotconn")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "memnotconn")).queue();
 			return;
 		}
 		long vcid = ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("supporttalk");
 		VoiceChannel st = guild.getVoiceChannelById(vcid);
 		if (st == null) {
 			ConfigLoader.INSTANCE.getGuildConfig(guild).put("supporttalk", 0L);
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nochannel")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nochannel")).queue();
 			return;
 		}
 		if (st.getMembers().contains(event.getMember())) {
 			guild.moveVoiceMember(guild.getMember(event.getOption("member").getAsUser()), st).queue();
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")).queue();
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "notconnected")).queue();
 		}
 	}
 

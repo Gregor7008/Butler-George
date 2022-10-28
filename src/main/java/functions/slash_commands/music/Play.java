@@ -29,15 +29,15 @@ public class Play implements SlashCommandEventHandler {
 		final User user = event.getUser();
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		if (argument == null) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "wrongusage")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "wrongusage")).queue();
 			return;
 		}
 		if (!member.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noVCdefined")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "noVCdefined")).queue();
 			return;
 		}
 		if (self.getVoiceState().inAudioChannel() && self.getVoiceState().getChannel().getIdLong() != member.getVoiceState().getChannel().getIdLong()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "alreadyinuse")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "alreadyinuse")).queue();
 			return;
 		}
 		this.load(event, argument, musicManager, channel, member);

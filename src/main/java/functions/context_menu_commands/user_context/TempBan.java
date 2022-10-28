@@ -45,11 +45,11 @@ public class TempBan implements UserContextEventHandler {
 							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanned", true);
 							guild.getMember(target).ban(0, TimeUnit.DAYS).queue();
 							ModController.RUN.userModCheck(guild, target);
-							d.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
+							d.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")
 									.replaceDescription("{user}", target.getName())
 									.replaceDescription("{time}", String.valueOf(days))).setEphemeral(true).queue();
 					  } catch (NumberFormatException e) {
-						  d.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).setEphemeral(true).queue();
+						  d.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "error")).setEphemeral(true).queue();
 					  }
 				  }).append();
 	}

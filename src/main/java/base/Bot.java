@@ -191,7 +191,7 @@ public class Bot {
     			offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "addonpresent"));
     			offlineMessageBuilder.append(additionalMessage);
     		}
-    		long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.buildMessageFromRaw(offlineMessageBuilder.toString(), null)).complete().getIdLong();
+    		long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(offlineMessageBuilder.toString())).complete().getIdLong();
     		ConfigLoader.INSTANCE.getGuildConfig(guild).put("offlinemsg", new JSONArray().put(msgid).put(chid));
 //    		Save ModMail status
     		JSONObject modmailDataSet = ConfigLoader.INSTANCE.getGuildConfig(guild, "modmails");

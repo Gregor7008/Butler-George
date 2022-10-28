@@ -95,7 +95,7 @@ public class EventProcessor extends ListenerAdapter {
 			try {
 				slashCommandEventHandler.execute(event);
 			} catch (InsufficientPermissionException e) {
-				MessageEmbed embed = LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), null, "insufficientperms")
+				MessageEmbed embed = LanguageEngine.getMessageEmbed(event.getGuild(), event.getUser(), null, "insufficientperms")
 						.replaceDescription("{permissions}", e.getPermission().getName().toLowerCase());
 				if (event.isAcknowledged()) {
 					event.getHook().retrieveOriginal().complete().editMessageEmbeds(embed).queue();
@@ -120,7 +120,7 @@ public class EventProcessor extends ListenerAdapter {
 			try {
 				userContextEventHandler.execute(event);
 			} catch (InsufficientPermissionException e) {
-				MessageEmbed embed = LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), null, "insufficientperms")
+				MessageEmbed embed = LanguageEngine.getMessageEmbed(event.getGuild(), event.getUser(), null, "insufficientperms")
 						.replaceDescription("{permissions}", e.getPermission().getName().toLowerCase());
 				if (event.isAcknowledged()) {
 					event.getHook().retrieveOriginal().complete().editMessageEmbeds(embed).queue();
@@ -143,7 +143,7 @@ public class EventProcessor extends ListenerAdapter {
 				try {
 					messageContextEventHandler.execute(event);
 				} catch (InsufficientPermissionException e) {
-					MessageEmbed embed = LanguageEngine.fetchMessage(event.getGuild(), event.getUser(), null, "insufficientperms")
+					MessageEmbed embed = LanguageEngine.getMessageEmbed(event.getGuild(), event.getUser(), null, "insufficientperms")
 							.replaceDescription("{permissions}", e.getPermission().getName().toLowerCase());
 					if (event.isAcknowledged()) {
 						event.getHook().retrieveOriginal().complete().editMessageEmbeds(embed).queue();
@@ -177,7 +177,7 @@ public class EventProcessor extends ListenerAdapter {
 		} else {
 			final JSONArray selectedTicketData = ConfigLoader.INSTANCE.getUserConfig(user).getJSONArray("selected_ticket");
 			if (selectedTicketData.isEmpty()) {
-				event.getChannel().sendMessageEmbeds(LanguageEngine.fetchMessage(null, user, this, "noticket")).queue();
+				event.getChannel().sendMessageEmbeds(LanguageEngine.getMessageEmbed(null, user, this, "noticket")).queue();
 			} else {
 				final Guild guild = event.getJDA().getGuildById(selectedTicketData.getLong(0));
 				final long ticketID = selectedTicketData.getLong(1);
@@ -212,7 +212,7 @@ public class EventProcessor extends ListenerAdapter {
 				if (welcomemsg.getBoolean(3)) {
 					String title = Toolbox.processAutoMessage(welcomemsg.getString(1), guild, event.getUser(), false);
 					String message = Toolbox.processAutoMessage(welcomemsg.getString(2), guild, event.getUser(), true);
-					guild.getTextChannelById(welcomemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
+					guild.getTextChannelById(welcomemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title, message)).queue();
 				}
 			}
 		}
@@ -231,7 +231,7 @@ public class EventProcessor extends ListenerAdapter {
 			if (goodbyemsg.getBoolean(3)) {
 				String title = Toolbox.processAutoMessage(goodbyemsg.getString(1), guild, event.getUser(), false);
 				String message = Toolbox.processAutoMessage(goodbyemsg.getString(2), guild, event.getUser(), true);
-				guild.getTextChannelById(goodbyemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
+				guild.getTextChannelById(goodbyemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title, message)).queue();
 			}
 		}
 		if (ConfigLoader.INSTANCE.getMemberConfig(guild, user).getLong("customchannelcategory") != 0) {
@@ -258,7 +258,7 @@ public class EventProcessor extends ListenerAdapter {
 				if (boostmsg.getBoolean(3)) {
 					String title = Toolbox.processAutoMessage(boostmsg.getString(1), guild, user, false);
 					String message = Toolbox.processAutoMessage(boostmsg.getString(2), guild, user, true);
-					guild.getTextChannelById(boostmsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessage(title, message, null)).queue();
+					guild.getTextChannelById(boostmsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title, message)).queue();
 				}
 			}
 		}
@@ -377,14 +377,14 @@ public class EventProcessor extends ListenerAdapter {
 				} else if (buttonId.equals(buttonIdCriteria + "_denyclose")) {
 					final PrivateChannel userChannel = targetUser.openPrivateChannel().complete();
 					userChannel.retrieveMessageById(channelProperties.getLong(2)).complete().delete().queue();
-					userChannel.sendMessageEmbeds(LanguageEngine.fetchMessage(guild, targetUser, modmailCommandHandler, "closeDeniedPrivate")
+					userChannel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, targetUser, modmailCommandHandler, "closeDeniedPrivate")
 							.replaceDescription("{guild}", guild.getName())
 							.replaceDescription("{title}", ConfigLoader.INSTANCE.getMemberConfig(guild, targetUser)
 									.getJSONObject("modmails")
 									.getJSONArray(String.valueOf(channelProperties.getLong(1)))
 									.getString(1)))
 					.queue();
-					event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, event.getUser(), modmailCommandHandler, "closeDeniedAdmin")).setComponents().queue();
+					event.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, event.getUser(), modmailCommandHandler, "closeDeniedAdmin")).setComponents().queue();
 				}
 			}			
 		}

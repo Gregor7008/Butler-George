@@ -19,7 +19,7 @@ public class InboxChannels implements ConfigurationEventHandler {
 	public void execute(ConfigurationEvent event) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
-		event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "seltype"))
+		event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "seltype"))
 						  .setActionRow(Button.secondary("community", Emoji.fromUnicode("\uD83C\uDF89")),
 								  	    Button.secondary("suggestion", Emoji.fromUnicode("\uD83D\uDCA1")),
 								  	    Button.secondary("moderation", Emoji.fromUnicode("\uD83D\uDC6E"))).queue();
@@ -27,7 +27,7 @@ public class InboxChannels implements ConfigurationEventHandler {
 				b -> {
 					final String selection = b.getComponentId();
 					if (event.getSubOperation().equals("set")) {
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "defchannel").replaceDescription("{selection}", selection)).setComponents().queue();
+						b.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "defchannel").replaceDescription("{selection}", selection)).setComponents().queue();
 						AwaitTask.forMessageReceival(guild, user, event.getChannel(),
 								e -> {if (!e.getMessage().getMentions().getChannels().isEmpty()) {
 									return guild.getTextChannelById(e.getMessage().getMentions().getChannels().get(0).getIdLong()) != null;
@@ -36,7 +36,7 @@ public class InboxChannels implements ConfigurationEventHandler {
 								e -> {
 									long id = e.getMessage().getMentions().getChannels().get(0).getIdLong();
 									ConfigLoader.INSTANCE.getGuildConfig(guild).put(selection + "inbox", id);
-									b.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "setsuccess")
+									b.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "setsuccess")
 											.replaceDescription("{selection}", selection)
 											.replaceDescription("{channel}", guild.getTextChannelById(id).getAsMention())).queue();
 									e.getMessage().delete().queue();
@@ -45,7 +45,7 @@ public class InboxChannels implements ConfigurationEventHandler {
 					}
 					if (event.getSubOperation().equals("clear")) {
 						ConfigLoader.INSTANCE.getGuildConfig(guild).put("communityinbox", 0L);
-						b.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "clearsuccess").replaceDescription("{selection}", selection)).setComponents().queue();
+						b.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "clearsuccess").replaceDescription("{selection}", selection)).setComponents().queue();
 					}
 				}).append();
 	}

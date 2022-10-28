@@ -26,7 +26,7 @@ public class CreateChannel implements SlashCommandEventHandler {
 		User user = event.getUser();
 		String name = event.getOption("name").getAsString();
 		this.createTextChannel(guild, user, name);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")).queue();
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")).queue();
 	}
 
 	@Override

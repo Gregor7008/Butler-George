@@ -25,13 +25,13 @@ public class Unmute implements UserContextEventHandler {
 		JSONObject userconfig = ConfigLoader.INSTANCE.getMemberConfig(guild, target);
 		if (!guild.getMember(target).isTimedOut()) {
 			if (!userconfig.getBoolean("muted") && !userconfig.getBoolean("tempmuted")) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nomute").replaceDescription("{user}", target.getAsMention())).setEphemeral(true).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nomute").replaceDescription("{user}", target.getAsMention())).setEphemeral(true).queue();
 				return;
 			}
 		}
 		userconfig.put("muted", false);
 		userconfig.put("tempmuted", false);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "success")
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")
 				.replaceDescription("{user}", target.getAsMention())).setEphemeral(true).queue();
 		ModController.RUN.userModCheck(guild, target);
 	}

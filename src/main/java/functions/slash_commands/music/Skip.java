@@ -30,27 +30,27 @@ public class Skip implements SlashCommandEventHandler {
 		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		final AudioPlayer audioPlayer = musicManager.audioPlayer;
 		if (!self.getVoiceState().inAudioChannel()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "notconnected")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "notconnected")).queue();
 			return;
 		}
 		if (member.getVoiceState().inAudioChannel()) {
 			if (member.getVoiceState().getChannel() != self.getVoiceState().getChannel()) {
-				event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
+				event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nopermission")).queue();
 				return;
 			}
 		} else {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "nopermission")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nopermission")).queue();
 			return;
 		}
 		if (musicManager.scheduler.queue.isEmpty()) {
-			event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "noskip")).queue();
+			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "noskip")).queue();
 			Toolbox.stopMusicAndLeaveOn(guild);
 			return;
 		}
 		AudioTrack nextTrack = musicManager.scheduler.queue.poll();
 		audioPlayer.stopTrack();
 		audioPlayer.startTrack(nextTrack, false);
-		event.replyEmbeds(LanguageEngine.fetchMessage(guild, user, this, "skipped")
+		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "skipped")
 				.replaceDescription("{track}", this.formatTrackInfo(guild, user, nextTrack))).queue();
 	}
 
