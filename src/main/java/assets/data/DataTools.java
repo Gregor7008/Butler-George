@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,12 +17,24 @@ public abstract class DataTools {
     
 
     public static List<Role> getRolesFromArrayKeys(Guild guild, JSONObject data, String primary, String secondary) {
-        JSONArray values = data.getJSONObject(primary).getJSONArray(secondary);
-        List<Role> roles = new LinkedList<>();
-        for (int i = 0; i < values.length(); i++) {
-            roles.add(guild.getRoleById(values.getLong(i)));
+        try {
+            JSONArray values = null;
+            if (secondary == null) {
+                values = data.getJSONArray(primary);
+            } else {
+                values = data.getJSONObject(primary).getJSONArray(secondary);
+            }
+            List<Role> roles = new LinkedList<>();
+            for (int i = 0; i < values.length(); i++) {
+                Role role = guild.getRoleById(values.getLong(i));
+                if (role != null) {
+                    roles.add(role);
+                }
+            }
+            return roles;
+        } catch (JSONException e) {
+            return null;
         }
-        return roles;
     }
     
     public static <T> void setList(List<T> target, List<T> replacement) {

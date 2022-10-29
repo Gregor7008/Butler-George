@@ -50,10 +50,10 @@ public class MemberData implements DataContainer {
         
         this.language = Language.valueOf(data.getString(Key.LANGUAGE));
         
-        this.last_experience = OffsetDateTime.parse(data.getString(Key.LAST_EXPERIENCE), ConfigManager.CONFIG_TIME_SAVE_FORMAT);
-        this.last_modmail = OffsetDateTime.parse(data.getString(Key.LAST_MODMAIL), ConfigManager.CONFIG_TIME_SAVE_FORMAT);
-        this.last_suggestion = OffsetDateTime.parse(data.getString(Key.LAST_SUGGESTION), ConfigManager.CONFIG_TIME_SAVE_FORMAT);
-        this.temporarily_banned_until = OffsetDateTime.parse(data.getString(Key.TEMPORARILY_BANNED_UNTIL), ConfigManager.CONFIG_TIME_SAVE_FORMAT);
+        this.last_experience = OffsetDateTime.parse(data.getString(Key.LAST_EXPERIENCE), ConfigManager.DATA_TIME_SAVE_FORMAT);
+        this.last_modmail = OffsetDateTime.parse(data.getString(Key.LAST_MODMAIL), ConfigManager.DATA_TIME_SAVE_FORMAT);
+        this.last_suggestion = OffsetDateTime.parse(data.getString(Key.LAST_SUGGESTION), ConfigManager.DATA_TIME_SAVE_FORMAT);
+        this.temporarily_banned_until = OffsetDateTime.parse(data.getString(Key.TEMPORARILY_BANNED_UNTIL), ConfigManager.DATA_TIME_SAVE_FORMAT);
         
         permanently_muted = data.getBoolean(Key.PERMANENTLY_MUTED);
         
@@ -91,10 +91,10 @@ public class MemberData implements DataContainer {
         
         compiledData.put(Key.LANGUAGE, language.toString());
         
-        compiledData.put(Key.LAST_EXPERIENCE, last_experience.format(ConfigManager.CONFIG_TIME_SAVE_FORMAT));
-        compiledData.put(Key.LAST_MODMAIL, last_modmail.format(ConfigManager.CONFIG_TIME_SAVE_FORMAT));
-        compiledData.put(Key.LAST_SUGGESTION, last_suggestion.format(ConfigManager.CONFIG_TIME_SAVE_FORMAT));
-        compiledData.put(Key.TEMPORARILY_BANNED_UNTIL, temporarily_banned_until.format(ConfigManager.CONFIG_TIME_SAVE_FORMAT));
+        compiledData.put(Key.LAST_EXPERIENCE, last_experience.format(ConfigManager.DATA_TIME_SAVE_FORMAT));
+        compiledData.put(Key.LAST_MODMAIL, last_modmail.format(ConfigManager.DATA_TIME_SAVE_FORMAT));
+        compiledData.put(Key.LAST_SUGGESTION, last_suggestion.format(ConfigManager.DATA_TIME_SAVE_FORMAT));
+        compiledData.put(Key.TEMPORARILY_BANNED_UNTIL, temporarily_banned_until.format(ConfigManager.DATA_TIME_SAVE_FORMAT));
         
         compiledData.put(Key.PERMANENTLY_MUTED, permanently_muted);
         
@@ -288,7 +288,7 @@ public class MemberData implements DataContainer {
     }
     
     public MemberData setModmails(ConcurrentHashMap<Integer, ModMailData> modmails) {
-        this.modmails = modmails;
+        DataTools.setMap(this.modmails, modmails);
         return this;
     }
     

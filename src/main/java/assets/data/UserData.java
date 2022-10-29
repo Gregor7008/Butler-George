@@ -94,7 +94,7 @@ public class UserData implements DataContainer {
     }
     
     public UserData setMemberDatas(ConcurrentHashMap<Guild, MemberData> member_datas) {
-        this.member_datas = member_datas;
+        DataTools.setMap(this.member_datas, member_datas);
         return this;
     }
     

@@ -117,13 +117,13 @@ public class GuildData implements DataContainer {
         level_rewards.values().removeAll(Collections.singleton(null));
 
         JSONObject penalties_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.PENALTIES);
-        penalties_data.keySet().forEach(warning_count -> penalties.put(Integer.valueOf(warning_count), new PenaltyData(penalties_data.getJSONObject(warning_count))));
+        penalties_data.keySet().forEach(warning_count -> penalties.put(Integer.valueOf(warning_count), new PenaltyData(guild, penalties_data.getJSONObject(warning_count))));
 
         JSONObject modmails_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.MODMAILS);
         modmails_data.keySet().forEach(channelId -> {
             TextChannel channel = guild.getTextChannelById(channelId);
             if (channel != null) {
-                modmails.put(channel, new ModMailData(modmails_data.getJSONObject(channelId)));
+                modmails.put(channel, new ModMailData(guild, channel, modmails_data.getJSONObject(channelId)));
             }
         });
 
@@ -646,7 +646,7 @@ public class GuildData implements DataContainer {
 	
 	public GuildData addPenalties(PenaltyData... datas) {
 	    for (int i = 0; i < datas.length; i++) {
-	        this.penalties.put(datas[i].getWarningCount(), datas[i]);
+	        this.penalties.put(datas[i].getWarningLimit(), datas[i]);
 	    }
         return this;
 	}
@@ -660,7 +660,7 @@ public class GuildData implements DataContainer {
 	
 	public GuildData removePenaltiesByData(PenaltyData... datas) {
 	    for (int i = 0; i < datas.length; i++) {
-            this.penalties.remove(datas[i].getWarningCount());
+            this.penalties.remove(datas[i].getWarningLimit());
         }
         return this;
 	}

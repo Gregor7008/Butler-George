@@ -52,7 +52,7 @@ public class LevelEngine {
 	private void givexp(Guild guild, User user, OffsetDateTime time, int amount, int mindiff) {
 		JSONObject userconfig = ConfigLoader.INSTANCE.getMemberConfig(guild, user);
 		OffsetDateTime now = OffsetDateTime.now();
-		OffsetDateTime lastxpgotten = OffsetDateTime.parse(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getString("lastxpgotten"), ConfigManager.CONFIG_TIME_SAVE_FORMAT);
+		OffsetDateTime lastxpgotten = OffsetDateTime.parse(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getString("lastxpgotten"), ConfigManager.DATA_TIME_SAVE_FORMAT);
 		long difference = Duration.between(lastxpgotten, now).toSeconds();
 		if(difference >= Long.parseLong(String.valueOf(mindiff))) {
 			userconfig.put("levelspamcount", 0);
@@ -76,7 +76,7 @@ public class LevelEngine {
 		int current = ConfigLoader.INSTANCE.getMemberConfig(guild, user).getInt("experience");
 		int newamount = current + amount;
 		userconfig.put("experience", newamount);
-		userconfig.put("lastxpgotten", OffsetDateTime.now().format(ConfigManager.CONFIG_TIME_SAVE_FORMAT));
+		userconfig.put("lastxpgotten", OffsetDateTime.now().format(ConfigManager.DATA_TIME_SAVE_FORMAT));
 	}
 
 	private void checklevel(Guild guild, User user) {

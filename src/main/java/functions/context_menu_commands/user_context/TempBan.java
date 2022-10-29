@@ -41,7 +41,7 @@ public class TempBan implements UserContextEventHandler {
 					  try {
 						  int days = Integer.parseInt(d.getValue("duration").getAsString());
 					        OffsetDateTime until = OffsetDateTime.now().plusDays(days);
-							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanneduntil", until.format(ConfigManager.CONFIG_TIME_SAVE_FORMAT));
+							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanneduntil", until.format(ConfigManager.DATA_TIME_SAVE_FORMAT));
 							ConfigLoader.INSTANCE.getMemberConfig(guild, target).put("tempbanned", true);
 							guild.getMember(target).ban(0, TimeUnit.DAYS).queue();
 							ModController.RUN.userModCheck(guild, target);

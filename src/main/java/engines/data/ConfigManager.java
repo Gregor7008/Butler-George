@@ -3,6 +3,7 @@ package engines.data;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimerTask;
@@ -34,7 +35,7 @@ import net.dv8tion.jda.api.entities.User;
 
 public class ConfigManager {
 
-	public static DateTimeFormatter CONFIG_TIME_SAVE_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
+	public static DateTimeFormatter DATA_TIME_SAVE_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
 	
 	private static Logger LOG = ConsoleEngine.getLogger(ConfigManager.class);
 	
@@ -44,6 +45,23 @@ public class ConfigManager {
 	private MongoCollection<Document> guildConfigs;
 	private ConcurrentHashMap<Long, JSONObject> userConfigCache = new ConcurrentHashMap<Long, JSONObject>();
 	private ConcurrentHashMap<Long, JSONObject> guildConfigCache = new ConcurrentHashMap<Long, JSONObject>();
+	
+	public static String convertDurationToString(Duration duration) {
+	    return String.format("%02d:%02d:%02d:%02d",
+	            duration.toDaysPart(),
+	            duration.toHoursPart(), 
+	            duration.toMinutesPart(), 
+	            duration.toSecondsPart());
+	}
+	
+	public static Duration convertStringToDuration(String string) {
+	    String[] codes = string.split(":");
+	    long days = TimeUnit.DAYS.toSeconds(Integer.valueOf(codes[0]));
+	    long hours = TimeUnit.HOURS.toSeconds(Integer.valueOf(codes[1]));
+	    long minutes = TimeUnit.MINUTES.toSeconds(Integer.valueOf(codes[2]));
+	    long seconds = Long.valueOf(codes[3]);
+	    return Duration.ofSeconds(days + hours + minutes + seconds);
+	}
 	
 	public ConfigManager(String serverIP, String serverPort, String databaseName, String username, String password) {
 		if (serverIP.equals(GUI.INSTANCE.databaseIP.getName())) {
@@ -244,9 +262,9 @@ public class ConfigManager {
 		newConfig.put("customchannelcategory",		0L);
 		newConfig.put("experience",					0);
 		newConfig.put("language",					"en");
-		newConfig.put("lastmail", 					OffsetDateTime.now().minusDays(1).format(CONFIG_TIME_SAVE_FORMAT));
-		newConfig.put("lastsuggestion", 			OffsetDateTime.now().minusDays(1).format(CONFIG_TIME_SAVE_FORMAT));
-		newConfig.put("lastxpgotten", 				OffsetDateTime.now().minusDays(1).format(CONFIG_TIME_SAVE_FORMAT));
+		newConfig.put("lastmail", 					OffsetDateTime.now().minusDays(1).format(DATA_TIME_SAVE_FORMAT));
+		newConfig.put("lastsuggestion", 			OffsetDateTime.now().minusDays(1).format(DATA_TIME_SAVE_FORMAT));
+		newConfig.put("lastxpgotten", 				OffsetDateTime.now().minusDays(1).format(DATA_TIME_SAVE_FORMAT));
 		newConfig.put("level",						0);
 		newConfig.put("levelbackground",			0);
 		newConfig.put("levelspamcount",				0);
@@ -312,7 +330,7 @@ public class ConfigManager {
 		newConfig.put("answercount",				0);
 		newConfig.put("answers",					new JSONObject());
 		newConfig.put("channel",					Long.valueOf(channelID));
-		newConfig.put("creationdate",				OffsetDateTime.now().format(CONFIG_TIME_SAVE_FORMAT));
+		newConfig.put("creationdate",				OffsetDateTime.now().format(DATA_TIME_SAVE_FORMAT));
 		newConfig.put("daysopen",					0);
 		newConfig.put("description",				"");
 		newConfig.put("footer",						"");

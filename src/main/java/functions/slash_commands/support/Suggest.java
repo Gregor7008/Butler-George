@@ -34,7 +34,7 @@ public class Suggest implements SlashCommandEventHandler {
 			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nochannelset")).queue();
 			return;
 		}
-		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getString("lastsuggestion"), ConfigManager.CONFIG_TIME_SAVE_FORMAT);
+		OffsetDateTime lastsuggestion = OffsetDateTime.parse(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getString("lastsuggestion"), ConfigManager.DATA_TIME_SAVE_FORMAT);
 		if (Duration.between(lastsuggestion, OffsetDateTime.now()).toSeconds() < 300) {
 			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nospam")).queue();
 			return;

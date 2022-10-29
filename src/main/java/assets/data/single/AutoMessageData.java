@@ -13,23 +13,23 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 public class AutoMessageData implements DataContainer {
 
     private final Guild guild;
-    private TextChannel text_channel;
-    private String title, message = "";
+    private final TextChannel text_channel;
+    private String title, message = "N/A";
     private boolean embedded, activated = false;
     
 	public AutoMessageData(Guild guild, JSONObject data) {
 	    this.guild = guild;
+        this.text_channel = guild.getTextChannelById(data.getLong(Key.CHANNEL_ID));
 	    this.instanciateFromJSON(data);
 	}
 	
-	public AutoMessageData(Guild guild) {
+	public AutoMessageData(Guild guild, TextChannel channel) {
 	    this.guild = guild;
+	    this.text_channel = channel;
 	}
 
     @Override
     public DataContainer instanciateFromJSON(JSONObject data) {
-        this.text_channel = guild.getTextChannelById(data.getLong(Key.CHANNEL_ID));
-        
         this.title = data.getString(Key.TITLE);
         this.message = data.getString(Key.MESSAGE);
         
@@ -43,13 +43,15 @@ public class AutoMessageData implements DataContainer {
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         
-        compiledData.put(Key.CHANNEL_ID, text_channel.getIdLong());
-        
-        compiledData.put(Key.TITLE, this.title);
-        compiledData.put(Key.MESSAGE, this.message);
-        
-        compiledData.put(Key.EMBEDDED, this.embedded);
-        compiledData.put(Key.ACTIVATED, this.activated);
+        if (text_channel != null) {
+            compiledData.put(Key.CHANNEL_ID, text_channel.getIdLong());
+            
+            compiledData.put(Key.TITLE, this.title);
+            compiledData.put(Key.MESSAGE, this.message);
+            
+            compiledData.put(Key.EMBEDDED, this.embedded);
+            compiledData.put(Key.ACTIVATED, this.activated);
+        }
         
         return compiledData;
     }
@@ -60,11 +62,6 @@ public class AutoMessageData implements DataContainer {
     
     public TextChannel getTextChannel() {
         return this.text_channel;
-    }
-    
-    public AutoMessageData setTextChannel(TextChannel text_channel) {
-        this.text_channel = text_channel;
-        return this;
     }
     
     public String getTitle() {

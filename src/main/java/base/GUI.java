@@ -31,6 +31,7 @@ import javax.swing.table.DefaultTableModel;
 
 import base.Bot.ShutdownReason;
 import engines.base.ConsoleCommandListener;
+import engines.data.ConfigManager;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.miginfocom.swing.MigLayout;
@@ -347,11 +348,7 @@ public class GUI extends JFrame implements FocusListener {
 			@Override
 			public void run() {
 				Duration diff = Duration.between(startTime, OffsetDateTime.now()).plus(additional);
-				GUI.INSTANCE.setTableValue(3, String.format("%02d:%02d:%02d:%02d",
-						diff.toDaysPart(),
-	                    diff.toHoursPart(), 
-	                    diff.toMinutesPart(), 
-	                    diff.toSecondsPart()));
+				GUI.INSTANCE.setTableValue(3, ConfigManager.convertDurationToString(diff));
 			}
 		};
 		Bot.INSTANCE.getTimer().schedule(runtimeMeasuringTask, 0, 1000);

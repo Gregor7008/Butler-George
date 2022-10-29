@@ -19,9 +19,9 @@ public class Join2CreateChannelData implements DataContainer {
     
     private final Guild guild;
     private final VoiceChannel channel;
-    private String name_format;
-    private int limit_preset;
-    private boolean configurable;
+    private String name_format = "{member}'s channel";
+    private int limit_preset = -1;
+    private boolean configurable = false;
     private List<VoiceChannel> children = new LinkedList<>();
     
     public static Join2CreateChannelData getParentOf(VoiceChannel children) {
