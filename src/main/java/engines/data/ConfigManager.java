@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.entities.User;
 public class ConfigManager {
 
 	public static DateTimeFormatter DATA_TIME_SAVE_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss - dd.MM.yyyy | O");
+	public static int PUSH_CYCLE_PERIOD = 15; 
 	
 	private static Logger LOG = ConsoleEngine.getLogger(ConfigManager.class);
 	
@@ -127,7 +128,7 @@ public class ConfigManager {
                 }
                 executions++;
             }
-        }, 0, TimeUnit.MINUTES.toMillis(5));
+        }, 0, TimeUnit.MINUTES.toMillis(PUSH_CYCLE_PERIOD));
 	}
 	
 	private String encodeToURL(String input) {
