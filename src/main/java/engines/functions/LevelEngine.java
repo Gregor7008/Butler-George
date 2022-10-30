@@ -85,7 +85,7 @@ public class LevelEngine {
 		if (this.xpleftfornextlevel(guild, user) < 1) {
 			userconfig.put("level", currentlevel + 1);
 			JSONArray levelmessage = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("levelmsg");
-			if (!levelmessage.isEmpty() || levelmessage.getBoolean(3)) {
+			if (!levelmessage.isEmpty() && levelmessage.getBoolean(3)) {
 				String title = Toolbox.processAutoMessage(levelmessage.getString(1), guild, user, false);
 				String message = Toolbox.processAutoMessage(levelmessage.getString(2), guild, user, true);
 				guild.getTextChannelById(levelmessage.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title, message)).queue();

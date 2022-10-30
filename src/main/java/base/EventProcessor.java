@@ -485,12 +485,12 @@ public class EventProcessor extends ListenerAdapter {
 							perms.add(Permission.VOICE_MUTE_OTHERS);
 						}
 						Member newowner =  audioChannel.getMembers().get(0);
+                        channelData.put(0, newowner.getIdLong());
 						String name = audioChannel.getName().replace(guild.getMember(user).getEffectiveName(), newowner.getEffectiveName());
-						audioChannel.getManager().setName(name).queue();
-						audioChannel.getPermissionContainer().upsertPermissionOverride(newowner).setAllowed(perms).queue();
-						audioChannel.getPermissionContainer().getPermissionOverride(guild.getMember(user)).delete().queue();
-						channelData.put(0, newowner.getIdLong());
-						audioChannel.getPermissionContainer().getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(guild.getMember(user)).setName(name).queue();
+						audioChannel.getManager().setName(name).queue(sc -> {}, er -> {});
+						audioChannel.getPermissionContainer().upsertPermissionOverride(newowner).setAllowed(perms).queue(sc -> {}, er -> {});
+						audioChannel.getPermissionContainer().getPermissionOverride(guild.getMember(user)).delete().queue(sc -> {}, er -> {});
+						audioChannel.getPermissionContainer().getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(guild.getMember(user)).setName(name).queue(sc -> {}, er -> {});
 					}
 				}
 				i = parentChannels.size();

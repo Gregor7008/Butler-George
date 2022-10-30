@@ -119,15 +119,15 @@ public class ConfigManager {
 			throw new IllegalArgumentException("Connection to server failed, please check online status of server!");
 		}
 		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
-			private int executions = 0;
-			@Override
-			public void run() {
-				if (executions > 1) {
-					pushCache();
-				}
-				executions++;
-			}
-		}, TimeUnit.MINUTES.toMillis(5));
+            private int executions = 0;
+            @Override
+            public void run() {
+                if (executions > 1) {
+                    pushCache();
+                }
+                executions++;
+            }
+        }, 0, TimeUnit.MINUTES.toMillis(5));
 	}
 	
 	private String encodeToURL(String input) {
