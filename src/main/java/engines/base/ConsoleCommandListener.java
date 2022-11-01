@@ -49,7 +49,9 @@ public class ConsoleCommandListener implements ActionListener {
 				break;
 			case "pushCache":
 				if (ConfigLoader.INSTANCE.manager.pushCache()) {
-					ConsoleEngine.getLogger(ConfigManager.class).info("Cache successfully pushed");
+					ConsoleEngine.getLogger(ConfigManager.class).info("Cache successfully pushed - All changes were saved!");
+				} else {
+				    ConsoleEngine.getLogger(ConfigManager.class).info("Cache push cancelled - There's nothing to push!");
 				}
 				break;
 			case "printCache":

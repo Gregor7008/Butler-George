@@ -190,7 +190,7 @@ public class ConfigManager {
 			if (changes_made) {
 			    GUI.INSTANCE.increasePushCounter();
 			}
-			return true;
+			return changes_made;
 		} catch (Exception e) {
 			LOG.error("Push failed!");
 			return false;
