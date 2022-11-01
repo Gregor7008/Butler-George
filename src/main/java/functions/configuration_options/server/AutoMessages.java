@@ -2,6 +2,7 @@ package functions.configuration_options.server;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -57,7 +58,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 						for (TextChannel channel : availableChannels) {
 							String topic = channel.getTopic();
 							if (topic != null) {
-								menuBuilder.addOption(channel.getName(), channel.getId(), topic);
+								menuBuilder.addOption(channel.getName(), channel.getId(), StringUtils.abbreviate(topic, 100));
 							} else {
 								menuBuilder.addOption(channel.getName(), channel.getId());
 							}

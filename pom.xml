@@ -61,6 +61,12 @@
       <!-- Apache-2.0 -->
 	</dependency>
 	<dependency>
+    <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.12.0</version>
+    </dependency>
+    <!-- Apache-2.0 -->
+	<dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20220924</version>
