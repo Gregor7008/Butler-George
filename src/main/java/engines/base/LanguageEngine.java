@@ -10,7 +10,6 @@ import java.util.Properties;
 import assets.base.MutableMessageEmbed;
 import assets.logging.Logger;
 import base.Bot;
-import engines.data.ConfigLoader;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -52,9 +51,9 @@ public abstract class LanguageEngine {
 	
 	public static String getRaw(Guild guild, User user, Object requester, String key) {
 		Language language = Language.ENGLISH;
-		if (user != null && guild != null) {
-		    language = ConfigLoader.INSTANCE.getMemberData(guild, user).getLanguage();
-		}
+//		if (user != null && guild != null) {
+//		    language = ConfigLoader.INSTANCE.getMemberData(guild, user).getLanguage();
+//		}
 		return LanguageEngine.getRaw(language, requester, key);
 	}
 	
