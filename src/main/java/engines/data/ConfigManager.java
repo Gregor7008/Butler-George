@@ -162,25 +162,34 @@ public class ConfigManager {
 	        return false;
 	    }
 	    try {
-			userConfigCache.forEach((id, obj) -> {
-				Document searchresult = userConfigs.find(new Document("id", Long.valueOf(id))).first();
-				if (searchresult != null) {
-					userConfigs.replaceOne(searchresult, Document.parse(obj.toString()));
-				} else {
-					userConfigs.insertOne(Document.parse(obj.toString()));
-				}
-			});
-			userConfigCache.clear();
-			guildConfigCache.forEach((id, obj) -> {
-				Document searchresult = guildConfigs.find(new Document("id", Long.valueOf(id))).first();
-				if (searchresult != null) {
-					guildConfigs.replaceOne(searchresult, Document.parse(obj.toString()));
-				} else {
-					guildConfigs.insertOne(Document.parse(obj.toString()));
-				}
-			});
-			guildConfigCache.clear();
-			GUI.INSTANCE.increasePushCounter();
+	        boolean changes_made = false;
+	        if (!userConfigCache.isEmpty()) {
+	            userConfigCache.forEach((id, obj) -> {
+	                Document searchresult = userConfigs.find(new Document("id", Long.valueOf(id))).first();
+	                if (searchresult != null) {
+	                    userConfigs.replaceOne(searchresult, Document.parse(obj.toString()));
+	                } else {
+	                    userConfigs.insertOne(Document.parse(obj.toString()));
+	                }
+	            });
+	            userConfigCache.clear();
+                changes_made = true;
+	        }
+			if (!guildConfigCache.isEmpty())  {
+			    guildConfigCache.forEach((id, obj) -> {
+	                Document searchresult = guildConfigs.find(new Document("id", Long.valueOf(id))).first();
+	                if (searchresult != null) {
+	                    guildConfigs.replaceOne(searchresult, Document.parse(obj.toString()));
+	                } else {
+	                    guildConfigs.insertOne(Document.parse(obj.toString()));
+	                }
+	            });
+	            guildConfigCache.clear();
+                changes_made = true;
+			}
+			if (changes_made) {
+			    GUI.INSTANCE.increasePushCounter();
+			}
 			return true;
 		} catch (Exception e) {
 			LOG.error("Push failed!");

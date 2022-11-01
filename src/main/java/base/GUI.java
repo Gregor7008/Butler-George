@@ -204,6 +204,7 @@ public class GUI extends JFrame implements FocusListener {
 				{"Servers:", 0},
 				{"Users:", 0},
 				{"Push Paused:", false},
+				{"Push Cycle Period:", String.valueOf(ConfigManager.PUSH_CYCLE_PERIOD) + " min."},
 				{"Total Pushs:", 0}
 			},
 			new String[] {
@@ -309,7 +310,7 @@ public class GUI extends JFrame implements FocusListener {
 	}
 	
 	public void increasePushCounter() {
-		this.setTableValue(9, (int) this.getTableValue(9) + 1);
+		this.setTableValue(10, (int) this.getTableValue(10) + 1);
 	}
 	
 	public void increaseMemberCounter() {
