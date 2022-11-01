@@ -48,7 +48,7 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 	public ConsoleEngine() {
 		System.setOut(new PrintStream(outStream));
 		System.setErr(new PrintStream(errStream));
-		this.print(null, null, currentDay.format(DATE_FORMAT) + " " + "-".repeat(10) + ">| Console Engine V1.0 |<" + "-".repeat(32), false);
+		this.print(null, null, currentDay.format(DATE_FORMAT) + "    " + "-".repeat(35) + ">| Console Engine V1.1 |<" + "-".repeat(70), false);
 		this.checkStreams();
 	}
 	
@@ -83,7 +83,7 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 		OffsetDateTime now = OffsetDateTime.now();
 		if (currentDay.getDayOfMonth() != now.getDayOfMonth()) {
 			currentDay = now;
-			this.print(null, null, currentDay.format(DATE_FORMAT) + " " + "-".repeat(68), false);
+			this.print(null, null, currentDay.format(DATE_FORMAT) + " " + "-".repeat(143), false);
 		}
 		if (timeCode)
 			timeCodeText = now.format(TIME_FORMAT) + " | ";

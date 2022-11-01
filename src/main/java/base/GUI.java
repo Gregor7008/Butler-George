@@ -1,6 +1,8 @@
 package base;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.FocusEvent;
@@ -52,6 +54,9 @@ public class GUI extends JFrame implements FocusListener {
 	private final JButton showPassword = new JButton("");
 	private final JCheckBox shutdownWindowBox = new JCheckBox("");
 	private final JLabel sdWLabel = new JLabel("Custom shutdown reason:");
+    
+    private final Font default_font;
+    private final Font console_font;
 	
 	public final JTextArea console = new JTextArea();
 	public final JTextField consoleIn = new JTextField();
@@ -76,25 +81,30 @@ public class GUI extends JFrame implements FocusListener {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		new GUI(args);
+		try {
+            new GUI(args);
+        } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
+        }
 	}
 	
-	public GUI(String[] args) {
+	public GUI(String[] args) throws IOException, FontFormatException {
 		INSTANCE = this;
 		
 		ClassLoader loader = this.getClass().getClassLoader();
-		try {
-			greenLEDOn = new ImageIcon(loader.getResourceAsStream("gui/green_on.png").readAllBytes());
-			greenLEDOff = new ImageIcon(loader.getResourceAsStream("gui/green_off.png").readAllBytes());
-			redLEDOn = new ImageIcon(loader.getResourceAsStream("gui/red_on.png").readAllBytes());
-			redLEDOff = new ImageIcon(loader.getResourceAsStream("gui/red_off.png").readAllBytes());
-			eyeIconRaw = new ImageIcon(loader.getResourceAsStream("gui/eye_icon.png").readAllBytes());
-			windowIcon = new ImageIcon(loader.getResourceAsStream("misc/self_avatar.png").readAllBytes());
-		} catch (IOException e) {}
+		greenLEDOn = new ImageIcon(loader.getResourceAsStream("gui/green_on.png").readAllBytes());
+		greenLEDOff = new ImageIcon(loader.getResourceAsStream("gui/green_off.png").readAllBytes());
+		redLEDOn = new ImageIcon(loader.getResourceAsStream("gui/red_on.png").readAllBytes());
+		redLEDOff = new ImageIcon(loader.getResourceAsStream("gui/red_off.png").readAllBytes());
+		eyeIconRaw = new ImageIcon(loader.getResourceAsStream("gui/eye_icon.png").readAllBytes());
+		windowIcon = new ImageIcon(loader.getResourceAsStream("misc/self_avatar.png").readAllBytes());
+        default_font = Font.createFont(Font.TRUETYPE_FONT, loader.getResourceAsStream("gui/default_font.ttf")).deriveFont(0, 11f);
+        console_font = Font.createFont(Font.TRUETYPE_FONT, loader.getResourceAsStream("gui/console_font.ttf")).deriveFont(0, 13f);
 		
 		setIconImage(windowIcon.getImage());
 		setSize(1200, 600);
 		setTitle(Bot.NAME + " - " + Bot.VERSION);
+		setFont(default_font);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		getContentPane().setLayout(new MigLayout("", "[600,grow][125:125:125][75:75:75][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][20:n][20:n][510,grow][20:n]"));
@@ -103,6 +113,7 @@ public class GUI extends JFrame implements FocusListener {
 		consoleScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		consoleScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		console.setEditable(false);
+		console.setFont(console_font);
 		getContentPane().add(consoleScrollPane, "flowx,cell 0 0 1 6,grow");
 
 		greenLED.setIcon(greenLEDOff);
@@ -125,6 +136,7 @@ public class GUI extends JFrame implements FocusListener {
 		
 		password.setEchoChar((char) 0);
 		password.setForeground(Color.GRAY);
+		password.setFont(default_font);
 		password.setName("Password");
 		password.setText(password.getName());
 		password.addFocusListener(new FocusListener() {		
@@ -193,6 +205,7 @@ public class GUI extends JFrame implements FocusListener {
 		getContentPane().add(shutdownWindowBox, "cell 5 4,alignx left,aligny center");
 		
 		infoTable.setShowGrid(false);
+		infoTable.setFont(default_font.deriveFont(11f));
 		infoTable.setModel(new DefaultTableModel(
 			new Object[][] {
 				{"Name:", Bot.NAME},
@@ -220,6 +233,7 @@ public class GUI extends JFrame implements FocusListener {
 		tabbedPane.addTab("Info", null, infoTable, null);
 
 		commandTable.setShowGrid(false);
+		commandTable.setFont(default_font.deriveFont(11f));
 		commandTable.setModel(new DefaultTableModel(
 			new Object[][] {
 				{"stop", ""},
@@ -273,6 +287,7 @@ public class GUI extends JFrame implements FocusListener {
 	
 	private void setupTextField(String[] args, JTextField textField, String name, int argsIndex) {
 		textField.setForeground(Color.GRAY);
+		textField.setFont(default_font);
 		textField.setName(name);
 		textField.setText(name);
 		textField.addFocusListener(this);
