@@ -1,8 +1,9 @@
 package functions.slash_commands.administration;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 import assets.base.AwaitTask;
 import assets.functions.SlashCommandEventHandler;
@@ -11,6 +12,7 @@ import engines.base.Toolbox;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Mentions;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -22,22 +24,9 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Rolesorting implements SlashCommandEventHandler {
 	
-	private SlashCommandInteractionEvent oevent;
-	private Role grouprole;
-	private List<Role> subroles;
-	private List<Member> members;
-	private Guild guild;
-	private User user;
-	private TextChannel channel;
-	private List<Message> messages = new ArrayList<>();
-	
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		oevent = event;
-		guild = event.getGuild();
-		user = event.getUser();
-		channel = guild.getTextChannelById(event.getMessageChannel().getIdLong());
-		this.definegroup();
+		this.definegroup(event.getGuild(), event.getUser(), event.getChannel().asTextChannel(), event);
 	}
 
 	@Override
@@ -47,47 +36,49 @@ public class Rolesorting implements SlashCommandEventHandler {
 		   	   .setGuildOnly(true);
 		return command;
 	}
-	
-	private void cleanup() {
-		oevent.getHook().deleteOriginal().queue();
-		channel.deleteMessages(messages).queue();
+
+	private void definegroup(Guild guild, User user, TextChannel channel, SlashCommandInteractionEvent event) {
+	    Message message = event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "definegroup")).complete().retrieveOriginal().complete();
+	    AwaitTask.forMessageReceival(guild, user, channel, null,
+	            e -> {
+	                Role grouprole = e.getMessage().getMentions().getRoles().get(0);
+	                this.definesub(guild, user, channel, grouprole, message);
+	            }, null).append();
 	}
 
-	private void definegroup() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "definegroup")).complete());
-		AwaitTask.forMessageReceival(guild, user, channel, null,
-				e -> {messages.add(e.getMessage());
-				      grouprole = e.getMessage().getMentions().getRoles().get(0);
-				      this.definesub();},
-			   () -> {this.cleanup();
-				   	  channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
-	}
-	
-	private void definesub() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "definesub")).complete());
-		AwaitTask.forMessageReceival(guild, user, channel, null,
-							e -> {messages.add(e.getMessage());
-								  subroles = e.getMessage().getMentions().getRoles();
-								  this.definemember();},
-							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
+	private void definesub(Guild guild, User user, TextChannel channel, Role grouprole, Message message) {
+	    Message newMessage = message.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "definesub")).complete();
+	    AwaitTask.forMessageReceival(guild, user, channel, null,
+	            e -> {
+	                List<Role> subroles = e.getMessage().getMentions().getRoles();
+	                this.definemember(guild, user, channel, grouprole, subroles, newMessage);
+	            }, null).append();
 	}
 
-	private void definemember() {
-		messages.add(channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "definemember")).complete());
-		AwaitTask.forMessageReceival(guild, user, channel, null,
-							e -> {messages.add(e.getMessage());
-								  members = e.getMessage().getMentions().getMembers();
-								  this.rolesorter();},
-							() -> {this.cleanup();
-								   channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "timeout")).queue(response -> response.delete().queueAfter(3, TimeUnit.SECONDS));}).append();
+	private void definemember(Guild guild, User user, TextChannel channel, Role grouprole, List<Role> subroles, Message message) {
+	    message.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "definemember")).queue();
+	    AwaitTask.forMessageReceival(guild, user, channel, null,
+	            e -> {
+	                Mentions mentions = e.getMessage().getMentions();
+	                List<Member> members = mentions.getMembers();
+	                if (!mentions.getRoles().isEmpty()) {
+	                    if (mentions.getRoles().contains(guild.getPublicRole())) {
+	                        members.addAll(guild.loadMembers().get());
+	                    } else {
+	                        mentions.getRoles().forEach(role -> members.addAll(guild.findMembersWithRoles(role).get()));
+	                    }
+	                }
+	                this.rolesorter(guild, grouprole, subroles, members);
+	                message.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")).queue();
+	            }, null).append();
 	}
 	
-	private void rolesorter() {
-		for (int e = 0; e<members.size(); e++) {
-			Toolbox.sortRoles(guild, members.get(e), subroles, grouprole);
+	private void rolesorter(Guild guild, Role grouprole, List<Role> subroles, List<Member> members) {
+	    List<Member> listWithoutDuplicates = new ArrayList<>();
+	    Set<Member> set = new HashSet<>(members);
+	    listWithoutDuplicates.addAll(set);
+		for (int e = 0; e < listWithoutDuplicates.size(); e++) {
+			Toolbox.sortRoles(guild, listWithoutDuplicates.get(e), subroles, grouprole);
 		}
-		this.cleanup();
-		channel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")).queue(response -> response.delete().queueAfter(10, TimeUnit.SECONDS));
 	}
 }
