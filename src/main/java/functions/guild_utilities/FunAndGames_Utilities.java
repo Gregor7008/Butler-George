@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 public class FunAndGames_Utilities extends GuildUtilities {
 	
 	private static final long GUILD_ID = 708381749826289666L;
+	
 	private Guild guild;
 	
 	@Override
@@ -77,23 +78,27 @@ public class FunAndGames_Utilities extends GuildUtilities {
 	
 	private void rolecheck(Guild eventGuild) {
 		if (eventGuild != null && eventGuild.getIdLong() == GUILD_ID) {
-			final List<Member> members = guild.getMembers();
-			Role gr1 = guild.getRoleById("837742608604332052");
-			int gr1p = gr1.getPosition();
-			Role gr2 = guild.getRoleById("837744376712265728");
-			int gr2p = gr2.getPosition();
-			Role gr3 = guild.getRoleById("870231144300441671");
-			int gr3p = gr3.getPosition();
-			List<Role> sr1 = guild.getRoles().stream().filter(e -> e.getPosition() < gr1p && e.getPosition() > gr2p).toList();
-			List<Role> sr2 = guild.getRoles().stream().filter(e -> e.getPosition() < gr2p && e.getPosition() > gr3p).toList();
-			List<Role> sr3 = guild.getRoles().stream().filter(e -> e.getPosition() < gr3p && e.getPosition() >= guild.getRoleById("864136501653798932").getPosition()).toList();
-			for (int i = 0; i < members.size(); i++) {
-				Member member = members.get(i);
-				if (!member.getUser().isBot()) {
-				    Toolbox.sortRoles(guild, member, sr1, gr1);
-				    Toolbox.sortRoles(guild, member, sr2, gr2);
-				    Toolbox.sortRoles(guild, member, sr3, gr3);
-				}
+			try {
+			    final List<Member> members = guild.getMembers();
+	            Role gr1 = guild.getRoleById("837742608604332052");
+	            Role gr2 = guild.getRoleById("837744376712265728");
+	            Role gr3 = guild.getRoleById("870231144300441671");
+	            int gr1p = gr1.getPosition();
+	            int gr2p = gr2.getPosition();
+	            int gr3p = gr3.getPosition();
+	            List<Role> sr1 = guild.getRoles().stream().filter(e -> e.getPosition() < gr1p && e.getPosition() > gr2p).toList();
+	            List<Role> sr2 = guild.getRoles().stream().filter(e -> e.getPosition() < gr2p && e.getPosition() > gr3p).toList();
+	            List<Role> sr3 = guild.getRoles().stream().filter(e -> e.getPosition() < gr3p && e.getPosition() >= guild.getRoleById("864136501653798932").getPosition()).toList();
+	            for (int i = 0; i < members.size(); i++) {
+	                Member member = members.get(i);
+	                if (!member.getUser().isBot()) {
+	                    Toolbox.sortRoles(guild, member, sr1, gr1);
+	                    Toolbox.sortRoles(guild, member, sr2, gr2);
+	                    Toolbox.sortRoles(guild, member, sr3, gr3);
+	                }
+	            }
+			} catch (NullPointerException e) {
+			    LOG.error("NullPointerException in GuildUtilities for \"Fun & Games\" Probably as of it having deleted a role included in the automatic role sorting!");
 			}
 		}
 	}
