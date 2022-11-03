@@ -29,6 +29,11 @@ public abstract class LanguageEngine {
 	    return LanguageEngine.buildMessageEmbed(raw.split(SEPERATOR));
 	}
 	
+	public static String getMessage(Guild guild, User user, Object requester, String key) {
+	    String raw = getRaw(guild, user, requester, key);
+	    return LanguageEngine.buildMessage(raw.split(SEPERATOR));
+	}
+	
 	public static String getTitle(Guild guild, User user, Object requester, String key) {
 		return LanguageEngine.getRaw(guild, user, requester, key).split(SEPERATOR)[0];
 	}
