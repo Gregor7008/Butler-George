@@ -92,14 +92,14 @@ public class AutoRoles implements ConfigurationEventHandler {
 		}
 		for (int i = 0; i < autoroles.length(); i++) {
 			sB.append('#')
-			  .append(String.valueOf(i) + "\s\s");
+			  .append(String.valueOf(i+1) + "\s\s");
 			if (i+1 == autoroles.length()) {
 				sB.append(guild.getRoleById(autoroles.getLong(i)).getAsMention());
 			} else {
 				sB.append(guild.getRoleById(autoroles.getLong(i)).getAsMention() + "\n");
 			}
 		}
-		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user,  this, selection + "list").replaceDescription("{list}", sB.toString())).queue();
+		event.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user,  this, selection + "list").replaceDescription("{list}", sB.toString())).setComponents().queue();
 	}
 
 	@Override
