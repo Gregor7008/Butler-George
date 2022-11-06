@@ -98,15 +98,15 @@ public class GUI extends JFrame implements FocusListener {
 		redLEDOff = new ImageIcon(loader.getResourceAsStream("gui/red_off.png").readAllBytes());
 		eyeIconRaw = new ImageIcon(loader.getResourceAsStream("gui/eye_icon.png").readAllBytes());
 		windowIcon = new ImageIcon(loader.getResourceAsStream("misc/self_avatar.png").readAllBytes());
-        default_font = Font.createFont(Font.TRUETYPE_FONT, loader.getResourceAsStream("gui/default_font.ttf")).deriveFont(0, 11f);
-        console_font = Font.createFont(Font.TRUETYPE_FONT, loader.getResourceAsStream("gui/console_font.ttf")).deriveFont(0, 13f);
+        default_font = Font.createFont(Font.TRUETYPE_FONT, loader.getResourceAsStream("gui/default_font.ttf")).deriveFont(0, 12f);
+        console_font = Font.createFont(Font.TRUETYPE_FONT, loader.getResourceAsStream("gui/console_font.ttf")).deriveFont(0, 12f);
 		
 		setIconImage(windowIcon.getImage());
 		setSize(1200, 600);
 		setTitle(Bot.NAME + " - " + Bot.VERSION);
-		setFont(default_font);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
+		
 		getContentPane().setLayout(new MigLayout("", "[600,grow][125:125:125][75:75:75][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][20:n][20:n][510,grow][20:n]"));
 		
 		JScrollPane consoleScrollPane = new JScrollPane(console);
@@ -188,6 +188,7 @@ public class GUI extends JFrame implements FocusListener {
 		startButton.addActionListener(e -> {
 			this.startBot();
 		});
+		startButton.setFont(default_font);
 		getContentPane().add(startButton, "flowx,cell 1 3 2 1,grow");
 		
 		stopButton.addActionListener(e -> {
@@ -198,14 +199,16 @@ public class GUI extends JFrame implements FocusListener {
 			}
 		});
 		stopButton.setEnabled(false);
+		stopButton.setFont(default_font);
 		getContentPane().add(stopButton, "cell 3 3 3 1,grow");
 		
+		sdWLabel.setFont(default_font);
 		getContentPane().add(sdWLabel, "cell 3 4 2 1,alignx right,aligny center");
 		
 		getContentPane().add(shutdownWindowBox, "cell 5 4,alignx left,aligny center");
 		
 		infoTable.setShowGrid(false);
-		infoTable.setFont(default_font.deriveFont(11f));
+		infoTable.setFont(default_font);
 		infoTable.setModel(new DefaultTableModel(
 			new Object[][] {
 				{"Name:", Bot.NAME},
@@ -233,7 +236,7 @@ public class GUI extends JFrame implements FocusListener {
 		tabbedPane.addTab("Info", null, infoTable, null);
 
 		commandTable.setShowGrid(false);
-		commandTable.setFont(default_font.deriveFont(11f));
+		commandTable.setFont(default_font);
 		commandTable.setModel(new DefaultTableModel(
 			new Object[][] {
 				{"stop", ""},
@@ -257,9 +260,11 @@ public class GUI extends JFrame implements FocusListener {
 		commandTable.getColumnModel().getColumn(0).setResizable(false);
 		
 		tabbedPane.addTab("Commands", null, commandTable, null);
+		tabbedPane.setFont(default_font);
 		getContentPane().add(tabbedPane, "cell 1 5 5 2,grow");
 		
 		consoleIn.addActionListener(new ConsoleCommandListener());
+		consoleIn.setFont(console_font);
 		getContentPane().add(consoleIn, "cell 0 6,growx,aligny center");
 		
 		setVisible(true);

@@ -41,7 +41,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 public class Bot {
 	
 	public static Bot INSTANCE;
-	public static String VERSION = "V2.0-dev";
+	public static String VERSION = "V2.0-dev.0";
 	public static String NAME = "Butler George";
 	public static String ID = "853887837823959041";
 	public static String HOME = "708381749826289666";
