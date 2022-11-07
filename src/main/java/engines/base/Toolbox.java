@@ -2,8 +2,6 @@ package engines.base;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +9,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import base.Bot;
 import engines.data.ConfigLoader;
@@ -23,7 +20,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
@@ -58,15 +54,6 @@ public abstract class Toolbox {
 		messageAction.queue(e -> files.forEach(f -> f.delete()));
 	}
 	
-	public static boolean checkURL(String subject) {
-		try {
-			new URL(subject);
-			return true;
-		} catch (MalformedURLException e) {
-			return false;
-		}
-	}
-	
 	public static boolean removeValueFromArray(JSONArray current, Object value) {
 		for (int i = 0; i < current.length(); i++) {
 			if (current.get(i).equals(value)) {
@@ -76,14 +63,6 @@ public abstract class Toolbox {
 			}
 		}
 		return false;
-	}
-	
-	public static User checkCategory(Category category, Guild guild) {
-		try {
-			return Bot.INSTANCE.jda.getUserById(ConfigLoader.INSTANCE.getGuildConfig(guild, "customchannelcategories").getLong(category.getId()));
-		} catch (JSONException e) {
-			return null;
-		}
 	}
 	
 	public static String processAutoMessage(String input, Guild guild, User user, boolean mentions) {

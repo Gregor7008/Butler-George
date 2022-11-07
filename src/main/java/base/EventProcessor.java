@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import assets.functions.MessageContextEventHandler;
 import assets.functions.SlashCommandEventHandler;
 import assets.functions.UserContextEventHandler;
+import engines.base.Check;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import engines.data.ConfigLoader;
@@ -329,8 +330,8 @@ public class EventProcessor extends ListenerAdapter {
 		ConfigVerifier.RUN.guildCheck(guild);
 		if (event.isFromType(ChannelType.CATEGORY)) {
 			Category ctg = (Category) event.getChannel();
-			if (Toolbox.checkCategory(ctg, guild) != null) {
-				ConfigVerifier.RUN.userCheck(guild, Toolbox.checkCategory(ctg, guild));
+			if (Check.isUserCategory(ctg) != null) {
+				ConfigVerifier.RUN.userCheck(guild, Check.isUserCategory(ctg));
 			}
 		}
 	}

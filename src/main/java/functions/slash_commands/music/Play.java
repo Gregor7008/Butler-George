@@ -1,8 +1,8 @@
 package functions.slash_commands.music;
 
 import assets.functions.SlashCommandEventHandler;
+import engines.base.Check;
 import engines.base.LanguageEngine;
-import engines.base.Toolbox;
 import engines.functions.GuildMusicManager;
 import engines.functions.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -60,7 +60,7 @@ public class Play implements SlashCommandEventHandler {
 				vc.getManager().setUserLimit(vc.getUserLimit() + 1).queue();
 			}
 		}
-		if (!Toolbox.checkURL(argument)) {
+		if (!Check.isURL(argument)) {
 			String term = "ytsearch:" + argument;
 			musicManager.scheduler.player.setVolume(15);
 			PlayerManager.getInstance().loadAndPlay(event, term);

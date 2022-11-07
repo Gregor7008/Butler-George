@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import assets.base.AwaitTask;
 import assets.functions.SlashCommandEventHandler;
+import engines.base.Check;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -201,7 +202,7 @@ public class Embed implements SlashCommandEventHandler {
 				m -> {
 					m.deferEdit().queue();
 					String url = m.getValue("titleURL").getAsString();;
-					if (url.equals("") || !Toolbox.checkURL(url)) {
+					if (url.equals("") || !Check.isURL(url)) {
 						url = null;
 					}
 					String input = m.getValue("title").getAsString();
