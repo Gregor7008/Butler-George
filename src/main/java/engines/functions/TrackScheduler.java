@@ -28,8 +28,9 @@ public class TrackScheduler extends AudioEventAdapter {
 	}
 	
 	public void nextTrack() {
-		if (this.queue.poll() != null) {
-			this.player.startTrack(this.queue.poll(), false);
+	    AudioTrack next = this.queue.poll();
+		if (next != null) {
+			this.player.startTrack(next, false);
 		} else {
 			Toolbox.stopMusicAndLeaveOn(AudioPlayerCache.getInstance().getGuild(player));
 		}
