@@ -292,11 +292,11 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getChannelJoined() != null) {
 		    this.managej2cjoin(event.getGuild(), event.getMember(), event.getChannelJoined());
 		    LevelEngine.getInstance().voicejoin(event);
-		} else if (event.getChannelLeft() != null) {
+		}
+		if (event.getChannelLeft() != null) {
 		    this.managej2cleave(event.getGuild(), event.getMember().getUser(), event.getChannelLeft());
 		    LevelEngine.getInstance().voicemove(event);
 		}
-		
 	}
 	
 	@Override
