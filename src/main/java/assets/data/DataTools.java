@@ -46,11 +46,28 @@ public abstract class DataTools {
         }
     }
     
-    public static <T> void removeFromList(List<T> list, int[] indices) {
-        for (int i = 0; i < indices.length; i++) {
-            list.remove(indices[i]);
+    public static <T> void addToList(List<T> target, T[] new_entries) {
+        for (int i = 0; i < new_entries.length; i++) {
+            if (new_entries[i] != null) {
+                target.add(new_entries[i]);
+            }
         }
-        list.removeAll(Collections.singleton(null));
+    }
+    
+    public static <T> void removeFromList(List<T> target, int[] indices) {
+        for (int i = 0; i < indices.length; i++) {
+            target.remove(indices[i]);
+        }
+        target.removeAll(Collections.singleton(null));
+    }
+    
+    public static <T> void removeFromList(List<T> target, T[] objects) {
+        for (int i = 0; i < objects.length; i++) {
+            if (objects != null) {
+                target.remove(objects[i]);
+            }
+        }
+        target.removeAll(Collections.singleton(null));
     }
     
     public static <K, V> void setMap(ConcurrentHashMap<K, V> target, ConcurrentHashMap<K, V> replacement) {

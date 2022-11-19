@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.entities.Role;
 public class PenaltyData implements DataContainer {
 
     private final Guild guild;
-    private final Penalty type;
+    private final PenaltyType type;
     private final int warning_limit;
     private Duration opt_duration;
     private List<Role> opt_roles = new LinkedList<>();
@@ -25,12 +25,12 @@ public class PenaltyData implements DataContainer {
     
 	public PenaltyData(Guild guild, JSONObject data) {
 	    this.guild = guild;
-	    this.type = Penalty.valueOf(data.getString(Key.TYPE));
+	    this.type = PenaltyType.valueOf(data.getString(Key.TYPE));
 	    this.warning_limit = data.getInt(Key.WARNING_LIMIT);
 	    this.instanciateFromJSON(data);
 	}
 	
-	public PenaltyData(Guild guild, Penalty type, int warning_limit) {
+	public PenaltyData(Guild guild, PenaltyType type, int warning_limit) {
 	    this.guild = guild;
 	    this.type = type;
 	    this.warning_limit = warning_limit;
@@ -68,6 +68,8 @@ public class PenaltyData implements DataContainer {
             this.remove_role = false;
         }
         
+        compiledData.put(Key.WARNING_LIMIT, warning_limit);
+        compiledData.put(Key.TYPE, type.toString());
         compiledData.put(Key.REMOVE_ROLE, remove_role);
         compiledData.put(Key.RESET_EXPERIENCE, reset_experience);
         compiledData.put(Key.RESET_LEVEL, reset_level);
@@ -79,7 +81,7 @@ public class PenaltyData implements DataContainer {
         return this.guild;
     }
     
-    public Penalty getType() {
+    public PenaltyType getType() {
         return this.type;
     }
     
@@ -102,7 +104,7 @@ public class PenaltyData implements DataContainer {
     }
     
     public PenaltyData addRoles(Role... roles) {
-        this.opt_roles.addAll(List.of(roles));
+        DataTools.addToList(this.opt_roles, roles);
         return this;
     }
     
@@ -112,7 +114,7 @@ public class PenaltyData implements DataContainer {
     }
     
     public PenaltyData removeRolesByRole(Role... roles) {
-        this.opt_roles.removeAll(List.of(roles));
+        DataTools.removeFromList(this.opt_roles, roles);
         return this;
     }
     
@@ -157,7 +159,7 @@ public class PenaltyData implements DataContainer {
         public static final String WARNING_LIMIT = "warning_limit";
     }
 
-    public static enum Penalty {
+    public static enum PenaltyType {
         REMOVE_ROLE,
         TEMPORARY_MUTE,
         PERMANENT_MUTE,

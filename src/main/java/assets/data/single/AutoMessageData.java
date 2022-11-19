@@ -3,6 +3,7 @@ package assets.data.single;
 import org.json.JSONObject;
 
 import assets.data.DataContainer;
+import engines.base.Check;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
@@ -43,7 +44,7 @@ public class AutoMessageData implements DataContainer {
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         
-        if (text_channel != null) {
+        if (Check.isValidChannel(text_channel)) {
             compiledData.put(Key.CHANNEL_ID, text_channel.getIdLong());
             
             compiledData.put(Key.TITLE, this.title);

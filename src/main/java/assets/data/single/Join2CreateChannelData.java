@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import assets.data.DataContainer;
 import assets.data.DataTools;
+import engines.base.Check;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
@@ -54,9 +55,9 @@ public class Join2CreateChannelData implements DataContainer {
         this.limit_preset = data.getInt(Key.LIMIT_PRESET);
         this.configurable = data.getBoolean(Key.CONFIGURABLE);
         
-        JSONArray chilrend_array = data.getJSONArray(Key.CHILDREN);
-        for (int i = 0; i < chilrend_array.length(); i++) {
-            this.children.add(guild.getVoiceChannelById(chilrend_array.getLong(i)));
+        JSONArray chilren_array = data.getJSONArray(Key.CHILDREN);
+        for (int i = 0; i < chilren_array.length(); i++) {
+            this.children.add(guild.getVoiceChannelById(chilren_array.getLong(i)));
             this.children.removeAll(Collections.singleton(null));
         }
         
@@ -66,11 +67,21 @@ public class Join2CreateChannelData implements DataContainer {
     @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
-        
-        compiledData.put(Key.NAME_FORMAT, this.name_format);
-        compiledData.put(Key.LIMIT_PRESET, this.limit_preset);
-        compiledData.put(Key.CONFIGURABLE, configurable);
-        
+
+        if (Check.isValidChannel(channel)) {
+            compiledData.put(Key.NAME_FORMAT, this.name_format);
+            compiledData.put(Key.LIMIT_PRESET, this.limit_preset);
+            compiledData.put(Key.CONFIGURABLE, configurable);
+
+            JSONArray children_data = new JSONArray();
+            children.forEach(channel -> {
+                if (Check.isValidChannel(channel)) {
+                    children_data.put(channel.getIdLong());
+                }
+            });
+            compiledData.put(Key.CHILDREN, children_data);
+        }
+
         return compiledData;
     }
     
@@ -84,8 +95,7 @@ public class Join2CreateChannelData implements DataContainer {
     }
     
     public Join2CreateChannelData addChildren(VoiceChannel... childrens) {
-        this.children.addAll(List.of(childrens));
-        this.children.removeAll(Collections.singleton(null));
+        DataTools.addToList(this.children, childrens);
         return this;
     }
     
@@ -95,7 +105,7 @@ public class Join2CreateChannelData implements DataContainer {
     }
     
     public Join2CreateChannelData removeChildrenByChannel(VoiceChannel... childrens) {
-        this.children.removeAll(List.of(childrens));
+        DataTools.removeFromList(this.children, childrens);
         return this;
     }
     

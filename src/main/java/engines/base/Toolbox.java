@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 
@@ -114,5 +117,19 @@ public abstract class Toolbox {
             if (match == 0 && member.getRoles().contains(group_role)) {
                 guild.removeRoleFromMember(member, group_role).queue();
             }
+    }
+    
+    public static void filterValidMembers(Collection<Member> members, Guild guild) {
+        List<Member> validMembers = new ArrayList<>();
+        validMembers.addAll(guild.retrieveMembersByIds(
+                members.stream().map(member -> {
+                    return member.getIdLong();
+                })
+                .collect(Collectors.toList()))
+                .get());
+        validMembers.removeAll(Collections.singleton(null));
+        members.removeIf(member -> {
+            return !validMembers.contains(member);
+        });
     }
 }

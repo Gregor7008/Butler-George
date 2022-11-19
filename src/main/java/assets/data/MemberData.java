@@ -334,19 +334,19 @@ public class MemberData implements DataContainer {
         DataTools.setList(this.warnings, warnings);
         return this;
     }
-    
+
     public MemberData addWarnings(WarningData... datas) {
-        this.warnings.addAll(List.of(datas));
+        DataTools.addToList(this.warnings, datas);
         return this;
     }
-    
+
     public MemberData removeWarnings(int... indicies) {
         DataTools.removeFromList(this.warnings, indicies);
         return this;
     }
-    
+
     public MemberData removeWarningsByData(WarningData... datas) {
-        this.warnings.removeAll(List.of(datas));
+        DataTools.removeFromList(this.warnings, datas);
         return this;
     }
     
