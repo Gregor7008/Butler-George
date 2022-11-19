@@ -12,12 +12,14 @@ import org.json.JSONObject;
 import assets.functions.MessageContextEventHandler;
 import assets.functions.SlashCommandEventHandler;
 import assets.functions.UserContextEventHandler;
+import assets.logging.Logger;
 import engines.base.Check;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import engines.data.ConfigLoader;
 import engines.data.ConfigVerifier;
 import engines.functions.LevelEngine;
+import engines.logging.ConsoleEngine;
 import functions.context_menu_commands.MessageContextCommandList;
 import functions.context_menu_commands.UserContextCommandList;
 import functions.slash_commands.SlashCommandList;
@@ -58,6 +60,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 public class EventProcessor extends ListenerAdapter {
+    
+    private static final Logger LOG = ConsoleEngine.getLogger(EventProcessor.class);
 	
 	@Override
 	public void onReady(ReadyEvent event) {
@@ -80,7 +84,9 @@ public class EventProcessor extends ListenerAdapter {
 				if (msgid != 0L) {
 					guild.getTextChannelById(ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(1)).retrieveMessageById(msgid).complete().delete().queue();
 				}
-			} catch (JSONException | ErrorResponseException e) {}
+			} catch (JSONException | ErrorResponseException e) {
+			    LOG.error("Couldn't delete offline message for \"" + guild.getName() + "\"!", e);
+			}
 			ConfigLoader.INSTANCE.getGuildConfig(guild).put("offlinemsg", new JSONArray());
 		}
 	}
