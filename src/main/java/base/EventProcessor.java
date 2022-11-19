@@ -54,7 +54,6 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -82,11 +81,15 @@ public class EventProcessor extends ListenerAdapter {
 			try {
 				long msgid = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(0);
 				if (msgid != 0L) {
-					guild.getTextChannelById(ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(1)).retrieveMessageById(msgid).complete().delete().queue();
+					guild.getTextChannelById(ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(1)).retrieveMessageById(msgid).queue(
+					        message -> {
+					            if (message != null) {
+					                message.delete().queue();
+					            }
+					        },
+					        error -> LOG.error("Couldn't delete offline message for \"" + guild.getName() + "\"!", error));
 				}
-			} catch (JSONException | ErrorResponseException e) {
-			    LOG.error("Couldn't delete offline message for \"" + guild.getName() + "\"!", e);
-			}
+			} catch (JSONException e) {}
 			ConfigLoader.INSTANCE.getGuildConfig(guild).put("offlinemsg", new JSONArray());
 		}
 	}
