@@ -1,7 +1,5 @@
 package functions.slash_commands.utilities;
 
-import java.io.File;
-
 import assets.functions.SlashCommandEventHandler;
 import engines.base.LanguageEngine;
 import engines.data.ConfigLoader;
@@ -69,23 +67,18 @@ public class Levelbackground implements SlashCommandEventHandler {
 		eb4.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
 		
 		try {
-			File file0 = new File(this.getClass().getClassLoader().getResource("levelcards/0.png").toURI());
-			File file1 = new File(this.getClass().getClassLoader().getResource("levelcards/1.png").toURI());
-			File file2 = new File(this.getClass().getClassLoader().getResource("levelcards/2.png").toURI());
-			File file3 = new File(this.getClass().getClassLoader().getResource("levelcards/3.png").toURI());
-			File file4 = new File(this.getClass().getClassLoader().getResource("levelcards/4.png").toURI());
-			
+		    ClassLoader cl = this.getClass().getClassLoader();
 			eb0.setImage("attachment://0.png");
 			eb1.setImage("attachment://1.png");
 			eb2.setImage("attachment://2.png");
 			eb3.setImage("attachment://3.png");
 			eb4.setImage("attachment://4.png");
 			event.replyEmbeds(eb0.build(), eb1.build(), eb2.build(), eb3.build(), eb4.build())
-				 .addFiles(FileUpload.fromData(file0, "0.png"),
-						   FileUpload.fromData(file1, "1.png"),
-						   FileUpload.fromData(file2, "2.png"),
-						   FileUpload.fromData(file3, "3.png"),
-						   FileUpload.fromData(file4, "4.png"))
+				 .addFiles(FileUpload.fromData(cl.getResourceAsStream("levelcards/0.png"), "0.png"),
+						   FileUpload.fromData(cl.getResourceAsStream("levelcards/1.png"), "1.png"),
+						   FileUpload.fromData(cl.getResourceAsStream("levelcards/2.png"), "2.png"),
+						   FileUpload.fromData(cl.getResourceAsStream("levelcards/3.png"), "3.png"),
+						   FileUpload.fromData(cl.getResourceAsStream("levelcards/4.png"), "4.png"))
 				 .queue();
 		} catch (Exception e) {
 			e.printStackTrace();
