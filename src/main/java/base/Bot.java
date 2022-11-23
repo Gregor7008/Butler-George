@@ -45,7 +45,6 @@ public class Bot {
 	public static String NAME = "Butler George";
 	public static String ID = "853887837823959041";
 	public static String HOME = "708381749826289666";
-	public static String DEFAULT_FOOTER = "{time} | Made with ❤️ by Gregor7008";
 	
 	private static Logger LOG = ConsoleEngine.getLogger(Bot.class);
 	

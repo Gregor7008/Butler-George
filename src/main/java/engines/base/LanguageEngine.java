@@ -1,7 +1,7 @@
 package engines.base;
 
 import java.io.IOException;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,54 +16,55 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
 public abstract class LanguageEngine {
-	
-	public static DateTimeFormatter DEFAULT_TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
-	public static DateTimeFormatter SHORTENED_TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.");
-	public static String SEPERATOR = "; ";
-	public static int EMBED_DEFAULT_COLOR = 56575;
-	
-	private static Logger LOG = ConsoleEngine.getLogger(LanguageEngine.class);
-	
-	public static MutableMessageEmbed getMessageEmbed(Guild guild, User user, Object requester, String key)  {
-		String raw = getRaw(guild, user, requester, key);
-	    return LanguageEngine.buildMessageEmbed(raw.split(SEPERATOR));
-	}
-	
-	public static String getMessage(Guild guild, User user, Object requester, String key) {
-	    String raw = getRaw(guild, user, requester, key);
-	    return LanguageEngine.buildMessage(raw.split(SEPERATOR));
-	}
-	
-	public static String getTitle(Guild guild, User user, Object requester, String key) {
-		return LanguageEngine.getRaw(guild, user, requester, key).split(SEPERATOR)[0];
-	}
 
-	public static String getDescription(Guild guild, User user, Object requester, String key) {
-		try {
-		    return LanguageEngine.getRaw(guild, user, requester, key).split(SEPERATOR)[1];
-		} catch (IndexOutOfBoundsException e) {
-		    return null;
-		}
-	}
-	
-	public static String getFooter(Guild guild, User user, Object requester, String key) {
-	    try {
-	        return buildFooter(LanguageEngine.getRaw(guild, user, requester, key).split(SEPERATOR)[2]);
-	    } catch (IndexOutOfBoundsException e) {
-	        return null;
-	    }
-	}
-	
-	public static String getRaw(Guild guild, User user, Object requester, String key) {
-		Language language = Language.ENGLISH;
-//		if (user != null && guild != null) {
-//		    language = ConfigLoader.INSTANCE.getMemberData(guild, user).getLanguage();
-//		}
-		return LanguageEngine.getRaw(language, requester, key);
-	}
-	
-	public static String getRaw(Language language, Object requester, String key) {
-	    String path = "general";
+    public static DateTimeFormatter DEFAULT_TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyy - HH:mm");
+    public static DateTimeFormatter SHORTENED_TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.");
+    public static String DEFAULT_FOOTER = "Made with ❤️ by Gregor7008";
+    public static String SEPERATOR = "; ";
+    public static int EMBED_DEFAULT_COLOR = 56575;
+
+    private static Logger LOG = ConsoleEngine.getLogger(LanguageEngine.class);
+
+    public static MutableMessageEmbed getMessageEmbed(Guild guild, User user, Object requester, String key)  {
+        String raw = getRaw(guild, user, requester, key);
+        return LanguageEngine.buildMessageEmbed(raw.split(SEPERATOR));
+    }
+
+    public static String getMessage(Guild guild, User user, Object requester, String key) {
+        String raw = getRaw(guild, user, requester, key);
+        return LanguageEngine.buildMessage(raw.split(SEPERATOR));
+    }
+
+    public static String getTitle(Guild guild, User user, Object requester, String key) {
+        return LanguageEngine.getRaw(guild, user, requester, key).split(SEPERATOR)[0];
+    }
+
+    public static String getDescription(Guild guild, User user, Object requester, String key) {
+        try {
+            return LanguageEngine.getRaw(guild, user, requester, key).split(SEPERATOR)[1];
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    public static String getFooter(Guild guild, User user, Object requester, String key) {
+        try {
+            return buildFooter(LanguageEngine.getRaw(guild, user, requester, key).split(SEPERATOR)[2]);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    public static String getRaw(Guild guild, User user, Object requester, String key) {
+        Language language = Language.ENGLISH;
+//      if (user != null && guild != null) {
+//          language = ConfigLoader.INSTANCE.getMemberData(guild, user).getLanguage();
+//      }
+        return LanguageEngine.getRaw(language, requester, key);
+    }
+
+    public static String getRaw(Language language, Object requester, String key) {
+        String path = "general";
         if (requester != null) {
             String requesterName = "";
             if (requester instanceof Class) {
@@ -72,7 +73,7 @@ public abstract class LanguageEngine {
             } else {
                 requesterName = requester.getClass().getName();
             }
-            path = requesterName.replace('.', '/').replaceAll("\\$[0-9]+", "").toLowerCase();
+            path = requesterName.replace('.', '/').replaceAll("\\\\$[0-9]+", "").toLowerCase();
         }
         String fullpath = "languages/" + language.toString().toLowerCase() + "/" + path + ".properties";
         Properties properties = new Properties();
@@ -88,8 +89,8 @@ public abstract class LanguageEngine {
             LOG.error("Couldn't find language file for " + fullpath + ":" + key);
             return "Error!; :x: | Couldn't find language files!\nContact support immediately!";
         }
-	}
-    
+    }
+
     public static MutableMessageEmbed buildMessageEmbed(String... args) {
         args = processArguments(args);
         EmbedBuilder eb = new EmbedBuilder();
@@ -104,12 +105,13 @@ public abstract class LanguageEngine {
         if (args.length > 2 && args[2] != null) {
             footer = args[2];
         } else {
-            footer = Bot.DEFAULT_FOOTER;
+            footer = DEFAULT_FOOTER;
         }
         eb.setFooter(buildFooter(footer));
+        eb.setTimestamp(Instant.now());
         return new MutableMessageEmbed(eb.build());
     }
-    
+
     public static String buildMessage(String... args) {
         args = processArguments(args);
         StringBuilder sB = new StringBuilder();
@@ -126,18 +128,21 @@ public abstract class LanguageEngine {
         if (args.length > 2 && args[2] != null) {
             footer = args[2];
         } else {
-            footer = Bot.DEFAULT_FOOTER;
+            footer = DEFAULT_FOOTER;
         }
         sB.append("\n\n" + buildFooter(footer));
         return sB.toString();
     }
-    
+
     public static String buildFooter(String raw_footer) {
-        return raw_footer.replace("{time}", OffsetDateTime.now().format(LanguageEngine.SHORTENED_TIME_FORMAT))
-                    .replace("{bot_name}", Bot.NAME)
-                    .replace("{bot_version}", Bot.VERSION);
+        return raw_footer.replace("{bot_name}", Bot.NAME)
+                .replace("{bot_version}", Bot.VERSION); 
     }
-    
+
+    public static String buildFooter() {
+        return buildFooter(DEFAULT_FOOTER);
+    }
+
     private static String[] processArguments(String[] args) {
         if (args.length == 1 && args[0].contains(SEPERATOR)) {
             args = args[0].split(SEPERATOR);
@@ -153,12 +158,12 @@ public abstract class LanguageEngine {
         }
         return args;
     }
-	
-	public static enum Language {
-	   ENGLISH,
-	   GERMAN,
-	   SPANISH,
-	   FRENCH,
-	   DUTCH;
-	}
+
+    public static enum Language {
+        ENGLISH,
+        GERMAN,
+        SPANISH,
+        FRENCH,
+        DUTCH;
+    }
 }
