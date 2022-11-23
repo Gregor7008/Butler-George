@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 
@@ -131,5 +132,47 @@ public abstract class Toolbox {
         members.removeIf(member -> {
             return !validMembers.contains(member);
         });
+    }
+    
+    public static Emoji convertIntegerToEmoji(int integer) {
+        String unicode = "";
+        switch (integer) {
+            case 0:
+                unicode = "\u0030\u20E3";
+                break;
+            case 1:
+                unicode = "\u0031\u20E3";
+                break;
+            case 2:
+                unicode = "\u0032\u20E3";
+                break;
+            case 3:
+                unicode = "\u0033\u20E3";
+                break;
+            case 4:
+                unicode = "\u0034\u20E3";
+                break;
+            case 5:
+                unicode = "\u0035\u20E3";
+                break;
+            case 6:
+                unicode = "\u0036\u20E3";
+                break;
+            case 7:
+                unicode = "\u0037\u20E3";
+                break;
+            case 8:
+                unicode = "\u0038\u20E3";
+                break;
+            case 9:
+                unicode = "\u0039\u20E3";
+                break;
+            case 10:
+                unicode = "\uD83D\uDD1F";
+                break;
+            default:
+                unicode = "\u002A\u20E3";
+        }
+        return Emoji.fromUnicode(unicode);
     }
 }
