@@ -457,7 +457,7 @@ public class PollData implements DataContainer {
         public static final String MAX_VOTES_PER_OPTION = "max_votes_per_option";
         public static final String OPTIONS = "options";
         public static final String VOTES = "votes";
-        public static final String ANONYMOUS = "anomyous";
+        public static final String ANONYMOUS = "anonymous";
         public static final String ALLOWED_ROLES = "allowed_roles";
         public static final String PUBLIC_RESULTS = "public_results";
         public static final String TIME_LIMIT = "time_limit";

@@ -56,9 +56,8 @@ public class GiveawayData implements DataContainer {
         public static final String TITLE = "title";
         public static final String PRIZES = "prizes";
         public static final String SIGN_UPS = "sign_ups";
-        public static final String ANONYMOUS = "anomyous";
-        public static final String ALLOWED_ROLES = "allowedroles";
-        public static final String WIN_MESSAGE = "win_message";
+        public static final String ANONYMOUS = "anonymous";
+        public static final String ALLOWED_ROLES = "allowed_roles";
         public static final String TIME_LIMIT = "time_limit";
     }
 }
