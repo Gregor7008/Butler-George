@@ -255,6 +255,98 @@ If you are considering to translate: Thank you very much :heart:! We're looking 
 [twitter_link]: https://cdn.discordapp.com/emojis/1006864194815139891.webp?size=32&amp;&quality=lossless
 [whatsapp_link]: https://cdn.discordapp.com/emojis/1006864196098600960.webp?size=32&amp;&quality=lossless
 [youtube_link]: https://cdn.discordapp.com/emojis/1006864197142990889.webp?size=32&amp;&quality=lossless
+<!-- Emojis - Numbers (1) -->
+[11_link]: https://cdn.discordapp.com/emojis/1044640314805190777.webp?size=32&amp;quality=lossless
+[12_link]: https://cdn.discordapp.com/emojis/1044640315996389386.webp?size=32&amp;quality=lossless
+[13_link]: https://cdn.discordapp.com/emojis/1044640317233704960.webp?size=32&amp;quality=lossless
+[14_link]: https://cdn.discordapp.com/emojis/1044640318437458030.webp?size=32&amp;quality=lossless
+[15_link]: https://cdn.discordapp.com/emojis/1044640319620255834.webp?size=32&amp;quality=lossless
+[16_link]: https://cdn.discordapp.com/emojis/1044640320727552040.webp?size=32&amp;quality=lossless
+[17_link]: https://cdn.discordapp.com/emojis/1044640321948110878.webp?size=32&amp;quality=lossless
+[18_link]: https://cdn.discordapp.com/emojis/1044640323118305300.webp?size=32&amp;quality=lossless
+[19_link]: https://cdn.discordapp.com/emojis/1044640324259172412.webp?size=32&amp;quality=lossless
+[20_link]: https://cdn.discordapp.com/emojis/1044640325571973201.webp?size=32&amp;quality=lossless
+[21_link]: https://cdn.discordapp.com/emojis/1044640326549245954.webp?size=32&amp;quality=lossless
+[22_link]: https://cdn.discordapp.com/emojis/1044640327753023619.webp?size=32&amp;quality=lossless
+[23_link]: https://cdn.discordapp.com/emojis/1044640329346854983.webp?size=32&amp;quality=lossless
+[24_link]: https://cdn.discordapp.com/emojis/1044640330525454356.webp?size=32&amp;quality=lossless
+[25_link]: https://cdn.discordapp.com/emojis/1044640331922145331.webp?size=32&amp;quality=lossless
+[26_link]: https://cdn.discordapp.com/emojis/1044640333222383706.webp?size=32&amp;quality=lossless
+[27_link]: https://cdn.discordapp.com/emojis/1044640334388412446.webp?size=32&amp;quality=lossless
+[28_link]: https://cdn.discordapp.com/emojis/1044640335516676187.webp?size=32&amp;quality=lossless
+[29_link]: https://cdn.discordapp.com/emojis/1044640336753983661.webp?size=32&amp;quality=lossless
+[30_link]: https://cdn.discordapp.com/emojis/1044640337911615488.webp?size=32&amp;quality=lossless
+[31_link]: https://cdn.discordapp.com/emojis/1044640339153137684.webp?size=32&amp;quality=lossless
+[32_link]: https://cdn.discordapp.com/emojis/1044640340235272192.webp?size=32&amp;quality=lossless
+[33_link]: https://cdn.discordapp.com/emojis/1044640341329973259.webp?size=32&amp;quality=lossless
+[34_link]: https://cdn.discordapp.com/emojis/1044640342550519891.webp?size=32&amp;quality=lossless
+[35_link]: https://cdn.discordapp.com/emojis/1044640344303747072.webp?size=32&amp;quality=lossless
+[36_link]: https://cdn.discordapp.com/emojis/1044640345574608967.webp?size=32&amp;quality=lossless
+[37_link]: https://cdn.discordapp.com/emojis/1044640346786758747.webp?size=32&amp;quality=lossless
+[38_link]: https://cdn.discordapp.com/emojis/1044640347843735563.webp?size=32&amp;quality=lossless
+[39_link]: https://cdn.discordapp.com/emojis/1044640349009739816.webp?size=32&amp;quality=lossless
+[40_link]: https://cdn.discordapp.com/emojis/1044640349877973035.webp?size=32&amp;quality=lossless
+[41_link]: https://cdn.discordapp.com/emojis/1044640351517941880.webp?size=32&amp;quality=lossless
+[42_link]: https://cdn.discordapp.com/emojis/1044640352612663396.webp?size=32&amp;quality=lossless
+[43_link]: https://cdn.discordapp.com/emojis/1044640353711575100.webp?size=32&amp;quality=lossless
+[44_link]: https://cdn.discordapp.com/emojis/1044640354508488838.webp?size=32&amp;quality=lossless
+[45_link]: https://cdn.discordapp.com/emojis/1044640356119089152.webp?size=32&amp;quality=lossless
+[46_link]: https://cdn.discordapp.com/emojis/1044640357247352934.webp?size=32&amp;quality=lossless
+[47_link]: https://cdn.discordapp.com/emojis/1044640358174306355.webp?size=32&amp;quality=lossless
+[48_link]: https://cdn.discordapp.com/emojis/1044640359872991302.webp?size=32&amp;quality=lossless
+[49_link]: https://cdn.discordapp.com/emojis/1044640360741208125.webp?size=32&amp;quality=lossless
+[50_link]: https://cdn.discordapp.com/emojis/1044640362112745505.webp?size=32&amp;quality=lossless
+<!-- Emojis - Numbers (2) -->
+[51_link]: https://cdn.discordapp.com/emojis/1044640476789215293.webp?size=32&amp;quality=lossless
+[52_link]: https://cdn.discordapp.com/emojis/1044640478022352917.webp?size=32&amp;quality=lossless
+[53_link]: https://cdn.discordapp.com/emojis/1044640478877978626.webp?size=32&amp;quality=lossless
+[54_link]: https://cdn.discordapp.com/emojis/1044640480476020816.webp?size=32&amp;quality=lossless
+[55_link]: https://cdn.discordapp.com/emojis/1044640482187292783.webp?size=32&amp;quality=lossless
+[56_link]: https://cdn.discordapp.com/emojis/1044640483722412152.webp?size=32&amp;quality=lossless
+[57_link]: https://cdn.discordapp.com/emojis/1044640485345591326.webp?size=32&amp;quality=lossless
+[58_link]: https://cdn.discordapp.com/emojis/1044640487056867448.webp?size=32&amp;quality=lossless
+[59_link]: https://cdn.discordapp.com/emojis/1044640488461975592.webp?size=32&amp;quality=lossless
+[60_link]: https://cdn.discordapp.com/emojis/1044640489791569960.webp?size=32&amp;quality=lossless
+[61_link]: https://cdn.discordapp.com/emojis/1044640490949189662.webp?size=32&amp;quality=lossless
+[62_link]: https://cdn.discordapp.com/emojis/1044640492475928586.webp?size=32&amp;quality=lossless
+[63_link]: https://cdn.discordapp.com/emojis/1044640493818089582.webp?size=32&amp;quality=lossless
+[64_link]: https://cdn.discordapp.com/emojis/1044640495080579142.webp?size=32&amp;quality=lossless
+[65_link]: https://cdn.discordapp.com/emojis/1044640496636657684.webp?size=32&amp;quality=lossless
+[66_link]: https://cdn.discordapp.com/emojis/1044640497957863494.webp?size=32&amp;quality=lossless
+[67_link]: https://cdn.discordapp.com/emojis/1044640499258110056.webp?size=32&amp;quality=lossless
+[68_link]: https://cdn.discordapp.com/emojis/1044640500684169296.webp?size=32&amp;quality=lossless
+[69_link]: https://cdn.discordapp.com/emojis/1044644046913671168.webp?size=32&amp;quality=lossless
+[70_link]: https://cdn.discordapp.com/emojis/1044640502135390330.webp?size=32&amp;quality=lossless
+[71_link]: https://cdn.discordapp.com/emojis/1044640503494348850.webp?size=32&amp;quality=lossless
+[72_link]: https://cdn.discordapp.com/emojis/1044640504698126428.webp?size=32&amp;quality=lossless
+[73_link]: https://cdn.discordapp.com/emojis/1044640506073841674.webp?size=32&amp;quality=lossless
+[74_link]: https://cdn.discordapp.com/emojis/1044640507697045514.webp?size=32&amp;quality=lossless
+[75_link]: https://cdn.discordapp.com/emojis/1044640509093757002.webp?size=32&amp;quality=lossless
+[76_link]: https://cdn.discordapp.com/emojis/1044640510784053309.webp?size=32&amp;quality=lossless
+[77_link]: https://cdn.discordapp.com/emojis/1044640512432406610.webp?size=32&amp;quality=lossless
+[78_link]: https://cdn.discordapp.com/emojis/1044640513405497355.webp?size=32&amp;quality=lossless
+[79_link]: https://cdn.discordapp.com/emojis/1044640515137753148.webp?size=32&amp;quality=lossless
+[80_link]: https://cdn.discordapp.com/emojis/1044640516270207067.webp?size=32&amp;quality=lossless
+[81_link]: https://cdn.discordapp.com/emojis/1044640517616574564.webp?size=32&amp;quality=lossless
+[82_link]: https://cdn.discordapp.com/emojis/1044640519105560607.webp?size=32&amp;quality=lossless
+[83_link]: https://cdn.discordapp.com/emojis/1044640520506458174.webp?size=32&amp;quality=lossless
+[84_link]: https://cdn.discordapp.com/emojis/1044640522041561098.webp?size=32&amp;quality=lossless
+[85_link]: https://cdn.discordapp.com/emojis/1044640523463434280.webp?size=32&amp;quality=lossless
+[86_link]: https://cdn.discordapp.com/emojis/1044640524679794720.webp?size=32&amp;quality=lossless
+[87_link]: https://cdn.discordapp.com/emojis/1044640526063898704.webp?size=32&amp;quality=lossless
+[88_link]: https://cdn.discordapp.com/emojis/1044640527653548053.webp?size=32&amp;quality=lossless
+[89_link]: https://cdn.discordapp.com/emojis/1044640528878280744.webp?size=32&amp;quality=lossless
+[90_link]: https://cdn.discordapp.com/emojis/1044640530199478372.webp?size=32&amp;quality=lossless
+[91_link]: https://cdn.discordapp.com/emojis/1044640531361317025.webp?size=32&amp;quality=lossless
+[92_link]: https://cdn.discordapp.com/emojis/1044640532753813574.webp?size=32&amp;quality=lossless
+[93_link]: https://cdn.discordapp.com/emojis/1044640533995323432.webp?size=32&amp;quality=lossless
+[94_link]: https://cdn.discordapp.com/emojis/1044640535299760159.webp?size=32&amp;quality=lossless
+[95_link]: https://cdn.discordapp.com/emojis/1044640536511913996.webp?size=32&amp;quality=lossless
+[96_link]: https://cdn.discordapp.com/emojis/1044640538168664104.webp?size=32&amp;quality=lossless
+[97_link]: https://cdn.discordapp.com/emojis/1044640539666022480.webp?size=32&amp;quality=lossless
+[98_link]: https://cdn.discordapp.com/emojis/1044640541289234504.webp?size=32&amp;quality=lossless
+[99_link]: https://cdn.discordapp.com/emojis/1044640542979543080.webp?size=32&amp;quality=lossless
+[keycap_100_link]: https://cdn.discordapp.com/emojis/1044640544137158656.webp?size=32&amp;quality=lossless
 <!-- Emojis - Misc Server -->
 [wumpus_ahegao_link]: https://cdn.discordapp.com/emojis/1006962679518347465.webp?size=32&amp;&quality=lossless
 [wumpus_blush_link]: https://cdn.discordapp.com/emojis/1006920765347745822.webp?size=32&amp;&quality=lossless
@@ -301,6 +393,9 @@ The table below shows <ins>**all**</ins> the emojis available to **Butler George
 <a href="https://discord.gg/Hrwfkr54uy"><img src="https://github.com/Gregor7008/Gregor7008/blob/main/resources/graphics/widgets/Emojis%20-%20Badges%20Widget%20Small.png?raw=true" alt="Emoji - Badges Widget Small" height="60"/></a>
   - Logos:<br>
 <a href="https://discord.gg/gUJVMMYwq4"><img src="https://github.com/Gregor7008/Gregor7008/blob/main/resources/graphics/widgets/Emojis%20-%20Logos%20Widget%20Small.png?raw=true" alt="Emoji - Logos Widget Small" height="60"/></a>
+  - Numbers:<br>
+<a href="https://discord.gg/rrNSBfYKMm"><img src="https://github.com/Gregor7008/Gregor7008/blob/main/resources/graphics/widgets/Emojis%20-%20Numbers%201%20Widget%20Small.png?raw=true" alt="Emoji - Numbers (1) Widget Small" height="60"/></a>
+<a href="https://discord.gg/bchQDTxvjZ"><img src="https://github.com/Gregor7008/Gregor7008/blob/main/resources/graphics/widgets/Emojis%20-%20Numbers%202%20Widget%20Small.png?raw=true" alt="Emoji - Numbers (2) Widget Small" height="60"/></a>
   - Miscellaneous:<br>
 <a href="https://discord.gg/VJ7YZvAMu5"><img src="https://github.com/Gregor7008/Gregor7008/blob/main/resources/graphics/widgets/Emojis%20-%20Misc%20Widget%20Small.png?raw=true" alt="Emoji - Misc Widget Small" height="60"/></a>
 
@@ -311,7 +406,7 @@ The table below shows <ins>**all**</ins> the emojis available to **Butler George
           <summary><b>Icons</b> from <a href="https://discord.gg/HqmQT5ThJa">Emojis - Icons</a></summary>
     
     Emoji                                         | Name               | ID                  | Type
-    --------------------------------------------- | ------------------ | ------------------- | ---
+    --------------------------------------------- | ------------------ | ------------------- | -----
     ![announcements_icon][announcement_icon_link] | announcements_icon | 1006860118794711151 | .png
     ![bell_icon][bell_icon_link]                  | bell_icon          | 1006860119981695077 | .png
     ![camera_icon][camera_icon_link]              | camera_icon        | 1006962533032271925 | .png
@@ -370,7 +465,7 @@ The table below shows <ins>**all**</ins> the emojis available to **Butler George
           <summary><b>Badges</b> from <a href="https://discord.gg/Hrwfkr54uy">Emojis - Badges</a></summary>
 
     Emoji                                                   | Name                      | ID                  | Type
-    ------------------------------------------------------- | ------------------------- | ------------------- | ---
+    ------------------------------------------------------- | ------------------------- | ------------------- | -----
     ![1st][first_link]                                      | 1st                       | 1006964116432355338 | .png
     ![2nd][second_link]                                     | 2nd                       | 1006964117376090123 | .png
     ![3rd][third_link]                                      | 3rd                       | 1006964118630174894 | .png
@@ -399,7 +494,7 @@ The table below shows <ins>**all**</ins> the emojis available to **Butler George
           <summary><b>Logos</b> from <a href="https://discord.gg/gUJVMMYwq4">Emojis - Logos</a></summary>
 
     Emoji                                         | Name               | ID                  | Type
-    --------------------------------------------- | ------------------ | ------------------- | ---
+    --------------------------------------------- | ------------------ | ------------------- | -----
     ![discord][discord_link]                      | discord            | 1006958534988148816 | .png
     ![clyde][clyde_link]                          | clyde              | 1006958533490774107 | .png
     ![whatsapp][whatsapp_link]                    | whatsapp           | 1006864196098600960 | .png
@@ -425,10 +520,114 @@ The table below shows <ins>**all**</ins> the emojis available to **Butler George
   </details>
 
   <details>
+          <summary><b>Numbers 11-50</b> from <a href="https://discord.gg/rrNSBfYKMm">Emojis - Numbers (1)</a></summary>
+
+    Emoji          | Name | ID                  | Type
+    -------------- | ---- | ------------------- | -----
+    ![11][11_link] | 11   | 1044640314805190777 | .png
+    ![12][12_link] | 12   | 1044640315996389386 | .png
+    ![13][13_link] | 13   | 1044640317233704960 | .png
+    ![14][14_link] | 14   | 1044640318437458030 | .png
+    ![15][15_link] | 15   | 1044640319620255834 | .png
+    ![16][16_link] | 16   | 1044640320727552040 | .png
+    ![17][17_link] | 17   | 1044640321948110878 | .png
+    ![18][18_link] | 18   | 1044640323118305300 | .png
+    ![19][19_link] | 19   | 1044640324259172412 | .png
+    ![20][20_link] | 20   | 1044640325571973201 | .png
+    ![21][21_link] | 21   | 1044640326549245954 | .png
+    ![22][22_link] | 22   | 1044640327753023619 | .png
+    ![23][23_link] | 23   | 1044640329346854983 | .png
+    ![24][24_link] | 24   | 1044640330525454356 | .png
+    ![25][25_link] | 25   | 1044640331922145331 | .png
+    ![26][26_link] | 26   | 1044640333222383706 | .png
+    ![27][27_link] | 27   | 1044640334388412446 | .png
+    ![28][28_link] | 28   | 1044640335516676187 | .png
+    ![29][29_link] | 29   | 1044640336753983661 | .png
+    ![30][30_link] | 30   | 1044640337911615488 | .png
+    ![31][31_link] | 31   | 1044640339153137684 | .png
+    ![32][32_link] | 32   | 1044640340235272192 | .png
+    ![33][33_link] | 33   | 1044640341329973259 | .png
+    ![34][34_link] | 34   | 1044640342550519891 | .png
+    ![35][35_link] | 35   | 1044640344303747072 | .png
+    ![36][36_link] | 36   | 1044640345574608967 | .png
+    ![37][37_link] | 37   | 1044640346786758747 | .png
+    ![38][38_link] | 38   | 1044640347843735563 | .png
+    ![39][39_link] | 39   | 1044640349009739816 | .png
+    ![40][40_link] | 40   | 1044640349877973035 | .png
+    ![41][41_link] | 41   | 1044640351517941880 | .png
+    ![42][42_link] | 42   | 1044640352612663396 | .png
+    ![43][43_link] | 43   | 1044640353711575100 | .png
+    ![44][44_link] | 44   | 1044640354508488838 | .png
+    ![45][45_link] | 45   | 1044640356119089152 | .png
+    ![46][46_link] | 46   | 1044640357247352934 | .png
+    ![47][47_link] | 47   | 1044640358174306355 | .png
+    ![48][48_link] | 48   | 1044640359872991302 | .png
+    ![49][49_link] | 49   | 1044640360741208125 | .png
+    ![50][50_link] | 50   | 1044640362112745505 | .png
+  </details>
+
+  <details>
+          <summary><b>Numbers 51-100</b> from <a href="https://discord.gg/bchQDTxvjZ">Emojis - Numbers (2)</a></summary>
+
+    Emoji                          | Name       | ID                  | Type
+    ------------------------------ | ---------- | ------------------- | -----
+    ![51][51_link]                 | 51         | 1044640476789215293 | .png
+    ![52][52_link]                 | 52         | 1044640478022352917 | .png
+    ![53][53_link]                 | 53         | 1044640478877978626 | .png
+    ![54][54_link]                 | 54         | 1044640480476020816 | .png
+    ![55][55_link]                 | 55         | 1044640482187292783 | .png
+    ![56][56_link]                 | 56         | 1044640483722412152 | .png
+    ![57][57_link]                 | 57         | 1044640485345591326 | .png
+    ![58][58_link]                 | 58         | 1044640487056867448 | .png
+    ![59][59_link]                 | 59         | 1044640488461975592 | .png
+    ![60][60_link]                 | 60         | 1044640489791569960 | .png
+    ![61][61_link]                 | 61         | 1044640490949189662 | .png
+    ![62][62_link]                 | 62         | 1044640492475928586 | .png
+    ![63][63_link]                 | 63         | 1044640493818089582 | .png
+    ![64][64_link]                 | 64         | 1044640495080579142 | .png
+    ![65][65_link]                 | 65         | 1044640496636657684 | .png
+    ![66][66_link]                 | 66         | 1044640497957863494 | .png
+    ![67][67_link]                 | 67         | 1044640499258110056 | .png
+    ![68][68_link]                 | 68         | 1044640500684169296 | .png
+    ![69][69_link]                 | 69         | 1044644046913671168 | .png
+    ![70][70_link]                 | 70         | 1044640502135390330 | .png
+    ![71][71_link]                 | 71         | 1044640503494348850 | .png
+    ![72][72_link]                 | 72         | 1044640504698126428 | .png
+    ![73][73_link]                 | 73         | 1044640506073841674 | .png
+    ![74][74_link]                 | 74         | 1044640507697045514 | .png
+    ![75][75_link]                 | 75         | 1044640509093757002 | .png
+    ![76][76_link]                 | 76         | 1044640510784053309 | .png
+    ![77][77_link]                 | 77         | 1044640512432406610 | .png
+    ![78][78_link]                 | 78         | 1044640513405497355 | .png
+    ![79][79_link]                 | 79         | 1044640515137753148 | .png
+    ![80][80_link]                 | 80         | 1044640516270207067 | .png
+    ![81][81_link]                 | 81         | 1044640517616574564 | .png
+    ![82][82_link]                 | 82         | 1044640519105560607 | .png
+    ![83][83_link]                 | 83         | 1044640520506458174 | .png
+    ![84][84_link]                 | 84         | 1044640522041561098 | .png
+    ![85][85_link]                 | 85         | 1044640523463434280 | .png
+    ![86][86_link]                 | 86         | 1044640524679794720 | .png
+    ![87][87_link]                 | 87         | 1044640526063898704 | .png
+    ![88][88_link]                 | 88         | 1044640527653548053 | .png
+    ![89][89_link]                 | 89         | 1044640528878280744 | .png
+    ![90][90_link]                 | 90         | 1044640530199478372 | .png
+    ![91][91_link]                 | 91         | 1044640531361317025 | .png
+    ![92][92_link]                 | 92         | 1044640532753813574 | .png
+    ![93][93_link]                 | 93         | 1044640533995323432 | .png
+    ![94][94_link]                 | 94         | 1044640535299760159 | .png
+    ![95][95_link]                 | 95         | 1044640536511913996 | .png
+    ![96][96_link]                 | 96         | 1044640538168664104 | .png
+    ![97][97_link]                 | 97         | 1044640539666022480 | .png
+    ![98][98_link]                 | 98         | 1044640541289234504 | .png
+    ![99][99_link]                 | 99         | 1044640542979543080 | .png
+    ![keycap_100][keycap_100_link] | keycap_100 | 1044640544137158656 | .png
+  </details>
+
+  <details>
           <summary><b>Miscellaneous</b> from <a href="https://discord.gg/VJ7YZvAMu5">Emojis - Misc</a></summary>
 
     Emoji                                         | Name               | ID                  | Type
-    --------------------------------------------- | ------------------ | ------------------- | ---
+    --------------------------------------------- | ------------------ | ------------------- | -----
     ![wumpus_ahegao][wumpus_ahegao_link]          | wumpus_ahegao      | 1006962679518347465 | .png
     ![wumpus_blush][wumpus_blush_link]            | wumpus_blush       | 1006920765347745822 | .png
     ![wumpus_cookie_leg][wumpus_cookie_leg_link]  | wumpus_cookie_leg  | 1006920795982921728 | .png
