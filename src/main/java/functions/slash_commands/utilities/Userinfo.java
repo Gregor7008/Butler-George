@@ -1,10 +1,8 @@
 package functions.slash_commands.utilities;
 
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import assets.functions.SlashCommandEventHandler;
-import base.Bot;
 import engines.base.LanguageEngine;
 import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 public class Userinfo implements SlashCommandEventHandler {
 
@@ -38,10 +37,9 @@ public class Userinfo implements SlashCommandEventHandler {
 	
 	private void listInfo (SlashCommandInteractionEvent event, boolean moderator) {
 		EmbedBuilder eb = new EmbedBuilder();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd.MM.yyy");
 		String booster, timeoutEnd;
 		Member member;
-		String[] titles = LanguageEngine.getRaw(event.getGuild(), event.getUser(), this, "titles").split(",");
+		String[] titles = LanguageEngine.getRaw(event.getGuild(), event.getUser(), this, "titles").split(LanguageEngine.SEPERATOR);
 		if (event.getOption("user") == null) {
 			member = event.getMember();
 		} else {
@@ -54,27 +52,27 @@ public class Userinfo implements SlashCommandEventHandler {
 		if (member.getTimeBoosted() == null) {
 			booster = "false";
 		} else {
-			booster = titles[0] + "\s" + member.getTimeBoosted().format(formatter) + "\s:heart:";
+			booster = titles[0] + "\s" + TimeFormat.DATE_LONG.format(member.getTimeBoosted()) + "\s:heart:";
 		}
 		 if (member.getTimeOutEnd() == null) {
 		     timeoutEnd = "--";
 		 } else {
-		     timeoutEnd = member.getTimeOutEnd().format(formatter);
+		     timeoutEnd = TimeFormat.DATE_TIME_SHORT.format(member.getTimeOutEnd());
 		 }
 		eb.setTitle(titles[1] + "\s" + member.getEffectiveName());
-		eb.setThumbnail(member.getUser().getAvatarUrl());
-		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl());
-		eb.setFooter(LanguageEngine.buildFooter(Bot.DEFAULT_FOOTER));
+		eb.setThumbnail(member.getUser().getEffectiveAvatarUrl());
+		eb.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getEffectiveAvatarUrl());
+		eb.setFooter(LanguageEngine.buildFooter());
 		eb.setColor(56575);
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getUser().getName() + "`", true);
-		eb.addField(":name_badge:" + titles[3], "`" + member.getEffectiveName() + "`", true);
+		eb.addField(":name_badge:" + titles[3], "`" + member.getAsMention() + "`", true);
 		eb.addField(":registered:" + titles[4], "`" + member.getUser().getDiscriminator() + "`", true);
 		if(moderator) {eb.addField(":id:" + titles[5], "`" + member.getUser().getId() + "`", true);}
 		eb.addField(":robot:" + titles[6], "`" + String.valueOf(member.getUser().isBot()) + "`", true);
 		eb.addField(":rocket:" + titles[7], "`" + booster + "`", true);
-		eb.addField(":calendar:" + titles[8], "`" + member.getTimeJoined().format(formatter) + "`", true);
-		if(moderator) {eb.addField(":calendar:" + titles[9], "`" + member.getUser().getTimeCreated().format(formatter) + "`", true);
+		eb.addField(":calendar:" + titles[8], "`" + TimeFormat.DATE_LONG.format(member.getTimeJoined()) + "`", true);
+		if(moderator) {eb.addField(":calendar:" + titles[9], "`" + TimeFormat.DATE_LONG.format(member.getUser().getTimeCreated()) + "`", true);
 					   eb.addField(":warning:" + titles[10], "`" + String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), member.getUser()).getJSONArray("warnings").length()) + "`", true);
 					   eb.addField(":clock11:" + titles[15], "`" + timeoutEnd + "`", true);}
 		eb.addField(":card_index:" + titles[11], "`" + String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), member.getUser()).getInt("experience")) + "`", true);

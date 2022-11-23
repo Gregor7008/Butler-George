@@ -28,7 +28,7 @@ public class Report implements SlashCommandEventHandler {
 		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyy");
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+		eb.setAuthor(event.getUser().getName(), null, event.getUser().getEffectiveAvatarUrl());
 		eb.setFooter(OffsetDateTime.now().format(formatter));
 		eb.setColor(56575);
 		if (event.getOption("link") == null) {

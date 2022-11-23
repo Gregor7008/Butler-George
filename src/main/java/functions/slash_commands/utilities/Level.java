@@ -85,7 +85,7 @@ public class Level implements SlashCommandEventHandler {
 			avfile = File.createTempFile("avatar", ").png");
 		} catch (IOException e) {}
 		try {
-			URL url = new URL(iuser.getAvatarUrl());
+			URL url = new URL(iuser.getEffectiveAvatarUrl());
 			FileUtils.copyURLToFile(url, avfile);
 			avatar = ImageIO.read(avfile);
 		} catch (Exception e) {}

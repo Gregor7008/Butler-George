@@ -56,7 +56,7 @@ public class Suggest implements SlashCommandEventHandler {
 		TextChannel channel = guild.getTextChannelById(ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("suggest"));
 		EmbedBuilder eb = new EmbedBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm | dd.MM.yyyy");
-		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl());
+		eb.setAuthor(member.getEffectiveName(), null, member.getUser().getEffectiveAvatarUrl());
 		eb.setColor(Color.YELLOW);
 		eb.setFooter(OffsetDateTime.now().format(formatter));
 		eb.setDescription(idea);
