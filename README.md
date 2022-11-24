@@ -47,6 +47,8 @@ The newest version of **Butler George** will feature:
     - Context Menu options for moderators for e.g. (temp-)muting
     - Reduced message spam (Both server and private side)
     - Private messages are no longer embedded
+  - **Documentation**:
+    - Full documentation of all functions of Butler George, including all topics mentioned above
     
 ## 📗 History
 In Juli 2021 [Nevar](https://nevar.eu) by [@1887Jonas](https://discordapp.com/users/631176108372656148), the bot we used since the creation of our community was shutdown. And as auto role assignment was really important for the security of the server back then, we needed to find a replacement real quick. And as there was also a need for automated actions resulting from this autorole mess, we decided to start our own bot: **Butler George** was born!<br>
