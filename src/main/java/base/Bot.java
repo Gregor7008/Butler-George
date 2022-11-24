@@ -54,6 +54,14 @@ public class Bot {
 	private Thread shutdownThread = null;
 	private boolean shutdown = false;
 	
+	public static boolean isShutdown() {
+	    if (Bot.INSTANCE != null) {
+	        return Bot.INSTANCE.shutdown;
+	    } else {
+	        return true;
+	    }
+	}
+	
 	public Bot(String token, String serverIP, String port, String databaseName, String username, String password) throws LoginException, InterruptedException, IOException {
 		this.performPreStartupOperations(serverIP, port, databaseName, username, password);
 		JDABuilder builder = JDABuilder.createDefault(token);
@@ -66,6 +74,7 @@ public class Bot {
     	jda = builder.build().awaitReady();
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing(VERSION));
+	    LOG.debug("Bot online");
 	    this.performPostStartupOperations();
 	}
 	
@@ -152,7 +161,7 @@ public class Bot {
     	}
 	}
 	
-	public void shutdown(ShutdownReason reason, @Nullable String additionalMessage) {
+	public void shutdown(ShutdownReason reason, boolean sendMessage, @Nullable String additionalMessage, @Nullable Runnable followUp) {
 		List<Guild> guilds = jda.getGuilds();
 		List<Long> processedUserIds = new ArrayList<>();
 		for (int i = 0; i < guilds.size(); i++) {
@@ -164,34 +173,21 @@ public class Bot {
     			createdchannels.clear();
     		}
 //    		Send offline message
-    		long chid = ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("communityinbox");
-    		if (chid == 0L) {
-        		chid = guild.getTextChannels().stream().filter(c -> {return guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND);}).toList().get(0).getIdLong();
-        	}
-    		StringBuilder offlineMessageBuilder = new StringBuilder();
-    		switch (reason) {
-			case FATAL_ERROR:
-				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "fatal"));
-				break;
-			case MAINTENANCE:
-				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "maintenance"));
-				break;
-			case OFFLINE:
-				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "offline"));
-				break;
-			case RESTART:
-				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "restart"));
-				break;
-			default:
-				offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "offline"));
-			}
-    		offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "information"));
-    		if (additionalMessage != null && !additionalMessage.equals("")) {
-    			offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "addonpresent"));
-    			offlineMessageBuilder.append(additionalMessage);
+    		if (sendMessage) {
+    		    long chid = ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("communityinbox");
+                if (chid == 0L) {
+                    chid = guild.getTextChannels().stream().filter(c -> {return guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND);}).toList().get(0).getIdLong();
+                }
+                StringBuilder offlineMessageBuilder = new StringBuilder();
+                offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, reason.toString().toLowerCase()));
+                offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "information"));
+                if (additionalMessage != null && !additionalMessage.isBlank()) {
+                    offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "addonpresent"));
+                    offlineMessageBuilder.append(additionalMessage);
+                }
+                long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(offlineMessageBuilder.toString())).complete().getIdLong();
+                ConfigLoader.INSTANCE.getGuildConfig(guild).put("offlinemsg", new JSONArray().put(msgid).put(chid));
     		}
-    		long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(offlineMessageBuilder.toString())).complete().getIdLong();
-    		ConfigLoader.INSTANCE.getGuildConfig(guild).put("offlinemsg", new JSONArray().put(msgid).put(chid));
 //    		Save ModMail status
     		JSONObject modmailDataSet = ConfigLoader.INSTANCE.getGuildConfig(guild, "modmails");
     		modmailDataSet.keySet().forEach(ticketChannelId -> {
@@ -221,7 +217,17 @@ public class Bot {
 		shutdown = true;
 //		Debug logging
 		LOG.debug("Bot offline");
+//		Follow Up
+		if (followUp != null) {
+	        followUp.run();
+		}
 	}
+    
+    public void kill() {
+        this.timer.cancel();
+        INSTANCE = null;
+        this.shutdown = true;
+    }
 	
 	public Timer getTimer() {
 		return timer;
@@ -231,21 +237,11 @@ public class Bot {
 		if (shutdownThread == null) {
 			shutdownThread = new Thread(() -> {
 				if (!shutdown) {
-					shutdown(ShutdownReason.RESTART, null);
+					shutdown(ShutdownReason.OFFLINE, true, null, null);
 				}
 			});
 		}
 		return shutdownThread;
-	}
-	
-	public boolean isShutdown() {
-		return shutdown;
-	}
-	
-	public void kill() {
-		this.timer.cancel();
-		INSTANCE = null;
-		this.shutdown = true;
 	}
 	
 	public static enum ShutdownReason {

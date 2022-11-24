@@ -158,9 +158,6 @@ public class ConfigManager {
 	
 	//Manage cache	
 	public boolean pushCache() {
-	    if (GUI.INSTANCE.getErrorBoolean()) {
-	        return false;
-	    }
 	    try {
 	        boolean changes_made = false;
 	        if (!userConfigCache.isEmpty()) {

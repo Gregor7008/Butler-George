@@ -31,8 +31,11 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
+import com.mongodb.lang.Nullable;
+
 import base.Bot.ShutdownReason;
 import engines.base.ConsoleCommandListener;
+import engines.base.ScrollEngine;
 import engines.data.ConfigManager;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;
@@ -41,9 +44,18 @@ import net.miginfocom.swing.MigLayout;
 public class GUI extends JFrame implements FocusListener {
 	
 	public static GUI INSTANCE;
-	private static final long serialVersionUID = 5923282583431103590L;
-	private TimerTask runtimeMeasuringTask;
 	
+	private static final long serialVersionUID = 5923282583431103590L;
+    
+    public final JTextArea console = new JTextArea();
+    public final JTextField consoleIn = new JTextField();
+    public final JTextField databaseIP = new JTextField();
+    public final JTextField databaseName = new JTextField();
+    public final JTextField botToken = new JTextField();
+    public final JTextField databasePort = new JTextField();
+    public final JTextField username = new JTextField();
+    public final JPasswordField password = new JPasswordField();
+    
 	private final JLabel greenLED = new JLabel();
 	private final JLabel redLED = new JLabel();
 	private final JButton startButton = new JButton("Start");
@@ -54,26 +66,19 @@ public class GUI extends JFrame implements FocusListener {
 	private final JButton showPassword = new JButton("");
 	private final JCheckBox shutdownWindowBox = new JCheckBox("");
 	private final JLabel sdWLabel = new JLabel("Custom shutdown reason:");
-    
     private final Font default_font;
     private final Font console_font;
 	
-	public final JTextArea console = new JTextArea();
-	public final JTextField consoleIn = new JTextField();
-	
-	public final JTextField databaseIP = new JTextField();
-	public final JTextField databaseName = new JTextField();
-	public final JTextField botToken = new JTextField();
-	public final JTextField databasePort = new JTextField();
-	public final JTextField username = new JTextField();
-	public final JPasswordField password = new JPasswordField();
-	
-	public ImageIcon greenLEDOn;
-	public ImageIcon greenLEDOff;
-	public ImageIcon redLEDOn;
-	public ImageIcon redLEDOff;
-	public ImageIcon eyeIconRaw;
-	public ImageIcon windowIcon;
+	private ImageIcon greenLEDOn;
+	private ImageIcon greenLEDOff;
+	private ImageIcon redLEDOn;
+	private ImageIcon redLEDOff;
+	private ImageIcon eyeIconRaw;
+	private ImageIcon windowIcon;
+    
+    private TimerTask runtimeMeasuringTask;
+    private OffsetDateTime startTime = null;
+    private Duration additional = Duration.ZERO;
 	
 	public static void main(String[] args) {
 		try {
@@ -112,6 +117,7 @@ public class GUI extends JFrame implements FocusListener {
 		JScrollPane consoleScrollPane = new JScrollPane(console);
 		consoleScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		consoleScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        new ScrollEngine(consoleScrollPane);
 		console.setEditable(false);
 		console.setFont(console_font);
 		getContentPane().add(consoleScrollPane, "flowx,cell 0 0 1 6,grow");
@@ -193,9 +199,9 @@ public class GUI extends JFrame implements FocusListener {
 		
 		stopButton.addActionListener(e -> {
 			if (shutdownWindowBox.isSelected()) {
-				new ShutdownWindow((reasons, additionalMessage) -> this.shutdownBot(reasons.get(0), additionalMessage));
+				new ShutdownWindow((reasons, additionalMessage) -> this.shutdownBot(reasons.get(0), true, additionalMessage));
 			} else {
-				this.shutdownBot(ShutdownReason.OFFLINE, null);
+				this.shutdownBot(ShutdownReason.OFFLINE, true, null);
 			}
 		});
 		stopButton.setEnabled(false);
@@ -219,7 +225,7 @@ public class GUI extends JFrame implements FocusListener {
 				{"Executions:", 0},
 				{"Servers:", 0},
 				{"Users:", 0},
-				{"Push Paused:", false},
+				{"J2C-Channels", 0},
 				{"Push Cycle Period:", String.valueOf(ConfigManager.PUSH_CYCLE_PERIOD) + " min."},
 				{"Total Pushs:", 0}
 			},
@@ -239,7 +245,8 @@ public class GUI extends JFrame implements FocusListener {
 		commandTable.setFont(default_font);
 		commandTable.setModel(new DefaultTableModel(
 			new Object[][] {
-				{"stop", ""},
+				{"stop", "[Send Message]"},
+				{"restart", ""},
 				{"exit", ""},
 				{"warn", "[Guild ID]  [User ID]"},
 				{"pushCache", ""},
@@ -276,8 +283,8 @@ public class GUI extends JFrame implements FocusListener {
 		} catch (IndexOutOfBoundsException e) {}
 	}
 
-	private void startBot() {
-		if (Bot.INSTANCE == null || Bot.INSTANCE.isShutdown()) {
+	public void startBot() {
+		if (Bot.isShutdown()) {
 			try {
 				new Bot(botToken.getText(), databaseIP.getText(), databasePort.getText(), databaseName.getText(), username.getText(), String.copyValueOf(password.getPassword()));
 			} catch (LoginException | InterruptedException | IOException e) {
@@ -290,24 +297,38 @@ public class GUI extends JFrame implements FocusListener {
 		}
 	}
 	
-	private void setupTextField(String[] args, JTextField textField, String name, int argsIndex) {
-		textField.setForeground(Color.GRAY);
-		textField.setFont(default_font);
-		textField.setName(name);
-		textField.setText(name);
-		textField.addFocusListener(this);
-		try {
-			textField.setText(args[argsIndex]);
-			textField.setForeground(Color.BLACK);
-		} catch (IndexOutOfBoundsException e) {}
+	public void restartBot() {
+	    if (!Bot.isShutdown()) {
+	        Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
+            Bot.INSTANCE.shutdown(ShutdownReason.RESTART, false, null, () -> startBot());
+        }
 	}
 	
-	public void shutdownBot(ShutdownReason reason, String additionalMessage) {
-		if (Bot.INSTANCE != null && !Bot.INSTANCE.isShutdown()) {
+	public void shutdownBot(ShutdownReason reason, boolean sendMessage, @Nullable String additionalMessage) {
+		if (!Bot.isShutdown()) {
 			Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
-			Bot.INSTANCE.shutdown(reason, additionalMessage);
+			Bot.INSTANCE.shutdown(reason, sendMessage, additionalMessage, null);
 		}
 	}
+    
+    public void startRuntimeMeasuring() {
+        startTime = OffsetDateTime.now();
+        runtimeMeasuringTask = new TimerTask() {
+            @Override
+            public void run() {
+                Duration diff = Duration.between(startTime, OffsetDateTime.now()).plus(additional);
+                GUI.INSTANCE.setTableValue(3, ConfigManager.convertDurationToString(diff));
+            }
+        };
+        Bot.INSTANCE.getTimer().schedule(runtimeMeasuringTask, 0, 1000);
+    }
+    
+    public void stopRuntimeMeasuring() {
+        if (startTime != null) {
+            additional = Duration.between(startTime, OffsetDateTime.now());
+        }
+        runtimeMeasuringTask.cancel();
+    }
 	
 	public void setBotRunning(boolean status) {
 		if (status) {
@@ -322,74 +343,80 @@ public class GUI extends JFrame implements FocusListener {
 	}
 	
 	public void increaseErrorCounter() {
-		this.setTableValue(4, (int) this.getTableValue(4) + 1);
+		this.increaseCounter(4);
 	}
 	
 	public void increaseExecutionsCounter() {
-		this.setTableValue(5, (int) this.getTableValue(5) + 1);
+		this.increaseCounter(5);
+	}
+    
+    public void increaseMemberCounter() {
+        this.increaseCounter(7);
+    }
+    
+    public void decreaseMemberCounter() {
+        this.decreaseCounter(7);
+    }
+	
+	public void increaseJ2CCounter() {
+	    this.increaseCounter(8);
+	}
+	
+	public void decreaseJ2CCounter() {
+	    this.decreaseCounter(8);
 	}
 	
 	public void increasePushCounter() {
-		this.setTableValue(10, (int) this.getTableValue(10) + 1);
+		this.increaseCounter(10);
 	}
 	
-	public void increaseMemberCounter() {
-		this.setTableValue(7, (int) this.getTableValue(7) + 1);
+	private void increaseCounter(int position) {
+	    this.modifyCounter(position, 1);
 	}
 	
-	public void decreaseMemberCounter() {
-		this.setTableValue(7, (int) this.getTableValue(7) - 1);
+	private void decreaseCounter(int position) {
+        this.modifyCounter(position, -1);
 	}
 	
-	public void updateErrorBoolean(boolean newValue) {
-		this.setTableValue(8, newValue);
+	private void modifyCounter(int position, int value) {
+        try {
+            this.setTableValue(position, (int) this.getTableValue(position) + value);
+        } catch (ClassCastException e) {
+            ConsoleEngine.getLogger(this).debug("Couldn't cast table entry to counter for position: " + String.valueOf(position));
+        }
 	}
-	
-	public boolean getErrorBoolean() {
-	    return (boolean) this.getTableValue(8);
-	}
-	
-	public void updateStatistics() {
-		int guildCount = 0;
-		int userCount = 0;
-		for (Guild guild : Bot.INSTANCE.jda.getGuilds()) {
-			guildCount++;
-			userCount += guild.getMemberCount();
-		}
-		this.setTableValue(6, guildCount);
-		this.setTableValue(7, userCount);
-	}
-	
-	OffsetDateTime startTime = null;
-	Duration additional = Duration.ZERO;
-	
-	public void startRuntimeMeasuring() {
-		startTime = OffsetDateTime.now();
-		runtimeMeasuringTask = new TimerTask() {
-			@Override
-			public void run() {
-				Duration diff = Duration.between(startTime, OffsetDateTime.now()).plus(additional);
-				GUI.INSTANCE.setTableValue(3, ConfigManager.convertDurationToString(diff));
-			}
-		};
-		Bot.INSTANCE.getTimer().schedule(runtimeMeasuringTask, 0, 1000);
-	}
-	
-	public void stopRuntimeMeasuring() {
-	    if (startTime != null) {
-	        additional = Duration.between(startTime, OffsetDateTime.now());
-	    }
-		runtimeMeasuringTask.cancel();
-	}
-	
-	public void setTableValue(int row, Object value) {
-		infoTable.getModel().setValueAt(value, row, 1);
-		infoTable.repaint();
-	}
-	
-	public Object getTableValue(int row) {
-		return infoTable.getModel().getValueAt(row, 1);
-	}
+    
+    public void updateStatistics() {
+        int guildCount = 0;
+        int userCount = 0;
+        for (Guild guild : Bot.INSTANCE.jda.getGuilds()) {
+            guildCount++;
+            userCount += guild.getMemberCount();
+        }
+        this.setTableValue(6, guildCount);
+        this.setTableValue(7, userCount);
+    }
+    
+    private void setupTextField(String[] args, JTextField textField, String name, int argsIndex) {
+        textField.setForeground(Color.GRAY);
+        textField.setFont(default_font);
+        textField.setName(name);
+        textField.setText(name);
+        textField.addFocusListener(this);
+        try {
+            textField.setText(args[argsIndex]);
+            textField.setForeground(Color.BLACK);
+        } catch (IndexOutOfBoundsException e) {}
+    }
+    
+    public void setTableValue(int row, Object value) {
+        infoTable.getModel().setValueAt(value, row, 1);
+        infoTable.repaint();
+    }
+    
+    public Object getTableValue(int row) {
+        return infoTable.getModel().getValueAt(row, 1);
+    }
 	
 	@Override
 	public void focusGained(FocusEvent e) {

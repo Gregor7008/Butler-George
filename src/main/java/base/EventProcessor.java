@@ -12,14 +12,12 @@ import org.json.JSONObject;
 import assets.functions.MessageContextEventHandler;
 import assets.functions.SlashCommandEventHandler;
 import assets.functions.UserContextEventHandler;
-import assets.logging.Logger;
 import engines.base.Check;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import engines.data.ConfigLoader;
 import engines.data.ConfigVerifier;
 import engines.functions.LevelEngine;
-import engines.logging.ConsoleEngine;
 import functions.context_menu_commands.MessageContextCommandList;
 import functions.context_menu_commands.UserContextCommandList;
 import functions.slash_commands.SlashCommandList;
@@ -59,8 +57,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 public class EventProcessor extends ListenerAdapter {
-    
-    private static final Logger LOG = ConsoleEngine.getLogger(EventProcessor.class);
 	
 	@Override
 	public void onReady(ReadyEvent event) {
@@ -87,7 +83,7 @@ public class EventProcessor extends ListenerAdapter {
 					                message.delete().queue();
 					            }
 					        },
-					        error -> LOG.error("Couldn't delete offline message for \"" + guild.getName() + "\"!", error));
+					        error -> {});
 				}
 			} catch (JSONException e) {}
 			ConfigLoader.INSTANCE.getGuildConfig(guild).put("offlinemsg", new JSONArray());
@@ -441,6 +437,8 @@ public class EventProcessor extends ListenerAdapter {
 			}
 			guild.moveVoiceMember(member, nc).queue();
 			createdChannels.getJSONObject(audioChannel.getId()).put(nc.getId(), new JSONArray().put(member.getUser().getIdLong()).put(index));
+			//Update GUI information
+            GUI.INSTANCE.increaseJ2CCounter();
 		}
 	}
 	
@@ -484,7 +482,9 @@ public class EventProcessor extends ListenerAdapter {
 							target.getManager().setName(newName).queue();
 							subChannelData.put(1, currentIndex - 1);
 						}
-					}				
+					}
+					//Update GUI information
+                    GUI.INSTANCE.decreaseJ2CCounter();
 				} else {
 					if (ownerID == user.getIdLong()) {
 						Collection<Permission> perms = new LinkedList<Permission>();

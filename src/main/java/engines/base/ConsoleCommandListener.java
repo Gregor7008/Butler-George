@@ -11,6 +11,8 @@ import engines.data.ConfigLoader;
 import engines.data.ConfigManager;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 
 public class ConsoleCommandListener implements ActionListener {
 	
@@ -18,12 +20,16 @@ public class ConsoleCommandListener implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (Bot.INSTANCE != null && !Bot.INSTANCE.isShutdown()) {
-			String input = GUI.INSTANCE.consoleIn.getText();
+        String input = GUI.INSTANCE.consoleIn.getText();
+		if (!Bot.isShutdown()) {
 			LOG.debug("Executing command \"" + input + "\"...");
 			this.processCommand(input);
 		} else {
-			LOG.warn("Input ignored as the bot is offline!");
+			if (input.equals("exit")) {
+			    System.exit(0);
+			} else {
+			    LOG.warn("Input ignored as the bot is offline!");
+			}
 		}
 		GUI.INSTANCE.consoleIn.setText("");
 	}
@@ -34,15 +40,24 @@ public class ConsoleCommandListener implements ActionListener {
 		String command = insplit[0];
 		switch (command) {
 			case "stop":
-				GUI.INSTANCE.shutdownBot(ShutdownReason.OFFLINE, null);
+				boolean sendMessage = true;
+				try {
+				    sendMessage = Boolean.parseBoolean(insplit[1]);
+				} catch (IndexOutOfBoundsException e) {}
+				GUI.INSTANCE.shutdownBot(ShutdownReason.OFFLINE, sendMessage, null);
 				break;
+			case "restart":
+			    GUI.INSTANCE.restartBot();
+			    break;
 			case "exit":
 				System.exit(0);
 				break;
 			case "warn":
 				try {
-					ConfigLoader.INSTANCE.getMemberConfig(jda.getGuildById(insplit[1]), jda.getUserById(insplit[2])).getJSONArray("warnings").put("Administrative actions");
-					LOG.info("User " + jda.retrieveUserById(insplit[2]).complete().getName() + " was successfully warned on " + jda.getGuildById(insplit[1]).getName());
+				    User user = jda.retrieveUserById(insplit[2]).complete();
+				    Guild guild = jda.getGuildById(insplit[1]);
+					ConfigLoader.INSTANCE.getMemberConfig(guild, user).getJSONArray("warnings").put("Administrative actions");
+					LOG.info("User " + user.getName() + " was successfully warned on " + guild.getName());
 				} catch (IndexOutOfBoundsException e) {
 					LOG.error("Invalid arguments - Please try again!");
 				}
@@ -68,6 +83,11 @@ public class ConsoleCommandListener implements ActionListener {
 			case "clearEventAwaiter":
 				EventAwaiter.INSTANCE.clear();
 				break;
+			case "devtest":
+			    for (int i = 0; i < 50; i++) {
+			        LOG.info(String.valueOf(i) + ". *devtest message*");
+			    }
+			    break;
 			default:
 				LOG.error("Unknown command!");
 		}

@@ -19,9 +19,9 @@ public class Logger implements org.slf4j.Logger {
 	private boolean warnEnabled = false;
 	private boolean errorEnabled = false;
 	
-	public Logger(String name) {
+	public Logger(String name, Level threshold) {
 		this.name = name;
-		this.setLevelThreshold(Level.INFO);
+		this.setLevelThreshold(threshold);
 	}
 	
 	public Logger setLevelThreshold(Level level) {

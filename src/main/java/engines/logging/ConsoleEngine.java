@@ -22,6 +22,7 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 	private static ConsoleEngine INSTANCE;
     private static DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE - dd.MM.uuuu");
+    private static Level THRESHOLD = Level.INFO;
 	private static Logger LOG = ConsoleEngine.getLogger(ConsoleEngine.class);
 	
 	public Timer streamConnector = new Timer();
@@ -56,7 +57,7 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 	public Logger getLogger(String name) {
 		Logger logger = loggerCache.get(name);
 		if (logger == null) {
-			logger = new Logger(name);
+			logger = new Logger(name, THRESHOLD);
 			loggerCache.put(name, logger);
 		}
 		return logger;
@@ -64,7 +65,6 @@ public class ConsoleEngine implements ILoggerFactory, UncaughtExceptionHandler {
 
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
-		GUI.INSTANCE.updateErrorBoolean(true);
 		GUI.INSTANCE.increaseErrorCounter();
 		e.printStackTrace();
 	}
