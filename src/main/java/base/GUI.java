@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.ImageIcon;
@@ -47,6 +48,7 @@ public class GUI extends JFrame implements FocusListener {
 	
 	private static final long serialVersionUID = 5923282583431103590L;
     
+    public final ConcurrentHashMap<Argument, String> argument = new ConcurrentHashMap<>();
     public final JTextArea console = new JTextArea();
     public final JTextField consoleIn = new JTextField();
     public final JTextField databaseIP = new JTextField();
@@ -79,13 +81,12 @@ public class GUI extends JFrame implements FocusListener {
     private TimerTask runtimeMeasuringTask;
     private OffsetDateTime startTime = null;
     private Duration additional = Duration.ZERO;
+    private boolean invalidArguments, autostart = false;
 	
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
+		} catch (Throwable e) {}
 		try {
             new GUI(args);
         } catch (IOException | FontFormatException e) {
@@ -95,6 +96,7 @@ public class GUI extends JFrame implements FocusListener {
 	
 	public GUI(String[] args) throws IOException, FontFormatException {
 		INSTANCE = this;
+		this.processArguments(args);
 		
 		ClassLoader loader = this.getClass().getClassLoader();
 		greenLEDOn = new ImageIcon(loader.getResourceAsStream("gui/green_on.png").readAllBytes());
@@ -128,16 +130,16 @@ public class GUI extends JFrame implements FocusListener {
 		redLED.setIcon(redLEDOn);
 		getContentPane().add(redLED, "flowx,cell 5 0,alignx center");
 		
-		this.setupTextField(args, databaseIP, "Server IP", 0);
+		this.setupTextField(databaseIP, "Server IP", argument.get(Argument.DATABASE_IP));
 		getContentPane().add(databaseIP, "cell 1 0,growx,aligny bottom");
 		
-		this.setupTextField(args, databasePort, "Port", 1);
+		this.setupTextField(databasePort, "Port", argument.get(Argument.DATABASE_PORT));
 		getContentPane().add(databasePort, "cell 2 0,growx,aligny bottom");
 		
-		this.setupTextField(args, databaseName, "Database name", 2);
+		this.setupTextField(databaseName, "Database name", argument.get(Argument.DATABASE_NAME));
 		getContentPane().add(databaseName, "cell 3 0,growx,aligny bottom");
 		
-		this.setupTextField(args, username, "Username", 3);
+		this.setupTextField(username, "Username", argument.get(Argument.USERNAME));
 		getContentPane().add(username, "cell 1 1 2 1,grow");
 		
 		password.setEchoChar((char) 0);
@@ -165,11 +167,11 @@ public class GUI extends JFrame implements FocusListener {
 				}
 			}
 		});
-		try {
-			password.setText(args[4]);
-			password.setForeground(Color.BLACK);
-			password.setEchoChar('*');
-		} catch (IndexOutOfBoundsException e) {}
+		if (argument.get(Argument.PASSWORD) != null) {
+            password.setText(argument.get(Argument.PASSWORD));
+            password.setForeground(Color.BLACK);
+            password.setEchoChar('*');
+		}
 		getContentPane().add(password, "cell 3 1 2 1,grow");
 		
 		showPassword.setSize(30, 20);
@@ -188,7 +190,7 @@ public class GUI extends JFrame implements FocusListener {
 		});
 		getContentPane().add(showPassword, "cell 5 1,alignx left");
 		
-		this.setupTextField(args, botToken, "Bot Token", 5);
+		this.setupTextField(botToken, "Bot Token", argument.get(Argument.TOKEN));
 		getContentPane().add(botToken, "cell 1 2 5 1,grow");
 		
 		startButton.addActionListener(e -> {
@@ -276,11 +278,12 @@ public class GUI extends JFrame implements FocusListener {
 		
 		setVisible(true);
 		
-		try {
-			if (Boolean.parseBoolean(args[6])) {
-				this.startBot();
-			}
-		} catch (IndexOutOfBoundsException e) {}
+		if (this.invalidArguments) {
+		    ConsoleEngine.getLogger(this).warn("Encountered a problem whilst parsing arguments!");
+		}
+		if (this.autostart) {
+		    this.startBot();
+		}
 	}
 
 	public void startBot() {
@@ -313,21 +316,21 @@ public class GUI extends JFrame implements FocusListener {
     
     public void startRuntimeMeasuring() {
         startTime = OffsetDateTime.now();
-        runtimeMeasuringTask = new TimerTask() {
+        this.runtimeMeasuringTask = new TimerTask() {
             @Override
             public void run() {
                 Duration diff = Duration.between(startTime, OffsetDateTime.now()).plus(additional);
                 GUI.INSTANCE.setTableValue(3, ConfigManager.convertDurationToString(diff));
             }
         };
-        Bot.INSTANCE.getTimer().schedule(runtimeMeasuringTask, 0, 1000);
+        Bot.INSTANCE.getTimer().schedule(this.runtimeMeasuringTask, 0, 1000);
     }
     
     public void stopRuntimeMeasuring() {
         if (startTime != null) {
             additional = Duration.between(startTime, OffsetDateTime.now());
         }
-        runtimeMeasuringTask.cancel();
+        this.runtimeMeasuringTask.cancel();
     }
 	
 	public void setBotRunning(boolean status) {
@@ -397,16 +400,81 @@ public class GUI extends JFrame implements FocusListener {
         this.setTableValue(7, userCount);
     }
     
-    private void setupTextField(String[] args, JTextField textField, String name, int argsIndex) {
+    private void processArguments(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            String[] input = args[i].split(" ");
+            if (input.length < 2) {
+                this.invalidArguments = true;
+            } else {
+                for (int a = 0; a < input.length; a++) {
+                    if (input[a].startsWith("--")) {
+                        Argument argumentType = null;
+                        switch (input[a]) {
+                            case "--dbip":
+                                argumentType = Argument.DATABASE_IP;
+                                break;
+                            case "--dbport":
+                                argumentType = Argument.DATABASE_PORT;
+                                break;
+                            case "--dbname":
+                                argumentType = Argument.DATABASE_NAME;
+                                break;
+                            case "--user":
+                                argumentType = Argument.USERNAME;
+                                break;
+                            case "--password":
+                                argumentType = Argument.PASSWORD;
+                                break;
+                            case "--token":
+                                argumentType = Argument.TOKEN;
+                                break;
+                            case "--autostart":
+                                this.autostart = true;
+                                break;
+                            default:
+                                this.invalidArguments = true;
+                        }
+                        if (argumentType != null && !input[a+1].startsWith("--")) {
+                            a += 1;
+                            String value = input[a];
+                            if (!value.isBlank()) {
+                                if (value.startsWith(">")) {
+                                    for (int e = a+1; e < input.length; e++) {
+                                        a += 1;
+                                        value += " " + input[e];
+                                        if (value.endsWith("<")) {
+                                            e = input.length;
+                                        }
+                                    }
+                                    value = value.replace(">", "").replace("<", "");
+                                }
+                                if (argumentType == Argument.DATABASE_IP && value.contains(":")) {
+                                    String[] split_value = value.split(":");
+                                    this.argument.put(Argument.DATABASE_IP, split_value[0]);
+                                    this.argument.put(Argument.DATABASE_PORT, split_value[1]);
+                                } else {
+                                    this.argument.put(argumentType, value);
+                                }
+                            }
+                        }
+                    } else {
+                        this.invalidArguments = true;
+                    }
+                }
+            }
+        }
+    }
+    
+    private void setupTextField(JTextField textField, String name, @Nullable String value) {
         textField.setForeground(Color.GRAY);
         textField.setFont(default_font);
         textField.setName(name);
         textField.setText(name);
         textField.addFocusListener(this);
-        try {
-            textField.setText(args[argsIndex]);
+        if (value != null) {
+            textField.setText(value);
             textField.setForeground(Color.BLACK);
-        } catch (IndexOutOfBoundsException e) {}
+        }
     }
     
     public void setTableValue(int row, Object value) {
@@ -434,5 +502,14 @@ public class GUI extends JFrame implements FocusListener {
 			textField.setForeground(Color.GRAY);
 			textField.setText(textField.getName());
 		}
-	}	
+	}
+	
+	private static enum Argument {
+	    DATABASE_IP,
+	    DATABASE_PORT,
+	    DATABASE_NAME,
+	    USERNAME,
+	    PASSWORD,
+	    TOKEN;
+	}
 }
