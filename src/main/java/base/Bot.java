@@ -3,7 +3,6 @@ package base;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 import javax.security.auth.login.LoginException;
 
@@ -14,6 +13,7 @@ import org.json.JSONObject;
 import com.mongodb.lang.Nullable;
 
 import assets.logging.Logger;
+import engines.base.CentralTimer;
 import engines.base.EventAwaiter;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
@@ -50,7 +50,6 @@ public class Bot {
 	
 	public JDA jda;
 	
-	private Timer timer = new Timer();
 	private Thread shutdownThread = null;
 	private boolean shutdown = false;
 	
@@ -205,7 +204,7 @@ public class Bot {
     	}
 //		Stop period operations
 		EventAwaiter.INSTANCE.clear();
-		timer.cancel();
+		CentralTimer.get().cancelAll();
 //		Shutdown operations
 		GuildUtilitiesList.getEngines().forEach((id, handler) -> handler.onShutdown(reason));
 //		Shutdown bot
@@ -224,14 +223,10 @@ public class Bot {
 	}
     
     public void kill() {
-        this.timer.cancel();
+        CentralTimer.get().cancelAll();
         INSTANCE = null;
         this.shutdown = true;
     }
-	
-	public Timer getTimer() {
-		return timer;
-	}
 	
 	public Thread getShutdownThread() {
 		if (shutdownThread == null) {

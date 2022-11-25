@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import assets.data.DataContainer;
 import assets.data.DataTools;
 import base.Bot;
+import engines.base.CentralTimer;
 import engines.base.Check;
 import engines.base.LanguageEngine;
 import engines.base.LanguageEngine.Language;
@@ -49,6 +50,8 @@ public class PollData implements DataContainer {
     private List<String> options = new LinkedList<>();
     private List<Role> allowed_roles = new LinkedList<>();
     private ConcurrentHashMap<Member, List<Integer>> votes = new ConcurrentHashMap<>();
+    
+    private long timer_operation_id = 0L;
 
 	public PollData(Message message, JSONObject data) {
         this.guild = message.getGuild();
@@ -78,6 +81,7 @@ public class PollData implements DataContainer {
         this.max_votes_per_option = data.getInt(Key.MAX_VOTES_PER_OPTION);
         
         this.time_limit = OffsetDateTime.parse(data.getString(Key.TIME_LIMIT), ConfigManager.DATA_TIME_SAVE_FORMAT);
+        this.timer_operation_id = CentralTimer.get().schedule(() ->  message.editMessageEmbeds(buildEndEmbed()).setComponents().queue(), this.time_limit);
         
         JSONArray options_array = data.getJSONArray(Key.OPTIONS);
         for (int i = 0; i < options_array.length(); i++) {
@@ -232,6 +236,7 @@ public class PollData implements DataContainer {
     
     public PollData setTimeLimit(OffsetDateTime time_limit) {
         this.time_limit = time_limit;
+        CentralTimer.get().reschedule(timer_operation_id, time_limit);
         return this;
     }
     
@@ -399,6 +404,10 @@ public class PollData implements DataContainer {
         eb.setFooter(LanguageEngine.buildFooter());
         eb.setTimestamp(Instant.now());
         return eb.build();
+    }
+    
+    private MessageEmbed buildEndEmbed() {
+        return null;
     }
     
     private String getVotersDisplayByOptionIndex(int index) {

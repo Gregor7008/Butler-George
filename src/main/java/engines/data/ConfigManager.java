@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +28,7 @@ import com.mongodb.lang.NonNull;
 import assets.logging.Logger;
 import base.Bot;
 import base.GUI;
+import engines.base.CentralTimer;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -119,7 +119,7 @@ public class ConfigManager {
 		} catch (MongoTimeoutException e) {
 			throw new IllegalArgumentException("Connection to server failed, please check online status of server!");
 		}
-		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
+		CentralTimer.get().schedule(new Runnable() {
             private int executions = 0;
             @Override
             public void run() {
@@ -128,7 +128,7 @@ public class ConfigManager {
                 }
                 executions++;
             }
-        }, 0, TimeUnit.MINUTES.toMillis(PUSH_CYCLE_PERIOD));
+        }, TimeUnit.MINUTES, 0, TimeUnit.MINUTES, PUSH_CYCLE_PERIOD);
 	}
 	
 	private String encodeToURL(String input) {

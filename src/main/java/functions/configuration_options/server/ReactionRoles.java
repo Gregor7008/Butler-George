@@ -13,8 +13,8 @@ import assets.functions.ConfigurationEvent;
 import assets.functions.ConfigurationEventHandler;
 import assets.functions.ConfigurationOptionData;
 import assets.functions.ConfigurationSubOptionData;
+import engines.base.CentralTimer;
 import engines.base.LanguageEngine;
-import engines.base.Toolbox;
 import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -167,7 +167,7 @@ public class ReactionRoles implements ConfigurationEventHandler {
 						}
 					} else {
 						response.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "invalidEmoji")).queue();
-						Toolbox.scheduleOperation(() -> defineAddEmojis(roles, response), 1500);
+						CentralTimer.get().schedule(() -> defineAddEmojis(roles, response), TimeUnit.MILLISECONDS, 1500);
 					}
 				}).append();		
 	}
@@ -176,7 +176,7 @@ public class ReactionRoles implements ConfigurationEventHandler {
 		Message response = msg.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "adding")).complete();
 		Set<String> actions = ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channel.getId(), message.getId()).keySet();
 		actions.forEach(e -> channel.retrieveMessageById(message.getId()).complete().addReaction(Emoji.fromFormatted(e)).queue());
-		Toolbox.scheduleOperation(() -> response.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")).queue(), 1500);
+		CentralTimer.get().schedule(() -> response.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")).queue(), TimeUnit.MILLISECONDS, 1500);
 	}
 
 	private String listReactionroles(TextChannel channel, Message message) {

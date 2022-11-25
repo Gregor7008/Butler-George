@@ -2,14 +2,13 @@ package assets.base;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.mongodb.lang.Nullable;
 
-import base.Bot;
+import engines.base.CentralTimer;
 import engines.base.EventAwaiter;
 import engines.base.LanguageEngine;
 import engines.logging.ConsoleEngine;
@@ -46,7 +45,7 @@ public class AwaitTask<T extends GenericEvent> {
 	private boolean invalidInputReceived = false;
 	private boolean executed = false;
 	private boolean cancelled = false;
-	private TimerTask timeoutTask = null;
+	private long timeoutTaskId = 0L;
 	
 	public static AwaitTask<MessageReceivedEvent> forMessageReceival(Guild guild, User user, MessageChannel channel, Consumer<MessageReceivedEvent> onSuccess) {
 		return AwaitTask.forMessageReceival(guild, user, channel, null, onSuccess, null);
@@ -149,13 +148,7 @@ public class AwaitTask<T extends GenericEvent> {
 	
 	public AwaitTask<T> append() {
 		EventAwaiter.INSTANCE.appendTask(this);
-		this.timeoutTask = new TimerTask() {
-			@Override
-			public void run() {
-				timeout();
-			}
-		};
-		Bot.INSTANCE.getTimer().schedule(timeoutTask, TimeUnit.MINUTES.toMillis(5));
+		this.timeoutTaskId = CentralTimer.get().schedule(() -> timeout(), TimeUnit.MINUTES, 5);
 		return this;
 	}
 	
@@ -168,7 +161,7 @@ public class AwaitTask<T extends GenericEvent> {
 		}
 		if (!executed && !cancelled) {
 			EventAwaiter.INSTANCE.removeTask(this);
-			this.timeoutTask.cancel();
+			CentralTimer.get().cancel(timeoutTaskId);
 			this.executed = true;
 			try {
 				this.eventConsumer.accept(event);
@@ -213,7 +206,7 @@ public class AwaitTask<T extends GenericEvent> {
 	}
 	
 	public AwaitTask<T> cancel() {
-		this.timeoutTask.cancel();
+        CentralTimer.get().cancel(timeoutTaskId);
 		this.timeout();
 		return this;
 	}

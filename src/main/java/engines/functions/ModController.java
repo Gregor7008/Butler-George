@@ -11,7 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import base.Bot;
-import engines.base.Toolbox;
+import engines.base.CentralTimer;
 import engines.data.ConfigLoader;
 import engines.data.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,12 +24,12 @@ public class ModController {
 
 	public ModController() {
 		RUN = this;
-		Toolbox.scheduleOperation(() -> {
+		CentralTimer.get().schedule(() -> {
 			List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
 			for (int i = 0; i < guilds.size(); i++) {
 				guildModCheck(guilds.get(i));
 			}
-		}, TimeUnit.MINUTES.toMillis(5));
+		}, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, 5);
 	}
 	
 	public void guildModCheck(Guild guild) {

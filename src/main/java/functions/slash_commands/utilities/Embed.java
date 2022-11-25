@@ -10,9 +10,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import assets.base.AwaitTask;
 import assets.functions.SlashCommandEventHandler;
+import engines.base.CentralTimer;
 import engines.base.Check;
 import engines.base.LanguageEngine;
-import engines.base.Toolbox;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -387,16 +387,16 @@ public class Embed implements SlashCommandEventHandler {
 	private void defaultConsumer(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event, String key, String input) {
 		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, key + "success")
 				.replaceDescription("{" + key + "}", input)).setComponents().complete();
-		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
+		CentralTimer.get().schedule(() -> continueEmbedConfiguration(newMessage, menu, false, eb), TimeUnit.SECONDS, 2);
 	}
 	
 	private void errorConsumer(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "error")).setComponents().complete();
-		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
+		CentralTimer.get().schedule(() -> continueEmbedConfiguration(newMessage, menu, false, eb), TimeUnit.SECONDS, 2);
 	}
 	
 	private void defaultTimeout(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "timeout")).setComponents().complete();
-		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
+		CentralTimer.get().schedule(() -> continueEmbedConfiguration(newMessage, menu, false, eb), TimeUnit.SECONDS, 2);
 	}
 }

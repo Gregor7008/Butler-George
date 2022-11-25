@@ -12,8 +12,8 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.ImageIcon;
@@ -35,6 +35,7 @@ import javax.swing.table.DefaultTableModel;
 import com.mongodb.lang.Nullable;
 
 import base.Bot.ShutdownReason;
+import engines.base.CentralTimer;
 import engines.base.ConsoleCommandListener;
 import engines.base.ScrollEngine;
 import engines.data.ConfigManager;
@@ -78,7 +79,7 @@ public class GUI extends JFrame implements FocusListener {
 	private ImageIcon eyeIconRaw;
 	private ImageIcon windowIcon;
     
-    private TimerTask runtimeMeasuringTask;
+    private long runtimeMeasuringTaskId;
     private OffsetDateTime startTime = null;
     private Duration additional = Duration.ZERO;
     private boolean invalidArguments, autostart = false;
@@ -316,21 +317,20 @@ public class GUI extends JFrame implements FocusListener {
     
     public void startRuntimeMeasuring() {
         startTime = OffsetDateTime.now();
-        this.runtimeMeasuringTask = new TimerTask() {
+        this.runtimeMeasuringTaskId = CentralTimer.get().schedule(new Runnable() {
             @Override
             public void run() {
                 Duration diff = Duration.between(startTime, OffsetDateTime.now()).plus(additional);
                 GUI.INSTANCE.setTableValue(3, ConfigManager.convertDurationToString(diff));
             }
-        };
-        Bot.INSTANCE.getTimer().schedule(this.runtimeMeasuringTask, 0, 1000);
+        }, TimeUnit.MILLISECONDS,  0, TimeUnit.SECONDS, 1);
     }
     
     public void stopRuntimeMeasuring() {
         if (startTime != null) {
             additional = Duration.between(startTime, OffsetDateTime.now());
         }
-        this.runtimeMeasuringTask.cancel();
+        CentralTimer.get().cancel(this.runtimeMeasuringTaskId);
     }
 	
 	public void setBotRunning(boolean status) {

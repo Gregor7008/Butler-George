@@ -7,13 +7,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 
-import base.Bot;
 import engines.data.ConfigLoader;
 import engines.functions.GuildMusicManager;
 import engines.functions.PlayerManager;
@@ -83,15 +81,6 @@ public abstract class Toolbox {
 	        }
 		}
 		return output;
-	}
-	
-	public static void scheduleOperation(Runnable operation, long delay) {
-		Bot.INSTANCE.getTimer().schedule(new TimerTask() {
-			@Override
-			public void run() {
-				operation.run();
-			}
-		}, delay);
 	}
 	
 	public static void stopMusicAndLeaveOn(Guild guild) {
