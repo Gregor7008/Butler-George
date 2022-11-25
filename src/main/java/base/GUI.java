@@ -434,7 +434,7 @@ public class GUI extends JFrame implements FocusListener {
                             default:
                                 this.invalidArguments = true;
                         }
-                        if (argumentType != null && !input[a+1].startsWith("--")) {
+                        if (argumentType != null && a+1 < input.length && !input[a+1].startsWith("--")) {
                             a += 1;
                             String value = input[a];
                             if (!value.isBlank()) {
