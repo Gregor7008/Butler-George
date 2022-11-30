@@ -152,6 +152,13 @@ public class Join2CreateChannelData implements DataContainer {
         return this;
     }
     
+ /* TODO Transfer & Adapt tool methods from 'EventProcessor.class' to here
+  * This includes....
+  * 1. Creation of a new J2C-Channel incl. Formatting
+  * 2. Deletion of an old J2C-Channel including the...
+  * 3. Processing of remaining J2C-Channels  
+  */
+    
     private static abstract class Key {
         public static final String NAME_FORMAT = "name_format";
         public static final String LIMIT_PRESET = "limit_preset";

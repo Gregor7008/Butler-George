@@ -22,12 +22,15 @@ public class MemberData implements DataContainer {
     
     private final Guild guild;
     private Category custom_category;
-    private int experience, last_penalty_index, level, levelcard_background, spam_count = 0;
+    private int experience, last_penalty_index, level, levelcard_background = 0;
     private Language language = Language.ENGLISH;
     private OffsetDateTime last_experience, last_modmail, last_suggestion, temporarily_banned_until = OffsetDateTime.now().minusDays(1L);
     private ConcurrentHashMap<Integer, ModMailData> modmails = new ConcurrentHashMap<>();
     private boolean permanently_muted = false;
     private List<WarningData> warnings = new LinkedList<>();
+
+//  Temporary runtime data
+    private int spam_count = 0;
     
     public MemberData(Guild guild, JSONObject data) {
         this.guild = guild;
@@ -46,7 +49,6 @@ public class MemberData implements DataContainer {
         this.last_penalty_index = data.getInt(Key.LAST_PENALTY_INDEX);
         this.level = data.getInt(Key.LEVEL);
         this.levelcard_background = data.getInt(Key.LEVELCARD_BACKGROUND);
-        this.spam_count = data.getInt(Key.SPAM_COUNT);
         
         this.language = Language.valueOf(data.getString(Key.LANGUAGE));
         
@@ -87,7 +89,6 @@ public class MemberData implements DataContainer {
         compiledData.put(Key.LAST_PENALTY_INDEX, last_penalty_index);
         compiledData.put(Key.LEVEL, level);
         compiledData.put(Key.LEVELCARD_BACKGROUND, levelcard_background);
-        compiledData.put(Key.SPAM_COUNT, spam_count);
         
         compiledData.put(Key.LANGUAGE, language.toString());
         
@@ -363,7 +364,6 @@ public class MemberData implements DataContainer {
         public static final String LEVELCARD_BACKGROUND = "levelcard_background";
         public static final String MODMAILS = "modmails";
         public static final String PERMANENTLY_MUTED = "permanently_muted";
-        public static final String SPAM_COUNT = "spam_count";
         public static final String TEMPORARILY_BANNED_UNTIL = "temporarily_banned_until";
         public static final String WARNINGS = "warnings";
     }

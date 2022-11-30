@@ -6,6 +6,8 @@ import assets.data.DataContainer;
 
 public class WarningData implements DataContainer {
 
+//  TODO Implement completely incl. ModController notification
+    
     public WarningData(JSONObject data) {
         this.instanciateFromJSON(data);
     }
