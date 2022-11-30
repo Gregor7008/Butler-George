@@ -11,8 +11,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.JTextComponent;
 
-public class ScrollEngine implements AdjustmentListener
-{
+public class ScrollEngine implements AdjustmentListener {
     public final static int HORIZONTAL = 0;
     public final static int VERTICAL = 1;
 
