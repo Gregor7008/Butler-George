@@ -44,13 +44,14 @@ public class PollData implements DataContainer {
     private final PollType type;
     private Message message;
     private String title, description = "N/A";
-    private boolean anonymous, public_results = false;
+    private boolean anonymous, show_vote_count, public_results = false;
     private int max_total_votes, max_votes_per_option = 1;
     private OffsetDateTime time_limit = OffsetDateTime.now().plusWeeks(1);
     private List<String> options = new LinkedList<>();
     private List<Role> allowed_roles = new LinkedList<>();
     private ConcurrentHashMap<Member, List<Integer>> votes = new ConcurrentHashMap<>();
     
+//  Temporary runtime data
     private long timer_operation_id = 0L;
 
 	public PollData(Message message, JSONObject data) {
@@ -76,12 +77,13 @@ public class PollData implements DataContainer {
         
         this.anonymous = data.getBoolean(Key.ANONYMOUS);
         this.public_results = data.getBoolean(Key.PUBLIC_RESULTS);
+        this.show_vote_count = data.getBoolean(Key.SHOW_VOTE_COUNT);
         
         this.max_total_votes = data.getInt(Key.MAX_TOTAL_VOTES);
         this.max_votes_per_option = data.getInt(Key.MAX_VOTES_PER_OPTION);
         
         this.time_limit = OffsetDateTime.parse(data.getString(Key.TIME_LIMIT), ConfigManager.DATA_TIME_SAVE_FORMAT);
-        this.timer_operation_id = CentralTimer.get().schedule(() ->  message.editMessageEmbeds(buildEndEmbed()).setComponents().queue(), this.time_limit);
+        this.timer_operation_id = CentralTimer.get().schedule(() ->  message.editMessageEmbeds(buildPollEmbed()).setComponents().queue(), this.time_limit);
         
         JSONArray options_array = data.getJSONArray(Key.OPTIONS);
         for (int i = 0; i < options_array.length(); i++) {
@@ -118,6 +120,7 @@ public class PollData implements DataContainer {
         compiledData.put(Key.TITLE, title);
         compiledData.put(Key.ANONYMOUS, anonymous);
         compiledData.put(Key.PUBLIC_RESULTS, public_results);
+        compiledData.put(Key.SHOW_VOTE_COUNT, show_vote_count);
         
         compiledData.put(Key.MAX_TOTAL_VOTES, max_total_votes);
         compiledData.put(Key.MAX_VOTES_PER_OPTION, max_votes_per_option);
@@ -212,6 +215,15 @@ public class PollData implements DataContainer {
         return this;
     }
     
+    public boolean areVoteCountsShown() {
+        return this.show_vote_count;
+    }
+    
+    public PollData setVoteCountsShown(boolean show_vote_count) {
+        this.show_vote_count = show_vote_count;
+        return this;
+    }
+    
     public int getMaxTotalVotes() {
         return this.max_total_votes;
     }
@@ -288,6 +300,9 @@ public class PollData implements DataContainer {
     
     public PollData addVotesForMember(Member member, int... votes) {
         List<Integer> current = this.votes.get(member);
+        if (current == null) {
+            current = new LinkedList<>();
+        }
         for (int i = 0; i < votes.length; i++) {
             current.add(votes[i]);
         }
@@ -303,34 +318,53 @@ public class PollData implements DataContainer {
     
     public PollData removeVotesOfMember(Member member, int... votes) {
         List<Integer> current = this.getVotesByMember(member);
-        ArrayList<Integer> votes_to_remove = new ArrayList<>();
-        ArrayList<Integer> indicies_to_remove = new ArrayList<>();
-        for (int i = 0; i < votes.length; i++) {
-            votes_to_remove.add(i, votes[i]);
-        }
-        for (int i = 0; i < current.size(); i++) {
-            if (votes_to_remove.remove(current.get(i))) {
-                indicies_to_remove.add(i);
+        if (current != null) {
+            ArrayList<Integer> votes_to_remove = new ArrayList<>();
+            ArrayList<Integer> indicies_to_remove = new ArrayList<>();
+            for (int i = 0; i < votes.length; i++) {
+                votes_to_remove.add(i, votes[i]);
             }
+            for (int i = 0; i < current.size(); i++) {
+                if (votes_to_remove.remove(current.get(i))) {
+                    indicies_to_remove.add(i);
+                }
+            }
+            indicies_to_remove.forEach(index -> current.remove(index));
+            this.votes.put(member, current);
         }
-        indicies_to_remove.forEach(index -> current.remove(index));
-        this.votes.put(member, current);
         return this;
     }
     
     public boolean checkVoteValidity(Member member, int vote) {
-        List<Integer> current = this.votes.get(member);
-        if (current.size() >= this.max_total_votes) {
-            return false;
-        } else if (Collections.frequency(current, vote) >= this.max_votes_per_option) {
+        boolean roleFilterPassed = true;
+        if (!this.allowed_roles.isEmpty()) {
+            roleFilterPassed = false;
+            for (int i = 0; i < this.allowed_roles.size(); i++) {
+                Role role = this.allowed_roles.get(i);
+                if (member.getRoles().contains(role)) {
+                    roleFilterPassed = true;
+                    i = this.allowed_roles.size();
+                }
+            }
+        }
+        if (roleFilterPassed) {
+            List<Integer> current = this.votes.get(member);
+            if (current == null) {
+                return true;
+            } else if (current.size() >= this.max_total_votes) {
                 return false;
+            } else if (Collections.frequency(current, vote) >= this.max_votes_per_option) {
+                    return false;
+            } else {
+                return true;
+            }
         } else {
-            return true;
+            return false;
         }
     }
     
     public Message sendPollMessage() {
-        MessageCreateAction mca = this.text_channel.sendMessageEmbeds(this.buildPollEmbed(true, false));
+        MessageCreateAction mca = this.text_channel.sendMessageEmbeds(this.buildPollEmbed());
         if (this.type != PollType.TRUE_OR_FALSE) {
             ItemComponent[] components = new ItemComponent[]{};
             for (int i = 0; i < this.options.size(); i++) {
@@ -363,54 +397,75 @@ public class PollData implements DataContainer {
         return this.message;
     }
     
-    public MessageEmbed buildPollEmbed(boolean show_settings, boolean results) {
+    public MessageEmbed buildPollEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setAuthor(this.user.getName(), "https://www.discordapp.com/users/" + this.user.getId(), this.user.getEffectiveAvatarUrl());
-        eb.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
-        if (results) {
+        boolean poll_has_ended = this.time_limit.isBefore(OffsetDateTime.now());
+        boolean vote_count_display = this.show_vote_count || (poll_has_ended && this.public_results);
+        if (poll_has_ended) {
             eb.setTitle("**Results** | " + this.title);
         } else {
             eb.setTitle(this.title);
         }
+        eb.setAuthor(this.user.getName(), "https://www.discordapp.com/users/" + this.user.getId(), this.user.getEffectiveAvatarUrl());
+        eb.setColor(LanguageEngine.EMBED_DEFAULT_COLOR);
         eb.setDescription(this.description);
         eb.setThumbnail("https://github.com/Gregor7008/Gregor7008/blob/37c084226d19be80e8e2b907eeeff67a3e3fa5c9/resources/graphics/emojis/bar_chart.png?raw=true");
 
         String[] texts = LanguageEngine.getRaw(Language.ENGLISH, this, "titles").split(LanguageEngine.SEPERATOR);
-        if (this.anonymous) {
+        if (this.anonymous || (poll_has_ended && this.public_results)) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < this.options.size(); i++) {
-                sb.append(Toolbox.convertIntegerToEmoji(i+1).getFormatted()
-                        + " "
-                        + this.options.get(i)
-                        + String.valueOf(this.getVotersListByOptionIndex(i).size()));
-                if (i++ < this.options.size()) {
+                sb.append(Toolbox.convertIntegerToEmoji(i+1).getFormatted() + " " + this.options.get(i));
+                if (vote_count_display) {
+                    sb.append(" " + String.valueOf(this.getVotersListByOptionIndex(i).size()));
+                }
+                if (i + 1 < this.options.size()) {
                     sb.append("\n");
                 }
             }
             eb.addField(":arrow_right: " + texts[0], sb.toString(), false);
         } else {
             for (int i = 0; i < this.options.size(); i++) {
-                eb.addField(Toolbox.convertIntegerToEmoji(i+1).getFormatted()
-                        + " "
-                        + this.options.get(i)
-                        + String.valueOf(this.getVotersListByOptionIndex(i).size()),
-                        this.getVotersDisplayByOptionIndex(i), false);
+                String title = Toolbox.convertIntegerToEmoji(i+1).getFormatted() + " " + this.options.get(i);
+                if (vote_count_display) {
+                    title += " " + String.valueOf(this.getVotersListByOptionIndex(i).size());
+                }
+                eb.addField(title, this.getVotersDisplayByOptionIndex(i, vote_count_display), false);
             }
         }
-        
-        if (show_settings) {
-            eb.addField(texts[1], texts[2] + ": " + String.valueOf(anonymous) + "\n" + texts[3] + ": " + TimeFormat.DATE_TIME_SHORT.format(this.time_limit), false);    
+
+        String[] end_embed_content = LanguageEngine.getRaw(Language.ENGLISH, this, "end_embed").split(LanguageEngine.SEPERATOR);
+        if (poll_has_ended && !this.anonymous) {
+            List<Member> voters = new ArrayList<>();
+            StringBuilder voters_display_list = new StringBuilder();
+            this.votes.keySet().removeAll(Collections.singleton(null));
+            this.votes.keySet().forEach(member -> {
+                voters.add(member);
+            });
+            voters.sort((member_1, member_2) -> {
+               return member_2.getEffectiveName().compareTo(member_1.getEffectiveName());
+            });
+            int limit = Math.min(voters.size(), 15);
+            for (int i = 0; i < limit; i++) {
+                voters_display_list.append(voters.get(i).getAsMention());
+                voters_display_list.append("\n");
+                if (i + 1 == limit && limit == 15) {
+                    voters_display_list.append(end_embed_content[3].replace("{count}", String.valueOf(voters.size() - 15)));
+                }
+            }
+            eb.addField(end_embed_content[2], voters_display_list.toString(), false);
+        }
+        if (poll_has_ended) {
+            eb.addField(end_embed_content[0], end_embed_content[1].replace("{date}", TimeFormat.DATE_TIME_SHORT.format(this.time_limit)), false);
+        } else {
+            eb.addField(":gear: " + texts[1], texts[2] + ": " + String.valueOf(anonymous) + "\n" + texts[3] + ": " + TimeFormat.DATE_TIME_SHORT.format(this.time_limit), false);    
         }
         eb.setFooter(LanguageEngine.buildFooter());
         eb.setTimestamp(Instant.now());
         return eb.build();
     }
     
-    private MessageEmbed buildEndEmbed() {
-        return null;
-    }
-    
-    private String getVotersDisplayByOptionIndex(int index) {
+    private String getVotersDisplayByOptionIndex(int index, boolean vote_count_display) {
         StringBuilder sb = new StringBuilder();
         List<Member> list = this.getVotersListByOptionIndex(index);
         if (!list.isEmpty()) {
@@ -432,7 +487,7 @@ public class PollData implements DataContainer {
                         sb.append(", ");
                     }
                     sb.append(entry.getKey().getAsMention());
-                    if (vote_count > 1) {
+                    if (vote_count > 1 && vote_count_display) {
                         sb.append(" " + String.valueOf(vote_count));
                     }
                     progress++;
@@ -469,6 +524,7 @@ public class PollData implements DataContainer {
         public static final String ANONYMOUS = "anonymous";
         public static final String ALLOWED_ROLES = "allowed_roles";
         public static final String PUBLIC_RESULTS = "public_results";
+        public static final String SHOW_VOTE_COUNT = "show_vote_count";
         public static final String TIME_LIMIT = "time_limit";
     }
 
