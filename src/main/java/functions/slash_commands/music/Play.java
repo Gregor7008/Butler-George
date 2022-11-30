@@ -62,10 +62,10 @@ public class Play implements SlashCommandEventHandler {
 		}
 		if (!Check.isURL(argument)) {
 			String term = "ytsearch:" + argument;
-			musicManager.scheduler.player.setVolume(15);
+			musicManager.scheduler.player.setVolume(10);
 			PlayerManager.getInstance().loadAndPlay(event, term);
 		} else {
-			musicManager.scheduler.player.setVolume(15);
+			musicManager.scheduler.player.setVolume(10);
 			PlayerManager.getInstance().loadAndPlay(event, argument);
 		}
 	}

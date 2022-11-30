@@ -73,7 +73,7 @@ public abstract class LanguageEngine {
             } else {
                 requesterName = requester.getClass().getName();
             }
-            path = requesterName.replace('.', '/').replaceAll("\\\\$[0-9]+", "").toLowerCase();
+            path = requesterName.replace('.', '/').replaceAll("\\$[0-9]+", "").toLowerCase();
         }
         String fullpath = "languages/" + language.toString().toLowerCase() + "/" + path + ".properties";
         Properties properties = new Properties();
