@@ -1,13 +1,14 @@
 package assets.data.single;
 
 import java.time.Duration;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import assets.data.DataTools;
 import engines.data.ConfigManager;
@@ -20,7 +21,7 @@ public class PenaltyData implements DataContainer {
     private final PenaltyType type;
     private final int warning_limit;
     private Duration opt_duration;
-    private List<Role> opt_roles = new LinkedList<>();
+    private List<Role> opt_roles = new ArrayList<>();
     private boolean remove_role, reset_experience, reset_level = false;
     
 	public PenaltyData(Guild guild, JSONObject data) {
@@ -76,6 +77,12 @@ public class PenaltyData implements DataContainer {
         
         return compiledData;
     }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
+    }
     
     public Guild getGuild() {
         return this.guild;
@@ -109,12 +116,12 @@ public class PenaltyData implements DataContainer {
     }
     
     public PenaltyData removeRoles(int... indices) {
-        DataTools.removeFromList(this.opt_roles, indices);
+        DataTools.removeIndiciesFromList(this.opt_roles, indices);
         return this;
     }
     
     public PenaltyData removeRolesByRole(Role... roles) {
-        DataTools.removeFromList(this.opt_roles, roles);
+        DataTools.removeValuesFromList(this.opt_roles, roles);
         return this;
     }
     

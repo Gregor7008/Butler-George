@@ -3,12 +3,13 @@ package assets.data.single;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import base.Bot;
 import engines.base.CentralTimer;
@@ -30,9 +31,9 @@ public class GiveawayData implements DataContainer {
     private String title, description = "N/A";
     private boolean anonymous = false;
     private OffsetDateTime time_limit = OffsetDateTime.now().plusWeeks(1);
-    private List<String> prizes = new LinkedList<>();
-    private List<Member> sign_ups = new LinkedList<>();
-    private List<Role> allowed_roles = new LinkedList<>();
+    private List<String> prizes = new ArrayList<>();
+    private List<Member> sign_ups = new ArrayList<>();
+    private List<Role> allowed_roles = new ArrayList<>();
     
 //  Temporary runtime data
     private long timer_operation_id = 0L;
@@ -41,7 +42,7 @@ public class GiveawayData implements DataContainer {
 	    this.guild = message.getGuild();
 	    this.text_channel = message.getChannel().asTextChannel();
 	    this.message = message;
-	    this.user = Bot.INSTANCE.jda.retrieveUserById(data.getLong(Key.USER_ID)).complete();
+	    this.user = Bot.getAPI().retrieveUserById(data.getLong(Key.USER_ID)).complete();
 	    this.instanciateFromJSON(data);
 	}
 	
@@ -86,6 +87,12 @@ public class GiveawayData implements DataContainer {
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         return compiledData;
+    }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     public TextChannel getChannel() {

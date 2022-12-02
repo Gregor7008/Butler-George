@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +24,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.lang.NonNull;
 
 import assets.logging.Logger;
 import base.Bot;
@@ -142,14 +142,14 @@ public class ConfigManager {
 	public void log() {
 		LOG.info("---------| User-Cache |---------");
 		userConfigCache.forEach((id, obj) -> {
-			LOG.info("-> " + Bot.INSTANCE.jda.retrieveUserById(id).complete().getName());
+			LOG.info("-> " + Bot.getAPI().retrieveUserById(id).complete().getName());
 		});
 		if (userConfigCache.isEmpty()) {
 			LOG.info("EMPTY");
 		}
 		LOG.info("---------| Guild-Cache |--------");
 		guildConfigCache.forEach((id, obj) -> {
-			LOG.info("-> " + Bot.INSTANCE.jda.getGuildById(id).getName());
+			LOG.info("-> " + Bot.getAPI().getGuildById(id).getName());
 		});
 		if (guildConfigCache.isEmpty()) {
 			LOG.info("EMPTY");
@@ -204,7 +204,7 @@ public class ConfigManager {
 	}
 	
 	//Get JSONObjects
-	@NonNull
+	@NotNull
 	public JSONObject getUserConfig(User user) {
 		JSONObject config = null;
 		config = userConfigCache.get(user.getIdLong());
@@ -221,7 +221,7 @@ public class ConfigManager {
 		return config;
 	}
 	
-	@NonNull
+	@NotNull
 	public JSONObject getMemberConfig(Guild guild, User user) {
 		JSONObject config = null;
 		try {
@@ -233,7 +233,7 @@ public class ConfigManager {
 		return config;
 	}
 	
-	@NonNull
+	@NotNull
 	public JSONObject getGuildConfig(Guild guild) {
 		JSONObject config = null;
 		config = guildConfigCache.get(guild.getIdLong());

@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import assets.data.DataTools;
 import base.Bot;
@@ -47,8 +48,8 @@ public class PollData implements DataContainer {
     private boolean anonymous, show_vote_count, public_results = false;
     private int max_total_votes, max_votes_per_option = 1;
     private OffsetDateTime time_limit = OffsetDateTime.now().plusWeeks(1);
-    private List<String> options = new LinkedList<>();
-    private List<Role> allowed_roles = new LinkedList<>();
+    private List<String> options = new ArrayList<>();
+    private List<Role> allowed_roles = new ArrayList<>();
     private ConcurrentHashMap<Member, List<Integer>> votes = new ConcurrentHashMap<>();
     
 //  Temporary runtime data
@@ -58,7 +59,7 @@ public class PollData implements DataContainer {
         this.guild = message.getGuild();
 	    this.text_channel = message.getChannel().asTextChannel();
 	    this.message = message;
-	    this.user = Bot.INSTANCE.jda.retrieveUserById(data.getLong(Key.USER_ID)).complete();
+	    this.user = Bot.getAPI().retrieveUserById(data.getLong(Key.USER_ID)).complete();
 	    this.type = PollType.valueOf(data.getString(Key.TYPE));
 	    this.instanciateFromJSON(data);
 	}
@@ -99,7 +100,7 @@ public class PollData implements DataContainer {
         JSONObject votes_object = data.getJSONObject(Key.VOTES);
         votes_object.keySet().forEach(key -> {
             JSONArray votes_array = votes_object.getJSONArray(key);
-            LinkedList<Integer> votes_list = new LinkedList<>();
+            ArrayList<Integer> votes_list = new ArrayList<>();
             for (int i = 0; i < votes_array.length(); i++) {
                 votes_list.add(votes_array.getInt(i));
             }
@@ -149,6 +150,12 @@ public class PollData implements DataContainer {
         compiledData.put(Key.VOTES, votes_data);
         
         return compiledData;
+    }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
     }
     
     public Guild getGuild() {
@@ -267,12 +274,12 @@ public class PollData implements DataContainer {
     }
     
     public PollData removeOptions(int... indicies) {
-        DataTools.removeFromList(this.options, indicies);
+        DataTools.removeIndiciesFromList(this.options, indicies);
         return this;
     }
     
     public PollData removeOptionsByOption(String... options) {
-        DataTools.removeFromList(this.options, options);
+        DataTools.removeValuesFromList(this.options, options);
         return this;
     }
     
@@ -301,7 +308,7 @@ public class PollData implements DataContainer {
     public PollData addVotesForMember(Member member, int... votes) {
         List<Integer> current = this.votes.get(member);
         if (current == null) {
-            current = new LinkedList<>();
+            current = new ArrayList<>();
         }
         for (int i = 0; i < votes.length; i++) {
             current.add(votes[i]);

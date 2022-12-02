@@ -2,6 +2,7 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -24,6 +25,12 @@ public class ReactionRoleData implements DataContainer {
     @Override
     public JSONObject compileToJSON() {
         return null;
+    }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     public TextChannel getChannel() {

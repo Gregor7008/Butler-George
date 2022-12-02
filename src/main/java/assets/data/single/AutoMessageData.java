@@ -2,8 +2,9 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.DataContainer;
-import engines.base.Check;
+import base.Bot;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
@@ -13,29 +14,32 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
 public class AutoMessageData implements DataContainer {
 
-    private final Guild guild;
-    private final TextChannel text_channel;
+    private final long guild_id;
+    private long  text_channel_id;
     private String title, message = "N/A";
     private boolean embedded, activated = false;
-    
-	public AutoMessageData(Guild guild, JSONObject data) {
-	    this.guild = guild;
-        this.text_channel = guild.getTextChannelById(data.getLong(Key.CHANNEL_ID));
-	    this.instanciateFromJSON(data);
+   
+    public AutoMessageData(Guild guild, JSONObject data) {
+        guild_id = guild.getIdLong();
+        if (!data.isEmpty()) {
+            this.instanciateFromJSON(data);
+        }
 	}
 	
 	public AutoMessageData(Guild guild, TextChannel channel) {
-	    this.guild = guild;
-	    this.text_channel = channel;
+	    guild_id = guild.getIdLong();
+	    text_channel_id = channel.getIdLong();
 	}
 
     @Override
     public DataContainer instanciateFromJSON(JSONObject data) {
-        this.title = data.getString(Key.TITLE);
-        this.message = data.getString(Key.MESSAGE);
+        text_channel_id = data.getLong(Key.CHANNEL_ID);
         
-        this.embedded = data.getBoolean(Key.EMBEDDED);
-        this.activated = data.getBoolean(Key.ACTIVATED);
+        title = data.getString(Key.TITLE);
+        message = data.getString(Key.MESSAGE);
+        
+        embedded = data.getBoolean(Key.EMBEDDED);
+        activated = data.getBoolean(Key.ACTIVATED);
         
         return this;
     }
@@ -43,26 +47,35 @@ public class AutoMessageData implements DataContainer {
     @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
-        
-        if (Check.isValidChannel(text_channel)) {
-            compiledData.put(Key.CHANNEL_ID, text_channel.getIdLong());
-            
-            compiledData.put(Key.TITLE, this.title);
-            compiledData.put(Key.MESSAGE, this.message);
-            
-            compiledData.put(Key.EMBEDDED, this.embedded);
-            compiledData.put(Key.ACTIVATED, this.activated);
-        }
-        
+
+        compiledData.put(Key.CHANNEL_ID, text_channel_id);
+
+        compiledData.put(Key.TITLE, title);
+        compiledData.put(Key.MESSAGE, message);
+
+        compiledData.put(Key.EMBEDDED, embedded);
+        compiledData.put(Key.ACTIVATED, activated);
+
         return compiledData;
+    }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
     }
     
     public Guild getGuild() {
-        return this.guild;
+        return Bot.getAPI().getGuildById(guild_id);
     }
     
     public TextChannel getTextChannel() {
-        return this.text_channel;
+        Guild guild = this.getGuild();
+        if (guild != null) {
+            return guild.getTextChannelById(text_channel_id);
+        } else {
+            return null;
+        }
     }
     
     public String getTitle() {

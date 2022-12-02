@@ -2,6 +2,7 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
@@ -21,7 +22,7 @@ public class ModMailData implements DataContainer {
 	public ModMailData(Guild guild, TextChannel channel, JSONObject data) {
 	    this.guild = guild;
         this.text_channel = channel;
-	    this.user = Bot.INSTANCE.jda.retrieveUserById(data.getLong(Key.USER_ID)).complete();
+	    this.user = Bot.getAPI().retrieveUserById(data.getLong(Key.USER_ID)).complete();
 	    this.instanciateFromJSON(data);
 	}
 
@@ -59,6 +60,12 @@ public class ModMailData implements DataContainer {
         compiledData.put(Key.TITLE, this.title);
         
         return compiledData;
+    }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     public TextChannel getGuildChannel() {

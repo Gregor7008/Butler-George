@@ -1,13 +1,14 @@
 package assets.data.single;
 
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import assets.data.DataTools;
 import engines.base.Check;
@@ -23,7 +24,7 @@ public class Join2CreateChannelData implements DataContainer {
     private String name_format = "{member}'s channel";
     private int limit_preset = -1;
     private boolean configurable = false;
-    private List<VoiceChannel> children = new LinkedList<>();
+    private List<VoiceChannel> children = new ArrayList<>();
     
     public static Join2CreateChannelData getParentOf(VoiceChannel children) {
         List<Join2CreateChannelData> join2create_channel_guild_data = JOIN2CREATE_CHANNEL_LIST.get(children.getGuild());
@@ -84,6 +85,12 @@ public class Join2CreateChannelData implements DataContainer {
 
         return compiledData;
     }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
+    }
     
     public List<VoiceChannel> getChildren() {
         return this.children;
@@ -100,12 +107,12 @@ public class Join2CreateChannelData implements DataContainer {
     }
     
     public Join2CreateChannelData removeChildren(int... indicies) {
-        DataTools.removeFromList(this.children, indicies);
+        DataTools.removeIndiciesFromList(this.children, indicies);
         return this;
     }
     
     public Join2CreateChannelData removeChildrenByChannel(VoiceChannel... childrens) {
-        DataTools.removeFromList(this.children, childrens);
+        DataTools.removeValuesFromList(this.children, childrens);
         return this;
     }
     

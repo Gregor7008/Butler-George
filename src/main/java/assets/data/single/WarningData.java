@@ -2,6 +2,7 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 
 public class WarningData implements DataContainer {
@@ -22,5 +23,11 @@ public class WarningData implements DataContainer {
     @Override
     public JSONObject compileToJSON() {
         return null;
+    }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

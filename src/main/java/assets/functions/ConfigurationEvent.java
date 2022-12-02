@@ -1,6 +1,6 @@
 package assets.functions;
 
-import com.mongodb.lang.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

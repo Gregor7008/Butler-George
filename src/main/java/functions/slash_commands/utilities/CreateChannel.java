@@ -1,7 +1,7 @@
 package functions.slash_commands.utilities;
 
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 
@@ -59,8 +59,8 @@ public class CreateChannel implements SlashCommandEventHandler {
 		guild.createTextChannel(name, cgy).complete();
 	}
 	
-	private LinkedList<Permission> setupPerms() {
-		LinkedList<Permission> ll = new LinkedList<>();
+	private ArrayList<Permission> setupPerms() {
+		ArrayList<Permission> ll = new ArrayList<>();
 		ll.add(Permission.VIEW_CHANNEL);
 		ll.add(Permission.MANAGE_CHANNEL);
 		ll.add(Permission.MANAGE_WEBHOOKS);

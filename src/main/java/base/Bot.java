@@ -6,11 +6,10 @@ import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.mongodb.lang.Nullable;
 
 import assets.logging.Logger;
 import engines.base.CentralTimer;
@@ -40,26 +39,41 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 public class Bot {
 	
-	public static Bot INSTANCE;
 	public static String VERSION = "V2.0-dev.0";
 	public static String NAME = "Butler George";
 	public static String ID = "853887837823959041";
 	public static String HOME = "708381749826289666";
-	
+
+    private static Bot INSTANCE;
 	private static Logger LOG = ConsoleEngine.getLogger(Bot.class);
 	
-	public JDA jda;
-	
+    private JDA jda;
 	private Thread shutdownThread = null;
 	private boolean shutdown = false;
 	
-	public static boolean isShutdown() {
+	public static Bot get() {
 	    if (Bot.INSTANCE != null) {
-	        return Bot.INSTANCE.shutdown;
+	        return Bot.INSTANCE;
 	    } else {
-	        return true;
+	        return null;
 	    }
 	}
+	
+	public static JDA getAPI() {
+	    if (Bot.isShutdown()) {
+            return null;
+        } else {
+            return Bot.getAPI();
+        }
+	}
+    
+    public static boolean isShutdown() {
+        if (Bot.get() != null) {
+            return Bot.get().shutdown;
+        } else {
+            return true;
+        }
+    }
 	
 	public Bot(String token, String serverIP, String port, String databaseName, String username, String password) throws LoginException, InterruptedException, IOException {
 		this.performPreStartupOperations(serverIP, port, databaseName, username, password);

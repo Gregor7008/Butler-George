@@ -1,6 +1,6 @@
 package assets.base;
 
-import com.mongodb.lang.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;

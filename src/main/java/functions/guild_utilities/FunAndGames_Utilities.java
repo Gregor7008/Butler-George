@@ -28,7 +28,7 @@ public class FunAndGames_Utilities extends GuildUtilities {
 	
 	@Override
 	public void onStartup() {
-		guild = Bot.INSTANCE.jda.getGuildById(GUILD_ID);
+		guild = Bot.getAPI().getGuildById(GUILD_ID);
 		if (guild != null) {
 			this.openGuildChannel(guild.getVoiceChannelById(938425419860959242L));
 			

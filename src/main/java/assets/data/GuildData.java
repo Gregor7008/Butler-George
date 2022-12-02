@@ -1,13 +1,14 @@
 package assets.data;
 
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException;
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.single.AutoMessageData;
 import assets.data.single.GiveawayData;
 import assets.data.single.Join2CreateChannelData;
@@ -26,72 +27,77 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
 public class GuildData implements DataContainer {
 
-	private final Guild guild;
-	private List<Role> admin_roles = new LinkedList<>();
-	private List<Role> custom_channel_policing_roles = new LinkedList<>();
-	private List<Role> moderation_roles = new LinkedList<>();
-	private List<Role> support_roles = new LinkedList<>();
-	private List<Role> bot_auto_roles = new LinkedList<>();
-	private List<Role> user_auto_roles = new LinkedList<>();
+	private final long guild;
+	private List<Long> admin_roles = new ArrayList<>();
+	private List<Long> custom_channel_policing_roles = new ArrayList<>();
+	private List<Long> moderation_roles = new ArrayList<>();
+	private List<Long> support_roles = new ArrayList<>();
+	private List<Long> bot_auto_roles = new ArrayList<>();
+	private List<Long> user_auto_roles = new ArrayList<>();
 	private AutoMessageData boost_message, goodbye_message, level_up_message, welcome_message;
-	private TextChannel community_inbox_channel, moderation_inbox_channel, suggestion_inbox_channel;
-	private VoiceChannel support_talk;
+	private long community_inbox_channel, moderation_inbox_channel, suggestion_inbox_channel, support_talk;
 	private Message offline_message;
-	private ConcurrentHashMap<VoiceChannel, Join2CreateChannelData> join2create_channels = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<Category, Member> custom_categories = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<Integer, Role> level_rewards = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Long, Join2CreateChannelData> join2create_channels = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Long, Long> custom_categories = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Integer, Long> level_rewards = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Integer, PenaltyData> penalties = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<TextChannel, ModMailData> modmails = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, PollData>> polls = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, ReactionRoleData>> reaction_roles = new ConcurrentHashMap<>();
-	private ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, GiveawayData>> giveaways = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Long, ModMailData> modmails = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Long, ConcurrentHashMap<Long, PollData>> polls = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Long, ConcurrentHashMap<Long, ReactionRoleData>> reaction_roles = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Long, ConcurrentHashMap<Long, GiveawayData>> giveaways = new ConcurrentHashMap<>();
 
-	public GuildData(JSONObject data) {
-		this.guild = Bot.INSTANCE.jda.getGuildById(data.getLong(Key.GUILD_ID));
-		this.instanciateFromJSON(data);
+	public GuildData(JSONObject data) throws ReferenceNotFoundException {
+		this.guild = data.getLong(Key.GUILD_ID);
+		Guild guild_object = Bot.getAPI().getGuildById(guild);
+		if (guild_object == null) {
+		    throw new ReferenceNotFoundException(ReferenceType.GUILD).setReferenceId(guild);
+		} else {
+		    this.instanciateFromJSON(data);
+		}
 	}
 	
 	public GuildData(Guild guild) {
-	    this.guild = guild;
+	    this.guild = guild.getIdLong();
 	}
 
     @Override
     public DataContainer instanciateFromJSON(JSONObject data) {
-        this.admin_roles = DataTools.getRolesFromArrayKeys(guild, data, Key.STATIC_ROLES, Key.ADMIN_ROLES);
-        this.custom_channel_policing_roles = DataTools.getRolesFromArrayKeys(guild, data, Key.STATIC_ROLES, Key.CUSTOM_CHANNEL_POLICING_ROLES);
-        this.moderation_roles = DataTools.getRolesFromArrayKeys(guild, data, Key.STATIC_ROLES, Key.MODERATION_ROLES);
-        this.support_roles = DataTools.getRolesFromArrayKeys(guild, data, Key.STATIC_ROLES, Key.SUPPORT_ROLES);
-        this.bot_auto_roles = DataTools.getRolesFromArrayKeys(guild, data, Key.AUTO_ROLES, Key.BOT_AUTO_ROLES);
-        this.user_auto_roles = DataTools.getRolesFromArrayKeys(guild, data, Key.AUTO_ROLES, Key.USER_AUTO_ROLES);
+        Guild guild_object = Bot.getAPI().getGuildById(guild);
+        
+        this.admin_roles = DataTools.getIdsFromArrayKeys(data, Key.STATIC_ROLES, Key.ADMIN_ROLES);
+        this.custom_channel_policing_roles = DataTools.getIdsFromArrayKeys(data, Key.STATIC_ROLES, Key.CUSTOM_CHANNEL_POLICING_ROLES);
+        this.moderation_roles = DataTools.getIdsFromArrayKeys(data, Key.STATIC_ROLES, Key.MODERATION_ROLES);
+        this.support_roles = DataTools.getIdsFromArrayKeys(data, Key.STATIC_ROLES, Key.SUPPORT_ROLES);
+        this.bot_auto_roles = DataTools.getIdsFromArrayKeys(data, Key.AUTO_ROLES, Key.BOT_AUTO_ROLES);
+        this.user_auto_roles = DataTools.getIdsFromArrayKeys(data, Key.AUTO_ROLES, Key.USER_AUTO_ROLES);
 
         JSONObject auto_messages = data.getJSONObject(Key.AUTO_MESSAGES);
         JSONObject boost_message_data = auto_messages.getJSONObject(Key.BOOST_MESSAGE);
         if (!boost_message_data.isEmpty()) {
-            this.boost_message = new AutoMessageData(guild, boost_message_data);
+            this.boost_message = new AutoMessageData(guild_object, boost_message_data);
         }
         JSONObject goodbye_message_data = auto_messages.getJSONObject(Key.GOODBYE_MESSAGE);
         if (!goodbye_message_data.isEmpty()) {
-            this.goodbye_message = new AutoMessageData(guild, goodbye_message_data);
+            this.goodbye_message = new AutoMessageData(guild_object, goodbye_message_data);
         }
         JSONObject level_up_message_data = auto_messages.getJSONObject(Key.LEVEL_UP_MESSAGE);
         if (!level_up_message_data.isEmpty()) {
-            this.level_up_message = new AutoMessageData(guild, level_up_message_data);
+            this.level_up_message = new AutoMessageData(guild_object, level_up_message_data);
         }
         JSONObject welcome_message_data = auto_messages.getJSONObject(Key.WELCOME_MESSAGE);
         if (!welcome_message_data.isEmpty()) {
-            this.welcome_message = new AutoMessageData(guild, welcome_message_data);
+            this.welcome_message = new AutoMessageData(guild_object, welcome_message_data);
         }
 
         JSONObject static_channels = data.getJSONObject(Key.STATIC_CHANNELS);
-        this.community_inbox_channel = guild.getTextChannelById(static_channels.getLong(Key.COMMUNITY_INBOX_CHANNEL));
-        this.moderation_inbox_channel = guild.getTextChannelById(static_channels.getLong(Key.MODERATION_INBOX_CHANNEL));
-        this.suggestion_inbox_channel = guild.getTextChannelById(static_channels.getLong(Key.SUGGESTION_INBOX_CHANNEL));
-
-        this.support_talk = guild.getVoiceChannelById(static_channels.getLong(Key.SUPPORT_TALK));
+        this.community_inbox_channel = static_channels.getLong(Key.COMMUNITY_INBOX_CHANNEL);
+        this.moderation_inbox_channel = static_channels.getLong(Key.MODERATION_INBOX_CHANNEL);
+        this.suggestion_inbox_channel = static_channels.getLong(Key.SUGGESTION_INBOX_CHANNEL);
+        this.support_talk = static_channels.getLong(Key.SUPPORT_TALK);
 
         JSONArray offline_message_data = data.getJSONObject(Key.STATIC_MESSAGES).getJSONArray(Key.OFFLINE_MESSAGE);
         if (!offline_message_data.isEmpty()) {
-            TextChannel channel = guild.getTextChannelById(offline_message_data.getLong(1));
+            TextChannel channel = guild_object.getTextChannelById(offline_message_data.getLong(1));
             if (channel != null) {
                 this.offline_message = channel.retrieveMessageById(offline_message_data.getLong(0)).complete();
             }
@@ -99,86 +105,90 @@ public class GuildData implements DataContainer {
 
         JSONObject j2c_channels_data = data.getJSONObject(Key.AUTO_CHANNELS).getJSONObject(Key.JOIN2CREATE_CHANNELS);
         j2c_channels_data.keySet().forEach(channelId -> {
-            VoiceChannel channel = guild.getVoiceChannelById(channelId);
+            VoiceChannel channel = guild_object.getVoiceChannelById(channelId);
             if (channel != null) {
-                join2create_channels.put(channel, new Join2CreateChannelData(channel, j2c_channels_data.getJSONObject(channelId)));
+                join2create_channels.put(Long.valueOf(channelId), new Join2CreateChannelData(channel, j2c_channels_data.getJSONObject(channelId)));
             }
         });
 
         JSONObject custom_categories_data = data.getJSONObject(Key.AUTO_CHANNELS).getJSONObject(Key.CUSTOM_CATEGORIES);
         custom_categories_data.keySet().forEach(categoryId -> {
-            Category category = guild.getCategoryById(categoryId);
-            Member member = guild.retrieveMemberById(custom_categories_data.getLong(categoryId)).complete();
-            if (category != null) {
-                custom_categories.put(category, member);
+            Category category = guild_object.getCategoryById(categoryId);
+            Member member = guild_object.retrieveMemberById(custom_categories_data.getLong(categoryId)).complete();
+            if (category != null && member != null) {
+                custom_categories.put(category.getIdLong(), member.getIdLong());
             }
         });
 
         JSONObject lvl_reward_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.LEVEL_REWARDS);
-        lvl_reward_data.keySet().forEach(level_count -> level_rewards.put(Integer.valueOf(level_count), guild.getRoleById(lvl_reward_data.getLong(level_count))));
-        level_rewards.values().removeAll(Collections.singleton(null));
+        lvl_reward_data.keySet().forEach(level_count -> {
+            Role role = guild_object.getRoleById(lvl_reward_data.getLong(level_count));
+            if (role != null) {
+                level_rewards.put(Integer.valueOf(level_count), role.getIdLong());
+            }
+        });
 
         JSONObject penalties_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.PENALTIES);
-        penalties_data.keySet().forEach(warning_count -> penalties.put(Integer.valueOf(warning_count), new PenaltyData(guild, penalties_data.getJSONObject(warning_count))));
+        penalties_data.keySet().forEach(warning_count -> penalties.put(Integer.valueOf(warning_count), new PenaltyData(guild_object, penalties_data.getJSONObject(warning_count))));
 
         JSONObject modmails_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.MODMAILS);
         modmails_data.keySet().forEach(channelId -> {
-            TextChannel channel = guild.getTextChannelById(channelId);
+            TextChannel channel = guild_object.getTextChannelById(channelId);
             if (channel != null) {
-                modmails.put(channel, new ModMailData(guild, channel, modmails_data.getJSONObject(channelId)));
+                modmails.put(channel.getIdLong(), new ModMailData(guild_object, channel, modmails_data.getJSONObject(channelId)));
             }
         });
 
         JSONObject polls_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.POLLS);
         polls_data.keySet().forEach(channelId -> {
-            TextChannel channel = guild.getTextChannelById(channelId);
+            TextChannel channel = guild_object.getTextChannelById(channelId);
             if (channel != null) {
-                ConcurrentHashMap<Message, PollData> pollSubMap = new ConcurrentHashMap<>();
+                ConcurrentHashMap<Long, PollData> pollSubMap = new ConcurrentHashMap<>();
                 JSONObject polls_sub_data = polls_data.getJSONObject(channelId);
                 polls_sub_data.keySet().forEach(messageId -> {
                     Message message = channel.retrieveMessageById(messageId).complete();
                     if (message != null) {
-                        pollSubMap.put(message, new PollData(message, polls_sub_data.getJSONObject(messageId)));
+                        pollSubMap.put(message.getIdLong(), new PollData(message, polls_sub_data.getJSONObject(messageId)));
                     }
                 });
                 if (!pollSubMap.isEmpty()) {
-                    polls.put(channel, pollSubMap);
+                    polls.put(channel.getIdLong(), pollSubMap);
                 }
             }
         });
 
         JSONObject reaction_roles_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.REACTION_ROLES);
         reaction_roles_data.keySet().forEach(channelId -> {
-            TextChannel channel = guild.getTextChannelById(channelId);
+            TextChannel channel = guild_object.getTextChannelById(channelId);
             if (channel != null) {
-                ConcurrentHashMap<Message, ReactionRoleData> reactionRoleSubMap = new ConcurrentHashMap<>();
+                ConcurrentHashMap<Long, ReactionRoleData> reactionRoleSubMap = new ConcurrentHashMap<>();
                 JSONObject reaction_role_sub_data = reaction_roles_data.getJSONObject(channelId);
                 reaction_role_sub_data.keySet().forEach(messageId -> {
                     Message message = channel.retrieveMessageById(messageId).complete();
                     if (message != null) {
-                        reactionRoleSubMap.put(message, new ReactionRoleData(reaction_role_sub_data.getJSONObject(messageId)));
+                        reactionRoleSubMap.put(message.getIdLong(), new ReactionRoleData(reaction_role_sub_data.getJSONObject(messageId)));
                     }
                 });
                 if (!reactionRoleSubMap.isEmpty()) {
-                    reaction_roles.put(channel, reactionRoleSubMap);
+                    reaction_roles.put(channel.getIdLong(), reactionRoleSubMap);
                 }
             }
         });
         
         JSONObject giveaways_data = data.getJSONObject(Key.OTHER).getJSONObject(Key.GIVEAWAYS);
         giveaways_data.keySet().forEach(channelId -> {
-            TextChannel channel = guild.getTextChannelById(channelId);
+            TextChannel channel = guild_object.getTextChannelById(channelId);
             if (channel != null) {
-                ConcurrentHashMap<Message, GiveawayData> giveawaySubMap = new ConcurrentHashMap<>();
+                ConcurrentHashMap<Long, GiveawayData> giveawaySubMap = new ConcurrentHashMap<>();
                 JSONObject giveaway_sub_data = giveaways_data.getJSONObject(channelId);
                 giveaway_sub_data.keySet().forEach(messageId -> {
                     Message message = channel.retrieveMessageById(messageId).complete();
                     if (message != null) {
-                        giveawaySubMap.put(message, new GiveawayData(message, giveaway_sub_data.getJSONObject(messageId)));
+                        giveawaySubMap.put(message.getIdLong(), new GiveawayData(message, giveaway_sub_data.getJSONObject(messageId)));
                     }
                 });
                 if (!giveawaySubMap.isEmpty()) {
-                    giveaways.put(channel, giveawaySubMap);
+                    giveaways.put(channel.getIdLong(), giveawaySubMap);
                 }
             }
         });
@@ -197,19 +207,13 @@ public class GuildData implements DataContainer {
 	    JSONObject auto_channels = new JSONObject();
 	    JSONObject other = new JSONObject();
 	    
-	    static_roles.put(Key.ADMIN_ROLES, 
-	            new JSONArray(admin_roles.stream().map(role -> {return role.getIdLong();}).toList()));
-	    static_roles.put(Key.CUSTOM_CHANNEL_POLICING_ROLES, 
-                new JSONArray(custom_channel_policing_roles.stream().map(role -> {return role.getIdLong();}).toList()));
-	    static_roles.put(Key.MODERATION_ROLES, 
-                new JSONArray(moderation_roles.stream().map(role -> {return role.getIdLong();}).toList()));
-	    static_roles.put(Key.SUPPORT_ROLES, 
-                new JSONArray(support_roles.stream().map(role -> {return role.getIdLong();}).toList()));
+	    static_roles.put(Key.ADMIN_ROLES, new JSONArray(admin_roles));
+	    static_roles.put(Key.CUSTOM_CHANNEL_POLICING_ROLES, new JSONArray(custom_channel_policing_roles));
+	    static_roles.put(Key.MODERATION_ROLES, new JSONArray(moderation_roles));
+	    static_roles.put(Key.SUPPORT_ROLES, new JSONArray());
 	    
-	    auto_roles.put(Key.BOT_AUTO_ROLES, 
-                new JSONArray(bot_auto_roles.stream().map(role -> {return role.getIdLong();}).toList()));
-	    auto_roles.put(Key.USER_AUTO_ROLES, 
-                new JSONArray(user_auto_roles.stream().map(role -> {return role.getIdLong();}).toList()));
+	    auto_roles.put(Key.BOT_AUTO_ROLES, new JSONArray(bot_auto_roles));
+	    auto_roles.put(Key.USER_AUTO_ROLES, new JSONArray(user_auto_roles));
 	    
 	    if (offline_message != null) {
 	        static_messages.put(Key.OFFLINE_MESSAGE,
@@ -219,81 +223,57 @@ public class GuildData implements DataContainer {
 	    }
 	    
 	    if (boost_message != null) {
-	        auto_messages.put(Key.BOOST_MESSAGE,
-	                boost_message.compileToJSON());
+	        auto_messages.put(Key.BOOST_MESSAGE, boost_message.compileToJSON());
 	    } else {
 	        auto_messages.put(Key.BOOST_MESSAGE, new JSONObject());
 	    }
 	    if (goodbye_message != null) {
-	        auto_messages.put(Key.GOODBYE_MESSAGE,
-	                goodbye_message.compileToJSON());
+	        auto_messages.put(Key.GOODBYE_MESSAGE, goodbye_message.compileToJSON());
         } else {
             auto_messages.put(Key.GOODBYE_MESSAGE, new JSONObject());
         }
 	    if (level_up_message != null) {
-	        auto_messages.put(Key.LEVEL_UP_MESSAGE,
-	                level_up_message.compileToJSON());
+	        auto_messages.put(Key.LEVEL_UP_MESSAGE, level_up_message.compileToJSON());
         } else {
             auto_messages.put(Key.LEVEL_UP_MESSAGE, new JSONObject());
         }
 	    if (welcome_message != null) {
-	        auto_messages.put(Key.WELCOME_MESSAGE,
-	                welcome_message.compileToJSON());
+	        auto_messages.put(Key.WELCOME_MESSAGE, welcome_message.compileToJSON());
         } else {
             auto_messages.put(Key.WELCOME_MESSAGE, new JSONObject());
         }
-	    
-	    if (community_inbox_channel != null) {
-	        static_channels.put(Key.COMMUNITY_INBOX_CHANNEL,
-	                community_inbox_channel.getIdLong());
-	    } else {
-	        static_channels.put(Key.COMMUNITY_INBOX_CHANNEL, 0L);
-	    }
-	    if (moderation_inbox_channel != null) {
-	        static_channels.put(Key.MODERATION_INBOX_CHANNEL,
-	                moderation_inbox_channel.getIdLong());
-        } else {
-            static_channels.put(Key.MODERATION_INBOX_CHANNEL, 0L);
-        }
-	    if (suggestion_inbox_channel != null) {
-	        static_channels.put(Key.SUGGESTION_INBOX_CHANNEL,
-	                suggestion_inbox_channel.getIdLong());
-        } else {
-            static_channels.put(Key.SUGGESTION_INBOX_CHANNEL, 0L);
-        }
-	    if (support_talk != null) {
-	        static_channels.put(Key.SUPPORT_TALK,
-	                support_talk.getIdLong());
-        } else {
-            static_channels.put(Key.SUPPORT_TALK, 0L);
-        }
+
+	    static_channels.put(Key.COMMUNITY_INBOX_CHANNEL, community_inbox_channel);
+	    static_channels.put(Key.MODERATION_INBOX_CHANNEL, moderation_inbox_channel);
+	    static_channels.put(Key.SUGGESTION_INBOX_CHANNEL, suggestion_inbox_channel);
+	    static_channels.put(Key.SUPPORT_TALK, support_talk);
+        
+        JSONObject custom_channel_categories_object = new JSONObject();
+        custom_categories.forEach((category, owner) -> custom_channel_categories_object.put(String.valueOf(category), String.valueOf(owner)));
+        auto_channels.put(Key.CUSTOM_CATEGORIES, custom_channel_categories_object);
+        
+        JSONObject level_rewards_object = new JSONObject();
+        level_rewards.forEach((level_count, reward_role) -> level_rewards_object.put(String.valueOf(level_count), String.valueOf(reward_role)));
+        other.put(Key.LEVEL_REWARDS, level_rewards_object);
 	    
 	    JSONObject join2create_channels_object = new JSONObject();
-	    join2create_channels.forEach((channel, data) -> join2create_channels_object.put(channel.getId(), data.compileToJSON()));
+	    join2create_channels.forEach((channel, data) -> join2create_channels_object.put(String.valueOf(channel), data.compileToJSON()));
 	    auto_channels.put(Key.JOIN2CREATE_CHANNELS, join2create_channels_object);
-	    
-	    JSONObject custom_channel_categories_object = new JSONObject();
-	    custom_categories.forEach((category, owner) -> custom_channel_categories_object.put(category.getId(), owner.getIdLong()));
-	    auto_channels.put(Key.CUSTOM_CATEGORIES, custom_channel_categories_object);
-	    
-	    JSONObject level_rewards_object = new JSONObject();
-	    level_rewards.forEach((level_count, reward_role) -> level_rewards_object.put(String.valueOf(level_count), reward_role.getIdLong()));
-	    other.put(Key.LEVEL_REWARDS, level_rewards_object);
 	    
 	    JSONObject penalties_object = new JSONObject();
 	    penalties.forEach((warning_count, data) -> penalties_object.put(String.valueOf(warning_count), data.compileToJSON()));
 	    other.put(Key.PENALTIES, penalties_object);
 	    
 	    JSONObject modmails_object = new JSONObject();
-	    modmails.forEach((channel, data) -> modmails_object.put(channel.getId(), data.compileToJSON()));
+	    modmails.forEach((channel, data) -> modmails_object.put(String.valueOf(channel), data.compileToJSON()));
 	    other.put(Key.MODMAILS, modmails_object);
 	    
 	    JSONObject polls_object = new JSONObject();
 	    polls.forEach((channel, message_map) -> {
 	        JSONObject message_map_object = new JSONObject();
-	        message_map.forEach((message, data) -> message_map_object.put(message.getId(), data.compileToJSON()));
+	        message_map.forEach((message, data) -> message_map_object.put(String.valueOf(message), data.compileToJSON()));
 	        if (!message_map_object.isEmpty()) {
-	            polls_object.put(channel.getId(), message_map_object);
+	            polls_object.put(String.valueOf(channel), message_map_object);
 	        }
 	    });
 	    other.put(Key.POLLS, polls_object);
@@ -301,9 +281,9 @@ public class GuildData implements DataContainer {
 	    JSONObject reaction_roles_object = new JSONObject();
         reaction_roles.forEach((channel, message_map) -> {
             JSONObject message_map_object = new JSONObject();
-            message_map.forEach((message, data) -> message_map_object.put(message.getId(), data.compileToJSON()));
+            message_map.forEach((message, data) -> message_map_object.put(String.valueOf(message), data.compileToJSON()));
             if (!message_map_object.isEmpty()) {
-                reaction_roles_object.put(channel.getId(), message_map_object);
+                reaction_roles_object.put(String.valueOf(channel), message_map_object);
             }
         });
         other.put(Key.REACTION_ROLES, reaction_roles_object);
@@ -311,15 +291,15 @@ public class GuildData implements DataContainer {
         JSONObject giveaways_object = new JSONObject();
         giveaways.forEach((channel, message_map) -> {
             JSONObject message_map_object = new JSONObject();
-            message_map.forEach((message, data) -> message_map_object.put(message.getId(), data.compileToJSON()));
+            message_map.forEach((message, data) -> message_map_object.put(String.valueOf(message), data.compileToJSON()));
             if (!message_map_object.isEmpty()) {
-                giveaways_object.put(channel.getId(), message_map_object);
+                giveaways_object.put(String.valueOf(channel), message_map_object);
             }
         });
         other.put(Key.GIVEAWAYS, giveaways_object);
 
-        compiledData.put(Key.GUILD_ID, guild.getIdLong());
-        compiledData.put(Key.GUILD_NAME, guild.getName());
+        compiledData.put(Key.GUILD_ID, guild);
+        compiledData.put(Key.GUILD_NAME, Bot.getAPI().getGuildById(guild).getName());
         compiledData.put(Key.STATIC_ROLES, static_roles);
         compiledData.put(Key.AUTO_ROLES, auto_roles);
         compiledData.put(Key.STATIC_MESSAGES, static_messages);
@@ -330,152 +310,159 @@ public class GuildData implements DataContainer {
 	    
 	    return compiledData;
 	}
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
+    }
     
     public Guild getGuild() {
-        return this.guild;
+        return Bot.getAPI().getGuildById(guild);
     }
+    
 //  Static Roles
 	public List<Role> getAdminRoles() {
-		return this.admin_roles;
+		return DataTools.getRolesFromIds(this.getGuild(), this.admin_roles);
 	}
 
 	public GuildData setAdminRoles(List<Role> roles) {
-	    DataTools.setList(this.admin_roles, roles);
+	    DataTools.setList(this.admin_roles, List.of(DataTools.convertRoleListToIds(roles)));
 		return this;
 	}
     
     public GuildData addAdminRoles(Role... roles) {
-        DataTools.addToList(this.admin_roles, roles);
+        DataTools.addToList(this.admin_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
     
     public GuildData removeAdminRoles(int... indices) {
-        DataTools.removeFromList(this.admin_roles, indices);
+        DataTools.removeIndiciesFromList(this.admin_roles, indices);
         return this;
     }
     
     public GuildData removeAdminRolesByRole(Role... roles) {
-        DataTools.removeFromList(this.admin_roles, roles);
+        DataTools.removeValuesFromList(this.admin_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
     
     public List<Role> getCustomChannelPolicingRoles() {
-        return this.custom_channel_policing_roles;
+        return DataTools.getRolesFromIds(this.getGuild(), this.custom_channel_policing_roles);
     }
 
     public GuildData setCustomChannelPolicingRoles(List<Role> roles) {
-        DataTools.setList(this.custom_channel_policing_roles, roles);
+        DataTools.setList(this.custom_channel_policing_roles, List.of(DataTools.convertRoleListToIds(roles)));
         return this;
     }
     
     public GuildData addCustomChannelPolicingRoles(Role... roles) {
-        DataTools.addToList(this.custom_channel_policing_roles, roles);
+        DataTools.addToList(this.custom_channel_policing_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
     
     public GuildData removeCustomChannelPolicingRoles(int... indices) {
-        DataTools.removeFromList(this.custom_channel_policing_roles, indices);
+        DataTools.removeIndiciesFromList(this.custom_channel_policing_roles, indices);
         return this;
     }
     
     public GuildData removeCustomChannelPolicingRolesByRole(Role... roles) {
-        DataTools.removeFromList(this.custom_channel_policing_roles, roles);
+        DataTools.removeValuesFromList(this.custom_channel_policing_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
 
 	public List<Role> getModerationRoles() {
-		return this.moderation_roles;
+        return DataTools.getRolesFromIds(this.getGuild(), this.moderation_roles);
 	}
 
 	public GuildData setModerationRoles(List<Role> roles) {
-	    DataTools.setList(this.moderation_roles, roles);
+        DataTools.setList(this.moderation_roles, List.of(DataTools.convertRoleListToIds(roles)));
         return this;
 	}
     
     public GuildData addModerationRoles(Role... roles) {
-        DataTools.addToList(this.moderation_roles, roles);
+        DataTools.addToList(this.moderation_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
     
     public GuildData removeModerationRoles(int... indices) {
-        DataTools.removeFromList(this.moderation_roles, indices);
+        DataTools.removeIndiciesFromList(this.moderation_roles, indices);
         return this;
     }
     
     public GuildData removeModerationRolesByRole(Role... roles) {
-        DataTools.removeFromList(this.moderation_roles, roles);
+        DataTools.addToList(this.moderation_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
 
 	public List<Role> getSupportRoles() {
-		return this.support_roles;
+        return DataTools.getRolesFromIds(this.getGuild(), this.support_roles);
 	}
 
 	public GuildData setSupportRoles(List<Role> roles) {
-	    DataTools.setList(this.support_roles, roles);
+        DataTools.setList(this.support_roles, List.of(DataTools.convertRoleListToIds(roles)));
         return this;
 	}
 	
     public GuildData addSupportRoles(Role... roles) {
-        DataTools.addToList(this.support_roles, roles);
+        DataTools.addToList(this.support_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
     
     public GuildData removeSupportRoles(int... indices) {
-        DataTools.removeFromList(this.support_roles, indices);
+        DataTools.removeIndiciesFromList(this.support_roles, indices);
         return this;
     }
     
     public GuildData removeSupportRolesByRole(Role... roles) {
-        DataTools.removeFromList(this.support_roles, roles);
+        DataTools.removeValuesFromList(this.support_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
     
 //  Auto Roles
 	public List<Role> getBotAutoRoles() {
-		return this.bot_auto_roles;
+        return DataTools.getRolesFromIds(this.getGuild(), this.bot_auto_roles);
 	}
 
 	public GuildData setBotAutoRoles(List<Role> roles) {
-	    DataTools.setList(this.bot_auto_roles, roles);
+        DataTools.setList(this.bot_auto_roles, List.of(DataTools.convertRoleListToIds(roles)));
         return this;
 	}
 	
 	public GuildData addBotAutoRoles(Role... roles) {
-	    DataTools.addToList(this.bot_auto_roles, roles);
+        DataTools.addToList(this.bot_auto_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
     
     public GuildData removeBotAutoRoles(int... indices) {
-        DataTools.removeFromList(this.bot_auto_roles, indices);
+        DataTools.removeIndiciesFromList(this.bot_auto_roles, indices);
         return this;
     }
     
     public GuildData removeBotAutoRolesByRole(Role... roles) {
-        DataTools.removeFromList(this.bot_auto_roles, roles);
+        DataTools.removeValuesFromList(this.bot_auto_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
 
 	public List<Role> getUserAutoRoles() {
-		return this.user_auto_roles;
+        return DataTools.getRolesFromIds(this.getGuild(), this.user_auto_roles);
 	}
 
 	public GuildData setUserAutoRoles(List<Role> roles) {
-	    DataTools.setList(this.user_auto_roles, roles);
+        DataTools.setList(this.user_auto_roles, List.of(DataTools.convertRoleListToIds(roles)));
         return this;
 	}
 	public GuildData addUserAutoRoles(Role... roles) {
-        DataTools.addToList(this.user_auto_roles, roles);
+        DataTools.addToList(this.user_auto_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
     
     public GuildData removeUserAutoRoles(int... indices) {
-        DataTools.removeFromList(this.user_auto_roles, indices);
+        DataTools.removeIndiciesFromList(this.user_auto_roles, indices);
         return this;
     }
     
     public GuildData removeUserAutoRolesByRole(Role... roles) {
-        DataTools.removeFromList(this.user_auto_roles, roles);
+        DataTools.removeValuesFromList(this.user_auto_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
 //  Static Messages
@@ -525,7 +512,7 @@ public class GuildData implements DataContainer {
 	}
 //  Static Channels
 	public TextChannel getCommunityInboxChannel() {
-		return this.community_inbox_channel;
+		return this.getGuild().getTextChannelById(this.community_inbox_channel);
 	}
 
 	public GuildData setCommunityInboxChannel(TextChannel community_inbox_channel) {
@@ -624,7 +611,7 @@ public class GuildData implements DataContainer {
 	}
 	
 	public GuildData removeCustomCategoriesByOwner(Member... owners) {
-	    DataTools.removeFromMap(this.custom_categories, owners);
+	    DataTools.removeValuesFromMap(this.custom_categories, owners);
         return this;
 	}
 //  Other
@@ -659,7 +646,7 @@ public class GuildData implements DataContainer {
 	}
 	
 	public GuildData removeLevelRewardsByReward(Role... rewards) {
-	    DataTools.removeFromMap(this.level_rewards, rewards);
+	    DataTools.removeValuesFromMap(this.level_rewards, rewards);
         return this;
 	}
 

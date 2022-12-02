@@ -6,11 +6,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.mongodb.lang.Nullable;
 
 import assets.base.AwaitTask;
 import assets.functions.SlashCommandEventHandler;
@@ -337,7 +336,7 @@ public class Modmail implements SlashCommandEventHandler {
 		List<String> validkeys = new ArrayList<>();
 		userConfig.keySet().stream().filter(k -> {
 			try {
-				Guild guildFromKey = Bot.INSTANCE.jda.getGuildById(k);
+				Guild guildFromKey = Bot.getAPI().getGuildById(k);
 				return guildFromKey != null;
 			} catch (NumberFormatException e) {
 				return false;
@@ -353,7 +352,7 @@ public class Modmail implements SlashCommandEventHandler {
 			JSONObject modmailObject = userConfig.getJSONObject(key).getJSONObject("modmails");
 			if (!modmailObject.isEmpty()) {
 				if (guild == null) {
-					guild = Bot.INSTANCE.jda.getGuildById(key);
+					guild = Bot.getAPI().getGuildById(key);
 				}
 				sB.append("**" + guild.getName() + "**\n");
 				List<String> ticketIds = new ArrayList<>();

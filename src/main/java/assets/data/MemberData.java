@@ -2,13 +2,14 @@ package assets.data;
 
 import java.time.OffsetDateTime;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.single.ModMailData;
 import assets.data.single.WarningData;
 import engines.base.LanguageEngine.Language;
@@ -27,7 +28,7 @@ public class MemberData implements DataContainer {
     private OffsetDateTime last_experience, last_modmail, last_suggestion, temporarily_banned_until = OffsetDateTime.now().minusDays(1L);
     private ConcurrentHashMap<Integer, ModMailData> modmails = new ConcurrentHashMap<>();
     private boolean permanently_muted = false;
-    private List<WarningData> warnings = new LinkedList<>();
+    private List<WarningData> warnings = new ArrayList<>();
 
 //  Temporary runtime data
     private int spam_count = 0;
@@ -110,6 +111,12 @@ public class MemberData implements DataContainer {
         compiledData.put(Key.WARNINGS, warnings_data);
         
         return compiledData;
+    }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
     }
     
     public Guild getGuild() {
@@ -342,12 +349,12 @@ public class MemberData implements DataContainer {
     }
 
     public MemberData removeWarnings(int... indicies) {
-        DataTools.removeFromList(this.warnings, indicies);
+        DataTools.removeIndiciesFromList(this.warnings, indicies);
         return this;
     }
 
     public MemberData removeWarningsByData(WarningData... datas) {
-        DataTools.removeFromList(this.warnings, datas);
+        DataTools.removeValuesFromList(this.warnings, datas);
         return this;
     }
     

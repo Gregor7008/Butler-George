@@ -2,7 +2,6 @@ package base;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -404,10 +403,10 @@ public class EventProcessor extends ListenerAdapter {
 		} catch (JSONException e) {return;}
 		if (channelConfig != null) {
 			audioChannel.getPermissionContainer().upsertPermissionOverride(guild.getPublicRole()).deny(Permission.VOICE_SPEAK).queue();
-			Collection<Permission> defperms = new LinkedList<Permission>();
+			Collection<Permission> defperms = new ArrayList<Permission>();
 			defperms.add(Permission.VIEW_CHANNEL);
 			defperms.add(Permission.VOICE_SPEAK);
-			Collection<Permission> perms = new LinkedList<Permission>();
+			Collection<Permission> perms = new ArrayList<Permission>();
 			if (channelConfig.getBoolean("configurable")) {
 				perms.add(Permission.MANAGE_CHANNEL);
 				perms.add(Permission.MANAGE_PERMISSIONS);
@@ -487,7 +486,7 @@ public class EventProcessor extends ListenerAdapter {
                     GUI.INSTANCE.decreaseJ2CCounter();
 				} else {
 					if (ownerID == user.getIdLong()) {
-						Collection<Permission> perms = new LinkedList<Permission>();
+						Collection<Permission> perms = new ArrayList<Permission>();
 						if (parentChannelConfig.getBoolean("configurable")) {
 							perms.add(Permission.MANAGE_CHANNEL);
 							perms.add(Permission.MANAGE_PERMISSIONS);

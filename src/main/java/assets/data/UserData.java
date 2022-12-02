@@ -1,11 +1,12 @@
 package assets.data;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONObject;
 
+import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
 import assets.data.single.ModMailData;
 import assets.data.single.ModMailSelectionData;
 import base.Bot;
@@ -19,7 +20,7 @@ public class UserData implements DataContainer {
     private ConcurrentHashMap<Guild, MemberData> member_datas = new ConcurrentHashMap<>();
     
 	public UserData(JSONObject data) {
-	    this.user = Bot.INSTANCE.jda.retrieveUserById(data.getLong(Key.USER_ID)).complete();
+	    this.user = Bot.getAPI().retrieveUserById(data.getLong(Key.USER_ID)).complete();
         this.instanciateFromJSON(data);
     }
     
@@ -29,10 +30,10 @@ public class UserData implements DataContainer {
 
     @Override
     public DataContainer instanciateFromJSON(JSONObject data) {        
-        List<Guild> saved_guilds = new LinkedList<>();
+        List<Guild> saved_guilds = new ArrayList<>();
         data.keySet().forEach(key -> {
             try {
-                Guild guild_candidate = Bot.INSTANCE.jda.getGuildById(key);
+                Guild guild_candidate = Bot.getAPI().getGuildById(key);
                 if (guild_candidate != null) {
                     saved_guilds.add(guild_candidate);
                 }
@@ -65,6 +66,12 @@ public class UserData implements DataContainer {
         compiledData.put(Key.MODMAIL_SELECTION, modmail_selection_data);
         
         return compiledData;
+    }
+
+    @Override
+    public boolean verify(ReferenceType type) {
+        // TODO Auto-generated method stub
+        return false;
     }
     
     public User getUser() {
@@ -116,7 +123,7 @@ public class UserData implements DataContainer {
     }
     
     public UserData removeMemberDatasByData(MemberData... datas) {
-        DataTools.removeFromMap(this.member_datas, datas);
+        DataTools.removeValuesFromMap(this.member_datas, datas);
         return this;
     }
     

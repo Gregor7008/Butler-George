@@ -32,7 +32,7 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
-import com.mongodb.lang.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import base.Bot.ShutdownReason;
 import engines.base.CentralTimer;
@@ -293,25 +293,25 @@ public class GUI extends JFrame implements FocusListener {
 				new Bot(botToken.getText(), databaseIP.getText(), databasePort.getText(), databaseName.getText(), username.getText(), String.copyValueOf(password.getPassword()));
 			} catch (LoginException | InterruptedException | IOException e) {
 				ConsoleEngine.getLogger(Bot.class).error("Bot instanciation failed - Check token validity!");
-				Bot.INSTANCE.kill();
+				Bot.get().kill();
 			} catch (IllegalArgumentException e) {
 				ConsoleEngine.getLogger(Bot.class).error("Bot instanciation failed - " + e.getMessage());
-				Bot.INSTANCE.kill();
+				Bot.get().kill();
 			}
 		}
 	}
 	
 	public void restartBot() {
 	    if (!Bot.isShutdown()) {
-	        Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
-            Bot.INSTANCE.shutdown(ShutdownReason.RESTART, false, null, () -> startBot());
+	        Runtime.getRuntime().removeShutdownHook(Bot.get().getShutdownThread());
+            Bot.get().shutdown(ShutdownReason.RESTART, false, null, () -> startBot());
         }
 	}
 	
 	public void shutdownBot(ShutdownReason reason, boolean sendMessage, @Nullable String additionalMessage) {
 		if (!Bot.isShutdown()) {
-			Runtime.getRuntime().removeShutdownHook(Bot.INSTANCE.getShutdownThread());
-			Bot.INSTANCE.shutdown(reason, sendMessage, additionalMessage, null);
+			Runtime.getRuntime().removeShutdownHook(Bot.get().getShutdownThread());
+			Bot.get().shutdown(reason, sendMessage, additionalMessage, null);
 		}
 	}
     
@@ -392,7 +392,7 @@ public class GUI extends JFrame implements FocusListener {
     public void updateStatistics() {
         int guildCount = 0;
         int userCount = 0;
-        for (Guild guild : Bot.INSTANCE.jda.getGuilds()) {
+        for (Guild guild : Bot.getAPI().getGuilds()) {
             guildCount++;
             userCount += guild.getMemberCount();
         }

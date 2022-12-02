@@ -2,10 +2,10 @@ package assets.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,59 +15,38 @@ import net.dv8tion.jda.api.entities.Role;
 
 public abstract class DataTools {
     
-
-    public static List<Role> getRolesFromArrayKeys(Guild guild, JSONObject data, String primary, String secondary) {
-        try {
-            JSONArray values = null;
-            if (secondary == null) {
-                values = data.getJSONArray(primary);
-            } else {
-                values = data.getJSONObject(primary).getJSONArray(secondary);
-            }
-            List<Role> roles = new LinkedList<>();
-            for (int i = 0; i < values.length(); i++) {
-                Role role = guild.getRoleById(values.getLong(i));
-                if (role != null) {
-                    roles.add(role);
-                }
-            }
-            return roles;
-        } catch (JSONException e) {
-            return null;
-        }
-    }
-    
+//  List and Map tools
     public static <T> void setList(List<T> target, List<T> replacement) {
         if (replacement == null) {
             target.clear();
         } else {
-            target = replacement;
+            target = new ArrayList<>(replacement);
             target.removeAll(Collections.singleton(null));
         }
     }
     
-    public static <T> void addToList(List<T> target, T[] new_entries) {
-        for (int i = 0; i < new_entries.length; i++) {
-            if (new_entries[i] != null) {
-                target.add(new_entries[i]);
+    @SafeVarargs
+    public static <T> void addToList(List<T> target, T... values) {
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] != null) {
+                target.add(values[i]);
             }
         }
     }
     
-    public static <T> void removeFromList(List<T> target, int[] indices) {
+    public static <T> void removeIndiciesFromList(List<T> target, int... indices) {
         for (int i = 0; i < indices.length; i++) {
             target.remove(indices[i]);
         }
-        target.removeAll(Collections.singleton(null));
     }
     
-    public static <T> void removeFromList(List<T> target, T[] objects) {
-        for (int i = 0; i < objects.length; i++) {
-            if (objects != null) {
-                target.remove(objects[i]);
+    @SafeVarargs
+    public static <T> void removeValuesFromList(List<T> target, T... values) {
+        for (int i = 0; i < values.length; i++) {
+            if (values != null) {
+                target.remove(values[i]);
             }
         }
-        target.removeAll(Collections.singleton(null));
     }
     
     public static <K, V> void setMap(ConcurrentHashMap<K, V> target, ConcurrentHashMap<K, V> replacement) {
@@ -75,24 +54,79 @@ public abstract class DataTools {
             target.clear();
         } else {
             target = replacement;
-            target.values().removeAll(Collections.singleton(null));
-            target.keySet().removeAll(Collections.singleton(null));
+        }
+    }
+
+    @SafeVarargs
+    public static <K, V> void removeKeysFromMap(ConcurrentHashMap<K, V> target, K... keys) {
+        for (int i = 0; i < keys.length; i++) {
+            target.remove(keys[i]);
         }
     }
     
-    public static <K, V> void removeFromMap(ConcurrentHashMap<K, V> map, V[] values) {
+    @SafeVarargs
+    public static <K, V> void removeValuesFromMap(ConcurrentHashMap<K, V> target, V... values) {
         List<K> keysToRemove = new ArrayList<>();
         List<V> valueList = new ArrayList<>();
         valueList.addAll(List.of(values));
-        map.forEach((key, value) -> {
+        target.forEach((key, value) -> {
             if (valueList.contains(value)) {
                 keysToRemove.add(key);
             }
         });
         for (int i = 0; i < keysToRemove.size(); i++) {
-            map.remove(keysToRemove.get(i));
+            target.remove(keysToRemove.get(i));
         }
-        map.values().removeAll(Collections.singleton(null));
-        map.keySet().removeAll(Collections.singleton(null));
+    }
+    
+//  Data conversion tools
+    public static List<Long> getIdsFromArrayKeys(JSONObject data, String primary, @Nullable String secondary) {
+        try {
+            JSONArray values = null;
+            if (secondary == null) {
+                values = data.getJSONArray(primary);
+            } else {
+                values = data.getJSONObject(primary).getJSONArray(secondary);
+            }
+            List<Long> values_list = new ArrayList<>();
+            for (int i = 0; i < values.length(); i++) {
+                values_list.add(values.getLong(i));
+            }
+            return values_list;
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+    
+    public static List<Role> getRolesFromIds(Guild guild, List<Long> ids) {
+        List<Role> roles = new ArrayList<>();
+        for (int i = 0; i < ids.size(); i++) {
+            Role role = guild.getRoleById(ids.get(i));
+            if (role != null) {
+                roles.add(role);
+            } else {
+                ids.remove(i);
+                i -= 1;
+            }
+        }
+        return roles;
+    }
+    
+    public static Long[] convertRoleArrayToIds(Role[] roles) {
+        return DataTools.convertRoleListToIds(new ArrayList<>(List.of(roles)));
+    }
+    
+    public static Long[] convertRoleListToIds(List<Role> roles) {
+        ArrayList<Long> ids = new ArrayList<>();
+        for (int i = 0; i < roles.size(); i++) {
+            Role role = roles.get(i);
+            if (role != null) {
+                ids.add(role.getIdLong());
+            } else {
+                roles.remove(i);
+                i -= 1;
+            }
+        }
+        return ids.toArray(new Long[0]);
     }
 }

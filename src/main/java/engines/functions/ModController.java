@@ -25,7 +25,7 @@ public class ModController {
 	public ModController() {
 		RUN = this;
 		CentralTimer.get().schedule(() -> {
-			List<Guild> guilds = Bot.INSTANCE.jda.getGuilds();
+			List<Guild> guilds = Bot.getAPI().getGuilds();
 			for (int i = 0; i < guilds.size(); i++) {
 				guildModCheck(guilds.get(i));
 			}
@@ -36,7 +36,7 @@ public class ModController {
 		new Thread(() -> {
 			ConcurrentHashMap<Long, JSONObject> usersCached = ConfigLoader.INSTANCE.manager.getUserCache();
 			usersCached.forEach((id, obj) -> {
-				User user = Bot.INSTANCE.jda.retrieveUserById(id).complete();
+				User user = Bot.getAPI().retrieveUserById(id).complete();
 				if (user != null) {
 				    this.userModCheck(guild, user);
 				}

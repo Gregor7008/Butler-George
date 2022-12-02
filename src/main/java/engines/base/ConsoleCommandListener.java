@@ -35,7 +35,7 @@ public class ConsoleCommandListener implements ActionListener {
 	}
 	
 	private void processCommand(String line) {
-		JDA jda = Bot.INSTANCE.jda;
+		JDA jda = Bot.getAPI();
 		String[] insplit = line.split(" ");
 		String command = insplit[0];
 		switch (command) {

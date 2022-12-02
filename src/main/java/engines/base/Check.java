@@ -19,7 +19,7 @@ public abstract class Check {
     
     public static User isUserCategory(Category category) {
         try {
-            return Bot.INSTANCE.jda.getUserById(ConfigLoader.INSTANCE.getGuildConfig(category.getGuild(), "customchannelcategories").getLong(category.getId()));
+            return Bot.getAPI().getUserById(ConfigLoader.INSTANCE.getGuildConfig(category.getGuild(), "customchannelcategories").getLong(category.getId()));
         } catch (JSONException e) {
             return null;
         }
@@ -38,14 +38,14 @@ public abstract class Check {
         if (guild == null) {
             return false;
         }
-        return Bot.INSTANCE.jda.getGuildById(guild.getIdLong()) != null;
+        return Bot.getAPI().getGuildById(guild.getIdLong()) != null;
     }
     
     public static boolean isValidUser(User user) {
         if (user == null) {
             return false;
         }
-        return Bot.INSTANCE.jda.retrieveUserById(user.getIdLong()).complete() != null;
+        return Bot.getAPI().retrieveUserById(user.getIdLong()).complete() != null;
     }
     
     public static boolean isValidMember(Member member) {
