@@ -1,8 +1,11 @@
 package assets.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -465,6 +468,7 @@ public class GuildData implements DataContainer {
         DataTools.removeValuesFromList(this.user_auto_roles, DataTools.convertRoleArrayToIds(roles));
         return this;
     }
+    
 //  Static Messages
     public Message getOfflineMessage() {
         return this.offline_message;
@@ -474,6 +478,7 @@ public class GuildData implements DataContainer {
         this.offline_message = offline_message;
         return this;
     }
+    
 //  Auto Messages
 	public AutoMessageData getBoostMessage() {
 		return this.boost_message;
@@ -510,131 +515,217 @@ public class GuildData implements DataContainer {
 		this.welcome_message = welcome_message;
         return this;
 	}
+	
 //  Static Channels
 	public TextChannel getCommunityInboxChannel() {
 		return this.getGuild().getTextChannelById(this.community_inbox_channel);
 	}
 
 	public GuildData setCommunityInboxChannel(TextChannel community_inbox_channel) {
-		this.community_inbox_channel = community_inbox_channel;
+		this.community_inbox_channel = community_inbox_channel.getIdLong();
         return this;
 	}
 
 	public TextChannel getModerationInboxChannel() {
-		return this.moderation_inbox_channel;
+		return this.getGuild().getTextChannelById(this.moderation_inbox_channel);
 	}
 
 	public GuildData setModerationInboxChannel(TextChannel moderation_inbox_channel) {
-		this.moderation_inbox_channel = moderation_inbox_channel;
+		this.moderation_inbox_channel = moderation_inbox_channel.getIdLong();
         return this;
 	}
 
 	public TextChannel getSuggestionInboxChannel() {
-		return this.suggestion_inbox_channel;
+		return this.getGuild().getTextChannelById(this.suggestion_inbox_channel);
 	}
 
 	public GuildData setSuggestionInboxChannel(TextChannel suggestion_inbox_channel) {
-		this.suggestion_inbox_channel = suggestion_inbox_channel;
+		this.suggestion_inbox_channel = suggestion_inbox_channel.getIdLong();
         return this;
 	}
 
 	public VoiceChannel getSupportTalk() {
-		return this.support_talk;
+		return this.getGuild().getVoiceChannelById(this.support_talk);
 	}
 
 	public GuildData setSupportTalk(VoiceChannel support_talk) {
-		this.support_talk = support_talk;
+		this.support_talk = support_talk.getIdLong();
         return this;
 	}
+	
 //	Auto Channels
+    public ConcurrentHashMap<Long, Join2CreateChannelData> getJoin2CreateChannelIdDatas() {
+        return this.join2create_channels;
+    }
+    
 	public ConcurrentHashMap<VoiceChannel, Join2CreateChannelData> getJoin2CreateChannelDatas() {
-		return this.join2create_channels;
+	    ConcurrentHashMap<VoiceChannel, Join2CreateChannelData> return_value = new ConcurrentHashMap<>();
+	    for (Map.Entry<Long, Join2CreateChannelData> entry : this.join2create_channels.entrySet()) {
+	        return_value.put(this.getGuild().getVoiceChannelById(entry.getKey()), entry.getValue());
+	    }
+		return return_value;
+	}
+	
+	public Join2CreateChannelData getJoin2CreateChannelData(long id) {
+	    return this.join2create_channels.get(id);
 	}
 	
 	public Join2CreateChannelData getJoin2CreateChannelData(VoiceChannel channel) {
-	    return this.join2create_channels.get(channel);
+	    return this.join2create_channels.get(channel.getIdLong());
+	}
+	
+	public GuildData setJoin2CreateChannelIds(ConcurrentHashMap<Long, Join2CreateChannelData> join2create_channels) {
+	    DataTools.setMap(this.join2create_channels, join2create_channels);
+	    return this;
 	}
 	
 	public GuildData setJoin2CreateChannels(ConcurrentHashMap<VoiceChannel, Join2CreateChannelData> join2create_channels) {
-	    DataTools.setMap(this.join2create_channels, join2create_channels);
+	    ConcurrentHashMap<Long, Join2CreateChannelData> converted_map = new ConcurrentHashMap<>();
+	    for (Map.Entry<VoiceChannel, Join2CreateChannelData> entry : join2create_channels.entrySet()) {
+	        converted_map.put(entry.getKey().getIdLong(), entry.getValue());
+	    }
+	    DataTools.setMap(this.join2create_channels, converted_map);
         return this;
 	}
 	
 	public GuildData addJoin2CreateChannels(Join2CreateChannelData... datas) {
 	    for (int i = 0; i < datas.length; i++) {
-	        this.join2create_channels.put(datas[i].getVoiceChannel(), datas[i]);
+	        this.join2create_channels.put(datas[i].getVoiceChannelId(), datas[i]);
 	    }
         return this;
 	}
+	
+	public GuildData removeJoin2CreateChannels(long... channel_ids) {
+	    for (int i = 0; i < channel_ids.length; i++) {
+            this.join2create_channels.remove(channel_ids[i]);
+        }
+        return this;
+	}
+	
 	public GuildData removeJoin2CreateChannels(VoiceChannel... channels) {
 	    for (int i = 0; i < channels.length; i++) {
-	        this.join2create_channels.remove(channels[i]);
+	        this.join2create_channels.remove(channels[i].getIdLong());
 	    }
         return this;
 	}
 	
 	public GuildData removeJoin2CreateChannelsByData(Join2CreateChannelData... datas) {
 	    for (int i = 0; i < datas.length; i++) {
-	        this.join2create_channels.remove(datas[i].getVoiceChannel());
+	        this.join2create_channels.remove(datas[i].getVoiceChannelId());
 	    }
         return this;
 	}
+	
+	public ConcurrentHashMap<Long, Long> getCustomCategoryIds() {
+	    return this.custom_categories;
+	}
 
 	public ConcurrentHashMap<Category, Member> getCustomCategories() {
-		return this.custom_categories;
+        ConcurrentHashMap<Category, Member> return_value = new ConcurrentHashMap<>();
+        Map<Long, Member> converted_members = this.getGuild().retrieveMembersByIds(false, this.custom_categories.values()).get().stream().collect(Collectors.toMap(Member::getIdLong, member -> member));
+        for (Map.Entry<Long, Long> entry : this.custom_categories.entrySet()) {
+            return_value.put(this.getGuild().getCategoryById(entry.getKey()), converted_members.get(entry.getValue()));
+        }
+		return return_value;
+	}
+	
+	public long getCustomCategoryOwnerId(long category_id) {
+	    return this.custom_categories.get(category_id);
+	}
+	
+	public long getCustomCategoryOwnerId(Category category) {
+	    return this.custom_categories.get(category.getIdLong());
+	}
+	
+	public Member getCustomCategoryOwner(long category_id) {
+	    return this.getGuild().retrieveMemberById(this.custom_categories.get(category_id)).complete();
 	}
 	
 	public Member getCustomCategoryOwner(Category category) {
-	    return this.custom_categories.get(category);
+	    return this.getGuild().retrieveMemberById(this.custom_categories.get(category.getIdLong())).complete();
+	}
+	
+	public GuildData setCustomCategoryIds(ConcurrentHashMap<Long, Long> custom_categories) {
+	    DataTools.setMap(this.custom_categories, custom_categories);
+	    return this;
 	}
 
-	public GuildData setCustomCategories(ConcurrentHashMap<Category, Member> custom_channel_categories) {
-	    DataTools.setMap(this.custom_categories, custom_channel_categories);
+	public GuildData setCustomCategories(ConcurrentHashMap<Category, Member> custom_categories) {
+        ConcurrentHashMap<Long, Long> converted_map = new ConcurrentHashMap<>();
+        for (Map.Entry<Category, Member> entry : custom_categories.entrySet()) {
+            converted_map.put(entry.getKey().getIdLong(), entry.getValue().getIdLong());
+        }
+        DataTools.setMap(this.custom_categories, converted_map);
         return this;
+	}
+	
+	public GuildData addCustomCategoryOwner(Long category_id, Long member_id) {
+	    this.custom_categories.put(category_id, member_id);
+	    return this;
 	}
 	
 	public GuildData addCustomCategoryOwner(Category category, Member owner) {
-	    this.custom_categories.put(category, owner);
+	    this.custom_categories.put(category.getIdLong(), owner.getIdLong());
         return this;
 	}
 	
-	public GuildData addCustomCategoryOwners(ConcurrentHashMap<Category, Member> custom_channel_categories) {
-	    this.custom_categories.putAll(custom_channel_categories);
-        return this;
+	public GuildData removeCustomCategories(long... category_ids) {
+	    for (int i = 0; i < category_ids.length; i++) {
+            this.custom_categories.remove(category_ids[i]);
+        }
+	    return this;
 	}
 	
 	public GuildData removeCustomCategories(Category... categories) {
 	    for (int i = 0; i < categories.length; i++) {
-	        this.custom_categories.remove(categories[i]);
+	        this.custom_categories.remove(categories[i].getIdLong());
 	    }
         return this;
 	}
 	
+	public GuildData removeCustomCategoriesByOwnerIds(Long... owner_ids) {
+	    DataTools.removeValuesFromMap(this.custom_categories, owner_ids);
+	    return this;
+	}
+	
 	public GuildData removeCustomCategoriesByOwner(Member... owners) {
-	    DataTools.removeValuesFromMap(this.custom_categories, owners);
+	    DataTools.removeValuesFromMap(this.custom_categories, Arrays.stream(owners).map(Member::getIdLong).toArray(Long[]::new));
         return this;
 	}
+	
 //  Other
 	public ConcurrentHashMap<Integer, Role> getLevelRewards() {
-		return this.level_rewards;
+	    ConcurrentHashMap<Integer, Role> return_value = new ConcurrentHashMap<>();
+        for (Map.Entry<Integer, Long> entry : this.level_rewards.entrySet()) {
+            return_value.put(entry.getKey(), this.getGuild().getRoleById(entry.getValue()));
+        }
+        return return_value;
+	}
+	
+	public long getLevelRewardId(int level_count) {
+	    return this.level_rewards.get(level_count);
 	}
 	
 	public Role getLevelReward(int level_count) {
-	    return this.level_rewards.get(level_count);
+	    return this.getGuild().getRoleById(this.level_rewards.get(level_count));
 	}
 
 	public GuildData setLevelRewards(ConcurrentHashMap<Integer, Role> level_rewards) {
-	    DataTools.setMap(this.level_rewards, level_rewards);
+	    ConcurrentHashMap<Integer, Long> converted_map = new ConcurrentHashMap<>();
+        for (Map.Entry<Integer, Role> entry : level_rewards.entrySet()) {
+            converted_map.put(entry.getKey(), entry.getValue().getIdLong());
+        }
+        DataTools.setMap(this.level_rewards, converted_map);
+        return this;
+	}
+	
+	public GuildData addLevelRewardId(int level_count, long reward_id) {
+	    this.level_rewards.put(level_count, reward_id);
         return this;
 	}
 	
 	public GuildData addLevelReward(int level_count, Role reward) {
-	    this.level_rewards.put(level_count, reward);
-        return this;
-	}
-	
-	public GuildData addLevelRewards(ConcurrentHashMap<Integer, Role> level_rewards) {
-	    this.level_rewards.putAll(level_rewards);
+	    this.level_rewards.put(level_count, reward.getIdLong());
         return this;
 	}
 	
@@ -645,8 +736,13 @@ public class GuildData implements DataContainer {
         return this;
 	}
 	
+	public GuildData removeLevelRewardsByRewardIds(Long... rewards_ids) {
+	    DataTools.removeValuesFromMap(this.level_rewards, rewards_ids);
+	    return this;
+	}
+	
 	public GuildData removeLevelRewardsByReward(Role... rewards) {
-	    DataTools.removeValuesFromMap(this.level_rewards, rewards);
+	    DataTools.removeValuesFromMap(this.level_rewards, Arrays.stream(rewards).map(Role::getIdLong).toArray(Long[]::new));
         return this;
 	}
 
@@ -683,47 +779,102 @@ public class GuildData implements DataContainer {
         }
         return this;
 	}
+	
+	public ConcurrentHashMap<Long, ModMailData> getModmailIds() {
+	    return this.modmails;
+	}
 
 	public ConcurrentHashMap<TextChannel, ModMailData> getModmails() {
-		return this.modmails;
+	    ConcurrentHashMap<TextChannel, ModMailData> return_value = new ConcurrentHashMap<>();
+        for (Map.Entry<Long, ModMailData> entry : this.modmails.entrySet()) {
+            return_value.put(this.getGuild().getTextChannelById(entry.getKey()), entry.getValue());
+        }
+        return return_value;
+	}
+	
+	public ModMailData getModMail(long channel_id) {
+	    return this.modmails.get(channel_id);
 	}
 	
 	public ModMailData getModMail(TextChannel channel) {
-	    return this.modmails.get(channel);
+	    return this.modmails.get(channel.getIdLong());
 	}
 
 	public GuildData setModmails(ConcurrentHashMap<TextChannel, ModMailData> modmails) {
-	    DataTools.setMap(this.modmails, modmails);
+	    ConcurrentHashMap<Long, ModMailData> converted_map = new ConcurrentHashMap<>();
+        for (Map.Entry<TextChannel, ModMailData> entry : modmails.entrySet()) {
+            converted_map.put(entry.getKey().getIdLong(), entry.getValue());
+        }
+        DataTools.setMap(this.modmails, converted_map);
         return this;
 	}
 	
 	public GuildData addModmails(ModMailData... datas) {
 	    for (int i = 0; i < datas.length; i++) {
-	        this.modmails.put(datas[i].getGuildChannel(), datas[i]);
+	        this.modmails.put(datas[i].getGuildChannelId(), datas[i]);
 	    }
+        return this;
+	}
+	
+	public GuildData removeModmails(long... channel_ids) {
+	    for (int i = 0; i < channel_ids.length; i++) {
+            this.modmails.remove(channel_ids[i]);
+        }
         return this;
 	}
 	
 	public GuildData removeModmails(TextChannel... channels) {
 	    for (int i = 0; i < channels.length; i++) {
-	        this.modmails.remove(channels[i]);
+	        this.modmails.remove(channels[i].getIdLong());
 	    }
         return this;
 	}
 	
 	public GuildData removeModmailsByData(ModMailData... datas) {
 	    for (int i = 0; i < datas.length; i++) {
-            this.modmails.remove(datas[i].getGuildChannel());
+            this.modmails.remove(datas[i].getGuildChannelId());
         }
         return this;
 	}
+	
+	public ConcurrentHashMap<Long, ConcurrentHashMap<Long, PollData>> getPollIds() {
+	    return this.polls;
+	}
 
 	public ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, PollData>> getPolls() {
-		return this.polls;
+		ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, PollData>> return_value = new ConcurrentHashMap<>();
+		this.polls.forEach((channel_id, map) -> {
+		    ConcurrentHashMap<Message, PollData> sub_map = new ConcurrentHashMap<>();
+		    TextChannel channel = this.getGuild().getTextChannelById(channel_id);
+		    if (channel != null) {
+		        map.forEach((message_id, data) -> {
+		            Message message = channel.retrieveMessageById(message_id).complete();
+		            if (message != null) {
+		                sub_map.put(message, data);
+		            }
+		        });
+		        return_value.put(channel, sub_map);
+		    }
+		});
+		return return_value;
+	}
+	
+	public ConcurrentHashMap<Message, PollData> getPollsByChannel(long channel_id) {
+	    return this.getPollsByChannel(this.getGuild().getTextChannelById(channel_id));
 	}
 	
 	public ConcurrentHashMap<Message, PollData> getPollsByChannel(TextChannel channel) {
-	    return this.polls.get(channel);
+	    ConcurrentHashMap<Message, PollData> return_value = new ConcurrentHashMap<>();
+	    ConcurrentHashMap<Long, PollData> sub_map = this.polls.get(channel.getIdLong());
+	    if (channel != null && sub_map != null && !sub_map.isEmpty()) {
+	        sub_map.forEach((message_id, data) -> {
+	            Message message = channel.retrieveMessageById(message_id).complete();
+	            if (message != null) {
+	                return_value.put(message, data);
+	            }
+	        });
+	    }
+	    return return_value;
 	}
 	
 	public PollData getPoll(TextChannel channel, Message message) {

@@ -1,7 +1,7 @@
 package assets.data.single;
 
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -126,6 +126,10 @@ public class Join2CreateChannelData implements DataContainer {
 
     public VoiceChannel getVoiceChannel() {
         return this.channel;
+    }
+    
+    public long getVoiceChannelId() {
+        return this.channel.getIdLong();
     }
     
     public String getNameFormat() {

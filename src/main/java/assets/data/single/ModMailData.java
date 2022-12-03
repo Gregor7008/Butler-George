@@ -72,6 +72,10 @@ public class ModMailData implements DataContainer {
         return this.text_channel;
     }
     
+    public long getGuildChannelId() {
+        return this.text_channel.getIdLong();
+    }
+    
     public Guild getGuild() {
         return this.guild;
     }
