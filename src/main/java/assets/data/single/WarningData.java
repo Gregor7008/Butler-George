@@ -2,7 +2,7 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
-import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
+import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 
 public class WarningData implements DataContainer {

@@ -9,7 +9,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
+import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import base.Bot;
 import engines.base.CentralTimer;

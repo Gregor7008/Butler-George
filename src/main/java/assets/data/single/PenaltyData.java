@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
+import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import assets.data.DataTools;
 import engines.data.ConfigManager;

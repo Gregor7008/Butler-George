@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONObject;
 
-import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
+import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.single.ModMailData;
 import assets.data.single.ModMailSelectionData;
 import base.Bot;

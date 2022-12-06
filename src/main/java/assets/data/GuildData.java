@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import assets.base.exceptions.ReferenceNotFoundException;
-import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
+import assets.base.exceptions.EntityNotFoundException;
+import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.single.AutoMessageData;
 import assets.data.single.GiveawayData;
 import assets.data.single.Join2CreateChannelData;
@@ -49,11 +49,11 @@ public class GuildData implements DataContainer {
 	private ConcurrentHashMap<Long, ConcurrentHashMap<Long, ReactionRoleData>> reaction_roles = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Long, ConcurrentHashMap<Long, GiveawayData>> giveaways = new ConcurrentHashMap<>();
 
-	public GuildData(JSONObject data) throws ReferenceNotFoundException {
+	public GuildData(JSONObject data) throws EntityNotFoundException {
 		this.guild = data.getLong(Key.GUILD_ID);
 		Guild guild_object = Bot.getAPI().getGuildById(guild);
 		if (guild_object == null) {
-		    throw new ReferenceNotFoundException(ReferenceType.GUILD).setReferenceId(guild);
+		    throw new EntityNotFoundException(ReferenceType.GUILD).setReferenceId(guild);
 		} else {
 		    this.instanciateFromJSON(data);
 		}

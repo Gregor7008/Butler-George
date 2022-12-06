@@ -2,7 +2,7 @@ package assets.data;
 
 import org.json.JSONObject;
 
-import assets.base.exceptions.ReferenceNotFoundException.ReferenceType;
+import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 
 public interface DataContainer {
     
