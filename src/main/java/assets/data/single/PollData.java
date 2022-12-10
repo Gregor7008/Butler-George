@@ -5,7 +5,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,6 +15,7 @@ import org.json.JSONObject;
 import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import assets.data.DataTools;
+import assets.data.MessageConnection;
 import base.Bot;
 import engines.base.CentralTimer;
 import engines.base.Check;
@@ -37,7 +37,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
-public class PollData implements DataContainer {
+public class PollData implements DataContainer, MessageConnection {
     
     private final Guild guild;
     private final TextChannel text_channel;
@@ -162,8 +162,14 @@ public class PollData implements DataContainer {
         return guild;
     }
 
+    @Override
     public TextChannel getChannel() {
         return this.text_channel;
+    }
+
+    @Override
+    public Long getChannelId() {
+        return this.text_channel.getIdLong();
     }
     
     public User getOwner() {
@@ -174,8 +180,14 @@ public class PollData implements DataContainer {
         return this.type;
     }
 
+    @Override
     public Message getMessage() {
         return this.message;
+    }
+
+    @Override
+    public Long getMessageId() {
+        return this.message.getIdLong();
     }
     
     public PollData setMessage(Message message) {

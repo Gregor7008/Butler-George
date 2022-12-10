@@ -3,7 +3,6 @@ package assets.data.single;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -11,6 +10,7 @@ import org.json.JSONObject;
 
 import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.DataContainer;
+import assets.data.MessageConnection;
 import base.Bot;
 import engines.base.CentralTimer;
 import engines.data.ConfigManager;
@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-public class GiveawayData implements DataContainer {
+public class GiveawayData implements DataContainer, MessageConnection {
     
     private final Guild guild;
     private final TextChannel text_channel;
@@ -95,12 +95,24 @@ public class GiveawayData implements DataContainer {
         return false;
     }
 
+    @Override
     public TextChannel getChannel() {
         return this.text_channel;
     }
 
+    @Override
+    public Long getChannelId() {
+        return this.text_channel.getIdLong();
+    }
+
+    @Override
     public Message getMessage() {
         return this.message;
+    }
+
+    @Override
+    public Long getMessageId() {
+        return this.message.getIdLong();
     }
     
     public User getUser() {

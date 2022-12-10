@@ -53,7 +53,7 @@ public class GuildData implements DataContainer {
 		this.guild = data.getLong(Key.GUILD_ID);
 		Guild guild_object = Bot.getAPI().getGuildById(guild);
 		if (guild_object == null) {
-		    throw new EntityNotFoundException(ReferenceType.GUILD).setReferenceId(guild);
+		    throw new EntityNotFoundException(ReferenceType.GUILD, guild);
 		} else {
 		    this.instanciateFromJSON(data);
 		}
@@ -316,8 +316,96 @@ public class GuildData implements DataContainer {
 
     @Override
     public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
+        boolean return_value = true;
+        Guild guild = this.getGuild();
+        if ((!type.equals(ReferenceType.USER) || !type.equals(ReferenceType.PRIVATE_CHANNEL)) && guild == null) {
+            return false;
+        }
+        switch (type) {
+            case GUILD:
+                return_value = guild != null;
+                break;
+            case ROLE:
+                this.admin_roles = this.admin_roles.stream().filter(role_id -> guild.getRoleById(role_id) != null).toList();
+                this.custom_channel_policing_roles = this.custom_channel_policing_roles.stream().filter(role_id -> guild.getRoleById(role_id) != null).toList();
+                this.moderation_roles = this.moderation_roles.stream().filter(role_id -> guild.getRoleById(role_id) != null).toList();
+                this.support_roles = this.support_roles.stream().filter(role_id -> guild.getRoleById(role_id) != null).toList();
+                this.bot_auto_roles = this.bot_auto_roles.stream().filter(role_id -> guild.getRoleById(role_id) != null).toList();
+                this.user_auto_roles = this.user_auto_roles.stream().filter(role_id -> guild.getRoleById(role_id) != null).toList();
+                break;
+            case TEXT_CHANNEL:
+                this.boost_message.verify(ReferenceType.TEXT_CHANNEL);
+                this.goodbye_message.verify(ReferenceType.TEXT_CHANNEL);
+                this.level_up_message.verify(ReferenceType.TEXT_CHANNEL);
+                this.welcome_message.verify(ReferenceType.TEXT_CHANNEL);
+                
+                if (guild.getTextChannelById(this.community_inbox_channel) == null) {
+                    this.community_inbox_channel = 0L;
+                }
+                if (guild.getTextChannelById(this.moderation_inbox_channel) == null) {
+                    this.moderation_inbox_channel = 0L;
+                }
+                if (guild.getTextChannelById(this.suggestion_inbox_channel) == null) {
+                    this.suggestion_inbox_channel = 0L;
+                }
+                
+                List<Long> text_channel_ids_to_remove = new ArrayList<>();
+                for (Map.Entry<Long, ModMailData> entry : this.modmails.entrySet()) {
+                    if (guild.getTextChannelById(entry.getKey()) == null) {
+                        text_channel_ids_to_remove.add(entry.getKey());
+                    }
+                }
+                for (long id : text_channel_ids_to_remove) {
+                    this.modmails.remove(id);
+                }
+                
+                DataTools.validateMesConMap(guild, false, this.polls);
+                DataTools.validateMesConMap(guild, false, this.reaction_roles);
+                DataTools.validateMesConMap(guild, false, this.giveaways);
+                break;
+            case PRIVATE_CHANNEL:
+                break;
+            case VOICE_CHANNEL:
+                if (guild.getTextChannelById(this.support_talk) == null) {
+                    this.support_talk = 0L;
+                }
+                
+                List<Long> voice_channel_ids_to_remove = new ArrayList<>();
+                for (Map.Entry<Long, Join2CreateChannelData> entry : this.join2create_channels.entrySet()) {
+                    if (guild.getVoiceChannelById(entry.getKey()) == null) {
+                        voice_channel_ids_to_remove.add(entry.getKey());
+                    }
+                }
+                for (long id : voice_channel_ids_to_remove) {
+                    this.join2create_channels.remove(id);
+                }
+                break;
+            case MESSAGE:
+                DataTools.validateMesConMap(guild, true, this.polls);
+                DataTools.validateMesConMap(guild, true, this.reaction_roles);
+                DataTools.validateMesConMap(guild, true, this.giveaways);
+                break;
+            case CATEGORY:
+                List<Long> category_ids_to_remove = new ArrayList<>();
+                for (Map.Entry<Long, Long> entry : this.custom_categories.entrySet()) {
+                    if (guild.getCategoryById(entry.getKey()) == null) {
+                        category_ids_to_remove.add(entry.getKey());
+                    }
+                }
+                for (long id : category_ids_to_remove) {
+                    this.custom_categories.remove(id);
+                }
+                break;
+            case MEMBER:
+                List<Long> valid_members1 = guild.retrieveMembersByIds(this.custom_categories.values()).get().stream().map(Member::getIdLong).toList();
+                this.custom_categories.values().removeIf(id -> !valid_members1.contains(id));
+                break;
+            case USER:
+                List<Long> valid_members2 = guild.retrieveMembersByIds(this.custom_categories.values()).get().stream().map(Member::getIdLong).toList();
+                this.custom_categories.values().removeIf(id -> !valid_members2.contains(id));
+                break;
+        }
+        return return_value;
     }
     
     public Guild getGuild() {
@@ -522,7 +610,11 @@ public class GuildData implements DataContainer {
 	}
 
 	public GuildData setCommunityInboxChannel(TextChannel community_inbox_channel) {
-		this.community_inbox_channel = community_inbox_channel.getIdLong();
+	    if (community_inbox_channel != null) {
+	        this.community_inbox_channel = community_inbox_channel.getIdLong();
+	    } else {
+	        this.community_inbox_channel = 0L;
+	    }
         return this;
 	}
 
@@ -531,7 +623,11 @@ public class GuildData implements DataContainer {
 	}
 
 	public GuildData setModerationInboxChannel(TextChannel moderation_inbox_channel) {
-		this.moderation_inbox_channel = moderation_inbox_channel.getIdLong();
+        if (moderation_inbox_channel != null) {
+            this.moderation_inbox_channel = moderation_inbox_channel.getIdLong();
+        } else {
+            this.moderation_inbox_channel = 0L;
+        }
         return this;
 	}
 
@@ -540,7 +636,11 @@ public class GuildData implements DataContainer {
 	}
 
 	public GuildData setSuggestionInboxChannel(TextChannel suggestion_inbox_channel) {
-		this.suggestion_inbox_channel = suggestion_inbox_channel.getIdLong();
+        if (suggestion_inbox_channel != null) {
+            this.suggestion_inbox_channel = suggestion_inbox_channel.getIdLong();
+        } else {
+            this.suggestion_inbox_channel = 0L;
+        }
         return this;
 	}
 
@@ -549,7 +649,11 @@ public class GuildData implements DataContainer {
 	}
 
 	public GuildData setSupportTalk(VoiceChannel support_talk) {
-		this.support_talk = support_talk.getIdLong();
+        if (support_talk != null) {
+            this.support_talk = support_talk.getIdLong();
+        } else {
+            this.support_talk = 0L;
+        }
         return this;
 	}
 	
@@ -581,37 +685,39 @@ public class GuildData implements DataContainer {
 	
 	public GuildData setJoin2CreateChannels(ConcurrentHashMap<VoiceChannel, Join2CreateChannelData> join2create_channels) {
 	    ConcurrentHashMap<Long, Join2CreateChannelData> converted_map = new ConcurrentHashMap<>();
-	    for (Map.Entry<VoiceChannel, Join2CreateChannelData> entry : join2create_channels.entrySet()) {
-	        converted_map.put(entry.getKey().getIdLong(), entry.getValue());
+	    if (join2create_channels != null) {
+	        for (Map.Entry<VoiceChannel, Join2CreateChannelData> entry : join2create_channels.entrySet()) {
+	            converted_map.put(entry.getKey().getIdLong(), entry.getValue());
+	        }
 	    }
-	    DataTools.setMap(this.join2create_channels, converted_map);
+	    this.join2create_channels = converted_map;
         return this;
 	}
 	
 	public GuildData addJoin2CreateChannels(Join2CreateChannelData... datas) {
-	    for (int i = 0; i < datas.length; i++) {
-	        this.join2create_channels.put(datas[i].getVoiceChannelId(), datas[i]);
+	    for (Join2CreateChannelData data : datas) {
+	        this.join2create_channels.put(data.getVoiceChannelId(), data);
 	    }
         return this;
 	}
 	
 	public GuildData removeJoin2CreateChannels(long... channel_ids) {
-	    for (int i = 0; i < channel_ids.length; i++) {
-            this.join2create_channels.remove(channel_ids[i]);
+	    for (long id : channel_ids) {
+            this.join2create_channels.remove(id);
         }
         return this;
 	}
 	
 	public GuildData removeJoin2CreateChannels(VoiceChannel... channels) {
-	    for (int i = 0; i < channels.length; i++) {
-	        this.join2create_channels.remove(channels[i].getIdLong());
+	    for (VoiceChannel channel : channels) {
+	        this.join2create_channels.remove(channel.getIdLong());
 	    }
         return this;
 	}
 	
 	public GuildData removeJoin2CreateChannelsByData(Join2CreateChannelData... datas) {
-	    for (int i = 0; i < datas.length; i++) {
-	        this.join2create_channels.remove(datas[i].getVoiceChannelId());
+	    for (Join2CreateChannelData data : datas) {
+	        this.join2create_channels.remove(data.getVoiceChannelId());
 	    }
         return this;
 	}
@@ -652,10 +758,12 @@ public class GuildData implements DataContainer {
 
 	public GuildData setCustomCategories(ConcurrentHashMap<Category, Member> custom_categories) {
         ConcurrentHashMap<Long, Long> converted_map = new ConcurrentHashMap<>();
-        for (Map.Entry<Category, Member> entry : custom_categories.entrySet()) {
-            converted_map.put(entry.getKey().getIdLong(), entry.getValue().getIdLong());
+        if (custom_categories != null) {
+            for (Map.Entry<Category, Member> entry : custom_categories.entrySet()) {
+                converted_map.put(entry.getKey().getIdLong(), entry.getValue().getIdLong());
+            }
         }
-        DataTools.setMap(this.custom_categories, converted_map);
+        this.custom_categories = converted_map;
         return this;
 	}
 	
@@ -670,15 +778,15 @@ public class GuildData implements DataContainer {
 	}
 	
 	public GuildData removeCustomCategories(long... category_ids) {
-	    for (int i = 0; i < category_ids.length; i++) {
-            this.custom_categories.remove(category_ids[i]);
+	    for (long id : category_ids) {
+            this.custom_categories.remove(id);
         }
 	    return this;
 	}
 	
 	public GuildData removeCustomCategories(Category... categories) {
-	    for (int i = 0; i < categories.length; i++) {
-	        this.custom_categories.remove(categories[i].getIdLong());
+	    for (Category category : categories) {
+	        this.custom_categories.remove(category.getIdLong());
 	    }
         return this;
 	}
@@ -712,10 +820,12 @@ public class GuildData implements DataContainer {
 
 	public GuildData setLevelRewards(ConcurrentHashMap<Integer, Role> level_rewards) {
 	    ConcurrentHashMap<Integer, Long> converted_map = new ConcurrentHashMap<>();
-        for (Map.Entry<Integer, Role> entry : level_rewards.entrySet()) {
-            converted_map.put(entry.getKey(), entry.getValue().getIdLong());
+        if (level_rewards != null) {
+            for (Map.Entry<Integer, Role> entry : level_rewards.entrySet()) {
+                converted_map.put(entry.getKey(), entry.getValue().getIdLong());
+            }
         }
-        DataTools.setMap(this.level_rewards, converted_map);
+        this.level_rewards = converted_map;
         return this;
 	}
 	
@@ -730,8 +840,8 @@ public class GuildData implements DataContainer {
 	}
 	
 	public GuildData removeLevelRewards(int... level_counts) {
-	    for (int i = 0; i < level_counts.length; i++) {
-	        this.level_rewards.remove(level_counts[i]);
+	    for (int level_count : level_counts) {
+	        this.level_rewards.remove(level_count);
 	    }
         return this;
 	}
@@ -760,22 +870,22 @@ public class GuildData implements DataContainer {
 	}
 	
 	public GuildData addPenalties(PenaltyData... datas) {
-	    for (int i = 0; i < datas.length; i++) {
-	        this.penalties.put(datas[i].getWarningLimit(), datas[i]);
+	    for (PenaltyData data : datas) {
+	        this.penalties.put(data.getWarningLimit(), data);
 	    }
         return this;
 	}
 	
 	public GuildData removePenalties(int... warning_counts) {
-	    for (int i = 0; i < warning_counts.length; i++) {
-	        this.penalties.remove(warning_counts[i]);
+	    for (int warning_count : warning_counts) {
+	        this.penalties.remove(warning_count);
 	    }
         return this;
 	}
 	
 	public GuildData removePenaltiesByData(PenaltyData... datas) {
-	    for (int i = 0; i < datas.length; i++) {
-            this.penalties.remove(datas[i].getWarningLimit());
+	    for (PenaltyData data : datas) {
+            this.penalties.remove(data.getWarningLimit());
         }
         return this;
 	}
@@ -802,37 +912,39 @@ public class GuildData implements DataContainer {
 
 	public GuildData setModmails(ConcurrentHashMap<TextChannel, ModMailData> modmails) {
 	    ConcurrentHashMap<Long, ModMailData> converted_map = new ConcurrentHashMap<>();
-        for (Map.Entry<TextChannel, ModMailData> entry : modmails.entrySet()) {
-            converted_map.put(entry.getKey().getIdLong(), entry.getValue());
+        if (modmails != null) {
+            for (Map.Entry<TextChannel, ModMailData> entry : modmails.entrySet()) {
+                converted_map.put(entry.getKey().getIdLong(), entry.getValue());
+            }
         }
-        DataTools.setMap(this.modmails, converted_map);
+        this.modmails = converted_map;
         return this;
 	}
 	
 	public GuildData addModmails(ModMailData... datas) {
-	    for (int i = 0; i < datas.length; i++) {
-	        this.modmails.put(datas[i].getGuildChannelId(), datas[i]);
+	    for (ModMailData data : datas) {
+	        this.modmails.put(data.getGuildChannelId(), data);
 	    }
         return this;
 	}
 	
 	public GuildData removeModmails(long... channel_ids) {
-	    for (int i = 0; i < channel_ids.length; i++) {
-            this.modmails.remove(channel_ids[i]);
+	    for (long id : channel_ids) {
+            this.modmails.remove(id);
         }
         return this;
 	}
 	
 	public GuildData removeModmails(TextChannel... channels) {
-	    for (int i = 0; i < channels.length; i++) {
-	        this.modmails.remove(channels[i].getIdLong());
+	    for (TextChannel channel : channels) {
+	        this.modmails.remove(channel.getIdLong());
 	    }
         return this;
 	}
 	
 	public GuildData removeModmailsByData(ModMailData... datas) {
-	    for (int i = 0; i < datas.length; i++) {
-            this.modmails.remove(datas[i].getGuildChannelId());
+	    for (ModMailData data : datas) {
+            this.modmails.remove(data.getGuildChannelId());
         }
         return this;
 	}
@@ -842,152 +954,217 @@ public class GuildData implements DataContainer {
 	}
 
 	public ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, PollData>> getPolls() {
-		ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, PollData>> return_value = new ConcurrentHashMap<>();
-		this.polls.forEach((channel_id, map) -> {
-		    ConcurrentHashMap<Message, PollData> sub_map = new ConcurrentHashMap<>();
-		    TextChannel channel = this.getGuild().getTextChannelById(channel_id);
-		    if (channel != null) {
-		        map.forEach((message_id, data) -> {
-		            Message message = channel.retrieveMessageById(message_id).complete();
-		            if (message != null) {
-		                sub_map.put(message, data);
-		            }
-		        });
-		        return_value.put(channel, sub_map);
-		    }
-		});
-		return return_value;
+		return DataTools.convertMesConMapToObj(this.getGuild(), this.polls);
 	}
 	
 	public ConcurrentHashMap<Message, PollData> getPollsByChannel(long channel_id) {
-	    return this.getPollsByChannel(this.getGuild().getTextChannelById(channel_id));
+        return this.getPollsByChannel(this.getGuild().getTextChannelById(channel_id));
 	}
 	
 	public ConcurrentHashMap<Message, PollData> getPollsByChannel(TextChannel channel) {
-	    ConcurrentHashMap<Message, PollData> return_value = new ConcurrentHashMap<>();
-	    ConcurrentHashMap<Long, PollData> sub_map = this.polls.get(channel.getIdLong());
-	    if (channel != null && sub_map != null && !sub_map.isEmpty()) {
-	        sub_map.forEach((message_id, data) -> {
-	            Message message = channel.retrieveMessageById(message_id).complete();
-	            if (message != null) {
-	                return_value.put(message, data);
-	            }
-	        });
+	    return DataTools.convertMesConMapOfChannelToObj(this.getGuild(), channel, this.polls);
+	}
+	
+	public ConcurrentHashMap<Long, PollData> getPollIdsByChannel(long channel_id) {
+	    return this.getPollIdsByChannel(this.getGuild().getTextChannelById(channel_id));
+	}
+	
+	public ConcurrentHashMap<Long, PollData> getPollIdsByChannel(TextChannel channel) {
+	    ConcurrentHashMap<Long, PollData> return_value = new ConcurrentHashMap<>();
+	    if (channel != null) {
+	        ConcurrentHashMap<Long, PollData> stored_map = this.polls.get(channel.getIdLong());
+	        if (stored_map != null) {
+	            return_value = stored_map;
+	        }
 	    }
 	    return return_value;
 	}
 	
 	public PollData getPoll(TextChannel channel, Message message) {
-	    return this.getPollsByChannel(channel).get(message);
+	    if (channel != null && message != null) {
+	        ConcurrentHashMap<Long, PollData> returned_map = this.polls.get(channel.getIdLong());
+	        if (returned_map != null) {
+	            return returned_map.get(message.getIdLong());
+	        }
+	    }
+	    return null;
 	}
 
 	public GuildData setPolls(ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, PollData>> polls) {
-	    DataTools.setMap(this.polls, polls);
+	    this.polls = DataTools.convertMesConMapToIds(polls);
         return this;
 	}
 	
 	public GuildData setPollsByChannel(TextChannel channel,  ConcurrentHashMap<Message, PollData> polls) {
-	    DataTools.setMap(this.getPollsByChannel(channel), polls);
-        return this;
-	}
-	
-	public GuildData addPolls(PollData... datas) {
-	    for (int i = 0; i < datas.length; i++) {
-	        this.getPollsByChannel(datas[i].getChannel()).put(datas[i].getMessage(), datas[i]);
+	    ConcurrentHashMap<Long, PollData> converted_map = DataTools.convertMesConMapOfChannelToIds(channel, polls);
+	    if (!converted_map.isEmpty()) {
+	        this.polls.put(channel.getIdLong(), converted_map);
 	    }
         return this;
 	}
 	
+	public GuildData addPolls(PollData... datas) {
+        DataTools.addDataToMesConMap(this.polls, datas);
+        return this;
+	}
+	
 	public GuildData removePoll(TextChannel channel, Message message) {
-	    this.getPollsByChannel(channel).remove(message);
+	    if (channel != null && message != null) {
+	        ConcurrentHashMap<Long, PollData> stored_map = this.polls.get(channel.getIdLong());
+	        if (stored_map != null) {
+	            stored_map.remove(message.getIdLong());
+	        }
+	    }
 	    return this;
 	}
 	
 	public GuildData removePollsByData(PollData... datas) {
 	    for (int i = 0; i < datas.length; i++) {
-	        this.getPollsByChannel(datas[i].getChannel()).remove(datas[i].getMessage());
+	        if (datas[i].getChannelId() != 0L && datas[i].getMessageId() != 0L) {
+	            ConcurrentHashMap<Long, PollData> stored_map = this.polls.get(datas[i].getChannelId());
+	            if (stored_map != null) {
+	                stored_map.remove(datas[i].getMessageId());
+	            }
+            }
 	    }
 	    return this;
 	}
+	
+	public ConcurrentHashMap<Long, ConcurrentHashMap<Long, ReactionRoleData>> getReactionRoleIds() {
+	    return this.reaction_roles;
+	}
 
 	public ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, ReactionRoleData>> getReactionRoles() {
-		return this.reaction_roles;
+        return DataTools.convertMesConMapToObj(this.getGuild(), this.reaction_roles);
+	}
+	
+	public ConcurrentHashMap<Message, ReactionRoleData> getReactionRolesByChannel(long channel_id) {
+	    return this.getReactionRolesByChannel(this.getGuild().getTextChannelById(channel_id));
 	}
 	
 	public ConcurrentHashMap<Message, ReactionRoleData> getReactionRolesByChannel(TextChannel channel) {
-	    return this.reaction_roles.get(channel);
+        return DataTools.convertMesConMapOfChannelToObj(this.getGuild(), channel, this.reaction_roles);
+	}
+	
+	public ConcurrentHashMap<Long, ReactionRoleData> getReactionRoleIdsByChannel(long channel_id) {
+	    return this.getReactionRoleIdsByChannel(this.getGuild().getTextChannelById(channel_id));
+	}
+	
+	public ConcurrentHashMap<Long, ReactionRoleData> getReactionRoleIdsByChannel(TextChannel channel) {
+        ConcurrentHashMap<Long, ReactionRoleData> return_value = new ConcurrentHashMap<>();
+        if (channel != null) {
+            ConcurrentHashMap<Long, ReactionRoleData> stored_map = this.reaction_roles.get(channel.getIdLong());
+            if (stored_map != null) {
+                return_value = stored_map;
+            }
+        }
+        return return_value;
 	}
 	
 	public ReactionRoleData getReactionRole(TextChannel channel, Message message) {
-	    return this.getReactionRolesByChannel(channel).get(message);
+        if (channel != null && message != null) {
+            ConcurrentHashMap<Long, ReactionRoleData> returned_map = this.reaction_roles.get(channel.getIdLong());
+            if (returned_map != null) {
+                return returned_map.get(message.getIdLong());
+            }
+        }
+        return null;
 	}
 
 	public GuildData setReactionRoles(ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, ReactionRoleData>> reaction_roles) {
-		DataTools.setMap(this.reaction_roles, reaction_roles);
+        this.reaction_roles = DataTools.convertMesConMapToIds(reaction_roles);
         return this;
 	}
 	
 	public GuildData setReactionRolesByChannel(TextChannel channel, ConcurrentHashMap<Message, ReactionRoleData> reaction_roles) {
-	    DataTools.setMap(this.getReactionRolesByChannel(channel), reaction_roles);
+        ConcurrentHashMap<Long, ReactionRoleData> converted_map = DataTools.convertMesConMapOfChannelToIds(channel, reaction_roles);
+        if (!converted_map.isEmpty()) {
+            this.reaction_roles.put(channel.getIdLong(), converted_map);
+        }
 	    return this;
 	}
 	
 	public GuildData addReactionRoles(ReactionRoleData... datas) {
-	    for (int i = 0; i < datas.length; i++) {
-	        this.getReactionRolesByChannel(datas[i].getChannel()).put(datas[i].getMessage(), datas[i]);
-	    }
+        DataTools.addDataToMesConMap(this.reaction_roles, datas);
 	    return this;
 	}
 	
 	public GuildData removeReactionRole(TextChannel channel, Message message) {
-	    this.getReactionRolesByChannel(channel).remove(message);
+        if (channel != null && message != null) {
+            ConcurrentHashMap<Long, ReactionRoleData> stored_map = this.reaction_roles.get(channel.getIdLong());
+            if (stored_map != null) {
+                stored_map.remove(message.getIdLong());
+            }
+        }
 	    return this;
 	}
 	
 	public GuildData removeReactionRoleByData(ReactionRoleData... datas) {
-	    for (int i = 0; i < datas.length; i++) {
-	        this.getReactionRolesByChannel(datas[i].getChannel()).remove(datas[i].getMessage());
-	    }
-	    return this;
+        for (int i = 0; i < datas.length; i++) {
+            if (datas[i].getChannelId() != 0L && datas[i].getMessageId() != 0L) {
+                ConcurrentHashMap<Long, ReactionRoleData> stored_map = this.reaction_roles.get(datas[i].getChannelId());
+                if (stored_map != null) {
+                    stored_map.remove(datas[i].getMessageId());
+                }
+            }
+        }
+        return this;
 	}
 	
 	public ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, GiveawayData>> getGiveaways() {
-        return this.giveaways;
+        return DataTools.convertMesConMapToObj(this.getGuild(), this.giveaways);
     }
     
     public ConcurrentHashMap<Message, GiveawayData> getGiveawaysByChannel(TextChannel channel) {
-        return this.giveaways.get(channel);
+        return DataTools.convertMesConMapOfChannelToObj(this.getGuild(), channel, this.giveaways);
     }
     
-    public ReactionRoleData getGiveaway(TextChannel channel, Message message) {
-        return this.getReactionRolesByChannel(channel).get(message);
+    public GiveawayData getGiveaway(TextChannel channel, Message message) {
+        if (channel != null && message != null) {
+            ConcurrentHashMap<Long, GiveawayData> returned_map = this.giveaways.get(channel.getIdLong());
+            if (returned_map != null) {
+                return returned_map.get(message.getIdLong());
+            }
+        }
+        return null;
     }
 
     public GuildData setGiveaways(ConcurrentHashMap<TextChannel, ConcurrentHashMap<Message, GiveawayData>> giveaways) {
-        DataTools.setMap(this.giveaways, giveaways);
+        this.giveaways = DataTools.convertMesConMapToIds(giveaways);
         return this;
     }
     
     public GuildData setGiveawaysByChannel(TextChannel channel, ConcurrentHashMap<Message, GiveawayData> giveaways) {
-        DataTools.setMap(this.getGiveawaysByChannel(channel), giveaways);
-        return this;
-    }
-    
-    public GuildData addGiveaways(GiveawayData... datas) {
-        for (int i = 0; i < datas.length; i++) {
-            this.getGiveawaysByChannel(datas[i].getChannel()).put(datas[i].getMessage(), datas[i]);
+        ConcurrentHashMap<Long, GiveawayData> converted_map = DataTools.convertMesConMapOfChannelToIds(channel, giveaways);
+        if (!converted_map.isEmpty()) {
+            this.giveaways.put(channel.getIdLong(), converted_map);
         }
         return this;
     }
     
+    public GuildData addGiveaways(GiveawayData... datas) {
+        DataTools.addDataToMesConMap(this.giveaways, datas);
+        return this;
+    }
+    
     public GuildData removeGiveaway(TextChannel channel, Message message) {
-        this.getGiveawaysByChannel(channel).remove(message);
+        if (channel != null && message != null) {
+            ConcurrentHashMap<Long, GiveawayData> stored_map = this.giveaways.get(channel.getIdLong());
+            if (stored_map != null) {
+                stored_map.remove(message.getIdLong());
+            }
+        }
         return this;
     }
     
     public GuildData removeGiveawayByData(ReactionRoleData... datas) {
         for (int i = 0; i < datas.length; i++) {
-            this.getGiveawaysByChannel(datas[i].getChannel()).remove(datas[i].getMessage());
+            if (datas[i].getChannelId() != 0L && datas[i].getMessageId() != 0L) {
+                ConcurrentHashMap<Long, GiveawayData> stored_map = this.giveaways.get(datas[i].getChannelId());
+                if (stored_map != null) {
+                    stored_map.remove(datas[i].getMessageId());
+                }
+            }
         }
         return this;
     }
