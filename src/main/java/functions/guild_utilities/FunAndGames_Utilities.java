@@ -29,7 +29,6 @@ public class FunAndGames_Utilities extends GuildUtilities {
 	public void onStartup() {
 		guild = Bot.INSTANCE.jda.getGuildById(GUILD_ID);
 		if (guild != null) {
-			this.openGuildChannel(guild.getTextChannelById(937825700243726387L));
 			this.openGuildChannel(guild.getVoiceChannelById(938425419860959242L));
 			
 			this.closeGuildChannel(guild.getVoiceChannelById(1008793448154923048L));
@@ -40,7 +39,6 @@ public class FunAndGames_Utilities extends GuildUtilities {
 	@Override
 	public void onShutdown(ShutdownReason reason) {
 		if (guild != null) {
-			this.closeGuildChannel(guild.getTextChannelById(937825700243726387L));
 			this.closeGuildChannel(guild.getVoiceChannelById(938425419860959242L));
 			
 			this.openGuildChannel(guild.getVoiceChannelById(1008793448154923048L));
