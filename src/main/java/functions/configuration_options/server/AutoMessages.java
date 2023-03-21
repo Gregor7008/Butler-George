@@ -20,11 +20,12 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 
 public class AutoMessages implements ConfigurationEventHandler {
 
@@ -48,7 +49,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 					} catch (JSONException e) {}
 					if (event.getSubOperation().equals("set")) {
 						//Implement menu
-						SelectMenu.Builder menuBuilder = SelectMenu.create("channel")
+						StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("channel")
 								.setPlaceholder("Select channel")
 								.setRequiredRange(1, 1);
 						List<TextChannel> availableChannels = guild.getTextChannels().stream().filter(
@@ -80,7 +81,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 											.setRequired(false)
 											.build();
 									Modal.Builder modalBuilder = Modal.create("configMessage", type.substring(0, 1).toUpperCase() + type.substring(1) + " message configuration");
-									modalBuilder.addActionRows(ActionRow.of(titleInput), ActionRow.of(messageInput), ActionRow.of(varDisplay));
+									modalBuilder.addComponents(ActionRow.of(titleInput), ActionRow.of(messageInput), ActionRow.of(varDisplay));
 									s.replyModal(modalBuilder.build()).queue();
 									s.getMessage().editMessageEmbeds(firstReplyEmbed).setComponents().queue();
 									AwaitTask.forModalInteraction(guild, user, s.getMessage(),

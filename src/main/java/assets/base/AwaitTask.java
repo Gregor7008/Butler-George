@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import base.Bot;
 import engines.base.EventAwaiter;
@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
@@ -84,13 +84,13 @@ public class AwaitTask<T extends GenericEvent> {
 		return new AwaitTask<ButtonInteractionEvent>(AwaitedEvent.BUTTON_INTERACTION_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
 	}
 	
-	public static AwaitTask<SelectMenuInteractionEvent> forSelectMenuInteraction(Guild guild, User user, Message message, Consumer<SelectMenuInteractionEvent> onSuccess) {
+	public static AwaitTask<StringSelectInteractionEvent> forSelectMenuInteraction(Guild guild, User user, Message message, Consumer<StringSelectInteractionEvent> onSuccess) {
 		return AwaitTask.forSelectMenuInteraction(guild, user, message, null, onSuccess, null);
 	}
 	
-	public static AwaitTask<SelectMenuInteractionEvent> forSelectMenuInteraction(Guild guild, User user, Message message,
-			@Nullable Predicate<SelectMenuInteractionEvent> additionalPredicate, Consumer<SelectMenuInteractionEvent> onSuccess, @Nullable Runnable onTimeout) {
-		return new AwaitTask<SelectMenuInteractionEvent>(AwaitedEvent.SELECT_MENU_INTERACTION_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
+	public static AwaitTask<StringSelectInteractionEvent> forSelectMenuInteraction(Guild guild, User user, Message message,
+			@Nullable Predicate<StringSelectInteractionEvent> additionalPredicate, Consumer<StringSelectInteractionEvent> onSuccess, @Nullable Runnable onTimeout) {
+		return new AwaitTask<StringSelectInteractionEvent>(AwaitedEvent.SELECT_MENU_INTERACTION_EVENT, guild, user, message, additionalPredicate, onSuccess, onTimeout);
 	}
 	
 	public static AwaitTask<ModalInteractionEvent> forModalInteraction(Guild guild, User user, MessageChannel channel, Consumer<ModalInteractionEvent> onSuccess) {

@@ -16,9 +16,9 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 
 public class TempMute implements UserContextEventHandler {
 
@@ -32,7 +32,7 @@ public class TempMute implements UserContextEventHandler {
 				.setMaxLength(3)
 				.setPlaceholder("Input duration in days")
 				.build();
-		Modal modal = Modal.create("configTempban", "Configure temporary ban").addActionRows(ActionRow.of(dayInput)).build();
+		Modal modal = Modal.create("configTempban", "Configure temporary ban").addComponents(ActionRow.of(dayInput)).build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessageChannel(),
 				d -> {

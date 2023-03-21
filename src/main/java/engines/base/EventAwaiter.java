@@ -9,7 +9,7 @@ import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
@@ -25,7 +25,7 @@ public class EventAwaiter extends ListenerAdapter {
 	private List<AwaitTask<MessageReactionAddEvent>> awaitingReactionAdding = new ArrayList<>();
 	private List<AwaitTask<MessageReactionRemoveEvent>> awaitingReactionRemoval = new ArrayList<>();
 	private List<AwaitTask<ButtonInteractionEvent>> awaitingButtonInteraction = new ArrayList<>();
-	private List<AwaitTask<SelectMenuInteractionEvent>> awaitingSelectMenuInteraction = new ArrayList<>();
+	private List<AwaitTask<StringSelectInteractionEvent>> awaitingSelectMenuInteraction = new ArrayList<>();
 	private List<AwaitTask<ModalInteractionEvent>> awaitingModalInteraction = new ArrayList<>();
 	
 	public EventAwaiter() {
@@ -112,7 +112,7 @@ public class EventAwaiter extends ListenerAdapter {
 			awaitingModalInteraction.add((AwaitTask<ModalInteractionEvent>) task);
 			break;
 		case SELECT_MENU_INTERACTION_EVENT:
-			awaitingSelectMenuInteraction.add((AwaitTask<SelectMenuInteractionEvent>) task);
+			awaitingSelectMenuInteraction.add((AwaitTask<StringSelectInteractionEvent>) task);
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid awaited event " + task.awaitedEvent.name() + "!");
@@ -237,10 +237,10 @@ public class EventAwaiter extends ListenerAdapter {
 	}
 
 	@Override
-	public void onSelectMenuInteraction(SelectMenuInteractionEvent event) {
-		List<AwaitTask<SelectMenuInteractionEvent>> listCopy = List.copyOf(awaitingSelectMenuInteraction);
+	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+		List<AwaitTask<StringSelectInteractionEvent>> listCopy = List.copyOf(awaitingSelectMenuInteraction);
 		for (int i = 0; i < listCopy.size(); i++) {
-			AwaitTask<SelectMenuInteractionEvent> task = listCopy.get(i);
+			AwaitTask<StringSelectInteractionEvent> task = listCopy.get(i);
 			if (!event.getUser().isBot()
 					&& event.getUser().getId().equals(task.getUser().getId())
 					&& event.getChannel().getId().equals(task.getChannel().getId())

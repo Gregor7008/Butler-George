@@ -26,17 +26,18 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -89,7 +90,7 @@ public class Embed implements SlashCommandEventHandler {
 					if (Boolean.parseBoolean(e.getButton().getId())) {
 						eb.setAuthor(member.getEffectiveName(), null, member.getEffectiveAvatarUrl());
 					}
-					SelectMenu menu = SelectMenu.create("selvalue")
+					StringSelectMenu menu = StringSelectMenu.create("selvalue")
 							.setPlaceholder("Select a value to configure/edit")
 							.setRequiredRange(1, 1)
 							.addOption("Title", "title", "The title of your embed, displayed on top of everything the embed contains")
@@ -116,7 +117,7 @@ public class Embed implements SlashCommandEventHandler {
 		}
 		message.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "selvalue").replaceDescription("{addon}", messageAddon)).setComponents(actionRows).queue();
 		AtomicReference<AwaitTask<ButtonInteractionEvent>> buttonInteractionTask = new AtomicReference<>(null);
-		AwaitTask<SelectMenuInteractionEvent> selectionMenuTask = AwaitTask.forSelectMenuInteraction(guild, user, message,
+		AwaitTask<StringSelectInteractionEvent> selectionMenuTask = AwaitTask.forSelectMenuInteraction(guild, user, message,
 				s -> {
 					if (buttonInteractionTask.get() != null) {
 						buttonInteractionTask.get().cancel();
@@ -177,7 +178,7 @@ public class Embed implements SlashCommandEventHandler {
 		}
 	}
 	
-	private void configureTitle(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+	private void configureTitle(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		TextInput.Builder titleInput = TextInput.create("title", "Title", TextInputStyle.SHORT)
 				.setPlaceholder("Input title")
 				.setMaxLength(MessageEmbed.TITLE_MAX_LENGTH)
@@ -193,7 +194,7 @@ public class Embed implements SlashCommandEventHandler {
 				.setRequired(false)
 				.build();
 		Modal modal = Modal.create("titleConfig", "Title configuration")
-				.addActionRows(ActionRow.of(titleInput.build()), ActionRow.of(titleURLInput))
+				.addComponents(ActionRow.of(titleInput.build()), ActionRow.of(titleURLInput))
 				.build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
@@ -211,7 +212,7 @@ public class Embed implements SlashCommandEventHandler {
 				}).addValidComponents(modal.getId()).append();
 	}
 	
-	private void configureDescription(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+	private void configureDescription(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		TextInput.Builder descriptionInput = TextInput.create("description", "Description", TextInputStyle.PARAGRAPH)
 				.setPlaceholder("Input description")
 				.setMinLength(1)
@@ -221,7 +222,7 @@ public class Embed implements SlashCommandEventHandler {
 			descriptionInput.setValue(current);
 		}
 		Modal modal = Modal.create("descriptionConfig", "Description configuration")
-				.addActionRows(ActionRow.of(descriptionInput.build()))
+				.addComponents(ActionRow.of(descriptionInput.build()))
 				.build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
@@ -235,7 +236,7 @@ public class Embed implements SlashCommandEventHandler {
 				}).addValidComponents(modal.getId()).append();
 	}
 	
-	private void configureFooter(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+	private void configureFooter(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		TextInput.Builder footerInput = TextInput.create("footer", "Footer", TextInputStyle.SHORT)
 				.setPlaceholder("Input footer")
 				.setMinLength(1)
@@ -246,7 +247,7 @@ public class Embed implements SlashCommandEventHandler {
 			footerInput.setValue(current.getText());
 		}
 		Modal modal = Modal.create("footerConfig", "Footer configuration")
-				.addActionRows(ActionRow.of(footerInput.build()))
+				.addComponents(ActionRow.of(footerInput.build()))
 				.build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
@@ -260,7 +261,7 @@ public class Embed implements SlashCommandEventHandler {
 				}).addValidComponents(modal.getId()).append();
 	}
 	
-	private void configureThumbnail(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+	private void configureThumbnail(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "configthumbnail")).setComponents().queue();
 		AwaitTask.forMessageReceival(guild, user, channel,
 				m -> {
@@ -285,7 +286,7 @@ public class Embed implements SlashCommandEventHandler {
 				}).append();
 	}
 	
-	private void configureImage(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+	private void configureImage(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		event.editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "configthumbnail")).setComponents().queue();
 		AwaitTask.forMessageReceival(guild, user, channel,
 				m -> {
@@ -310,10 +311,10 @@ public class Embed implements SlashCommandEventHandler {
 				}).append();
 	}
 	
-	private void configureFields(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+	private void configureFields(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		List<Field> fields = eb.build().getFields();
 		if (!fields.isEmpty()) {
-			SelectMenu.Builder menuBuilder = SelectMenu.create("fieldselection")
+		    StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("fieldselection")
 					.setRequiredRange(1, 1)
 					.setPlaceholder("Select field to configure")
 					.addOption("New field", "new");
@@ -337,7 +338,7 @@ public class Embed implements SlashCommandEventHandler {
 		}
 	}
 	
-	private void continueFieldConfiguration(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event, int targetIndex, List<Field> fields) {
+	private void continueFieldConfiguration(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event, int targetIndex, List<Field> fields) {
 		TextInput.Builder titleInput = TextInput.create("title", "Title", TextInputStyle.SHORT)
 				.setMaxLength(MessageEmbed.TITLE_MAX_LENGTH)
 				.setRequired(true)
@@ -351,7 +352,7 @@ public class Embed implements SlashCommandEventHandler {
 			descriptionInput.setValue(fields.get(targetIndex).getValue());
 		}
 		Modal modal = Modal.create("fieldconfig", "Field configuration")
-				.addActionRows(ActionRow.of(titleInput.build()), ActionRow.of(descriptionInput.build()))
+				.addComponents(ActionRow.of(titleInput.build()), ActionRow.of(descriptionInput.build()))
 				.build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
@@ -382,18 +383,18 @@ public class Embed implements SlashCommandEventHandler {
 				}).addValidComponents(modal.getId()).append();
 	}
 	
-	private void defaultConsumer(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event, String key, String input) {
+	private void defaultConsumer(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event, String key, String input) {
 		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, key + "success")
 				.replaceDescription("{" + key + "}", input)).setComponents().complete();
 		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
 	}
 	
-	private void errorConsumer(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+	private void errorConsumer(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "error")).setComponents().complete();
 		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
 	}
 	
-	private void defaultTimeout(SelectMenu menu, EmbedBuilder eb, SelectMenuInteractionEvent event) {
+	private void defaultTimeout(SelectMenu menu, EmbedBuilder eb, StringSelectInteractionEvent event) {
 		Message newMessage = event.getMessage().editMessageEmbeds(LanguageEngine.fetchMessage(guild, user, this, "timeout")).setComponents().complete();
 		Toolbox.scheduleOperation(() -> continueEmbedConfiguration(newMessage, menu, false, eb), 2000);
 	}

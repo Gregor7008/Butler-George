@@ -9,8 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Nullable;
-
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.event.Level;
 

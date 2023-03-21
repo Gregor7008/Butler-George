@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class Language implements SlashCommandEventHandler {
 
@@ -19,7 +19,7 @@ public class Language implements SlashCommandEventHandler {
 	public void execute(SlashCommandInteractionEvent event) {
 		Guild guild = event.getGuild();
 		User user = event.getUser();
-		SelectMenu menu = SelectMenu.create("sellang")
+		StringSelectMenu menu = StringSelectMenu.create("sellang")
 				.setPlaceholder("Select your language")
 				.setRequiredRange(1, 1)
 				.addOption("English", "en")
