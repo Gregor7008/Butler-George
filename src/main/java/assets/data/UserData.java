@@ -7,30 +7,31 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONObject;
 
+import assets.base.exceptions.EntityNotFoundException;
+import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.single.ModMailData;
 import assets.data.single.ModMailSelectionData;
 import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
-public class UserData implements DataContainer {
+public class UserData {
 
     private final long user_id;
     private ModMailData modmail_selection;
     private ConcurrentHashMap<Long, MemberData> member_datas = new ConcurrentHashMap<>();
+
+    public UserData(User user) throws EntityNotFoundException {
+        if (user == null) {
+            throw new EntityNotFoundException(ReferenceType.USER, "Couldn't find guild, aborting config creation");
+        } else {
+            this.user_id = user.getIdLong();
+        }
+    }
     
 	public UserData(JSONObject data) {
 	    this.user_id = data.getLong(Key.USER_ID);
-        this.instanciateFromJSON(data);
-    }
-    
-    public UserData(User user) {
-        this.user_id = user.getIdLong();
-    }
-
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {        
-        List<Guild> saved_guilds = new ArrayList<>();
+	    List<Guild> saved_guilds = new ArrayList<>();
         data.keySet().forEach(key -> {
             try {
                 Guild guild_candidate = Bot.getAPI().getGuildById(key);
@@ -46,10 +47,8 @@ public class UserData implements DataContainer {
             ModMailSelectionData selection_data = new ModMailSelectionData(modmail_selection_data);
             this.modmail_selection = member_datas.get(selection_data.getGuildId()).getModmail(selection_data.getTicketId());
         }
-        return this;
     }
-
-    @Override
+	
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         

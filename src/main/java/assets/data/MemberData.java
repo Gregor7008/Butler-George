@@ -17,7 +17,7 @@ import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-public class MemberData implements DataContainer {
+public class MemberData {
     
     private final long guild_id;
     private int experience, last_penalty_index, level, levelcard_background = 0;
@@ -27,20 +27,14 @@ public class MemberData implements DataContainer {
     private boolean permanently_muted = false;
     private List<WarningData> warnings = new ArrayList<>();
 
-//  Temporary runtime data
     private int spam_count = 0;
-    
-    public MemberData(Guild guild, JSONObject data) {
-        this.guild_id = guild.getIdLong();
-        this.instanciateFromJSON(data);
-    }
-    
+
     public MemberData(Guild guild) {
         this.guild_id = guild.getIdLong();
     }
     
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public MemberData(Guild guild, JSONObject data) {
+        this.guild_id = guild.getIdLong();
         this.experience = data.getInt(Key.EXPERIENCE);
         this.last_penalty_index = data.getInt(Key.LAST_PENALTY_INDEX);
         this.level = data.getInt(Key.LEVEL);
@@ -69,10 +63,8 @@ public class MemberData implements DataContainer {
             JSONObject warning_object = warnings_array.getJSONObject(i);
             warnings.add(new WarningData(warning_object));
         }
-        return this;
     }
     
-    @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         

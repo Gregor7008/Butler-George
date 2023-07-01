@@ -2,20 +2,12 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
-import assets.data.DataContainer;
-
-public class SystemData implements DataContainer {
+public class SystemData {
     
     private static String LICENSE_KEY, TOKEN, BOT_NAME, BOT_OWNER_NAME, USERNAME, PASSWORD, DATABASE;
     private static long BOT_ID, BOT_OWNER_ID, HOME_SERVER_ID;
 
-    @Override
-    public JSONObject compileToJSON() {
-        return null;
-    }
-
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public SystemData(JSONObject data) {
         LICENSE_KEY = data.getString(Key.LICENSE_KEY);
         TOKEN = data.getString(Key.TOKEN);
         BOT_NAME = data.getString(Key.BOT_NAME);
@@ -27,7 +19,6 @@ public class SystemData implements DataContainer {
         BOT_ID = data.getLong(Key.BOT_ID);
         BOT_OWNER_ID = data.getLong(Key.BOT_OWNER_ID);
         HOME_SERVER_ID = data.getLong(Key.HOME_SERVER_ID);
-        return this;
     }
     
     public String getLicenseKey() {

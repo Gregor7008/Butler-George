@@ -70,7 +70,7 @@ public class ConsoleCommandListener implements ActionListener {
 				}
 				break;
 			case "printCache":
-				ConfigLoader.INSTANCE.manager.log();
+				ConfigLoader.INSTANCE.manager.printCache();
 				break;
 			case "clearCache":
 				ConfigLoader.INSTANCE.manager.getGuildCache().clear();
