@@ -5,44 +5,81 @@ import org.json.JSONObject;
 import assets.data.DataContainer;
 
 public class SystemData implements DataContainer {
-
-    public SystemData() {
-        // TODO Auto-generated constructor stub
-    }
+    
+    private static String LICENSE_KEY, TOKEN, BOT_NAME, BOT_OWNER_NAME, USERNAME, PASSWORD, DATABASE;
+    private static long BOT_ID, BOT_OWNER_ID, HOME_SERVER_ID;
 
     @Override
     public JSONObject compileToJSON() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public DataContainer instanciateFromJSON(JSONObject data) {
-        // TODO Auto-generated method stub
-        return null;
+        LICENSE_KEY = data.getString(Key.LICENSE_KEY);
+        TOKEN = data.getString(Key.TOKEN);
+        BOT_NAME = data.getString(Key.BOT_NAME);
+        BOT_OWNER_NAME = data.getString(Key.BOT_OWNER_NAME);
+        USERNAME = data.getString(Key.USERNAME);
+        PASSWORD = data.getString(Key.PASSWORD);
+        DATABASE = data.getString(Key.DATABASE);
+        
+        BOT_ID = data.getLong(Key.BOT_ID);
+        BOT_OWNER_ID = data.getLong(Key.BOT_OWNER_ID);
+        HOME_SERVER_ID = data.getLong(Key.HOME_SERVER_ID);
+        return this;
+    }
+    
+    public String getLicenseKey() {
+        return LICENSE_KEY;
     }
     
     public String getBotToken() {
-        return null;
+        return TOKEN;
+    }
+    
+    public String getBotName() {
+        return BOT_NAME;
     }
     
     public long getBotId() {
-        return 0L;
+        return BOT_ID;
     }
     
-    public String getLicenseOwner() {
-        return null;
+    public String getBotOwnerName() {
+        return BOT_OWNER_NAME;
+    }
+    
+    public long getBotOwnerId() {
+        return BOT_OWNER_ID;
+    }
+    
+    public long getHomeServerId() {
+        return HOME_SERVER_ID;
     }
     
     public String getDatabaseUsername() {
-        return null;
+        return USERNAME;
     }
     
     public String getDatabasePassword() {
-        return null;
+        return PASSWORD;
     }
     
     public String getDatabaseName() {
-        return null;
+        return DATABASE;
+    }
+    
+    private static abstract class Key {
+        public static final String LICENSE_KEY = "license_key";
+        public static final String TOKEN = "token";
+        public static final String BOT_NAME = "bot_name";
+        public static final String BOT_ID = "bot_id";
+        public static final String BOT_OWNER_NAME = "bot_owner_name";
+        public static final String BOT_OWNER_ID = "bot_owner_id";
+        public static final String HOME_SERVER_ID = "home_id";
+        public static final String USERNAME = "username";
+        public static final String PASSWORD = "password";
+        public static final String DATABASE = "database";
     }
 }
