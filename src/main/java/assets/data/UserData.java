@@ -2,11 +2,11 @@ package assets.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.single.ModMailData;
 import assets.data.single.ModMailSelectionData;
 import base.Bot;
@@ -15,17 +15,17 @@ import net.dv8tion.jda.api.entities.User;
 
 public class UserData implements DataContainer {
 
-    private final User user;
+    private final long user_id;
     private ModMailData modmail_selection;
-    private ConcurrentHashMap<Guild, MemberData> member_datas = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, MemberData> member_datas = new ConcurrentHashMap<>();
     
 	public UserData(JSONObject data) {
-	    this.user = Bot.getAPI().retrieveUserById(data.getLong(Key.USER_ID)).complete();
+	    this.user_id = data.getLong(Key.USER_ID);
         this.instanciateFromJSON(data);
     }
     
     public UserData(User user) {
-        this.user = user;
+        this.user_id = user.getIdLong();
     }
 
     @Override
@@ -39,12 +39,12 @@ public class UserData implements DataContainer {
                 }
             } catch (NumberFormatException e) {}
         });
-        saved_guilds.forEach(guild -> member_datas.put(guild, new MemberData(guild, data.getJSONObject(guild.getId()))));
+        saved_guilds.forEach(guild -> member_datas.put(guild.getIdLong(), new MemberData(guild, data.getJSONObject(guild.getId()))));
 
         JSONObject modmail_selection_data = data.getJSONObject(Key.MODMAIL_SELECTION);
         if (!modmail_selection_data.isEmpty()) {
             ModMailSelectionData selection_data = new ModMailSelectionData(modmail_selection_data);
-            this.modmail_selection = member_datas.get(selection_data.getGuild()).getModmail(selection_data.getTicketId());
+            this.modmail_selection = member_datas.get(selection_data.getGuildId()).getModmail(selection_data.getTicketId());
         }
         return this;
     }
@@ -53,10 +53,10 @@ public class UserData implements DataContainer {
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         
-        member_datas.forEach((guild, data) -> compiledData.put(guild.getId(), data.compileToJSON()));
+        member_datas.forEach((guild, data) -> compiledData.put(String.valueOf(guild), data.compileToJSON()));
         
-        compiledData.put(Key.USER_ID, user.getIdLong());
-        compiledData.put(Key.USER_NAME, user.getName());
+        compiledData.put(Key.USER_ID, this.getUser().getIdLong());
+        compiledData.put(Key.USER_NAME, this.getUser().getName());
         
         ModMailSelectionData modmail_selection_data = new ModMailSelectionData();
         if (modmail_selection != null) {
@@ -66,64 +66,75 @@ public class UserData implements DataContainer {
         
         return compiledData;
     }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
-    }
     
     public User getUser() {
-        return this.user;
+        return Bot.getAPI().retrieveUserById(this.user_id).complete();
     }
     
     public ModMailData getSelectedModMail() {
         return this.modmail_selection;
     }
     
-    public UserData setSelectedModMail(ModMailData ticket_selection) {
+    public void setSelectedModMail(ModMailData ticket_selection) {
         this.modmail_selection = ticket_selection;
-        return this;
     }
     
-    public UserData setSelectedModMail(Guild guild, int ticket_id) {
-        this.modmail_selection = member_datas.get(guild).getModmail(ticket_id);
-        return this;
+    public void setSelectedModMail(Guild guild, int ticket_id) {
+        this.modmail_selection = member_datas.get(guild.getIdLong()).getModmail(ticket_id);
     }
     
-    public ConcurrentHashMap<Guild, MemberData> getMemberDatas() {
+    public ConcurrentHashMap<Long, MemberData> getMemberDataByIds() {
         return this.member_datas;
     }
     
-    public MemberData getMemberData(Guild guild) {
-        return this.member_datas.get(guild);
-    }
-    
-    public UserData setMemberDatas(ConcurrentHashMap<Guild, MemberData> member_datas) {
-        DataTools.setMap(this.member_datas, member_datas);
-        return this;
-    }
-    
-    public UserData addMemberData(Guild guild, MemberData data) {
-        this.member_datas.put(guild, data);
-        return this;
-    }
-    
-    public UserData addMemberDatas(ConcurrentHashMap<Guild, MemberData> member_datas) {
-        this.member_datas.putAll(member_datas);
-        return this;
-    }
-    
-    public UserData removeMemberDatas(Guild... guilds) {
-        for (int i = 0; i < guilds.length; i++) {
-            this.member_datas.remove(guilds[i]);
+    public ConcurrentHashMap<Guild, MemberData> getMemberData() {
+        ConcurrentHashMap<Guild, MemberData> return_value = new ConcurrentHashMap<>();
+        for (Map.Entry<Long, MemberData> entry : this.member_datas.entrySet()) {
+            return_value.put(Bot.getAPI().getGuildById(entry.getKey()), entry.getValue());
         }
-        return this;
+        return return_value;
     }
     
-    public UserData removeMemberDatasByData(MemberData... datas) {
-        DataTools.removeValuesFromMap(this.member_datas, datas);
-        return this;
+    public MemberData getMemberDataById(long guild_id) {
+        return this.member_datas.get(guild_id);
+    }
+    
+    public MemberData getMemberData(Guild guild) {
+        return this.member_datas.get(guild.getIdLong());
+    }
+    
+    public void setMemberDatas(ConcurrentHashMap<Guild, MemberData> member_datas) {
+        ConcurrentHashMap<Long, MemberData> converted_map = new ConcurrentHashMap<>();
+        if (this.member_datas != null) {
+            for (Map.Entry<Guild, MemberData> entry : member_datas.entrySet()) {
+                converted_map.put(entry.getKey().getIdLong(), entry.getValue());
+            }
+        }
+        this.member_datas = converted_map;
+    }
+    
+    public void addMemberDatas(MemberData... datas) {
+        for (MemberData data : datas) {
+            this.member_datas.put(data.getGuildId(), data);
+        }
+    }
+    
+    public void removeMemberDatas(long... guild_ids) {
+        for (int i = 0; i < guild_ids.length; i++) {
+            this.member_datas.remove(guild_ids[i]);
+        }
+    }
+    
+    public void removeMemberDatas(Guild... guilds) {
+        for (int i = 0; i < guilds.length; i++) {
+            this.member_datas.remove(guilds[i].getIdLong());
+        }
+    }
+    
+    public void removeMemberDatasByData(MemberData... datas) {
+        for (MemberData data : datas) {
+            this.member_datas.remove(data.getGuildId());
+        }
     }
     
     private static abstract class Key {

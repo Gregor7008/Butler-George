@@ -62,7 +62,6 @@ public class ConfigLoader {
     }
 	
 	public static boolean connect(String licenseKey) {
-//      Connect with read permissions and validate license
 	    String connectionUri = "mongodb://guest:33646991@butlergeorge.ddns.net:17389/?authMechanism=SCRAM-SHA-256";
 	    MongoClientSettings setting = MongoClientSettings.builder()
                 .applyToSocketSettings(builder -> {

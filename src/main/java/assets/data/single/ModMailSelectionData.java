@@ -2,7 +2,6 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
@@ -41,15 +40,13 @@ public class ModMailSelectionData implements DataContainer {
         
         return compiledData;
     }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
-    }
     
     public Guild getGuild() {
         return this.guild;
+    }
+    
+    public Long getGuildId() {
+        return this.guild.getIdLong();
     }
     
     public ModMailSelectionData setGuild(Guild guild) {

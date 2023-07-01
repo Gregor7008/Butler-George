@@ -567,7 +567,7 @@ public class GuildData implements DataContainer {
 	
 	public void setJoin2CreateChannels(ConcurrentHashMap<VoiceChannel, Join2CreateChannelData> join2create_channels) {
 	    ConcurrentHashMap<Long, Join2CreateChannelData> converted_map = new ConcurrentHashMap<>();
-	    if (join2create_channels != null) {
+	    if (this.join2create_channels != null) {
 	        for (Map.Entry<VoiceChannel, Join2CreateChannelData> entry : join2create_channels.entrySet()) {
 	            converted_map.put(entry.getKey().getIdLong(), entry.getValue());
 	        }
