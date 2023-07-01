@@ -3,10 +3,7 @@ package engines.base;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.json.JSONException;
-
 import base.Bot;
-import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -16,14 +13,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
 public abstract class Check {
-    
-    public static User isUserCategory(Category category) {
-        try {
-            return Bot.getAPI().getUserById(ConfigLoader.INSTANCE.getGuildConfig(category.getGuild(), "customchannelcategories").getLong(category.getId()));
-        } catch (JSONException e) {
-            return null;
-        }
-    }
     
     public static boolean isURL(String subject) {
         try {

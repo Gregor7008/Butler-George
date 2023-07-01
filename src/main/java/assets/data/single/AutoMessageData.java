@@ -2,7 +2,6 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import base.Bot;
 import engines.base.LanguageEngine;
@@ -57,12 +56,6 @@ public class AutoMessageData implements DataContainer {
         compiledData.put(Key.ACTIVATED, activated);
 
         return compiledData;
-    }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
     }
     
     public Guild getGuild() {

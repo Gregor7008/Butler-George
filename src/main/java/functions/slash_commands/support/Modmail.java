@@ -192,7 +192,7 @@ public class Modmail implements SlashCommandEventHandler {
 		TextInput messageInput = TextInput.create("message", "Message", TextInputStyle.PARAGRAPH)
 				.setPlaceholder("Input initial message")
 				.build();
-		Modal modal = Modal.create("modmailModal", "Open Modmail").addActionRows(ActionRow.of(titleInput), ActionRow.of(messageInput)).build();
+		Modal modal = Modal.create("modmailModal", "Open Modmail").addComponents(ActionRow.of(titleInput), ActionRow.of(messageInput)).build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessageChannel(),
 				mi -> {

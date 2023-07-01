@@ -12,10 +12,8 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import javax.security.auth.login.LoginException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -38,7 +36,8 @@ import base.Bot.ShutdownReason;
 import engines.base.CentralTimer;
 import engines.base.ConsoleCommandListener;
 import engines.base.ScrollEngine;
-import engines.data.ConfigManager;
+import engines.base.Toolbox;
+import engines.data.ConfigLoader;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.miginfocom.swing.MigLayout;
@@ -49,14 +48,8 @@ public class GUI extends JFrame implements FocusListener {
 	
 	private static final long serialVersionUID = 5923282583431103590L;
     
-    public final ConcurrentHashMap<Argument, String> argument = new ConcurrentHashMap<>();
     public final JTextArea console = new JTextArea();
     public final JTextField consoleIn = new JTextField();
-    public final JTextField databaseIP = new JTextField();
-    public final JTextField databaseName = new JTextField();
-    public final JTextField botToken = new JTextField();
-    public final JTextField databasePort = new JTextField();
-    public final JTextField username = new JTextField();
     public final JPasswordField password = new JPasswordField();
     
 	private final JLabel greenLED = new JLabel();
@@ -83,6 +76,7 @@ public class GUI extends JFrame implements FocusListener {
     private OffsetDateTime startTime = null;
     private Duration additional = Duration.ZERO;
     private boolean invalidArguments, autostart = false;
+    private String licenseKey = "";
 	
 	public static void main(String[] args) {
 		try {
@@ -130,18 +124,26 @@ public class GUI extends JFrame implements FocusListener {
 		
 		redLED.setIcon(redLEDOn);
 		getContentPane().add(redLED, "flowx,cell 5 0,alignx center");
+		if (!this.licenseKey.isBlank()) {
+            password.setText(this.licenseKey);
+            password.setForeground(Color.BLACK);
+            password.setEchoChar('*');
+		}
 		
-		this.setupTextField(databaseIP, "Server IP", argument.get(Argument.DATABASE_IP));
-		getContentPane().add(databaseIP, "cell 1 0,growx,aligny bottom");
-		
-		this.setupTextField(databasePort, "Port", argument.get(Argument.DATABASE_PORT));
-		getContentPane().add(databasePort, "cell 2 0,growx,aligny bottom");
-		
-		this.setupTextField(databaseName, "Database name", argument.get(Argument.DATABASE_NAME));
-		getContentPane().add(databaseName, "cell 3 0,growx,aligny bottom");
-		
-		this.setupTextField(username, "Username", argument.get(Argument.USERNAME));
-		getContentPane().add(username, "cell 1 1 2 1,grow");
+		showPassword.setSize(30, 20);
+		showPassword.setMargin(new Insets(0,0,0,0));
+		Image eyeIconRescaled = eyeIconRaw.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		showPassword.setIcon(new ImageIcon(eyeIconRescaled));
+		showPassword.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				password.setEchoChar((char) 0);
+	        }
+			@Override
+	        public void mouseReleased(MouseEvent e) {
+				password.setEchoChar('*');
+	        }
+		});
 		
 		password.setEchoChar((char) 0);
 		password.setForeground(Color.GRAY);
@@ -168,37 +170,14 @@ public class GUI extends JFrame implements FocusListener {
 				}
 			}
 		});
-		if (argument.get(Argument.PASSWORD) != null) {
-            password.setText(argument.get(Argument.PASSWORD));
-            password.setForeground(Color.BLACK);
-            password.setEchoChar('*');
-		}
-		getContentPane().add(password, "cell 3 1 2 1,grow");
-		
-		showPassword.setSize(30, 20);
-		showPassword.setMargin(new Insets(0,0,0,0));
-		Image eyeIconRescaled = eyeIconRaw.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
-		showPassword.setIcon(new ImageIcon(eyeIconRescaled));
-		showPassword.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				password.setEchoChar((char) 0);
-	        }
-			@Override
-	        public void mouseReleased(MouseEvent e) {
-				password.setEchoChar('*');
-	        }
-		});
+		getContentPane().add(password, "cell 1 1 4 1,grow");
 		getContentPane().add(showPassword, "cell 5 1,alignx left");
-		
-		this.setupTextField(botToken, "Bot Token", argument.get(Argument.TOKEN));
-		getContentPane().add(botToken, "cell 1 2 5 1,grow");
 		
 		startButton.addActionListener(e -> {
 			this.startBot();
 		});
 		startButton.setFont(default_font);
-		getContentPane().add(startButton, "flowx,cell 1 3 2 1,grow");
+		getContentPane().add(startButton, "flowx,cell 1 2 2 1,grow");
 		
 		stopButton.addActionListener(e -> {
 			if (shutdownWindowBox.isSelected()) {
@@ -209,12 +188,10 @@ public class GUI extends JFrame implements FocusListener {
 		});
 		stopButton.setEnabled(false);
 		stopButton.setFont(default_font);
-		getContentPane().add(stopButton, "cell 3 3 3 1,grow");
+		getContentPane().add(stopButton, "cell 3 2 3 1,grow");
 		
 		sdWLabel.setFont(default_font);
-		getContentPane().add(sdWLabel, "cell 3 4 2 1,alignx right,aligny center");
-		
-		getContentPane().add(shutdownWindowBox, "cell 5 4,alignx left,aligny center");
+		getContentPane().add(sdWLabel, "cell 3 3 2 1,alignx right,aligny center");
 		
 		infoTable.setShowGrid(false);
 		infoTable.setFont(default_font);
@@ -229,7 +206,7 @@ public class GUI extends JFrame implements FocusListener {
 				{"Servers:", 0},
 				{"Users:", 0},
 				{"J2C-Channels", 0},
-				{"Push Cycle Period:", String.valueOf(ConfigManager.PUSH_CYCLE_PERIOD) + " min."},
+				{"Push Cycle Period:", String.valueOf(ConfigLoader.PUSH_CYCLE_PERIOD) + " min."},
 				{"Total Pushs:", 0}
 			},
 			new String[] {
@@ -269,9 +246,11 @@ public class GUI extends JFrame implements FocusListener {
 		});
 		commandTable.getColumnModel().getColumn(0).setResizable(false);
 		
+		getContentPane().add(shutdownWindowBox, "cell 5 3,alignx left,aligny center");
+		
 		tabbedPane.addTab("Commands", null, commandTable, null);
 		tabbedPane.setFont(default_font);
-		getContentPane().add(tabbedPane, "cell 1 5 5 2,grow");
+		getContentPane().add(tabbedPane, "cell 1 4 5 3,grow");
 		
 		consoleIn.addActionListener(new ConsoleCommandListener());
 		consoleIn.setFont(console_font);
@@ -289,15 +268,19 @@ public class GUI extends JFrame implements FocusListener {
 
 	public void startBot() {
 		if (Bot.isShutdown()) {
-			try {
-				new Bot(botToken.getText(), databaseIP.getText(), databasePort.getText(), databaseName.getText(), username.getText(), String.copyValueOf(password.getPassword()));
-			} catch (LoginException | InterruptedException | IOException e) {
-				ConsoleEngine.getLogger(Bot.class).error("Bot instanciation failed - Check token validity!");
-				Bot.get().kill();
-			} catch (IllegalArgumentException e) {
-				ConsoleEngine.getLogger(Bot.class).error("Bot instanciation failed - " + e.getMessage());
-				Bot.get().kill();
-			}
+		    if (this.licenseKey.isBlank()) {
+		        ConsoleEngine.getLogger(this).warn("License key is empty, please provide valid key.");
+		    } else {
+		        if (ConfigLoader.connect(this.licenseKey)) {
+		            try {
+                        new Bot();
+                    } catch (InterruptedException e) {
+                        ConsoleEngine.getLogger(this).debug("Connection to Discords servers failed, please contact support!");
+                    }
+		        }
+		    }
+		} else {
+		    ConsoleEngine.getLogger(this).debug("Bot is already running!");
 		}
 	}
 	
@@ -321,7 +304,7 @@ public class GUI extends JFrame implements FocusListener {
             @Override
             public void run() {
                 Duration diff = Duration.between(startTime, OffsetDateTime.now()).plus(additional);
-                GUI.INSTANCE.setTableValue(3, ConfigManager.convertDurationToString(diff));
+                GUI.INSTANCE.setTableValue(3, Toolbox.convertDurationToString(diff));
             }
         }, TimeUnit.MILLISECONDS,  0, TimeUnit.SECONDS, 1);
     }
@@ -408,25 +391,15 @@ public class GUI extends JFrame implements FocusListener {
             } else {
                 for (int a = 0; a < input.length; a++) {
                     if (input[a].startsWith("--")) {
-                        Argument argumentType = null;
                         switch (input[a]) {
-                            case "--dbip":
-                                argumentType = Argument.DATABASE_IP;
-                                break;
-                            case "--dbport":
-                                argumentType = Argument.DATABASE_PORT;
-                                break;
-                            case "--dbname":
-                                argumentType = Argument.DATABASE_NAME;
-                                break;
-                            case "--user":
-                                argumentType = Argument.USERNAME;
-                                break;
-                            case "--password":
-                                argumentType = Argument.PASSWORD;
-                                break;
-                            case "--token":
-                                argumentType = Argument.TOKEN;
+                            case "--license":
+                                if (a+1 < input.length && !input[a+1].startsWith("--")) {
+                                    a += 1;
+                                    String value = input[a];
+                                    if (!value.isBlank()) {
+                                        this.licenseKey = value; 
+                                    }
+                                }
                                 break;
                             case "--autostart":
                                 this.autostart = true;
@@ -434,46 +407,11 @@ public class GUI extends JFrame implements FocusListener {
                             default:
                                 this.invalidArguments = true;
                         }
-                        if (argumentType != null && a+1 < input.length && !input[a+1].startsWith("--")) {
-                            a += 1;
-                            String value = input[a];
-                            if (!value.isBlank()) {
-                                if (value.startsWith(">")) {
-                                    for (int e = a+1; e < input.length; e++) {
-                                        a += 1;
-                                        value += " " + input[e];
-                                        if (value.endsWith("<")) {
-                                            e = input.length;
-                                        }
-                                    }
-                                    value = value.replace(">", "").replace("<", "");
-                                }
-                                if (argumentType == Argument.DATABASE_IP && value.contains(":")) {
-                                    String[] split_value = value.split(":");
-                                    this.argument.put(Argument.DATABASE_IP, split_value[0]);
-                                    this.argument.put(Argument.DATABASE_PORT, split_value[1]);
-                                } else {
-                                    this.argument.put(argumentType, value);
-                                }
-                            }
-                        }
                     } else {
                         this.invalidArguments = true;
                     }
                 }
             }
-        }
-    }
-    
-    private void setupTextField(JTextField textField, String name, @Nullable String value) {
-        textField.setForeground(Color.GRAY);
-        textField.setFont(default_font);
-        textField.setName(name);
-        textField.setText(name);
-        textField.addFocusListener(this);
-        if (value != null) {
-            textField.setText(value);
-            textField.setForeground(Color.BLACK);
         }
     }
     
@@ -502,14 +440,5 @@ public class GUI extends JFrame implements FocusListener {
 			textField.setForeground(Color.GRAY);
 			textField.setText(textField.getName());
 		}
-	}
-	
-	private static enum Argument {
-	    DATABASE_IP,
-	    DATABASE_PORT,
-	    DATABASE_NAME,
-	    USERNAME,
-	    PASSWORD,
-	    TOKEN;
 	}
 }

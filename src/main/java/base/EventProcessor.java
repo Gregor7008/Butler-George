@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import assets.functions.MessageContextEventHandler;
 import assets.functions.SlashCommandEventHandler;
 import assets.functions.UserContextEventHandler;
-import engines.base.Check;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import engines.data.ConfigLoader;
@@ -27,13 +26,11 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -239,15 +236,6 @@ public class EventProcessor extends ListenerAdapter {
 				guild.getTextChannelById(goodbyemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title, message)).queue();
 			}
 		}
-		if (ConfigLoader.INSTANCE.getMemberConfig(guild, user).getLong("customchannelcategory") != 0) {
-			Category ctg = guild.getCategoryById(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getLong("customchannelcategory"));
-			List<GuildChannel> channels = ctg.getChannels();
-			for (int i = 0; i < channels.size(); i++) {
-				channels.get(i).delete().queue();
-			}
-			ctg.delete().queue();
-			ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("customchannelcategory", 0L);
-		}
 	}
 	
 	@Override
@@ -332,12 +320,6 @@ public class EventProcessor extends ListenerAdapter {
 	public void onChannelDelete(ChannelDeleteEvent event) {
 		final Guild guild = event.getGuild();
 		ConfigVerifier.RUN.guildCheck(guild);
-		if (event.isFromType(ChannelType.CATEGORY)) {
-			Category ctg = (Category) event.getChannel();
-			if (Check.isUserCategory(ctg) != null) {
-				ConfigVerifier.RUN.userCheck(guild, Check.isUserCategory(ctg));
-			}
-		}
 	}
 	
 	@Override

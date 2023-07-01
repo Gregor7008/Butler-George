@@ -34,7 +34,7 @@ public class TempBan implements UserContextEventHandler {
 				.setMaxLength(3)
 				.setPlaceholder("Input duration in days")
 				.build();
-		Modal modal = Modal.create("configTempban", "Configure temporary ban").addActionRows(ActionRow.of(dayInput)).build();
+		Modal modal = Modal.create("configTempban", "Configure temporary ban").addComponents(ActionRow.of(dayInput)).build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessageChannel(),
 				  d -> {

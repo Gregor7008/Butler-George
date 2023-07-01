@@ -2,12 +2,14 @@ package engines.base;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -28,6 +30,23 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 
 public abstract class Toolbox {
+    
+    public static String convertDurationToString(Duration duration) {
+        return String.format("%02d:%02d:%02d:%02d",
+                duration.toDaysPart(),
+                duration.toHoursPart(), 
+                duration.toMinutesPart(), 
+                duration.toSecondsPart());
+    }
+    
+    public static Duration convertStringToDuration(String string) {
+        String[] codes = string.split(":");
+        long days = TimeUnit.DAYS.toSeconds(Integer.valueOf(codes[0]));
+        long hours = TimeUnit.HOURS.toSeconds(Integer.valueOf(codes[1]));
+        long minutes = TimeUnit.MINUTES.toSeconds(Integer.valueOf(codes[2]));
+        long seconds = Long.valueOf(codes[3]);
+        return Duration.ofSeconds(days + hours + minutes + seconds);
+    }
 
 	public static void forwardMessage(MessageChannel target, Message source) {
 		List<Attachment> attachements = source.getAttachments();
@@ -73,7 +92,7 @@ public abstract class Toolbox {
 				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.DEFAULT_TIME_FORMAT))
 				.replace("{boosts}", String.valueOf(guild.getBoostCount()));
 		if (user != null) {
-		    output = output.replace("{level}", String.valueOf(ConfigLoader.INSTANCE.getMemberConfig(guild, user).getInt("level")));
+		    output = output.replace("{level}", String.valueOf(ConfigLoader.get().getMemberConfig(guild, user).getInt("level")));
 	        if (mentions) {
 	            output = output.replace("{user}", user.getAsMention());
 	        } else {

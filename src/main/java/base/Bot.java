@@ -1,10 +1,7 @@
 package base;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.security.auth.login.LoginException;
 
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -17,7 +14,6 @@ import engines.base.EventAwaiter;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import engines.data.ConfigLoader;
-import engines.data.ConfigVerifier;
 import engines.functions.ModController;
 import engines.logging.ConsoleEngine;
 import functions.configuration_options.ServerConfigurationOptionsList;
@@ -39,7 +35,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 public class Bot {
 	
-	public static String VERSION = "V2.0-dev.0";
+	public static String VERSION = "V2.1-dev.0";
 	public static String NAME = "Butler George";
 	public static String ID = "853887837823959041";
 	public static String HOME = "708381749826289666";
@@ -75,9 +71,18 @@ public class Bot {
         }
     }
 	
-	public Bot(String token, String serverIP, String port, String databaseName, String username, String password) throws LoginException, InterruptedException, IOException {
-		this.performPreStartupOperations(serverIP, port, databaseName, username, password);
-		JDABuilder builder = JDABuilder.createDefault(token);
+	public Bot() throws InterruptedException {
+	    INSTANCE = this;
+//	    List Creation
+        ServerConfigurationOptionsList.create();
+        UserConfigurationOptionsList.create();
+        MessageContextCommandList.create();
+        UserContextCommandList.create();
+        GuildUtilitiesList.create();
+        SlashCommandList.create();
+        LOG.debug("Successfully created lists");
+//      API Login
+		JDABuilder builder = JDABuilder.createDefault(ConfigLoader.get().getSystemData().getBotToken());
 		builder.addEventListeners(new EventProcessor(), new EventAwaiter());
 		Object[] serverUtils = GuildUtilitiesList.getEngines().values().toArray();
 		builder.addEventListeners(serverUtils);
@@ -88,40 +93,20 @@ public class Bot {
 		jda.getPresence().setStatus(OnlineStatus.ONLINE);	    
 	    jda.getPresence().setActivity(Activity.playing(VERSION));
 	    LOG.debug("Bot online");
-	    this.performPostStartupOperations();
-	}
-	
-	private void performPreStartupOperations(String serverIP, String port, String databaseName, String username, String password) {
-//		Essentials
-		INSTANCE = this;
-		new ConfigLoader(serverIP, port, databaseName, username, password);
-		new ConfigVerifier();
-//	    Lists
-	    ServerConfigurationOptionsList.create();
-	    UserConfigurationOptionsList.create();
-	    MessageContextCommandList.create();
-	    UserContextCommandList.create();
-	    GuildUtilitiesList.create();
-	    SlashCommandList.create();
-//	    Debug logging
-	    LOG.debug("Pre-Startup operations completed");
-	}
-	
-	private void performPostStartupOperations() {
-//		Essentials
-		Runtime.getRuntime().addShutdownHook(this.getShutdownThread());
-		Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.getInstance());
-//	    Engines
-	    new ModController();
-//    	GUI
-    	GUI.INSTANCE.setBotRunning(true);
-    	GUI.INSTANCE.updateStatistics();
-    	GUI.INSTANCE.startRuntimeMeasuring();
-//	    Startup operations
-    	GuildUtilitiesList.getEngines().forEach((id, handler) -> handler.onStartup());
-    	this.processMissedModMailMessages();
-//    	Debug logging
-    	LOG.debug("Post-Startup operations completed");
+//      Setup Runtime
+        Runtime.getRuntime().addShutdownHook(this.getShutdownThread());
+        Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.getInstance());
+//      Startup Engines
+        new ModController();
+//      GUI Udates
+        GUI.INSTANCE.setBotRunning(true);
+        GUI.INSTANCE.updateStatistics();
+        GUI.INSTANCE.startRuntimeMeasuring();
+//      Startup Operations
+        GuildUtilitiesList.getEngines().forEach((id, handler) -> handler.onStartup());
+        this.processMissedModMailMessages();
+//      Debug Logging
+        LOG.debug("Post-Startup operations completed");
 	}
 	
 	private void processMissedModMailMessages() {
@@ -129,14 +114,14 @@ public class Bot {
     	List<Long> processedUserIds = new ArrayList<>();
     	for (int i = 0; i < guilds.size(); i++) {
     		final Guild guild = guilds.get(i);
-    		final JSONObject modmailDataSet = ConfigLoader.INSTANCE.getGuildConfig(guild, "modmails");
+    		final JSONObject modmailDataSet = ConfigLoader.get().getGuildConfig(guild, "modmails");
     		modmailDataSet.keySet().forEach(ticketChannelId -> {
     			final JSONArray modmailData = modmailDataSet.getJSONArray(ticketChannelId);
     			final User ticketOwner = jda.retrieveUserById(modmailData.getLong(0)).complete();
-    			final JSONArray ticketData = ConfigLoader.INSTANCE.getMemberConfig(guild, ticketOwner, "modmails").getJSONArray(String.valueOf(modmailData.getLong(1)));
-    			final JSONArray selectedTicket = ConfigLoader.INSTANCE.getUserConfig(ticketOwner).getJSONArray("selected_ticket");
+    			final JSONArray ticketData = ConfigLoader.get().getMemberConfig(guild, ticketOwner, "modmails").getJSONArray(String.valueOf(modmailData.getLong(1)));
+    			final JSONArray selectedTicket = ConfigLoader.get().getUserConfig(ticketOwner).getJSONArray("selected_ticket");
     			final Guild selectedTicketGuild = jda.getGuildById(selectedTicket.getLong(0));
-    			final JSONArray selectedTicketData = ConfigLoader.INSTANCE.getMemberConfig(selectedTicketGuild, ticketOwner, "modmails").getJSONArray(String.valueOf(selectedTicket.getLong(1)));
+    			final JSONArray selectedTicketData = ConfigLoader.get().getMemberConfig(selectedTicketGuild, ticketOwner, "modmails").getJSONArray(String.valueOf(selectedTicket.getLong(1)));
     			if (!processedUserIds.contains(modmailData.getLong(0))) {
 //    				Process users messages to selected ticket
     				List<Message> messagesByUser = null;
@@ -180,14 +165,14 @@ public class Bot {
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);
 //    		Delete channels created with Join2Create channels
-    		JSONObject createdchannels = ConfigLoader.INSTANCE.getGuildConfig(guild, "createdchannels");
+    		JSONObject createdchannels = ConfigLoader.get().getGuildConfig(guild, "createdchannels");
     		if (!createdchannels.isEmpty()) {
     			createdchannels.keySet().forEach(e -> createdchannels.getJSONObject(e).keySet().forEach(a ->  guild.getVoiceChannelById(a).delete().queue()));
     			createdchannels.clear();
     		}
 //    		Send offline message
     		if (sendMessage) {
-    		    long chid = ConfigLoader.INSTANCE.getGuildConfig(guild).getLong("communityinbox");
+    		    long chid = ConfigLoader.get().getGuildConfig(guild).getLong("communityinbox");
                 if (chid == 0L) {
                     chid = guild.getTextChannels().stream().filter(c -> {return guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND);}).toList().get(0).getIdLong();
                 }
@@ -199,16 +184,16 @@ public class Bot {
                     offlineMessageBuilder.append(additionalMessage);
                 }
                 long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(offlineMessageBuilder.toString())).complete().getIdLong();
-                ConfigLoader.INSTANCE.getGuildConfig(guild).put("offlinemsg", new JSONArray().put(msgid).put(chid));
+                ConfigLoader.get().getGuildConfig(guild).put("offlinemsg", new JSONArray().put(msgid).put(chid));
     		}
 //    		Save ModMail status
-    		JSONObject modmailDataSet = ConfigLoader.INSTANCE.getGuildConfig(guild, "modmails");
+    		JSONObject modmailDataSet = ConfigLoader.get().getGuildConfig(guild, "modmails");
     		modmailDataSet.keySet().forEach(ticketChannelId -> {
     			JSONArray modmailData = modmailDataSet.getJSONArray(ticketChannelId);
     			User ticketOwner = jda.retrieveUserById(modmailData.getLong(0)).complete();
     			if (!processedUserIds.contains(modmailData.getLong(0))) {
     				processedUserIds.add(ticketOwner.getIdLong());
-    				JSONArray ticketData = ConfigLoader.INSTANCE.getMemberConfig(guild, ticketOwner, "modmails").getJSONArray(String.valueOf(modmailData.getLong(1)));
+    				JSONArray ticketData = ConfigLoader.get().getMemberConfig(guild, ticketOwner, "modmails").getJSONArray(String.valueOf(modmailData.getLong(1)));
     				if (ticketData.getLong(2) == 0) {
     					ticketData.put(2, guild.getTextChannelById(ticketChannelId).getLatestMessageIdLong());
     				}
@@ -226,7 +211,7 @@ public class Bot {
 		jda.shutdown();
 		GUI.INSTANCE.setBotRunning(false);
 		GUI.INSTANCE.stopRuntimeMeasuring();
-		ConfigLoader.INSTANCE.manager.pushCache();
+		ConfigLoader.get().pushCache();
 		shutdown = true;
 //		Debug logging
 		LOG.debug("Bot offline");

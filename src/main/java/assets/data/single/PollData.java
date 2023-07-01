@@ -55,7 +55,7 @@ public class PollData implements DataContainer, MessageConnection {
 //  Temporary runtime data
     private long timer_operation_id = 0L;
 
-	public PollData(Message message, JSONObject data) {
+	public PollData(TextChannel channel, Message message2, JSONObject data) {
         this.guild = message.getGuild();
 	    this.text_channel = message.getChannel().asTextChannel();
 	    this.message = message;

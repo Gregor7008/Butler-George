@@ -32,8 +32,7 @@ public class StaticRoles implements ConfigurationEventHandler {
 		event.getMessage().editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "seltype")).setActionRow(
 				Button.secondary("adminroles", Emoji.fromUnicode("\u2696")),
 				Button.secondary("moderationroles", Emoji.fromUnicode("\uD83D\uDC6E")),
-				Button.secondary("supportroles", Emoji.fromUnicode("\uD83D\uDEA8")),
-				Button.secondary("customchannelpolicingroles", Emoji.fromUnicode("\uD83D\uDD12"))).queue();
+				Button.secondary("supportroles", Emoji.fromUnicode("\uD83D\uDEA8"))).queue();
 		AwaitTask.forButtonInteraction(guild, user, event.getMessage(),
 				b -> {
 					String type = b.getComponentId();

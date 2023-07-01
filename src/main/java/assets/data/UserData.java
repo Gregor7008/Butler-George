@@ -57,7 +57,6 @@ public class UserData implements DataContainer {
         
         compiledData.put(Key.USER_ID, user.getIdLong());
         compiledData.put(Key.USER_NAME, user.getName());
-        compiledData.put(Key.USER_DISCRIMINATOR, user.getDiscriminator());
         
         ModMailSelectionData modmail_selection_data = new ModMailSelectionData();
         if (modmail_selection != null) {
@@ -130,7 +129,6 @@ public class UserData implements DataContainer {
     private static abstract class Key {
         public static final String USER_ID = "id";
         public static final String USER_NAME = "name";
-        public static final String USER_DISCRIMINATOR = "discriminator";
         public static final String MODMAIL_SELECTION = "modmail_selection";
     }
 }

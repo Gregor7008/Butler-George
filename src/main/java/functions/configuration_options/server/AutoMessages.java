@@ -82,7 +82,7 @@ public class AutoMessages implements ConfigurationEventHandler {
 											.setRequired(false)
 											.build();
 									Modal.Builder modalBuilder = Modal.create("configMessage", type.substring(0, 1).toUpperCase() + type.substring(1) + " message configuration");
-									modalBuilder.addActionRows(ActionRow.of(titleInput), ActionRow.of(messageInput), ActionRow.of(varDisplay));
+									modalBuilder.addComponents(ActionRow.of(titleInput), ActionRow.of(messageInput), ActionRow.of(varDisplay));
 									s.replyModal(modalBuilder.build()).queue();
 									s.getMessage().editMessageEmbeds(firstReplyEmbed).setComponents().queue();
 									AwaitTask.forModalInteraction(guild, user, s.getMessage(),

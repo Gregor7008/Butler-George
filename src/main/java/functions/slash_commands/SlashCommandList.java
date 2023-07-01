@@ -18,11 +18,8 @@ import functions.slash_commands.music.Stop;
 import functions.slash_commands.support.Modmail;
 import functions.slash_commands.support.Report;
 import functions.slash_commands.support.Suggest;
-import functions.slash_commands.utilities.Channelpermission;
-import functions.slash_commands.utilities.CreateChannel;
 import functions.slash_commands.utilities.Embed;
 import functions.slash_commands.utilities.Language;
-import functions.slash_commands.utilities.Leave;
 import functions.slash_commands.utilities.Level;
 import functions.slash_commands.utilities.Levelbackground;
 import functions.slash_commands.utilities.PingAndMove;
@@ -64,10 +61,7 @@ public abstract class SlashCommandList {
 		add(new Userinfo());
 		add(new Serverinfo());
 		add(new Language());
-		add(new CreateChannel());
-		add(new Channelpermission());
 		add(new PingAndMove());
-		add(new Leave());
 	}
 	
 	public static void add(SlashCommandEventHandler handler) {

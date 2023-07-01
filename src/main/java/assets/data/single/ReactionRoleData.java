@@ -12,7 +12,7 @@ public class ReactionRoleData implements DataContainer, MessageConnection {
 
 //  TODO Implement completely
     
-	public ReactionRoleData(JSONObject data) {
+	public ReactionRoleData(TextChannel channel, Message message, JSONObject data) {
 	    this.instanciateFromJSON(data);
 	}
 	

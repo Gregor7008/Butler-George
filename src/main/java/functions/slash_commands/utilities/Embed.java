@@ -195,7 +195,7 @@ public class Embed implements SlashCommandEventHandler {
 				.setRequired(false)
 				.build();
 		Modal modal = Modal.create("titleConfig", "Title configuration")
-				.addActionRows(ActionRow.of(titleInput.build()), ActionRow.of(titleURLInput))
+				.addComponents(ActionRow.of(titleInput.build()), ActionRow.of(titleURLInput))
 				.build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
@@ -223,7 +223,7 @@ public class Embed implements SlashCommandEventHandler {
 			descriptionInput.setValue(current);
 		}
 		Modal modal = Modal.create("descriptionConfig", "Description configuration")
-				.addActionRows(ActionRow.of(descriptionInput.build()))
+				.addComponents(ActionRow.of(descriptionInput.build()))
 				.build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
@@ -248,7 +248,7 @@ public class Embed implements SlashCommandEventHandler {
 			footerInput.setValue(current.getText());
 		}
 		Modal modal = Modal.create("footerConfig", "Footer configuration")
-				.addActionRows(ActionRow.of(footerInput.build()))
+				.addComponents(ActionRow.of(footerInput.build()))
 				.build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,
@@ -353,7 +353,7 @@ public class Embed implements SlashCommandEventHandler {
 			descriptionInput.setValue(fields.get(targetIndex).getValue());
 		}
 		Modal modal = Modal.create("fieldconfig", "Field configuration")
-				.addActionRows(ActionRow.of(titleInput.build()), ActionRow.of(descriptionInput.build()))
+				.addComponents(ActionRow.of(titleInput.build()), ActionRow.of(descriptionInput.build()))
 				.build();
 		event.replyModal(modal).queue();
 		AwaitTask.forModalInteraction(guild, user, event.getMessage(), null,

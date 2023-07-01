@@ -67,7 +67,6 @@ public class Userinfo implements SlashCommandEventHandler {
 		
 		eb.addField(":diamond_shape_with_a_dot_inside:" + titles[2], "`" + member.getUser().getName() + "`", true);
 		eb.addField(":name_badge:" + titles[3], "`" + member.getAsMention() + "`", true);
-		eb.addField(":registered:" + titles[4], "`" + member.getUser().getDiscriminator() + "`", true);
 		if(moderator) {eb.addField(":id:" + titles[5], "`" + member.getUser().getId() + "`", true);}
 		eb.addField(":robot:" + titles[6], "`" + String.valueOf(member.getUser().isBot()) + "`", true);
 		eb.addField(":rocket:" + titles[7], "`" + booster + "`", true);
