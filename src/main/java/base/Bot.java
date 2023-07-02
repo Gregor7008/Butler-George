@@ -2,12 +2,13 @@ package base;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
+import assets.data.single.Join2CreateChannelData;
+import assets.data.single.ModMailData;
 import assets.logging.Logger;
 import engines.base.CentralTimer;
 import engines.base.EventAwaiter;
@@ -29,7 +30,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
@@ -114,46 +115,41 @@ public class Bot {
     	List<Long> processedUserIds = new ArrayList<>();
     	for (int i = 0; i < guilds.size(); i++) {
     		final Guild guild = guilds.get(i);
-    		final JSONObject modmailDataSet = ConfigLoader.get().getGuildConfig(guild, "modmails");
-    		modmailDataSet.keySet().forEach(ticketChannelId -> {
-    			final JSONArray modmailData = modmailDataSet.getJSONArray(ticketChannelId);
-    			final User ticketOwner = jda.retrieveUserById(modmailData.getLong(0)).complete();
-    			final JSONArray ticketData = ConfigLoader.get().getMemberConfig(guild, ticketOwner, "modmails").getJSONArray(String.valueOf(modmailData.getLong(1)));
-    			final JSONArray selectedTicket = ConfigLoader.get().getUserConfig(ticketOwner).getJSONArray("selected_ticket");
-    			final Guild selectedTicketGuild = jda.getGuildById(selectedTicket.getLong(0));
-    			final JSONArray selectedTicketData = ConfigLoader.get().getMemberConfig(selectedTicketGuild, ticketOwner, "modmails").getJSONArray(String.valueOf(selectedTicket.getLong(1)));
-    			if (!processedUserIds.contains(modmailData.getLong(0))) {
+    		final ConcurrentHashMap<Long, ModMailData> modmailsData = ConfigLoader.get().getGuildData(guild).getModmailIds();
+    		modmailsData.keySet().forEach(ticketChannelId -> {
+    			final ModMailData modmailData = modmailsData.get(ticketChannelId);
+    			final long ticketOwner = modmailData.getUserId();
+                final ModMailData selectedTicket = ConfigLoader.get().getUserData(ticketOwner).getSelectedModMail();
+    			if (!processedUserIds.contains(ticketOwner)) {
 //    				Process users messages to selected ticket
     				List<Message> messagesByUser = null;
     				try {
-    					messagesByUser = ticketOwner.openPrivateChannel().complete().getHistoryAfter(selectedTicketData.getLong(3), 100).complete().getRetrievedHistory();
+    					messagesByUser = modmailData.getUser().openPrivateChannel().complete().getHistoryAfter(selectedTicket.getLastUserMessageId(), 100).complete().getRetrievedHistory();
     				} catch (JSONException e) {}
     				if (messagesByUser != null) {
     					for (int a = messagesByUser.size() - 1 ; a >= 0 ; a--) {
-    						if (!messagesByUser.get(a).getAuthor().isBot() && messagesByUser.get(a).getIdLong() != selectedTicketData.getLong(2)) {
-    							Toolbox.forwardMessage(selectedTicketGuild.getTextChannelById(selectedTicketData.getLong(0)), messagesByUser.get(a));
+    					    Message message = messagesByUser.get(a);
+    						if (!message.getAuthor().isBot() && message.getIdLong() != selectedTicket.getLastUserMessageId()) {
+    							Toolbox.forwardMessage(selectedTicket.getGuildChannel(), message);
     						}
     					}
     				}
-    				selectedTicketData.remove(3);
 //    				Process servers messages to user, if the user has the ticket selected
-    				if (guild.getIdLong() == selectedTicket.getLong(0)
-    						&& modmailData.getLong(1) == selectedTicket.getLong(1)) {
+    				if (guild.getIdLong() == selectedTicket.getGuildId() && modmailData.getTicketId() == selectedTicket.getTicketId()) {
     					List<Message> messagesByServer = null;
     					try {
-    						if (ticketData.getLong(2) != 0) {
-    							messagesByServer = guild.getTextChannelById(ticketData.getLong(0)).getHistoryAfter(ticketData.getLong(2), 100).complete().getRetrievedHistory();
-    						}
+    						messagesByServer = modmailData.getGuildChannel().getHistoryAfter(modmailData.getLastGuildMessageId(), 100).complete().getRetrievedHistory();
     					} catch (JSONException e) {}
     					if (messagesByServer != null) {
     						for (int a = messagesByServer.size() - 1 ; a >= 0 ; a--) {
-    							if (!messagesByServer.get(a).getAuthor().isBot() && messagesByServer.get(a).getIdLong() != ticketData.getLong(2)) {
-    								Toolbox.forwardMessage(ticketOwner.openPrivateChannel().complete(), messagesByServer.get(a));
+    						    Message message = messagesByServer.get(a);
+    							if (!message.getAuthor().isBot() && message.getIdLong() != modmailData.getLastGuildMessageId()) {
+    								Toolbox.forwardMessage(modmailData.getUser().openPrivateChannel().complete(), message);
     							}
     						}
     					}
-    					ticketData.put(2, 0L);
     				}
+    				processedUserIds.add(ticketOwner);
     			}
     		});
     	}
@@ -161,20 +157,21 @@ public class Bot {
 	
 	public void shutdown(ShutdownReason reason, boolean sendMessage, @Nullable String additionalMessage, @Nullable Runnable followUp) {
 		List<Guild> guilds = jda.getGuilds();
-		List<Long> processedUserIds = new ArrayList<>();
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);
 //    		Delete channels created with Join2Create channels
-    		JSONObject createdchannels = ConfigLoader.get().getGuildConfig(guild, "createdchannels");
-    		if (!createdchannels.isEmpty()) {
-    			createdchannels.keySet().forEach(e -> createdchannels.getJSONObject(e).keySet().forEach(a ->  guild.getVoiceChannelById(a).delete().queue()));
-    			createdchannels.clear();
-    		}
+    		ConcurrentHashMap<Long, Join2CreateChannelData> join2createChannels = ConfigLoader.get().getGuildData(guild).getJoin2CreateChannelDataIds();
+    		join2createChannels.forEach((channel_id, data) -> {
+    		    List<Long> createdChannels = data.getChildrenIds();
+                if (!createdChannels.isEmpty()) {
+                    createdChannels.forEach(channel -> guild.getVoiceChannelById(channel).delete().queue());
+                }
+    		});
 //    		Send offline message
     		if (sendMessage) {
-    		    long chid = ConfigLoader.get().getGuildConfig(guild).getLong("communityinbox");
-                if (chid == 0L) {
-                    chid = guild.getTextChannels().stream().filter(c -> {return guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND);}).toList().get(0).getIdLong();
+    		    TextChannel communityInbox = ConfigLoader.get().getGuildData(guild).getCommunityInboxChannel();
+                if (communityInbox == null) {
+                    communityInbox = guild.getTextChannels().stream().filter(c -> {return guild.getSelfMember().hasPermission(c, Permission.MESSAGE_SEND);}).toList().get(0);
                 }
                 StringBuilder offlineMessageBuilder = new StringBuilder();
                 offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, reason.toString().toLowerCase()));
@@ -183,23 +180,9 @@ public class Bot {
                     offlineMessageBuilder.append(LanguageEngine.getRaw(guild, null, this, "addonpresent"));
                     offlineMessageBuilder.append(additionalMessage);
                 }
-                long msgid = guild.getTextChannelById(chid).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(offlineMessageBuilder.toString())).complete().getIdLong();
-                ConfigLoader.get().getGuildConfig(guild).put("offlinemsg", new JSONArray().put(msgid).put(chid));
+                Message message = communityInbox.sendMessageEmbeds(LanguageEngine.buildMessageEmbed(offlineMessageBuilder.toString())).complete();
+                ConfigLoader.get().getGuildData(guild).setOfflineMessage(message);
     		}
-//    		Save ModMail status
-    		JSONObject modmailDataSet = ConfigLoader.get().getGuildConfig(guild, "modmails");
-    		modmailDataSet.keySet().forEach(ticketChannelId -> {
-    			JSONArray modmailData = modmailDataSet.getJSONArray(ticketChannelId);
-    			User ticketOwner = jda.retrieveUserById(modmailData.getLong(0)).complete();
-    			if (!processedUserIds.contains(modmailData.getLong(0))) {
-    				processedUserIds.add(ticketOwner.getIdLong());
-    				JSONArray ticketData = ConfigLoader.get().getMemberConfig(guild, ticketOwner, "modmails").getJSONArray(String.valueOf(modmailData.getLong(1)));
-    				if (ticketData.getLong(2) == 0) {
-    					ticketData.put(2, guild.getTextChannelById(ticketChannelId).getLatestMessageIdLong());
-    				}
-    				ticketData.put(3, ticketOwner.openPrivateChannel().complete().getLatestMessageIdLong());
-    			}
-    		});
     	}
 //		Stop period operations
 		EventAwaiter.INSTANCE.clear();

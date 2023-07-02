@@ -31,6 +31,7 @@ public class Unmute implements UserContextEventHandler {
 		}
 		userconfig.put("muted", false);
 		userconfig.put("tempmuted", false);
+		//Implement compatibility with new EventProcessor#onGuildMemberUpdateTimeOut
 		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "success")
 				.replaceDescription("{user}", target.getAsMention())).setEphemeral(true).queue();
 		ModController.RUN.userModCheck(guild, target);

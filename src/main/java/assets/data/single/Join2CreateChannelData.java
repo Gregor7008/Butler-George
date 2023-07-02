@@ -176,4 +176,9 @@ public class Join2CreateChannelData implements DataContainer {
         public static final String CONFIGURABLE = "configurable";
         public static final String CHILDREN = "children";
     }
+
+    public List<Long> getChildrenIds() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

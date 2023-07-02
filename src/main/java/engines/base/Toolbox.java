@@ -92,7 +92,7 @@ public abstract class Toolbox {
 				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.DEFAULT_TIME_FORMAT))
 				.replace("{boosts}", String.valueOf(guild.getBoostCount()));
 		if (user != null) {
-		    output = output.replace("{level}", String.valueOf(ConfigLoader.get().getMemberConfig(guild, user).getInt("level")));
+		    output = output.replace("{level}", String.valueOf(ConfigLoader.get().getMemberData(guild, user).getLevel()));
 	        if (mentions) {
 	            output = output.replace("{user}", user.getAsMention());
 	        } else {

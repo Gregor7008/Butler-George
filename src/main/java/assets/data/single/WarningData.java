@@ -1,33 +1,27 @@
 package assets.data.single;
 
+import java.time.OffsetDateTime;
+
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
-import assets.data.DataContainer;
+import net.dv8tion.jda.api.entities.User;
 
-public class WarningData implements DataContainer {
-
-//  TODO Implement completely incl. ModController notification
+public class WarningData {
+    
+    private String reason = "~ Unknown ~";
+    private long creator_id = 0L;
+    private OffsetDateTime creation_time;
+    
+    public static WarningData create(String reason, User creator) {
+        
+        return null;
+    }
     
     public WarningData(JSONObject data) {
-        this.instanciateFromJSON(data);
+        
     }
     
-    public WarningData() {}
-    
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
-        return null;
-    }
-    
-    @Override
     public JSONObject compileToJSON() {
         return null;
-    }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
     }
 }

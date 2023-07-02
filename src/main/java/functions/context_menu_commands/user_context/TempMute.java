@@ -59,5 +59,6 @@ public class TempMute implements UserContextEventHandler {
 		ConfigLoader.INSTANCE.getMemberConfig(guild, user).put("tempmuted", true);
 		guild.getMember(user).timeoutFor(days, TimeUnit.DAYS).queue();
 		ModController.RUN.userModCheck(guild, user);
+		//Implement compatibility with new EventProcessor#onGuildMemberUpdateTimeOut
 	}
 }

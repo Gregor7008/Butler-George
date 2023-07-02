@@ -5,12 +5,11 @@ import org.json.JSONObject;
 import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.DataContainer;
 import assets.data.MessageConnection;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class ReactionRoleData implements DataContainer, MessageConnection {
-
-//  TODO Implement completely
     
 	public ReactionRoleData(TextChannel channel, Message message, JSONObject data) {
 	    this.instanciateFromJSON(data);
@@ -52,5 +51,13 @@ public class ReactionRoleData implements DataContainer, MessageConnection {
     @Override
     public Long getMessageId() {
         return 0L;
+    }
+    
+    public void onReactionAdd(String formatted_emoji, Member member) {
+        
+    }
+    
+    public void onReactionRemove(String formatted_emoji, Member member) {
+        
     }
 }

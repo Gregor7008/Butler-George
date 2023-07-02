@@ -48,21 +48,6 @@ public class ModController {
 		guild.retrieveMember(user).queue(member -> {
 	        JSONObject memberConfig = ConfigLoader.INSTANCE.getMemberConfig(guild, user);
 	        if (!user.isBot() && member != null) {
-	            if (!memberConfig.getBoolean("tempmuted")) {
-	                if (memberConfig.getBoolean("muted")) {
-	                    if (!member.isTimedOut()) {
-	                        member.timeoutFor(27, TimeUnit.DAYS).queue();
-	                    }
-	                } else {
-	                    if (member.isTimedOut()) {
-	                        member.removeTimeout().queue();
-	                    }
-	                }
-	            } else {
-	                if (!guild.getMember(user).isTimedOut()) {
-	                    memberConfig.put("tempmuted", false);
-	                }
-	            }
 	            if (ConfigLoader.INSTANCE.getMemberConfig(guild, user).getBoolean("tempbanned")) {
 	                OffsetDateTime tbuntil = OffsetDateTime.parse(memberConfig.getString("tempbanneduntil"), ConfigManager.DATA_TIME_SAVE_FORMAT);
 	                OffsetDateTime now = OffsetDateTime.now();

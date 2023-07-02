@@ -3,12 +3,12 @@ package engines.base;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import assets.data.single.WarningData;
 import assets.logging.Logger;
 import base.Bot;
 import base.Bot.ShutdownReason;
 import base.GUI;
 import engines.data.ConfigLoader;
-import engines.data.ConfigManager;
 import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -56,26 +56,26 @@ public class ConsoleCommandListener implements ActionListener {
 				try {
 				    User user = jda.retrieveUserById(insplit[2]).complete();
 				    Guild guild = jda.getGuildById(insplit[1]);
-					ConfigLoader.INSTANCE.getMemberConfig(guild, user).getJSONArray("warnings").put("Administrative actions");
+					ConfigLoader.get().getMemberData(guild, user).addWarnings(WarningData.create("Administrative Action", user));
 					LOG.info("User " + user.getName() + " was successfully warned on " + guild.getName());
 				} catch (IndexOutOfBoundsException e) {
 					LOG.error("Invalid arguments - Please try again!");
 				}
 				break;
 			case "pushCache":
-				if (ConfigLoader.INSTANCE.manager.pushCache()) {
-					ConsoleEngine.getLogger(ConfigManager.class).info("Cache successfully pushed - All changes were saved!");
+				if (ConfigLoader.get().pushCache()) {
+					ConsoleEngine.getLogger(ConfigLoader.class).info("Cache successfully pushed - All changes were saved!");
 				} else {
-				    ConsoleEngine.getLogger(ConfigManager.class).info("Cache push cancelled - There's nothing to push!");
+				    ConsoleEngine.getLogger(ConfigLoader.class).info("Cache push cancelled - There's nothing to push!");
 				}
 				break;
 			case "printCache":
-				ConfigLoader.INSTANCE.manager.printCache();
+				ConfigLoader.get().printCache();
 				break;
 			case "clearCache":
-				ConfigLoader.INSTANCE.manager.getGuildCache().clear();
-				ConfigLoader.INSTANCE.manager.getUserCache().clear();
-				ConsoleEngine.getLogger(ConfigManager.class).info("Cache cleared successfully!");
+				ConfigLoader.get().getGuildCache().clear();
+				ConfigLoader.get().getUserCache().clear();
+				ConsoleEngine.getLogger(ConfigLoader.class).info("Cache cleared successfully!");
 				break;
 			case "printEventAwaiter":
 				EventAwaiter.INSTANCE.log();

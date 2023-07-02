@@ -1,20 +1,25 @@
 package base;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import assets.data.MemberData;
+import assets.data.single.AutoMessageData;
+import assets.data.single.ModMailData;
+import assets.data.single.ReactionRoleData;
 import assets.functions.MessageContextEventHandler;
 import assets.functions.SlashCommandEventHandler;
 import assets.functions.UserContextEventHandler;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import engines.data.ConfigLoader;
-import engines.data.ConfigVerifier;
 import engines.functions.LevelEngine;
 import functions.context_menu_commands.MessageContextCommandList;
 import functions.context_menu_commands.UserContextCommandList;
@@ -23,6 +28,7 @@ import functions.slash_commands.support.Modmail;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -31,7 +37,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
-import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -46,7 +51,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
-import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -71,18 +75,12 @@ public class EventProcessor extends ListenerAdapter {
 		for (int i = 0; i < guilds.size(); i++) {
 			Guild guild = guilds.get(i);
 			try {
-				long msgid = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(0);
-				if (msgid != 0L) {
-					guild.getTextChannelById(ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("offlinemsg").getLong(1)).retrieveMessageById(msgid).queue(
-					        message -> {
-					            if (message != null) {
-					                message.delete().queue();
-					            }
-					        },
-					        error -> {});
+				Message message = ConfigLoader.get().getGuildData(guild).getOfflineMessage();
+				if (message != null) {
+					message.delete().queue();
 				}
 			} catch (JSONException e) {}
-			ConfigLoader.INSTANCE.getGuildConfig(guild).put("offlinemsg", new JSONArray());
+			ConfigLoader.get().getGuildData(guild).setOfflineMessage(null);
 		}
 	}
 	
@@ -165,26 +163,24 @@ public class EventProcessor extends ListenerAdapter {
 		final User user = event.getAuthor();
 		if (event.isFromGuild()) {
 			final Guild guild = event.getGuild();
-			final JSONObject modmailsData = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("modmails");
-			if (modmailsData.keySet().contains(event.getGuildChannel().getId())) {
-				final JSONArray modmailData = modmailsData.getJSONArray(event.getGuildChannel().getId());
-				final User ticketOwner = event.getJDA().getUserById(modmailData.getLong(0));
-				final JSONArray selectedTicketData = ConfigLoader.INSTANCE.getUserConfig(ticketOwner).getJSONArray("selected_ticket");
-				if (!selectedTicketData.isEmpty()
-						&& selectedTicketData.getLong(0) == guild.getIdLong()
-						&& selectedTicketData.getLong(1) == modmailData.getLong(1)) {
+			final ModMailData modmailData = ConfigLoader.get().getGuildData(guild).getModMail(event.getChannel().getIdLong());
+			if (modmailData != null) {
+				final User ticketOwner = modmailData.getUser();
+				final ModMailData selectedTicket = ConfigLoader.get().getUserData(ticketOwner).getSelectedModMail();
+				if (selectedTicket != null
+						&& selectedTicket.getGuildId() == guild.getIdLong()
+						&& selectedTicket.getGuildChannelId() == modmailData.getGuildChannelId()) {
 					Toolbox.forwardMessage(ticketOwner.openPrivateChannel().complete(), event.getMessage());
+					modmailData.setLastGuildMessage(event.getMessage());
 				}
 			}
 		} else {
-			final JSONArray selectedTicketData = ConfigLoader.INSTANCE.getUserConfig(user).getJSONArray("selected_ticket");
-			if (selectedTicketData.isEmpty()) {
+			final ModMailData selectedTicket = ConfigLoader.get().getUserData(user).getSelectedModMail();
+			if (selectedTicket == null) {
 				event.getChannel().sendMessageEmbeds(LanguageEngine.getMessageEmbed(null, user, this, "noticket")).queue();
 			} else {
-				final Guild guild = event.getJDA().getGuildById(selectedTicketData.getLong(0));
-				final long ticketID = selectedTicketData.getLong(1);
-				final long channelID = ConfigLoader.INSTANCE.getMemberConfig(guild, user).getJSONObject("modmails").getJSONArray(String.valueOf(ticketID)).getLong(0);
-				Toolbox.forwardMessage(guild.getTextChannelById(channelID), event.getMessage());
+				Toolbox.forwardMessage(selectedTicket.getGuildChannel(), event.getMessage());
+				selectedTicket.setLastUserMessage(event.getMessage());
 			}
 		}
 	}
@@ -194,27 +190,23 @@ public class EventProcessor extends ListenerAdapter {
 		GUI.INSTANCE.increaseMemberCounter();
 		final Guild guild = event.getGuild();
 		if (event.getMember().getUser().isBot()) {
-			JSONArray botautoroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("botautoroles");
+			List<Role> botautoroles = ConfigLoader.get().getGuildData(guild).getBotAutoRoles();
 			if (!botautoroles.isEmpty()) {
-				for (int i = 0; i < botautoroles.length(); i++) {
-					Role role = guild.getRoleById(botautoroles.getLong(i));
-					guild.addRoleToMember(event.getMember(), role).queue();
+				for (int i = 0; i < botautoroles.size(); i++) {
+					guild.addRoleToMember(event.getMember(), botautoroles.get(i)).queue();
 				}
 			}
 		} else {
-			JSONArray autoroles = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("userautoroles");
+		    List<Role> autoroles = ConfigLoader.get().getGuildData(guild).getUserAutoRoles();
 			if (!autoroles.isEmpty()) {
-				for (int i = 0; i < autoroles.length(); i++) {
-					Role role = guild.getRoleById(autoroles.getLong(i));
-					guild.addRoleToMember(event.getMember(), role).queue();
+				for (int i = 0; i < autoroles.size(); i++) {
+					guild.addRoleToMember(event.getMember(), autoroles.get(i)).queue();
 				}
 			}
-			JSONArray welcomemsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("welcomemsg");
-			if (!welcomemsg.isEmpty()) {
-				if (welcomemsg.getBoolean(3)) {
-					String title = Toolbox.processAutoMessage(welcomemsg.getString(1), guild, event.getUser(), false);
-					String message = Toolbox.processAutoMessage(welcomemsg.getString(2), guild, event.getUser(), true);
-					guild.getTextChannelById(welcomemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title, message)).queue();
+			AutoMessageData welcomemsg = ConfigLoader.get().getGuildData(guild).getWelcomeMessage();
+			if (welcomemsg != null) {
+				if (welcomemsg.isActivated()) {
+					welcomemsg.buildMessage(event.getUser()).queue();
 				}
 			}
 		}
@@ -226,16 +218,12 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
-		final Guild guild = event.getGuild();
-		final User user = event.getUser();
-		JSONArray goodbyemsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("goodbyemsg");
-		if (!goodbyemsg.isEmpty()) {
-			if (goodbyemsg.getBoolean(3)) {
-				String title = Toolbox.processAutoMessage(goodbyemsg.getString(1), guild, event.getUser(), false);
-				String message = Toolbox.processAutoMessage(goodbyemsg.getString(2), guild, event.getUser(), true);
-				guild.getTextChannelById(goodbyemsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title, message)).queue();
-			}
-		}
+		AutoMessageData goodbyemsg = ConfigLoader.get().getGuildData(event.getGuild()).getGoodbyeMessage();
+		if (goodbyemsg != null) {
+            if (goodbyemsg.isActivated()) {
+                goodbyemsg.buildMessage(event.getUser()).queue();
+            }
+        }
 	}
 	
 	@Override
@@ -243,17 +231,13 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
-		final Guild guild = event.getGuild();
-		final User user = event.getUser();
 		if (event.getNewTimeBoosted() != null) {
-			JSONArray boostmsg = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONArray("boostmsg");
-			if (!boostmsg.isEmpty()) {
-				if (boostmsg.getBoolean(3)) {
-					String title = Toolbox.processAutoMessage(boostmsg.getString(1), guild, user, false);
-					String message = Toolbox.processAutoMessage(boostmsg.getString(2), guild, user, true);
-					guild.getTextChannelById(boostmsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title, message)).queue();
-				}
-			}
+		    AutoMessageData boostmsg = ConfigLoader.get().getGuildData(event.getGuild()).getBoostMessage();
+	        if (boostmsg != null) {
+	            if (boostmsg.isActivated()) {
+	                boostmsg.buildMessage(event.getUser()).queue();
+	            }
+	        }
 		}
 	}
 	
@@ -287,15 +271,12 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getUser().isBot() || !event.isFromGuild()) {
 			return;
 		}
-		final User user = event.getUser();
-		final String channelID = event.getChannel().getId();
-		final String msgID = event.getMessageId();
+		final long channelId = event.getChannel().getIdLong();
+		final long messageId = event.getMessageIdLong();
 		final Guild guild = event.getGuild();
-		if (ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channelID, msgID) != null) {
-			JSONObject actions = ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channelID, msgID);
-			try {
-				guild.addRoleToMember(user, guild.getRoleById(actions.getLong(event.getReaction().getEmoji().getFormatted()))).queue();
-			} catch (JSONException e) {}
+		final ReactionRoleData reactionRoleData = ConfigLoader.get().getGuildData(guild).getReactionRole(channelId, messageId);
+		if (reactionRoleData != null) {
+		    reactionRoleData.onReactionAdd(event.getEmoji().getFormatted(), event.getMember());
 		}
 	}
 	
@@ -304,27 +285,13 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getUser().isBot() || !event.isFromGuild()) {
 			return;
 		}
-		final User user = event.getUser();
-		final String channelID = event.getChannel().getId();
-		final String msgID = event.getMessageId();
+		final long channelId = event.getChannel().getIdLong();
+		final long messageId = event.getMessageIdLong();
 		final Guild guild = event.getGuild();
-		if (ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channelID, msgID) != null) {
-			JSONObject actions = ConfigLoader.INSTANCE.getReactionMessageConfig(guild, channelID, msgID);
-			try {
-				guild.removeRoleFromMember(user, guild.getRoleById(actions.getLong(event.getReaction().getEmoji().getFormatted()))).queue();
-			} catch (JSONException e) {}
-		}
-	}
-	
-	@Override
-	public void onChannelDelete(ChannelDeleteEvent event) {
-		final Guild guild = event.getGuild();
-		ConfigVerifier.RUN.guildCheck(guild);
-	}
-	
-	@Override
-	public void onRoleDelete(RoleDeleteEvent event) {
-		ConfigVerifier.RUN.guildCheck(event.getGuild());
+		final ReactionRoleData reactionRoleData = ConfigLoader.get().getGuildData(guild).getReactionRole(channelId, messageId);
+        if (reactionRoleData != null) {
+            reactionRoleData.onReactionRemove(event.getEmoji().getFormatted(), event.getMember());
+        }
 	}
 	
 	@Override
@@ -332,13 +299,24 @@ public class EventProcessor extends ListenerAdapter {
 		if (event.getUser().isBot()) {
 			return;
 		}
-		JSONObject targetconfig = ConfigLoader.INSTANCE.getMemberConfig(event.getGuild(), event.getEntity().getUser());
+		final User target = event.getEntity().getUser();
+		final Guild guild = event.getGuild();
+		MemberData targetData = ConfigLoader.get().getMemberData(guild, target);
 		if (event.getNewTimeOutEnd() == null) {
-			targetconfig.put("muted", false);
-			targetconfig.put("tempmuted", false);
+		    if (!event.getUser().isSystem()) {
+		        targetData.setPermanentlyMuted(false);
+		    } else if (targetData.isPermanentlyMuted()) {
+		        guild.getMember(target).timeoutFor(27, TimeUnit.DAYS).queue();
+		    }
+		    targetData.setTemporarilyMutedUntil(OffsetDateTime.now().minusDays(1L));
 		} else {
-			targetconfig.put("muted", false);
-			targetconfig.put("tempmuted", true);
+			if (targetData.isTemporarilyMuted()) {
+			    if (targetData.isTemporarilyMutedUntil().isBefore(event.getNewTimeOutEnd())) {
+			        targetData.setTemporarilyMutedUntil(event.getNewTimeOutEnd());
+			    }
+			} else {
+			    targetData.setTemporarilyMutedUntil(event.getNewTimeOutEnd());
+			}
 		}
 	}
 	

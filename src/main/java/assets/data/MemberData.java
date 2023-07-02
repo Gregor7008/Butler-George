@@ -22,7 +22,7 @@ public class MemberData {
     private final long guild_id;
     private int experience, last_penalty_index, level, levelcard_background = 0;
     private Language language = Language.ENGLISH;
-    private OffsetDateTime last_experience, last_modmail, last_suggestion, temporarily_banned_until = OffsetDateTime.now().minusDays(1L);
+    private OffsetDateTime last_experience, last_modmail, last_suggestion, temporarily_banned_until, temporarily_muted_until = OffsetDateTime.now().minusDays(1L);
     private ConcurrentHashMap<Integer, ModMailData> modmails = new ConcurrentHashMap<>();
     private boolean permanently_muted = false;
     private List<WarningData> warnings = new ArrayList<>();
@@ -46,6 +46,7 @@ public class MemberData {
         this.last_modmail = OffsetDateTime.parse(data.getString(Key.LAST_MODMAIL), ConfigLoader.DATA_TIME_SAVE_FORMAT);
         this.last_suggestion = OffsetDateTime.parse(data.getString(Key.LAST_SUGGESTION), ConfigLoader.DATA_TIME_SAVE_FORMAT);
         this.temporarily_banned_until = OffsetDateTime.parse(data.getString(Key.TEMPORARILY_BANNED_UNTIL), ConfigLoader.DATA_TIME_SAVE_FORMAT);
+        this.temporarily_muted_until = OffsetDateTime.parse(data.getString(Key.TEMPORARILY_MUTED_UNTIL), ConfigLoader.DATA_TIME_SAVE_FORMAT);
         
         permanently_muted = data.getBoolean(Key.PERMANENTLY_MUTED);
         
@@ -81,11 +82,12 @@ public class MemberData {
         compiledData.put(Key.LAST_MODMAIL, last_modmail.format(ConfigLoader.DATA_TIME_SAVE_FORMAT));
         compiledData.put(Key.LAST_SUGGESTION, last_suggestion.format(ConfigLoader.DATA_TIME_SAVE_FORMAT));
         compiledData.put(Key.TEMPORARILY_BANNED_UNTIL, temporarily_banned_until.format(ConfigLoader.DATA_TIME_SAVE_FORMAT));
+        compiledData.put(Key.TEMPORARILY_MUTED_UNTIL, temporarily_muted_until.format(ConfigLoader.DATA_TIME_SAVE_FORMAT));
         
         compiledData.put(Key.PERMANENTLY_MUTED, permanently_muted);
         
         JSONObject modmails_data = new JSONObject();
-        modmails.forEach((ticket_id, modmail) -> modmails_data.put(String.valueOf(ticket_id), modmail.getGuildChannel().getIdLong()));
+        modmails.forEach((ticket_id, modmail) -> modmails_data.put(String.valueOf(ticket_id), modmail.getGuildChannelId()));
         compiledData.put(Key.MODMAILS, modmails_data);
         
         JSONArray warnings_data = new JSONArray();
@@ -229,12 +231,28 @@ public class MemberData {
         this.last_suggestion = OffsetDateTime.now(); 
     }
     
-    public OffsetDateTime isTemporaryBannedUntil() {
+    public boolean isTemporarilyBanned() {
+        return temporarily_banned_until.isAfter(OffsetDateTime.now());
+    }
+    
+    public OffsetDateTime isTemporarilyBannedUntil() {
         return temporarily_banned_until;
     }
     
-    public void setTemporaryBannedUntil(OffsetDateTime temporarily_banned_until) {
+    public void setTemporarilyBannedUntil(OffsetDateTime temporarily_banned_until) {
         this.temporarily_banned_until = temporarily_banned_until;
+    }
+
+    public boolean isTemporarilyMuted() {
+        return temporarily_muted_until.isAfter(OffsetDateTime.now());
+    }
+    
+    public OffsetDateTime isTemporarilyMutedUntil() {
+        return temporarily_muted_until;
+    }
+    
+    public void setTemporarilyMutedUntil(OffsetDateTime temporarily_muted_until) {
+        this.temporarily_muted_until = temporarily_muted_until;
     }
     
     public ConcurrentHashMap<Integer, ModMailData> getModmails() {
@@ -312,6 +330,7 @@ public class MemberData {
         public static final String MODMAILS = "modmails";
         public static final String PERMANENTLY_MUTED = "permanently_muted";
         public static final String TEMPORARILY_BANNED_UNTIL = "temporarily_banned_until";
+        public static final String TEMPORARILY_MUTED_UNTIL = "temporarily_muted_until";
         public static final String WARNINGS = "warnings";
     }
 }

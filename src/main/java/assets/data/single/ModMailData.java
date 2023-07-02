@@ -67,17 +67,25 @@ public class ModMailData implements DataContainer {
         // TODO Auto-generated method stub
         return false;
     }
-
-    public TextChannel getGuildChannel() {
-        return this.text_channel;
-    }
     
     public long getGuildChannelId() {
         return this.text_channel.getIdLong();
     }
+
+    public TextChannel getGuildChannel() {
+        return this.text_channel;
+    }
+
+    public long getGuildId() {
+        return this.guild.getIdLong();
+    }
     
     public Guild getGuild() {
         return this.guild;
+    }
+
+    public long getUserId() {
+        return this.user.getIdLong();
     }
     
     public User getUser() {
@@ -136,5 +144,14 @@ public class ModMailData implements DataContainer {
         public static final String LAST_USER_MESSAGE_ID = "last_user_message_id";
         public static final String FEEDBACK_MESSAGE_ID = "feedback_message_id";
         public static final String TITLE = "title";
+    }
+
+    public long getLastUserMessageId() {
+        return 0L;
+    }
+
+    public long getLastGuildMessageId() {
+        // TODO Auto-generated method stub
+        return 0L;
     }
 }

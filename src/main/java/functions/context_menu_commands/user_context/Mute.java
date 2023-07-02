@@ -21,6 +21,7 @@ public class Mute implements UserContextEventHandler {
 		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, event.getUser(), this, "success")
 						.replaceDescription("{user}", event.getTarget().getAsMention())).setEphemeral(true).queue();
 		ModController.RUN.userModCheck(guild, event.getTarget());
+		//Implement compatibility with new EventProcessor#onGuildMemberUpdateTimeOut
 	}
 
 	@Override
