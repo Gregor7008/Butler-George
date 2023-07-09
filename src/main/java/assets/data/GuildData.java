@@ -956,12 +956,10 @@ public class GuildData {
     }
 
     public ConcurrentHashMap<Long, Join2CreateChannelData> getJoin2CreateChannelDataIds() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public ReactionRoleData getReactionRole(long channelId, long messageId) {
-        // TODO Auto-generated method stub
         return null;
     }
 }

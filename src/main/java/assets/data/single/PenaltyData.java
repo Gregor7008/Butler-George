@@ -8,14 +8,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
-import assets.data.DataContainer;
 import assets.data.DataTools;
 import engines.data.ConfigManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 
-public class PenaltyData implements DataContainer {
+public class PenaltyData {
 
     private final Guild guild;
     private final PenaltyType type;
@@ -37,8 +35,7 @@ public class PenaltyData implements DataContainer {
 	    this.warning_limit = warning_limit;
 	}
 
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public PenaltyData instanciateFromJSON(JSONObject data) {
         try {
             this.opt_duration = ConfigManager.convertStringToDuration(data.getString(Key.DURATION));
         } catch (JSONException e) {}
@@ -52,7 +49,6 @@ public class PenaltyData implements DataContainer {
         return this;
     }
 
-    @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         
@@ -76,12 +72,6 @@ public class PenaltyData implements DataContainer {
         compiledData.put(Key.RESET_LEVEL, reset_level);
         
         return compiledData;
-    }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
     }
     
     public Guild getGuild() {

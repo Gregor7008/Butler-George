@@ -2,15 +2,13 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
-import assets.data.DataContainer;
 import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-public class ModMailData implements DataContainer {
+public class ModMailData {
 
     private final User user;
     private final Guild guild;
@@ -32,8 +30,7 @@ public class ModMailData implements DataContainer {
 	    this.text_channel = channel;
 	}
 	
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public ModMailData instanciateFromJSON(JSONObject data) {
         this.ticket_id = data.getInt(Key.TICKET_ID);
         
         this.lastGuildMessage = this.text_channel.retrieveMessageById(data.getLong(Key.LAST_GUILD_MESSAGE_ID)).complete();
@@ -45,7 +42,6 @@ public class ModMailData implements DataContainer {
         return this;
     }
 
-    @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         
@@ -60,12 +56,6 @@ public class ModMailData implements DataContainer {
         compiledData.put(Key.TITLE, this.title);
         
         return compiledData;
-    }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
     }
     
     public long getGuildChannelId() {
@@ -151,7 +141,6 @@ public class ModMailData implements DataContainer {
     }
 
     public long getLastGuildMessageId() {
-        // TODO Auto-generated method stub
         return 0L;
     }
 }

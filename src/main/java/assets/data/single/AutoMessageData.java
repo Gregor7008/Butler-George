@@ -2,7 +2,6 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
-import assets.data.DataContainer;
 import base.Bot;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
@@ -11,7 +10,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
-public class AutoMessageData implements DataContainer {
+public class AutoMessageData {
 
     private final long guild_id;
     private long  text_channel_id;
@@ -30,8 +29,7 @@ public class AutoMessageData implements DataContainer {
 	    text_channel_id = channel.getIdLong();
 	}
 
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public AutoMessageData instanciateFromJSON(JSONObject data) {
         text_channel_id = data.getLong(Key.CHANNEL_ID);
         
         title = data.getString(Key.TITLE);
@@ -43,7 +41,6 @@ public class AutoMessageData implements DataContainer {
         return this;
     }
 
-    @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
 

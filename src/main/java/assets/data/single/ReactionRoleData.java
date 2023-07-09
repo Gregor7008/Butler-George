@@ -2,14 +2,12 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
-import assets.data.DataContainer;
 import assets.data.MessageConnection;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-public class ReactionRoleData implements DataContainer, MessageConnection {
+public class ReactionRoleData implements MessageConnection {
     
 	public ReactionRoleData(TextChannel channel, Message message, JSONObject data) {
 	    this.instanciateFromJSON(data);
@@ -17,20 +15,12 @@ public class ReactionRoleData implements DataContainer, MessageConnection {
 	
 	public ReactionRoleData() {}
 
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public ReactionRoleData instanciateFromJSON(JSONObject data) {
         return this;
     }
 
-    @Override
     public JSONObject compileToJSON() {
         return null;
-    }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override

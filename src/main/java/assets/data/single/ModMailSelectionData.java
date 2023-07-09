@@ -2,11 +2,10 @@ package assets.data.single;
 
 import org.json.JSONObject;
 
-import assets.data.DataContainer;
 import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 
-public class ModMailSelectionData implements DataContainer {
+public class ModMailSelectionData {
     
     private Guild guild;
     private int ticket_id = 0;
@@ -17,8 +16,7 @@ public class ModMailSelectionData implements DataContainer {
     
     public ModMailSelectionData() {}
 
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public ModMailSelectionData instanciateFromJSON(JSONObject data) {
         long guild_id = data.getLong(Key.GUILD_ID);
         if (guild_id != 0L) {
             this.guild = Bot.getAPI().getGuildById(guild_id);
@@ -27,7 +25,6 @@ public class ModMailSelectionData implements DataContainer {
         return this;
     }
 
-    @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         

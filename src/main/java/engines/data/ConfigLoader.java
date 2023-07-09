@@ -1,5 +1,7 @@
 package engines.data;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -9,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -59,14 +62,18 @@ public class ConfigLoader {
     }
 
     public static boolean connect(String licenseKey) {
-        String connectionUri = "mongodb://guest:33646991@butlergeorge.ddns.net:17389/?authMechanism=SCRAM-SHA-256";
+        InputStream is = ConfigLoader.class.getClassLoader().getResourceAsStream("misc/secrets.json");
+        String connectionUrl = new JSONObject(new JSONTokener(is)).getString("auth_server_url");
+        try {
+            is.close();
+        } catch (IOException e) {}
         MongoClientSettings setting = MongoClientSettings.builder()
                 .applyToSocketSettings(builder -> {
                     builder.connectTimeout(3, TimeUnit.SECONDS);
                     builder.readTimeout(500, TimeUnit.MILLISECONDS);
                 })
                 .applyToClusterSettings(builder -> builder.serverSelectionTimeout(3, TimeUnit.SECONDS))
-                .applyConnectionString(new ConnectionString(connectionUri))
+                .applyConnectionString(new ConnectionString(connectionUrl))
                 .build();
         try {
             MongoClient preCheckClient = MongoClients.create(setting);
@@ -79,7 +86,6 @@ public class ConfigLoader {
                 LOG.error("License Key invalid, please try again!");
             }
         } catch (MongoSecurityException | MongoQueryException | MongoTimeoutException e) {
-            LOG.error("Connection to authentication server failed, please contact support!");
             return false;
         }
         return true;

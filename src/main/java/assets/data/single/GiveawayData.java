@@ -8,8 +8,6 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
-import assets.data.DataContainer;
 import assets.data.MessageConnection;
 import base.Bot;
 import engines.base.CentralTimer;
@@ -22,7 +20,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-public class GiveawayData implements DataContainer, MessageConnection {
+public class GiveawayData implements MessageConnection {
     
     private final Guild guild;
     private final TextChannel text_channel;
@@ -52,8 +50,7 @@ public class GiveawayData implements DataContainer, MessageConnection {
 	    this.user = user;
 	}
 
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public GiveawayData instanciateFromJSON(JSONObject data) {
         this.title = data.getString(Key.TITLE);
         this.description = this.message.getEmbeds().get(0).getDescription();
         
@@ -83,16 +80,9 @@ public class GiveawayData implements DataContainer, MessageConnection {
         return this;
     }
 
-    @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         return compiledData;
-    }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override
@@ -120,7 +110,6 @@ public class GiveawayData implements DataContainer, MessageConnection {
     }
 
     private MessageEmbed buildEndEmbed() {
-//      TODO Implement 'buildEndEmbed()' method
         return null;
     }
     

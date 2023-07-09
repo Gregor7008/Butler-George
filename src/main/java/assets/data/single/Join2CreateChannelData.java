@@ -8,14 +8,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
-import assets.data.DataContainer;
 import assets.data.DataTools;
 import engines.base.Check;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
-public class Join2CreateChannelData implements DataContainer {
+public class Join2CreateChannelData {
 
     private static final ConcurrentHashMap<Guild, List<Join2CreateChannelData>> JOIN2CREATE_CHANNEL_LIST = new ConcurrentHashMap<>();
     
@@ -50,8 +48,7 @@ public class Join2CreateChannelData implements DataContainer {
         JOIN2CREATE_CHANNEL_LIST.get(channel.getGuild()).add(this);
 	}
 
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public GiveawayData instanciateFromJSON(JSONObject data) {
         this.name_format = data.getString(Key.NAME_FORMAT);
         this.limit_preset = data.getInt(Key.LIMIT_PRESET);
         this.configurable = data.getBoolean(Key.CONFIGURABLE);
@@ -65,7 +62,6 @@ public class Join2CreateChannelData implements DataContainer {
         return this;
     }
 
-    @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
 
@@ -84,12 +80,6 @@ public class Join2CreateChannelData implements DataContainer {
         }
 
         return compiledData;
-    }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
     }
     
     public List<VoiceChannel> getChildren() {
@@ -163,7 +153,7 @@ public class Join2CreateChannelData implements DataContainer {
         return this;
     }
     
- /* TODO Transfer & Adapt tool methods from 'EventProcessor.class' to here
+ /* Transfer & Adapt tool methods from 'EventProcessor.class' to here
   * This includes....
   * 1. Creation of a new J2C-Channel incl. Formatting
   * 2. Deletion of an old J2C-Channel including the...
@@ -178,7 +168,6 @@ public class Join2CreateChannelData implements DataContainer {
     }
 
     public List<Long> getChildrenIds() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

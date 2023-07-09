@@ -12,8 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
-import assets.data.DataContainer;
 import assets.data.DataTools;
 import assets.data.MessageConnection;
 import base.Bot;
@@ -37,7 +35,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
-public class PollData implements DataContainer, MessageConnection {
+public class PollData implements MessageConnection {
     
     private final Guild guild;
     private final TextChannel text_channel;
@@ -71,8 +69,7 @@ public class PollData implements DataContainer, MessageConnection {
 	    this.type = type;
 	}
 
-    @Override
-    public DataContainer instanciateFromJSON(JSONObject data) {
+    public PollData instanciateFromJSON(JSONObject data) {
         this.title = data.getString(Key.TITLE);
         this.description = this.message.getEmbeds().get(0).getDescription();
         
@@ -111,7 +108,6 @@ public class PollData implements DataContainer, MessageConnection {
         return this;
     }
 
-    @Override
     public JSONObject compileToJSON() {
         JSONObject compiledData = new JSONObject();
         
@@ -150,12 +146,6 @@ public class PollData implements DataContainer, MessageConnection {
         compiledData.put(Key.VOTES, votes_data);
         
         return compiledData;
-    }
-
-    @Override
-    public boolean verify(ReferenceType type) {
-        // TODO Auto-generated method stub
-        return false;
     }
     
     public Guild getGuild() {

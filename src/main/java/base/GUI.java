@@ -32,6 +32,7 @@ import javax.swing.table.DefaultTableModel;
 
 import org.jetbrains.annotations.Nullable;
 
+import assets.logging.Logger;
 import base.Bot.ShutdownReason;
 import engines.base.CentralTimer;
 import engines.base.ConsoleCommandListener;
@@ -47,6 +48,8 @@ public class GUI extends JFrame implements FocusListener {
 	public static GUI INSTANCE;
 	
 	private static final long serialVersionUID = 5923282583431103590L;
+	
+	private static Logger LOG;
     
     public final JTextArea console = new JTextArea();
     public final JTextField consoleIn = new JTextField();
@@ -91,6 +94,7 @@ public class GUI extends JFrame implements FocusListener {
 	
 	public GUI(String[] args) throws IOException, FontFormatException {
 		INSTANCE = this;
+		LOG = ConsoleEngine.getLogger(this);
 		this.processArguments(args);
 		
 		ClassLoader loader = this.getClass().getClassLoader();
@@ -259,7 +263,7 @@ public class GUI extends JFrame implements FocusListener {
 		setVisible(true);
 		
 		if (this.invalidArguments) {
-		    ConsoleEngine.getLogger(this).warn("Encountered a problem whilst parsing arguments!");
+		    LOG.warn("Encountered a problem whilst parsing arguments!");
 		}
 		if (this.autostart) {
 		    this.startBot();
@@ -269,18 +273,20 @@ public class GUI extends JFrame implements FocusListener {
 	public void startBot() {
 		if (Bot.isShutdown()) {
 		    if (this.licenseKey.isBlank()) {
-		        ConsoleEngine.getLogger(this).warn("License key is empty, please provide valid key.");
+		        LOG.warn("License key is empty, please provide valid key.");
 		    } else {
 		        if (ConfigLoader.connect(this.licenseKey)) {
 		            try {
                         new Bot();
                     } catch (InterruptedException e) {
-                        ConsoleEngine.getLogger(this).debug("Connection to Discords servers failed, please contact support!");
+                        LOG.debug("Connection to Discords servers failed, please contact support!");
                     }
+		        } else {
+		            LOG.error("Connection to authentication server failed, please contact support!");
 		        }
 		    }
 		} else {
-		    ConsoleEngine.getLogger(this).debug("Bot is already running!");
+		    LOG.debug("Bot is already running!");
 		}
 	}
 	
@@ -368,7 +374,7 @@ public class GUI extends JFrame implements FocusListener {
         try {
             this.setTableValue(position, (int) this.getTableValue(position) + value);
         } catch (ClassCastException e) {
-            ConsoleEngine.getLogger(this).debug("Couldn't cast table entry to counter for position: " + String.valueOf(position));
+            LOG.debug("Couldn't cast table entry to counter for position: " + String.valueOf(position));
         }
 	}
     

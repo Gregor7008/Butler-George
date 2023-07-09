@@ -13,7 +13,6 @@ public class WarningData {
     private OffsetDateTime creation_time;
     
     public static WarningData create(String reason, User creator) {
-        
         return null;
     }
     
