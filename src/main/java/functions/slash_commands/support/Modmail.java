@@ -380,7 +380,7 @@ public class Modmail implements SlashCommandEventHandler {
 		return sB.toString();
 	}
 	
-	public void close(GenericInteractionCreateEvent event, Guild ticketGuild, User ticketUser, String ticketID) {
+	public void close(GenericInteractionCreateEvent event, Guild ticketGuild, User ticketUser, int ticketID) {
 		final Guild guild = event.getGuild();
 		final User user = event.getUser();
 		final JSONArray selectedTicket = ConfigLoader.INSTANCE.getUserConfig(ticketUser).getJSONArray("selected_ticket");
@@ -428,7 +428,7 @@ public class Modmail implements SlashCommandEventHandler {
 		}
 	}
 	
-	public void confirmclose(ButtonInteractionEvent event, Guild guild, User user, String ticketID) {
+	public void confirmclose(ButtonInteractionEvent event, Guild guild, User user, int ticketID) {
 		final JSONObject modmails = ConfigLoader.INSTANCE.getGuildConfig(guild, "modmails");
 		final String channelID = event.getChannel().getId();
 		final JSONArray channelProperties = modmails.getJSONArray(channelID);

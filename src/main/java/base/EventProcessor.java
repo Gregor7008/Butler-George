@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
@@ -327,28 +328,23 @@ public class EventProcessor extends ListenerAdapter {
 		}
 		if (event.isFromGuild()) {
 			final Guild guild = event.getGuild();
-			final JSONObject modmails = ConfigLoader.INSTANCE.getGuildConfig(guild).getJSONObject("modmails");
-			final String channelID = event.getChannel().getId();
+			ConcurrentHashMap<Long,ModMailData> modmails = ConfigLoader.get().getGuildData(guild).getModmailIds();
+			final long channelID = event.getChannel().getIdLong();
 			if (modmails.keySet().contains(channelID)) {
 				final String buttonIdCriteria = String.valueOf(event.getChannel().getIdLong() + guild.getIdLong());
 				final String buttonId = event.getComponentId();
-				final JSONArray channelProperties = modmails.getJSONArray(channelID);
+				ModMailData modmail = modmails.get(channelID);
 				final Modmail modmailCommandHandler = (Modmail) SlashCommandList.getHandler("modmail");
-				final User targetUser = event.getJDA().getUserById(channelProperties.getLong(0));
+				final User target = modmail.getUser();
 				if (buttonId.equals(buttonIdCriteria + "_close")) {
-					modmailCommandHandler.close(event, guild, targetUser, String.valueOf(channelProperties.getLong(1)));
+					modmailCommandHandler.close(event, guild, target, modmail.getTicketId());
 				} else if (buttonId.equals(buttonIdCriteria + "_confirmclose")) {
-					modmailCommandHandler.confirmclose(event, guild, targetUser, String.valueOf(channelProperties.getLong(1)));
+					modmailCommandHandler.confirmclose(event, guild, target, modmail.getTicketId());
 				} else if (buttonId.equals(buttonIdCriteria + "_denyclose")) {
-					final PrivateChannel userChannel = targetUser.openPrivateChannel().complete();
-					userChannel.retrieveMessageById(channelProperties.getLong(2)).complete().delete().queue();
-					userChannel.sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, targetUser, modmailCommandHandler, "closeDeniedPrivate")
+					modmail.getFeedbackMessage().delete().queue();
+					target.openPrivateChannel().complete().sendMessageEmbeds(LanguageEngine.getMessageEmbed(guild, target, modmailCommandHandler, "closeDeniedPrivate")
 							.replaceDescription("{guild}", guild.getName())
-							.replaceDescription("{title}", ConfigLoader.INSTANCE.getMemberConfig(guild, targetUser)
-									.getJSONObject("modmails")
-									.getJSONArray(String.valueOf(channelProperties.getLong(1)))
-									.getString(1)))
-					.queue();
+							.replaceDescription("{title}", modmail.getTitle())).queue();
 					event.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, event.getUser(), modmailCommandHandler, "closeDeniedAdmin")).setComponents().queue();
 				}
 			}			
