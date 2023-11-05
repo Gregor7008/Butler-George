@@ -26,37 +26,14 @@ public class ScrollEngine implements AdjustmentListener {
     private int previousValue = -1;
     private int previousMaximum = -1;
 
-    /**
-     *  Convenience constructor.
-     *  Scroll direction is VERTICAL and viewport position is at the END.
-     *
-     *  @param scrollPane the scroll pane to monitor
-     */
     public ScrollEngine(JScrollPane scrollPane) {
         this(scrollPane, VERTICAL, END);
     }
-
-    /**
-     *  Convenience constructor.
-     *  Scroll direction is VERTICAL.
-     *
-     *  @param scrollPane the scroll pane to monitor
-     *  @param viewportPosition valid values are START and END
-     */
+    
     public ScrollEngine(JScrollPane scrollPane, int viewportPosition) {
         this(scrollPane, VERTICAL, viewportPosition);
     }
-
-    /**
-     *  Specify how the SmartScroller will function.
-     *
-     *  @param scrollPane the scroll pane to monitor
-     *  @param scrollDirection indicates which JScrollBar to monitor.
-     *                         Valid values are HORIZONTAL and VERTICAL.
-     *  @param viewportPosition indicates where the viewport will normally be
-     *                          positioned as data is added.
-     *                          Valid values are START and END
-     */
+    
     public ScrollEngine(JScrollPane scrollPane, int scrollDirection, int viewportPosition) {
         if (scrollDirection != HORIZONTAL &&  scrollDirection != VERTICAL) {
             throw new IllegalArgumentException("invalid scroll direction specified");

@@ -10,7 +10,6 @@ import functions.configuration_options.server.AutoMessages;
 import functions.configuration_options.server.AutoRoles;
 import functions.configuration_options.server.InboxChannels;
 import functions.configuration_options.server.Join2CreateChannels;
-import functions.configuration_options.server.LevelRewards;
 import functions.configuration_options.server.Penalties;
 import functions.configuration_options.server.ReactionRoles;
 import functions.configuration_options.server.StaticRoles;
@@ -26,7 +25,6 @@ public abstract class ServerConfigurationOptionsList {
 		add(new AutoRoles());
 		add(new InboxChannels());
 		add(new Join2CreateChannels());
-		add(new LevelRewards());
 		add(new Penalties());
 		add(new ReactionRoles());
 		add(new StaticRoles());

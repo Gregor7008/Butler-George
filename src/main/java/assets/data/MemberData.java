@@ -20,9 +20,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 public class MemberData {
     
     private final long guild_id;
-    private int experience, last_penalty_index, level, levelcard_background = 0;
+    private int last_penalty_index = 0;
     private Language language = Language.ENGLISH;
-    private OffsetDateTime last_experience, last_modmail, last_suggestion, temporarily_banned_until, temporarily_muted_until = OffsetDateTime.now().minusDays(1L);
+    private OffsetDateTime last_modmail, last_suggestion, temporarily_banned_until, temporarily_muted_until = OffsetDateTime.now().minusDays(1L);
     private ConcurrentHashMap<Integer, ModMailData> modmails = new ConcurrentHashMap<>();
     private boolean permanently_muted = false;
     private List<WarningData> warnings = new ArrayList<>();
@@ -35,14 +35,10 @@ public class MemberData {
     
     public MemberData(Guild guild, JSONObject data) {
         this.guild_id = guild.getIdLong();
-        this.experience = data.getInt(Key.EXPERIENCE);
         this.last_penalty_index = data.getInt(Key.LAST_PENALTY_INDEX);
-        this.level = data.getInt(Key.LEVEL);
-        this.levelcard_background = data.getInt(Key.LEVELCARD_BACKGROUND);
         
         this.language = Language.valueOf(data.getString(Key.LANGUAGE));
         
-        this.last_experience = OffsetDateTime.parse(data.getString(Key.LAST_EXPERIENCE), ConfigLoader.DATA_TIME_SAVE_FORMAT);
         this.last_modmail = OffsetDateTime.parse(data.getString(Key.LAST_MODMAIL), ConfigLoader.DATA_TIME_SAVE_FORMAT);
         this.last_suggestion = OffsetDateTime.parse(data.getString(Key.LAST_SUGGESTION), ConfigLoader.DATA_TIME_SAVE_FORMAT);
         this.temporarily_banned_until = OffsetDateTime.parse(data.getString(Key.TEMPORARILY_BANNED_UNTIL), ConfigLoader.DATA_TIME_SAVE_FORMAT);
@@ -71,14 +67,10 @@ public class MemberData {
         
         compiledData.put(Key.GUILD_NAME, this.getGuild().getName());
         
-        compiledData.put(Key.EXPERIENCE, experience);
         compiledData.put(Key.LAST_PENALTY_INDEX, last_penalty_index);
-        compiledData.put(Key.LEVEL, level);
-        compiledData.put(Key.LEVELCARD_BACKGROUND, levelcard_background);
         
         compiledData.put(Key.LANGUAGE, language.toString());
         
-        compiledData.put(Key.LAST_EXPERIENCE, last_experience.format(ConfigLoader.DATA_TIME_SAVE_FORMAT));
         compiledData.put(Key.LAST_MODMAIL, last_modmail.format(ConfigLoader.DATA_TIME_SAVE_FORMAT));
         compiledData.put(Key.LAST_SUGGESTION, last_suggestion.format(ConfigLoader.DATA_TIME_SAVE_FORMAT));
         compiledData.put(Key.TEMPORARILY_BANNED_UNTIL, temporarily_banned_until.format(ConfigLoader.DATA_TIME_SAVE_FORMAT));
@@ -107,22 +99,6 @@ public class MemberData {
         return Bot.getAPI().getGuildById(guild_id);
     }
     
-    public int getExperience() {
-        return this.experience;
-    }
-    
-    public void setExperience(int experience) {
-        this.experience = experience;
-    }
-    
-    public void addToExperience(int additional_experience) {
-        this.experience += additional_experience; 
-    }
-    
-    public void removeFromExperience(int deductional_experience) {
-        this.experience -= deductional_experience;
-    }
-    
     public int getLastPenaltyIndex() {
         return this.last_penalty_index;
     }
@@ -137,38 +113,6 @@ public class MemberData {
     
     public void removeFromLastPenaltyIndex(int deductional_indicies) {
         this.last_penalty_index -= deductional_indicies;
-    }
-    
-    public int getLevel() {
-        return this.level;
-    }
-    
-    public void setLevel(int index) {
-        this.level = index; 
-    }
-    
-    public void addToLevel(int additional_levels) {
-        this.level += additional_levels;  
-    }
-    
-    public void removeFromLevel(int deductional_levels) {
-        this.level -= deductional_levels; 
-    }
-    
-    public int getLevelCardBackground() {
-        return this.levelcard_background;
-    }
-    
-    public void setLevelCardBackground(int index) {
-        this.level = index; 
-    }
-    
-    public void addToLevelCardBackground(int additional_levels) {
-        this.level += additional_levels; 
-    }
-    
-    public void removeFromLevelCardBackground(int deductional_levels) {
-        this.level -= deductional_levels; 
     }
     
     public int getSpamCount() {
@@ -193,18 +137,6 @@ public class MemberData {
     
     public void setLanguage(Language language) {
         this.language = language;
-    }
-    
-    public OffsetDateTime getLastExperience() {
-        return last_experience;
-    }
-    
-    public void setLastExperience(OffsetDateTime last_experience) {
-        this.last_experience = last_experience;
-    }
-    
-    public void updateLastExperience() {
-        this.last_experience = OffsetDateTime.now(); 
     }
     
     public OffsetDateTime getLastModmail() {
@@ -319,14 +251,10 @@ public class MemberData {
     
     private static abstract class Key {
         public static final String GUILD_NAME = "name";
-        public static final String EXPERIENCE = "experience";
         public static final String LANGUAGE = "language";
-        public static final String LAST_EXPERIENCE = "last_experience";
         public static final String LAST_MODMAIL = "last_modmail";
         public static final String LAST_PENALTY_INDEX = "last_penalty_index";
         public static final String LAST_SUGGESTION = "last_suggestion";
-        public static final String LEVEL = "level";
-        public static final String LEVELCARD_BACKGROUND = "levelcard_background";
         public static final String MODMAILS = "modmails";
         public static final String PERMANENTLY_MUTED = "permanently_muted";
         public static final String TEMPORARILY_BANNED_UNTIL = "temporarily_banned_until";

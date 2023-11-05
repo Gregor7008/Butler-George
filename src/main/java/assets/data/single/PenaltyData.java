@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import assets.data.DataTools;
-import engines.data.ConfigManager;
+import engines.base.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 
@@ -20,7 +20,7 @@ public class PenaltyData {
     private final int warning_limit;
     private Duration opt_duration;
     private List<Role> opt_roles = new ArrayList<>();
-    private boolean remove_role, reset_experience, reset_level = false;
+    private boolean remove_role, reset_experience = false;
     
 	public PenaltyData(Guild guild, JSONObject data) {
 	    this.guild = guild;
@@ -37,14 +37,18 @@ public class PenaltyData {
 
     public PenaltyData instanciateFromJSON(JSONObject data) {
         try {
-            this.opt_duration = ConfigManager.convertStringToDuration(data.getString(Key.DURATION));
+            this.opt_duration = Toolbox.convertStringToDuration(data.getString(Key.DURATION));
         } catch (JSONException e) {}
         
-        this.opt_roles = DataTools.getRolesFromArrayKeys(guild, data, Key.ROLES, null);
+        List<Long> roles_ids = new ArrayList<Long>();
+        JSONArray roles_array = data.getJSONArray(Key.ROLES);
+        for (int i=0; i<roles_array.length(); i++) {
+            roles_ids.add(roles_array.getLong(i));
+        }
+        this.opt_roles = DataTools.getRolesFromIds(guild, roles_ids);
         
         this.remove_role = data.getBoolean(Key.REMOVE_ROLE);
         this.reset_experience = data.getBoolean(Key.RESET_EXPERIENCE);
-        this.reset_level = data.getBoolean(Key.RESET_LEVEL);
         
         return this;
     }
@@ -53,7 +57,7 @@ public class PenaltyData {
         JSONObject compiledData = new JSONObject();
         
         if (this.opt_duration != null) {
-            compiledData.put(Key.DURATION, ConfigManager.convertDurationToString(this.opt_duration));
+            compiledData.put(Key.DURATION, Toolbox.convertDurationToString(this.opt_duration));
         }
         
         if (this.opt_roles != null && !this.opt_roles.isEmpty()) {
@@ -69,7 +73,6 @@ public class PenaltyData {
         compiledData.put(Key.TYPE, type.toString());
         compiledData.put(Key.REMOVE_ROLE, remove_role);
         compiledData.put(Key.RESET_EXPERIENCE, reset_experience);
-        compiledData.put(Key.RESET_LEVEL, reset_level);
         
         return compiledData;
     }
@@ -124,15 +127,6 @@ public class PenaltyData {
         return this;
     }
     
-    public boolean includesLevelReset() {
-        return this.reset_level;
-    }
-    
-    public PenaltyData setLevelReset(boolean reset_level) {
-        this.reset_level = reset_level;
-        return this;
-    }
-    
     public boolean includesRoleRemoval() {
         return this.remove_role;
     }
@@ -152,7 +146,6 @@ public class PenaltyData {
         public static final String ROLES = "roles";
         public static final String REMOVE_ROLE = "remove_role";
         public static final String RESET_EXPERIENCE = "reset_experience";
-        public static final String RESET_LEVEL = "reset_level";
         public static final String WARNING_LIMIT = "warning_limit";
     }
 

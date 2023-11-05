@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 
-import engines.data.ConfigLoader;
 import engines.functions.GuildMusicManager;
 import engines.functions.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -92,7 +91,6 @@ public abstract class Toolbox {
 				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.DEFAULT_TIME_FORMAT))
 				.replace("{boosts}", String.valueOf(guild.getBoostCount()));
 		if (user != null) {
-		    output = output.replace("{level}", String.valueOf(ConfigLoader.get().getMemberData(guild, user).getLevel()));
 	        if (mentions) {
 	            output = output.replace("{user}", user.getAsMention());
 	        } else {

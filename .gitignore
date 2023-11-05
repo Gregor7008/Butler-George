@@ -4,4 +4,3 @@ target/
 .project
 bin/
 src/test/
-src/main/resources/misc/secrets.json

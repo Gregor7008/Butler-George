@@ -1,7 +1,5 @@
 package engines.data;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -11,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -23,11 +20,9 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-import assets.base.exceptions.EntityNotFoundException;
 import assets.data.GuildData;
 import assets.data.MemberData;
 import assets.data.UserData;
-import assets.data.single.SystemData;
 import assets.logging.Logger;
 import base.Bot;
 import base.GUI;
@@ -44,7 +39,6 @@ public class ConfigLoader {
     private static ConfigLoader INSTANCE;
     private static Logger LOG = ConsoleEngine.getLogger(ConfigLoader.class);
 
-    private SystemData systemData;
     private MongoClient client;
     private MongoDatabase database;
     private MongoCollection<Document> userConfigs;
@@ -56,45 +50,19 @@ public class ConfigLoader {
         if (INSTANCE != null) {
             return INSTANCE;
         } else {
-            LOG.debug("Instance not found, try ConfigLoader.connect(String licenseKey) first!");
+            LOG.debug("Instance not found, try new ConfigLoader(String username, String password) first!");
             return null;
         }
     }
-
-    public static boolean connect(String licenseKey) {
-        InputStream is = ConfigLoader.class.getClassLoader().getResourceAsStream("misc/secrets.json");
-        String connectionUrl = new JSONObject(new JSONTokener(is)).getString("auth_server_url");
-        try {
-            is.close();
-        } catch (IOException e) {}
-        MongoClientSettings setting = MongoClientSettings.builder()
-                .applyToSocketSettings(builder -> {
-                    builder.connectTimeout(3, TimeUnit.SECONDS);
-                    builder.readTimeout(500, TimeUnit.MILLISECONDS);
-                })
-                .applyToClusterSettings(builder -> builder.serverSelectionTimeout(3, TimeUnit.SECONDS))
-                .applyConnectionString(new ConnectionString(connectionUrl))
-                .build();
-        try {
-            MongoClient preCheckClient = MongoClients.create(setting);
-            MongoCollection<Document> preCheckCollection = preCheckClient.getDatabase("system")
-                    .getCollection("licenses");
-            Document queryResult = preCheckCollection.find(new Document("license_key", licenseKey)).first();
-            if (queryResult != null) {
-                new ConfigLoader(new SystemData(new JSONObject(queryResult.toJson())));
-            } else {
-                LOG.error("License Key invalid, please try again!");
-            }
-        } catch (MongoSecurityException | MongoQueryException | MongoTimeoutException e) {
-            return false;
-        }
-        return true;
+    
+    public static boolean create(String username, String password) {
+        new ConfigLoader(username, password);
+        return INSTANCE != null;
     }
 
-    private ConfigLoader(SystemData data) {
-        this.systemData = data;
-        String connectionUri = "mongodb://" + this.encodeToURL(data.getDatabaseUsername()) + ":"
-                + this.encodeToURL(data.getDatabasePassword())
+    private ConfigLoader(String username, String password) {
+        String connectionUri = "mongodb://" + this.encodeToURL(username) + ":"
+                + this.encodeToURL(password)
                 + "@butlergeorge.ddns.net:17389/?authMechanism=SCRAM-SHA-256";
         MongoClientSettings setting = MongoClientSettings.builder()
                 .applyToSocketSettings(builder -> {
@@ -106,18 +74,18 @@ public class ConfigLoader {
                 .build();
         try {
             client = MongoClients.create(setting);
-            database = client.getDatabase(data.getDatabaseName());
+            database = client.getDatabase(username);
             try {
-                userConfigs = database.getCollection("user");
+                userConfigs = database.getCollection("users");
             } catch (IllegalArgumentException e) {
-                database.createCollection("user");
-                userConfigs = database.getCollection("user");
+                database.createCollection("users");
+                userConfigs = database.getCollection("users");
             }
             try {
-                guildConfigs = database.getCollection("guild");
+                guildConfigs = database.getCollection("guilds");
             } catch (IllegalArgumentException e) {
-                database.createCollection("guild");
-                guildConfigs = database.getCollection("guild");
+                database.createCollection("guilds");
+                guildConfigs = database.getCollection("guilds");
             }
             try {
                 guildConfigs.find(new Document("id", 475974084937646080L)).first();
@@ -214,10 +182,6 @@ public class ConfigLoader {
     }
 
 //    Get Data
-    public SystemData getSystemData() {
-        return this.systemData;
-    }
-
     public GuildData getGuildData(long guild_id) {
         GuildData guildData = guildConfigCache.get(guild_id);
         if (guildData == null) {
@@ -225,10 +189,11 @@ public class ConfigLoader {
             if (doc != null) {
                 guildData = new GuildData(new JSONObject(doc.toJson()));
             } else {
-                try {
-                    guildData = new GuildData(Bot.getAPI().getGuildById(guild_id));
-                } catch (EntityNotFoundException e) {
-                    LOG.debug(e.getMessage());
+                Guild guild = Bot.getAPI().getGuildById(guild_id);
+                if (guild != null) {
+                    guildData = new GuildData(guild);
+                } else {
+                    LOG.debug("Provided Guild ID returned 'null', aborting config creation");
                 }
             }
             guildConfigCache.put(guild_id, guildData);
@@ -247,10 +212,11 @@ public class ConfigLoader {
             if (doc != null) {
                 userData = new UserData(new JSONObject(doc.toJson()));
             } else {
-                try {
-                    userData = new UserData(Bot.getAPI().retrieveUserById(user_id).complete());
-                } catch (EntityNotFoundException e) {
-                    LOG.debug(e.getMessage());
+                User user = Bot.getAPI().retrieveUserById(user_id).complete();
+                if (user != null) {
+                    userData = new UserData(user);
+                } else {
+                    LOG.debug("Provided User ID returned 'null', aborting config creation");
                 }
             }
             userConfigCache.put(user_id, userData);

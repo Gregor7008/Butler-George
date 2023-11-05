@@ -8,12 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException;
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.single.AutoMessageData;
 import assets.data.single.GiveawayData;
 import assets.data.single.Join2CreateChannelData;
-import assets.data.single.LevelRewardData;
 import assets.data.single.ModMailData;
 import assets.data.single.PenaltyData;
 import assets.data.single.PollData;
@@ -33,23 +30,18 @@ public class GuildData {
     private List<Long> support_roles = new ArrayList<>();
     private List<Long> bot_auto_roles = new ArrayList<>();
     private List<Long> user_auto_roles = new ArrayList<>();
-    private AutoMessageData boost_message, goodbye_message, level_up_message, welcome_message;
+    private AutoMessageData boost_message, goodbye_message, welcome_message;
     private long community_inbox_channel, moderation_inbox_channel, suggestion_inbox_channel, support_talk;
     private Message offline_message;
     private ConcurrentHashMap<Long, Join2CreateChannelData> join2create_channels = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer, LevelRewardData> level_rewards = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, PenaltyData> penalties = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, ModMailData> modmails = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, ConcurrentHashMap<Long, PollData>> polls = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, ConcurrentHashMap<Long, ReactionRoleData>> reaction_roles = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, ConcurrentHashMap<Long, GiveawayData>> giveaways = new ConcurrentHashMap<>();
 
-    public GuildData(Guild guild) throws EntityNotFoundException {
-        if (guild == null) {
-            throw new EntityNotFoundException(ReferenceType.GUILD, "Couldn't find guild, aborting config creation");
-        } else {
-            this.guild_id = guild.getIdLong();
-        }
+    public GuildData(Guild guild) {
+        this.guild_id = guild.getIdLong();
     }
 
     public GuildData(JSONObject data) {
@@ -86,10 +78,6 @@ public class GuildData {
         if (!goodbye_message_data.isEmpty()) {
             this.goodbye_message = new AutoMessageData(guild, goodbye_message_data);
         }
-        JSONObject level_up_message_data = auto_messages.getJSONObject(Key.LEVEL_UP_MESSAGE);
-        if (!level_up_message_data.isEmpty()) {
-            this.level_up_message = new AutoMessageData(guild, level_up_message_data);
-        }
         JSONObject welcome_message_data = auto_messages.getJSONObject(Key.WELCOME_MESSAGE);
         if (!welcome_message_data.isEmpty()) {
             this.welcome_message = new AutoMessageData(guild, welcome_message_data);
@@ -106,14 +94,6 @@ public class GuildData {
         });
 
         JSONObject other = data.getJSONObject(Key.OTHER);
-        JSONObject lvl_reward_data = other.getJSONObject(Key.LEVEL_REWARDS);
-        lvl_reward_data.keySet().forEach(level_count -> {
-            JSONObject reward_data = lvl_reward_data.getJSONObject(level_count);
-            if (!reward_data.isEmpty()) {
-                level_rewards.put(Integer.valueOf(level_count), new LevelRewardData(guild, reward_data));
-            }
-        });
-
         JSONObject penalties_data = other.getJSONObject(Key.PENALTIES);
         penalties_data.keySet().forEach(warning_count -> {
             JSONObject penalty_data = penalties_data.getJSONObject(warning_count);
@@ -225,11 +205,6 @@ public class GuildData {
         } else {
             auto_messages.put(Key.GOODBYE_MESSAGE, new JSONObject());
         }
-        if (level_up_message != null) {
-            auto_messages.put(Key.LEVEL_UP_MESSAGE, level_up_message.compileToJSON());
-        } else {
-            auto_messages.put(Key.LEVEL_UP_MESSAGE, new JSONObject());
-        }
         if (welcome_message != null) {
             auto_messages.put(Key.WELCOME_MESSAGE, welcome_message.compileToJSON());
         } else {
@@ -240,11 +215,6 @@ public class GuildData {
         static_channels.put(Key.MODERATION_INBOX_CHANNEL, moderation_inbox_channel);
         static_channels.put(Key.SUGGESTION_INBOX_CHANNEL, suggestion_inbox_channel);
         static_channels.put(Key.SUPPORT_TALK, support_talk);
-
-        JSONObject level_rewards_object = new JSONObject();
-        level_rewards.forEach((level_count, reward_role) -> level_rewards_object.put(String.valueOf(level_count),
-                String.valueOf(reward_role)));
-        other.put(Key.LEVEL_REWARDS, level_rewards_object);
 
         JSONObject join2create_channels_object = new JSONObject();
         join2create_channels.forEach(
@@ -458,14 +428,6 @@ public class GuildData {
         this.goodbye_message = goodbye_message;
     }
 
-    public AutoMessageData getLevelUpMessage() {
-        return this.level_up_message;
-    }
-
-    public void setLevelUpMssage(AutoMessageData level_up_message) {
-        this.level_up_message = level_up_message;
-    }
-
     public AutoMessageData getWelcomeMessage() {
         return this.welcome_message;
     }
@@ -599,36 +561,6 @@ public class GuildData {
     }
 
 //  Other
-    public ConcurrentHashMap<Integer, LevelRewardData> getLevelRewards() {
-        return this.level_rewards;
-    }
-
-    public LevelRewardData getLevelRewardData(int level_count) {
-        return this.level_rewards.get(level_count);
-    }
-
-    public void setLevelRewards(ConcurrentHashMap<Integer, LevelRewardData> level_rewards) {
-        DataTools.setMap(this.level_rewards, level_rewards);
-    }
-
-    public void addLevelRewards(LevelRewardData... datas) {
-        for (LevelRewardData data : datas) {
-            this.level_rewards.put(data.getLevelCount(), data);
-        }
-    }
-
-    public void removeLevelRewards(int... level_counts) {
-        for (int level_count : level_counts) {
-            this.level_rewards.remove(level_count);
-        }
-    }
-
-    public void removeLevelRewardsByData(LevelRewardData... datas) {
-        for (LevelRewardData data : datas) {
-            this.level_rewards.remove(data.getLevelCount());
-        }
-    }
-
     public ConcurrentHashMap<Integer, PenaltyData> getPenalties() {
         return this.penalties;
     }
@@ -819,6 +751,14 @@ public class GuildData {
         }
         return return_value;
     }
+    
+    public ReactionRoleData getReactionRole(long channelId, long messageId) {
+        ConcurrentHashMap<Long, ReactionRoleData> returned_map = this.reaction_roles.get(channelId);
+        if (returned_map != null) {
+            return returned_map.get(messageId);
+        }
+        return null;
+    }
 
     public ReactionRoleData getReactionRole(TextChannel channel, Message message) {
         if (channel != null && message != null) {
@@ -937,7 +877,6 @@ public class GuildData {
         public static final String AUTO_MESSAGES = "auto_messages";
         public static final String BOOST_MESSAGE = "boost_message";
         public static final String GOODBYE_MESSAGE = "goodbye_message";
-        public static final String LEVEL_UP_MESSAGE = "level_up_message";
         public static final String WELCOME_MESSAGE = "welcome_message";
         public static final String STATIC_CHANNELS = "static_channels";
         public static final String COMMUNITY_INBOX_CHANNEL = "community_inbox_channel";
@@ -947,19 +886,10 @@ public class GuildData {
         public static final String AUTO_CHANNELS = "auto_channels";
         public static final String JOIN2CREATE_CHANNELS = "join2create_channels";
         public static final String OTHER = "other";
-        public static final String LEVEL_REWARDS = "level_rewards";
         public static final String PENALTIES = "penalties";
         public static final String MODMAILS = "modmails";
         public static final String POLLS = "polls";
         public static final String REACTION_ROLES = "reaction_roles";
         public static final String GIVEAWAYS = "giveaways";
-    }
-
-    public ConcurrentHashMap<Long, Join2CreateChannelData> getJoin2CreateChannelDataIds() {
-        return null;
-    }
-
-    public ReactionRoleData getReactionRole(long channelId, long messageId) {
-        return null;
     }
 }

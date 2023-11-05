@@ -48,7 +48,7 @@ public class Join2CreateChannelData {
         JOIN2CREATE_CHANNEL_LIST.get(channel.getGuild()).add(this);
 	}
 
-    public GiveawayData instanciateFromJSON(JSONObject data) {
+    public Join2CreateChannelData instanciateFromJSON(JSONObject data) {
         this.name_format = data.getString(Key.NAME_FORMAT);
         this.limit_preset = data.getInt(Key.LIMIT_PRESET);
         this.configurable = data.getBoolean(Key.CONFIGURABLE);
@@ -58,7 +58,6 @@ public class Join2CreateChannelData {
             this.children.add(guild.getVoiceChannelById(chilren_array.getLong(i)));
             this.children.removeAll(Collections.singleton(null));
         }
-        
         return this;
     }
 
@@ -152,7 +151,8 @@ public class Join2CreateChannelData {
         this.configurable = configurable;
         return this;
     }
-    
+
+//  TODO 
  /* Transfer & Adapt tool methods from 'EventProcessor.class' to here
   * This includes....
   * 1. Creation of a new J2C-Channel incl. Formatting

@@ -105,6 +105,8 @@ public class AutoMessageData {
     }
     
     public MessageCreateAction buildMessage(User user) {
+        Guild guild = this.getGuild();
+        TextChannel text_channel = guild.getTextChannelById(text_channel_id);
         if (activated && (!title.isBlank() || !message.isBlank()) && text_channel != null) {
             String title_edit = Toolbox.processAutoMessage(title, guild, user, false);
             String message_edit = Toolbox.processAutoMessage(message, guild, user, true);

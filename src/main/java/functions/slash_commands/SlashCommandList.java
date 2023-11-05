@@ -20,8 +20,6 @@ import functions.slash_commands.support.Report;
 import functions.slash_commands.support.Suggest;
 import functions.slash_commands.utilities.Embed;
 import functions.slash_commands.utilities.Language;
-import functions.slash_commands.utilities.Level;
-import functions.slash_commands.utilities.Levelbackground;
 import functions.slash_commands.utilities.PingAndMove;
 import functions.slash_commands.utilities.Serverinfo;
 import functions.slash_commands.utilities.Userinfo;
@@ -56,8 +54,6 @@ public abstract class SlashCommandList {
 		
 		//Utilities
 		add(new Embed());
-		add(new Level());
-		add(new Levelbackground());
 		add(new Userinfo());
 		add(new Serverinfo());
 		add(new Language());

@@ -31,6 +31,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
@@ -39,7 +40,6 @@ public class Bot {
 	public static String VERSION = "V2.1-dev.0";
 	public static String NAME = "Butler George";
 	public static String ID = "853887837823959041";
-	public static String HOME = "708381749826289666";
 
     private static Bot INSTANCE;
 	private static Logger LOG = ConsoleEngine.getLogger(Bot.class);
@@ -72,7 +72,7 @@ public class Bot {
         }
     }
 	
-	public Bot() throws InterruptedException {
+	public Bot(String token) throws InterruptedException {
 	    INSTANCE = this;
 //	    List Creation
         ServerConfigurationOptionsList.create();
@@ -83,7 +83,7 @@ public class Bot {
         SlashCommandList.create();
         LOG.debug("Successfully created lists");
 //      API Login
-		JDABuilder builder = JDABuilder.createDefault(ConfigLoader.get().getSystemData().getBotToken());
+		JDABuilder builder = JDABuilder.createDefault(token);
 		builder.addEventListeners(new EventProcessor(), new EventAwaiter());
 		Object[] serverUtils = GuildUtilitiesList.getEngines().values().toArray();
 		builder.addEventListeners(serverUtils);
@@ -125,7 +125,7 @@ public class Bot {
     				List<Message> messagesByUser = null;
     				try {
     					messagesByUser = modmailData.getUser().openPrivateChannel().complete().getHistoryAfter(selectedTicket.getLastUserMessageId(), 100).complete().getRetrievedHistory();
-    				} catch (JSONException e) {}
+    				} catch (JSONException | ErrorResponseException e) {}
     				if (messagesByUser != null) {
     					for (int a = messagesByUser.size() - 1 ; a >= 0 ; a--) {
     					    Message message = messagesByUser.get(a);
@@ -139,7 +139,7 @@ public class Bot {
     					List<Message> messagesByServer = null;
     					try {
     						messagesByServer = modmailData.getGuildChannel().getHistoryAfter(modmailData.getLastGuildMessageId(), 100).complete().getRetrievedHistory();
-    					} catch (JSONException e) {}
+    					} catch (JSONException | ErrorResponseException e) {}
     					if (messagesByServer != null) {
     						for (int a = messagesByServer.size() - 1 ; a >= 0 ; a--) {
     						    Message message = messagesByServer.get(a);
@@ -160,7 +160,7 @@ public class Bot {
 		for (int i = 0; i < guilds.size(); i++) {
     		Guild guild = guilds.get(i);
 //    		Delete channels created with Join2Create channels
-    		ConcurrentHashMap<Long, Join2CreateChannelData> join2createChannels = ConfigLoader.get().getGuildData(guild).getJoin2CreateChannelDataIds();
+    		ConcurrentHashMap<Long, Join2CreateChannelData> join2createChannels = ConfigLoader.get().getGuildData(guild).getJoin2CreateChannelIdDatas();
     		join2createChannels.forEach((channel_id, data) -> {
     		    List<Long> createdChannels = data.getChildrenIds();
                 if (!createdChannels.isEmpty()) {

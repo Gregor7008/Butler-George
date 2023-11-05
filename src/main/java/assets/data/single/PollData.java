@@ -20,7 +20,7 @@ import engines.base.Check;
 import engines.base.LanguageEngine;
 import engines.base.LanguageEngine.Language;
 import engines.base.Toolbox;
-import engines.data.ConfigManager;
+import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -53,7 +53,7 @@ public class PollData implements MessageConnection {
 //  Temporary runtime data
     private long timer_operation_id = 0L;
 
-	public PollData(TextChannel channel, Message message2, JSONObject data) {
+	public PollData(TextChannel channel, Message message, JSONObject data) {
         this.guild = message.getGuild();
 	    this.text_channel = message.getChannel().asTextChannel();
 	    this.message = message;
@@ -80,7 +80,7 @@ public class PollData implements MessageConnection {
         this.max_total_votes = data.getInt(Key.MAX_TOTAL_VOTES);
         this.max_votes_per_option = data.getInt(Key.MAX_VOTES_PER_OPTION);
         
-        this.time_limit = OffsetDateTime.parse(data.getString(Key.TIME_LIMIT), ConfigManager.DATA_TIME_SAVE_FORMAT);
+        this.time_limit = OffsetDateTime.parse(data.getString(Key.TIME_LIMIT), ConfigLoader.DATA_TIME_SAVE_FORMAT);
         this.timer_operation_id = CentralTimer.get().schedule(() ->  message.editMessageEmbeds(buildPollEmbed()).setComponents().queue(), this.time_limit);
         
         JSONArray options_array = data.getJSONArray(Key.OPTIONS);
@@ -122,7 +122,7 @@ public class PollData implements MessageConnection {
         compiledData.put(Key.MAX_TOTAL_VOTES, max_total_votes);
         compiledData.put(Key.MAX_VOTES_PER_OPTION, max_votes_per_option);
         
-        compiledData.put(Key.TIME_LIMIT, time_limit.format(ConfigManager.DATA_TIME_SAVE_FORMAT));
+        compiledData.put(Key.TIME_LIMIT, time_limit.format(ConfigLoader.DATA_TIME_SAVE_FORMAT));
         
         JSONArray options_data = new JSONArray();
         for (int i = 0; i < options.size(); i++) {

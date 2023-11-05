@@ -11,7 +11,7 @@ import org.json.JSONObject;
 import assets.data.MessageConnection;
 import base.Bot;
 import engines.base.CentralTimer;
-import engines.data.ConfigManager;
+import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -36,7 +36,7 @@ public class GiveawayData implements MessageConnection {
 //  Temporary runtime data
     private long timer_operation_id = 0L;
 
-	public GiveawayData(TextChannel channel, Message message2, JSONObject data) {
+	public GiveawayData(TextChannel channel, Message message, JSONObject data) {
 	    this.guild = message.getGuild();
 	    this.text_channel = message.getChannel().asTextChannel();
 	    this.message = message;
@@ -56,7 +56,7 @@ public class GiveawayData implements MessageConnection {
         
         this.anonymous = data.getBoolean(Key.ANONYMOUS);
         
-        this.time_limit = OffsetDateTime.parse(data.getString(Key.TIME_LIMIT), ConfigManager.DATA_TIME_SAVE_FORMAT);
+        this.time_limit = OffsetDateTime.parse(data.getString(Key.TIME_LIMIT), ConfigLoader.DATA_TIME_SAVE_FORMAT);
         this.timer_operation_id = CentralTimer.get().schedule(() ->  message.editMessageEmbeds(buildEndEmbed()).setComponents().queue(), this.time_limit);
         
         JSONArray prizes_array = data.getJSONArray(Key.PRIZES);

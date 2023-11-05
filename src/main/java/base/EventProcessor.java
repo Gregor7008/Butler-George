@@ -21,7 +21,6 @@ import assets.functions.UserContextEventHandler;
 import engines.base.LanguageEngine;
 import engines.base.Toolbox;
 import engines.data.ConfigLoader;
-import engines.functions.LevelEngine;
 import functions.context_menu_commands.MessageContextCommandList;
 import functions.context_menu_commands.UserContextCommandList;
 import functions.slash_commands.SlashCommandList;
@@ -35,7 +34,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -104,9 +102,6 @@ public class EventProcessor extends ListenerAdapter {
 					event.replyEmbeds(embed).queue();
 				}
 			}
-		}
-		if (event.isFromGuild()) {
-			LevelEngine.getInstance().slashcommand(event);
 		}
 	}
 
@@ -259,11 +254,9 @@ public class EventProcessor extends ListenerAdapter {
 		}
 		if (event.getChannelJoined() != null) {
 		    this.managej2cjoin(event.getGuild(), event.getMember(), event.getChannelJoined());
-		    LevelEngine.getInstance().voicejoin(event);
 		}
 		if (event.getChannelLeft() != null) {
 		    this.managej2cleave(event.getGuild(), event.getMember().getUser(), event.getChannelLeft());
-		    LevelEngine.getInstance().voicemove(event);
 		}
 	}
 	
@@ -351,7 +344,8 @@ public class EventProcessor extends ListenerAdapter {
 		}
 	}
 	
-	//Tool methods
+//	Tool methods
+//	TODO Move to Join2CreateChannelData.class
 	private void managej2cjoin(Guild guild, Member member, AudioChannel audioChannel) {
 		JSONObject channelConfig = null;
 		try {

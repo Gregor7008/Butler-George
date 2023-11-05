@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.User;
 
 public class WarningData {
     
+//  TODO
+    
     private String reason = "~ Unknown ~";
     private long creator_id = 0L;
     private OffsetDateTime creation_time;

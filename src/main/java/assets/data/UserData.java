@@ -7,8 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONObject;
 
-import assets.base.exceptions.EntityNotFoundException;
-import assets.base.exceptions.EntityNotFoundException.ReferenceType;
 import assets.data.single.ModMailData;
 import assets.data.single.ModMailSelectionData;
 import base.Bot;
@@ -21,12 +19,8 @@ public class UserData {
     private ModMailData modmail_selection;
     private ConcurrentHashMap<Long, MemberData> member_datas = new ConcurrentHashMap<>();
 
-    public UserData(User user) throws EntityNotFoundException {
-        if (user == null) {
-            throw new EntityNotFoundException(ReferenceType.USER, "Couldn't find guild, aborting config creation");
-        } else {
-            this.user_id = user.getIdLong();
-        }
+    public UserData(User user) {
+        this.user_id = user.getIdLong();
     }
     
 	public UserData(JSONObject data) {

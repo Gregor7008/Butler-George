@@ -43,7 +43,7 @@ import engines.logging.ConsoleEngine;
 import net.dv8tion.jda.api.entities.Guild;
 import net.miginfocom.swing.MigLayout;
 
-public class GUI extends JFrame implements FocusListener {
+public class GUI extends JFrame {
 	
 	public static GUI INSTANCE;
 	
@@ -53,7 +53,10 @@ public class GUI extends JFrame implements FocusListener {
     
     public final JTextArea console = new JTextArea();
     public final JTextField consoleIn = new JTextField();
-    public final JPasswordField password = new JPasswordField();
+    
+    private final JTextField usernameIn = new JTextField();
+    private final JPasswordField tokenIn = new JPasswordField();
+    private final JPasswordField passwordIn = new JPasswordField();
     
 	private final JLabel greenLED = new JLabel();
 	private final JLabel redLED = new JLabel();
@@ -63,6 +66,7 @@ public class GUI extends JFrame implements FocusListener {
 	private final JTable infoTable = new JTable();
 	private final JTable commandTable = new JTable();
 	private final JButton showPassword = new JButton("");
+	private final JButton showToken = new JButton("");
 	private final JCheckBox shutdownWindowBox = new JCheckBox("");
 	private final JLabel sdWLabel = new JLabel("Custom shutdown reason:");
     private final Font default_font;
@@ -79,7 +83,7 @@ public class GUI extends JFrame implements FocusListener {
     private OffsetDateTime startTime = null;
     private Duration additional = Duration.ZERO;
     private boolean invalidArguments, autostart = false;
-    private String licenseKey = "";
+    private String username, password, token = "";
 	
 	public static void main(String[] args) {
 		try {
@@ -113,7 +117,7 @@ public class GUI extends JFrame implements FocusListener {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		
-		getContentPane().setLayout(new MigLayout("", "[600,grow][125:125:125][75:75:75][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][20:n][20:n][510,grow][20:n]"));
+		getContentPane().setLayout(new MigLayout("", "[600,grow][125:125:125][75:75:75][140:140:140][30:30:30][30:30:30]", "[30:n][20:n][20:n][20:n][20:n][20:n][510,grow][20:n]"));
 		
 		JScrollPane consoleScrollPane = new JScrollPane(console);
 		consoleScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -121,67 +125,124 @@ public class GUI extends JFrame implements FocusListener {
         new ScrollEngine(consoleScrollPane);
 		console.setEditable(false);
 		console.setFont(console_font);
-		getContentPane().add(consoleScrollPane, "flowx,cell 0 0 1 6,grow");
+		getContentPane().add(consoleScrollPane, "flowx,cell 0 0 1 7,grow");
 
 		greenLED.setIcon(greenLEDOff);
-		getContentPane().add(greenLED, "cell 4 0,alignx center");
+		getContentPane().add(greenLED, "cell 5 0,alignx center");
 		
 		redLED.setIcon(redLEDOn);
-		getContentPane().add(redLED, "flowx,cell 5 0,alignx center");
-		if (!this.licenseKey.isBlank()) {
-            password.setText(this.licenseKey);
-            password.setForeground(Color.BLACK);
-            password.setEchoChar('*');
-		}
+		getContentPane().add(redLED, "flowx,cell 6 0,alignx center");
+		
+		if (!this.username.isBlank()) {
+            usernameIn.setText(this.username);
+            usernameIn.setForeground(Color.BLACK);
+        }
+		if (!this.password.isBlank()) {
+            passwordIn.setText(this.password);
+            passwordIn.setForeground(Color.BLACK);
+            passwordIn.setEchoChar('*');
+        }
+        if (!this.token.isBlank()) {
+            tokenIn.setText(this.token);
+            tokenIn.setForeground(Color.BLACK);
+            tokenIn.setEchoChar('*');
+        }
+        
+        FocusListener publicFL = new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                JTextField textField = (JTextField) e.getComponent();
+                if (textField.getText().equals(textField.getName())) {
+                    textField.setForeground(Color.BLACK);
+                    textField.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                JTextField textField = (JTextField) e.getComponent();
+                if (textField.getText().equals(textField.getName()) || textField.getText().equals("")) {
+                    textField.setForeground(Color.GRAY);
+                    textField.setText(textField.getName());
+                }
+            }
+        };
+		
+		FocusListener secretFL = new FocusListener() {        
+            @Override
+            public void focusLost(FocusEvent e) {
+                JPasswordField field = (JPasswordField) e.getComponent();
+                if (String.copyValueOf(field.getPassword()).equals("")) {
+                    field.setText(field.getName());
+                    field.setForeground(Color.GRAY);
+                    field.setEchoChar((char) 0);
+                }
+            }
+            @Override
+            public void focusGained(FocusEvent e) {
+                JPasswordField field = (JPasswordField) e.getComponent();
+                if (String.copyValueOf(field.getPassword()).equals(field.getName())) {
+                    field.setText("");
+                    field.setForeground(Color.BLACK);
+                    field.setEchoChar('*');
+                }
+            }
+        };
+        
+        MouseAdapter secretMA = new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                tokenIn.setEchoChar((char) 0);
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                tokenIn.setEchoChar('*');
+            }
+        };
+
+        Image eyeIconRescaled = eyeIconRaw.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		
+        usernameIn.setForeground(Color.GRAY);
+        usernameIn.setFont(default_font);
+        usernameIn.setName("Username");
+        usernameIn.setText(tokenIn.getName());
+        usernameIn.addFocusListener(publicFL);
+        
+		showToken.setSize(30, 20);
+		showToken.setMargin(new Insets(0,0,0,0));
+		showToken.setIcon(new ImageIcon(eyeIconRescaled));
+		showToken.addMouseListener(secretMA);
+		
+		tokenIn.setEchoChar((char) 0);
+		tokenIn.setForeground(Color.GRAY);
+		tokenIn.setFont(default_font);
+		tokenIn.setName("Token");
+		tokenIn.setText(tokenIn.getName());
+		tokenIn.addFocusListener(secretFL);
 		
 		showPassword.setSize(30, 20);
 		showPassword.setMargin(new Insets(0,0,0,0));
-		Image eyeIconRescaled = eyeIconRaw.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 		showPassword.setIcon(new ImageIcon(eyeIconRescaled));
-		showPassword.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				password.setEchoChar((char) 0);
-	        }
-			@Override
-	        public void mouseReleased(MouseEvent e) {
-				password.setEchoChar('*');
-	        }
-		});
+		showPassword.addMouseListener(secretMA);
 		
-		password.setEchoChar((char) 0);
-		password.setForeground(Color.GRAY);
-		password.setFont(default_font);
-		password.setName("Password");
-		password.setText(password.getName());
-		password.addFocusListener(new FocusListener() {		
-			@Override
-			public void focusLost(FocusEvent e) {
-				JPasswordField field = (JPasswordField) e.getComponent();
-				if (String.copyValueOf(field.getPassword()).equals("")) {
-					field.setText(field.getName());
-					field.setForeground(Color.GRAY);
-					field.setEchoChar((char) 0);
-				}
-			}
-			@Override
-			public void focusGained(FocusEvent e) {
-				JPasswordField field = (JPasswordField) e.getComponent();
-				if (String.copyValueOf(field.getPassword()).equals(field.getName())) {
-					field.setText("");
-					field.setForeground(Color.BLACK);
-					field.setEchoChar('*');
-				}
-			}
-		});
-		getContentPane().add(password, "cell 1 1 4 1,grow");
-		getContentPane().add(showPassword, "cell 5 1,alignx left");
+		passwordIn.setEchoChar((char) 0);
+		passwordIn.setForeground(Color.GRAY);
+		passwordIn.setFont(default_font);
+		passwordIn.setName("Token");
+		passwordIn.setText(tokenIn.getName());
+		passwordIn.addFocusListener(secretFL);
+		
+        getContentPane().add(usernameIn, "cell 1 0 3 1,growx,aligny bottom");
+        getContentPane().add(passwordIn, "cell 1 1 5 1,growx");
+		getContentPane().add(showPassword, "cell 6 1,alignx left");
+		getContentPane().add(tokenIn, "cell 1 2 5 1,growx");
+		getContentPane().add(showToken, "cell 6 2,alignx left");
 		
 		startButton.addActionListener(e -> {
 			this.startBot();
 		});
 		startButton.setFont(default_font);
-		getContentPane().add(startButton, "flowx,cell 1 2 2 1,grow");
+		getContentPane().add(startButton, "flowx,cell 1 3 2 1,grow");
 		
 		stopButton.addActionListener(e -> {
 			if (shutdownWindowBox.isSelected()) {
@@ -192,73 +253,75 @@ public class GUI extends JFrame implements FocusListener {
 		});
 		stopButton.setEnabled(false);
 		stopButton.setFont(default_font);
-		getContentPane().add(stopButton, "cell 3 2 3 1,grow");
+		getContentPane().add(stopButton, "cell 3 3 4 1,grow");
 		
 		sdWLabel.setFont(default_font);
-		getContentPane().add(sdWLabel, "cell 3 3 2 1,alignx right,aligny center");
+		getContentPane().add(sdWLabel, "cell 3 4 3 1,alignx right,aligny center");
 		
 		infoTable.setShowGrid(false);
 		infoTable.setFont(default_font);
-		infoTable.setModel(new DefaultTableModel(
-			new Object[][] {
-				{"Name:", Bot.NAME},
-				{"Version:", Bot.VERSION},
-				{"ID:", Bot.ID},
-				{"Runtime:", "00:00:00:00"},
-				{"Errors:", 0},
-				{"Executions:", 0},
-				{"Servers:", 0},
-				{"Users:", 0},
-				{"J2C-Channels", 0},
-				{"Push Cycle Period:", String.valueOf(ConfigLoader.PUSH_CYCLE_PERIOD) + " min."},
-				{"Total Pushs:", 0}
-			},
-			new String[] {
-				"key", "value"
-			}
-		) {private static final long serialVersionUID = 4012626449837340333L;
-			
-		   public boolean isCellEditable(int row, int column) {
-				return false;
-		   }
-		});
-		infoTable.getColumnModel().getColumn(0).setResizable(false);
-		tabbedPane.addTab("Info", null, infoTable, null);
+        infoTable.setModel(
+                new DefaultTableModel(
+                        new Object[][] {
+                                { "Name:", Bot.NAME },
+                                { "Version:", Bot.VERSION },
+                                { "ID:", Bot.ID },
+                                { "Runtime:", "00:00:00:00" },
+                                { "Errors:", 0 },
+                                { "Executions:", 0 },
+                                { "Servers:", 0 },
+                                { "Users:", 0 },
+                                { "J2C-Channels", 0 },
+                                { "Push Cycle Period:", String.valueOf(ConfigLoader.PUSH_CYCLE_PERIOD) + " min." },
+                                { "Total Pushs:", 0 }
+                        },
+                        new String[] {
+                                "key", "value"
+                        }) {
+                    private static final long serialVersionUID = 4012626449837340333L;
 
-		commandTable.setShowGrid(false);
-		commandTable.setFont(default_font);
-		commandTable.setModel(new DefaultTableModel(
-			new Object[][] {
-				{"stop", "[Send Message]"},
-				{"restart", ""},
-				{"exit", ""},
-				{"warn", "[Guild ID]  [User ID]"},
-				{"pushCache", ""},
-				{"printCache", ""},
-				{"clearCache", ""},
-				{"printEventAwaiter", ""},
-				{"clearEventAwaiter", ""}
-			},
-			new String[] {
-				"key", "value"
-			}
-		) {private static final long serialVersionUID = 7041769283649777050L;
+                    public boolean isCellEditable(int row, int column) {
+                        return false;
+                    }
+                });
+        infoTable.getColumnModel().getColumn(0).setResizable(false);
+        tabbedPane.addTab("Info", null, infoTable, null);
 
-		public boolean isCellEditable(int row, int column) {
-				return false;
-		   }
-		});
-		commandTable.getColumnModel().getColumn(0).setResizable(false);
+        commandTable.setShowGrid(false);
+        commandTable.setFont(default_font);
+        commandTable.setModel(
+                new DefaultTableModel(
+                        new Object[][] {
+                                { "stop", "[Send Message]" },
+                                { "restart", "" },
+                                { "exit", "" },
+                                { "warn", "[Guild ID]  [User ID]" },
+                                { "pushCache", "" },
+                                { "printCache", "" },
+                                { "clearCache", "" },
+                                { "printEventAwaiter", "" },
+                                { "clearEventAwaiter", "" }
+                        },
+                        new String[] {
+                                "key", "value"
+                        }) {
+                    private static final long serialVersionUID = 7041769283649777050L;
+
+                    public boolean isCellEditable(int row, int column) {
+                        return false;
+                    }
+                });
+        commandTable.getColumnModel().getColumn(0).setResizable(false);
 		
-		getContentPane().add(shutdownWindowBox, "cell 5 3,alignx left,aligny center");
+		getContentPane().add(shutdownWindowBox, "cell 6 4,alignx left,aligny center");
 		
 		tabbedPane.addTab("Commands", null, commandTable, null);
 		tabbedPane.setFont(default_font);
-		getContentPane().add(tabbedPane, "cell 1 4 5 3,grow");
+		getContentPane().add(tabbedPane, "cell 1 5 6 3,grow");
 		
 		consoleIn.addActionListener(new ConsoleCommandListener());
 		consoleIn.setFont(console_font);
-		getContentPane().add(consoleIn, "cell 0 6,growx,aligny center");
+		getContentPane().add(consoleIn, "cell 0 7,growx,aligny center");
 		
 		setVisible(true);
 		
@@ -272,18 +335,16 @@ public class GUI extends JFrame implements FocusListener {
 
 	public void startBot() {
 		if (Bot.isShutdown()) {
-		    if (this.licenseKey.isBlank()) {
-		        LOG.warn("License key is empty, please provide valid key.");
+		    if (this.token.isBlank()) {
+		        LOG.warn("Token is blank, please provide valid token.");
 		    } else {
-		        if (ConfigLoader.connect(this.licenseKey)) {
-		            try {
-                        new Bot();
-                    } catch (InterruptedException e) {
-                        LOG.debug("Connection to Discords servers failed, please contact support!");
-                    }
-		        } else {
-		            LOG.error("Connection to authentication server failed, please contact support!");
-		        }
+		            if (ConfigLoader.create(username, password)) {
+		                try {
+		                       new Bot(this.token);
+		                    } catch (InterruptedException e) {
+		                        LOG.debug("Connection to Discords servers failed, please contact support!");
+		                    }
+		            }
 		    }
 		} else {
 		    LOG.debug("Bot is already running!");
@@ -396,14 +457,34 @@ public class GUI extends JFrame implements FocusListener {
                 this.invalidArguments = true;
             } else {
                 for (int a = 0; a < input.length; a++) {
-                    if (input[a].startsWith("--")) {
+                    if (input[a].isBlank()) {
+//                      Do nothing
+                    } else if (input[a].startsWith("--")) {
                         switch (input[a]) {
-                            case "--license":
-                                if (a+1 < input.length && !input[a+1].startsWith("--")) {
+                            case "--username":
+                                if (a + 1 < input.length && !input[a + 1].startsWith("--")) {
                                     a += 1;
                                     String value = input[a];
                                     if (!value.isBlank()) {
-                                        this.licenseKey = value; 
+                                        this.username = value;
+                                    }
+                                }
+                                break;
+                            case "--password":
+                                if (a + 1 < input.length && !input[a + 1].startsWith("--")) {
+                                    a += 1;
+                                    String value = input[a];
+                                    if (!value.isBlank()) {
+                                        this.password = value;
+                                    }
+                                }
+                                break;
+                            case "--token":
+                                if (a + 1 < input.length && !input[a + 1].startsWith("--")) {
+                                    a += 1;
+                                    String value = input[a];
+                                    if (!value.isBlank()) {
+                                        this.token = value;
                                     }
                                 }
                                 break;
@@ -429,22 +510,4 @@ public class GUI extends JFrame implements FocusListener {
     public Object getTableValue(int row) {
         return infoTable.getModel().getValueAt(row, 1);
     }
-	
-	@Override
-	public void focusGained(FocusEvent e) {
-		JTextField textField = (JTextField) e.getComponent();
-		if (textField.getText().equals(textField.getName())) {
-			textField.setForeground(Color.BLACK);
-			textField.setText("");
-		}
-	}
-
-	@Override
-	public void focusLost(FocusEvent e) {
-		JTextField textField = (JTextField) e.getComponent();
-		if (textField.getText().equals(textField.getName()) || textField.getText().equals("")) {
-			textField.setForeground(Color.GRAY);
-			textField.setText(textField.getName());
-		}
-	}
 }

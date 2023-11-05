@@ -25,7 +25,6 @@ public class CentralTimer {
         return THIS;
     }
     
-    
     public long schedule(Runnable runnable, TimeUnit delay_unit, long delay) {
         return this.schedule(runnable, new Date(System.currentTimeMillis() + delay_unit.toMillis(delay)));
     }
@@ -47,6 +46,7 @@ public class CentralTimer {
                 }
             }
         };
+        
         this.long_runnable.put(id, runnable);
         this.long_task.put(id, task);
         this.runnable_long.put(task, id);
