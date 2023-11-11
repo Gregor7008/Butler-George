@@ -7,12 +7,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import assets.base.AwaitTask;
+import assets.data.single.AutoMessageData;
 import assets.functions.ConfigurationEvent;
 import assets.functions.ConfigurationEventHandler;
 import assets.functions.ConfigurationOptionData;
 import assets.functions.ConfigurationSubOptionData;
 import engines.base.LanguageEngine;
-import engines.base.Toolbox;
 import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -121,8 +121,8 @@ public class AutoMessages implements ConfigurationEventHandler {
 						}
 					}
 					if (event.getSubOperation().equals("test")) {
-						String title = Toolbox.processAutoMessage(selectedmsg.getString(1), guild, user, false);
-						String message = Toolbox.processAutoMessage(selectedmsg.getString(2), guild, user, true);
+						String title = AutoMessageData.processRawMessage(guild, user, false, selectedmsg.getString(1));
+						String message = AutoMessageData.processRawMessage(guild, user, true, selectedmsg.getString(2));
 						guild.getTextChannelById(selectedmsg.getLong(0)).sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title, message)).queue();
 						b.editMessageEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "testsuccess").replaceDescription("{type}", type)).setComponents().queue();
 					}

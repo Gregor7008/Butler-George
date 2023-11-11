@@ -8,7 +8,6 @@ import java.util.Set;
 import assets.base.AwaitTask;
 import assets.functions.SlashCommandEventHandler;
 import engines.base.LanguageEngine;
-import engines.base.Toolbox;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -23,6 +22,21 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class Rolesorting implements SlashCommandEventHandler {
+	
+    public static void sortRoles(Guild guild, Member member, List<Role> sorting_roles, Role group_role) {
+            int match = 0;
+            for (int i = 0; i < member.getRoles().size(); i++) {
+                if (sorting_roles.contains(member.getRoles().get(i))) {
+                    match++;
+                }
+            }
+            if (match > 0 && !member.getRoles().contains(group_role)) {
+                guild.addRoleToMember(member, group_role).queue();
+            }
+            if (match == 0 && member.getRoles().contains(group_role)) {
+                guild.removeRoleFromMember(member, group_role).queue();
+            }
+    }
 	
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
@@ -78,7 +92,7 @@ public class Rolesorting implements SlashCommandEventHandler {
 	    Set<Member> set = new HashSet<>(members);
 	    listWithoutDuplicates.addAll(set);
 		for (int e = 0; e < listWithoutDuplicates.size(); e++) {
-			Toolbox.sortRoles(guild, listWithoutDuplicates.get(e), subroles, grouprole);
+			sortRoles(guild, listWithoutDuplicates.get(e), subroles, grouprole);
 		}
 	}
 }

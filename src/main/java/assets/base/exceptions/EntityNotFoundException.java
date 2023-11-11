@@ -2,7 +2,8 @@ package assets.base.exceptions;
 
 public class EntityNotFoundException extends Exception {
 
-    private final ReferenceType type;
+	private static final long serialVersionUID = 4239678452832793524L;
+	private final ReferenceType type;
     private final long id;
     
     public EntityNotFoundException(ReferenceType type) {

@@ -10,11 +10,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class ModMailData {
 
-    private final User user;
-    private final Guild guild;
-    private final TextChannel text_channel;
+    private final long user_id, guild_id;
     private int ticket_id;
-    private Message lastGuildMessage, lastUserMessage, feedbackMessage;
+    private long lastGuildMessage_id, lastUserMessage_id, feedbackMessage_id, text_channel_id;
     private String title;
     
 	public ModMailData(Guild guild, TextChannel channel, JSONObject data) {

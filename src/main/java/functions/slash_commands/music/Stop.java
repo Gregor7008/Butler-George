@@ -2,7 +2,7 @@ package functions.slash_commands.music;
 
 import assets.functions.SlashCommandEventHandler;
 import engines.base.LanguageEngine;
-import engines.base.Toolbox;
+import engines.functions.TrackScheduler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -32,7 +32,7 @@ public class Stop implements SlashCommandEventHandler {
 			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "nopermission")).queue();
 			return;
 		}
-		Toolbox.stopMusicAndLeaveOn(guild);
+		TrackScheduler.stopMusicAndLeaveOn(guild);
 		event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "stopped")).queue();
 	}
 

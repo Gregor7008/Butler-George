@@ -1,10 +1,11 @@
 package assets.data.single;
 
+import java.time.OffsetDateTime;
+
 import org.json.JSONObject;
 
 import base.Bot;
 import engines.base.LanguageEngine;
-import engines.base.Toolbox;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -16,7 +17,22 @@ public class AutoMessageData {
     private long  text_channel_id;
     private String title, message = "N/A";
     private boolean embedded, activated = false;
-   
+    
+	public static String processRawMessage(Guild guild, User user, boolean mentions, String input) {
+		String output =  input.replace("{server}", guild.getName())
+				.replace("{membercount}", Integer.toString(guild.getMemberCount()))
+				.replace("{date}", OffsetDateTime.now().format(LanguageEngine.DEFAULT_TIME_FORMAT))
+				.replace("{boosts}", String.valueOf(guild.getBoostCount()));
+		if (user != null) {
+	        if (mentions) {
+	            output = output.replace("{user}", user.getAsMention());
+	        } else {
+	            output = output.replace("{user}", user.getName());
+	        }
+		}
+		return output;
+	}
+	
     public AutoMessageData(Guild guild, JSONObject data) {
         guild_id = guild.getIdLong();
         if (!data.isEmpty()) {
@@ -59,13 +75,12 @@ public class AutoMessageData {
         return Bot.getAPI().getGuildById(guild_id);
     }
     
+    public long getTextChannelId() {
+    	return text_channel_id;
+    }
+    
     public TextChannel getTextChannel() {
-        Guild guild = this.getGuild();
-        if (guild != null) {
-            return guild.getTextChannelById(text_channel_id);
-        } else {
-            return null;
-        }
+    	return this.getGuild().getTextChannelById(text_channel_id);
     }
     
     public String getTitle() {
@@ -108,8 +123,8 @@ public class AutoMessageData {
         Guild guild = this.getGuild();
         TextChannel text_channel = guild.getTextChannelById(text_channel_id);
         if (activated && (!title.isBlank() || !message.isBlank()) && text_channel != null) {
-            String title_edit = Toolbox.processAutoMessage(title, guild, user, false);
-            String message_edit = Toolbox.processAutoMessage(message, guild, user, true);
+            String title_edit = processRawMessage(guild, user, false, title);
+            String message_edit = processRawMessage(guild, user, true, message);
             if (embedded) {
                 return text_channel.sendMessageEmbeds(LanguageEngine.buildMessageEmbed(title_edit, message_edit));
             } else {

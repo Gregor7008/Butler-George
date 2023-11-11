@@ -37,18 +37,16 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 
 public class PollData implements MessageConnection {
     
-    private final Guild guild;
-    private final TextChannel text_channel;
-    private final User user;
+	private final long guild_id, text_channel_id, user_id;
     private final PollType type;
-    private Message message;
+    private long message_id;
     private String title, description = "N/A";
     private boolean anonymous, show_vote_count, public_results = false;
     private int max_total_votes, max_votes_per_option = 1;
     private OffsetDateTime time_limit = OffsetDateTime.now().plusWeeks(1);
     private List<String> options = new ArrayList<>();
-    private List<Role> allowed_roles = new ArrayList<>();
-    private ConcurrentHashMap<Member, List<Integer>> votes = new ConcurrentHashMap<>();
+    private List<Long> allowed_roles = new ArrayList<>();	//List<RoleId>
+    private ConcurrentHashMap<Long, List<Integer>> votes = new ConcurrentHashMap<>(); //Map(Member, List<OptionIndex>)
     
 //  Temporary runtime data
     private long timer_operation_id = 0L;

@@ -15,12 +15,12 @@ import net.dv8tion.jda.api.entities.Role;
 
 public class PenaltyData {
 
-    private final Guild guild;
+	private final long guild_id;
     private final PenaltyType type;
     private final int warning_limit;
     private Duration opt_duration;
-    private List<Role> opt_roles = new ArrayList<>();
-    private boolean remove_role, reset_experience = false;
+    private List<Long> opt_roles = new ArrayList<>();	//List<RoleId>
+    private boolean remove_role = false;
     
 	public PenaltyData(Guild guild, JSONObject data) {
 	    this.guild = guild;
@@ -45,7 +45,7 @@ public class PenaltyData {
         for (int i=0; i<roles_array.length(); i++) {
             roles_ids.add(roles_array.getLong(i));
         }
-        this.opt_roles = DataTools.getRolesFromIds(guild, roles_ids);
+        this.opt_roles = DataTools.convertIdListToRoleList(guild, roles_ids);
         
         this.remove_role = data.getBoolean(Key.REMOVE_ROLE);
         this.reset_experience = data.getBoolean(Key.RESET_EXPERIENCE);

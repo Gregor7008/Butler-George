@@ -10,11 +10,24 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import assets.functions.AudioPlayerCache;
 import engines.base.Toolbox;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
 public class TrackScheduler extends AudioEventAdapter {
 
 	public final AudioPlayer player;
 	public final BlockingQueue<AudioTrack> queue;
+	
+	public static void stopMusicAndLeaveOn(Guild guild) {
+		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+		musicManager.scheduler.player.stopTrack();
+		musicManager.scheduler.queue.clear();
+		VoiceChannel vc = (VoiceChannel) guild.getSelfMember().getVoiceState().getChannel();
+		guild.getAudioManager().closeAudioConnection();
+		if (vc.getUserLimit() != 0) {
+			vc.getManager().setUserLimit(vc.getUserLimit() - 1).queue();
+		}
+	}
 
 	public TrackScheduler(AudioPlayer aplayer) {
 		player = aplayer;
@@ -32,7 +45,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		if (next != null) {
 			this.player.startTrack(next, false);
 		} else {
-			Toolbox.stopMusicAndLeaveOn(AudioPlayerCache.getInstance().getGuild(player));
+			stopMusicAndLeaveOn(AudioPlayerCache.getInstance().getGuild(player));
 		}
 	}
 	

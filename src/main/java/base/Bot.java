@@ -99,7 +99,7 @@ public class Bot {
         Thread.setDefaultUncaughtExceptionHandler(ConsoleEngine.getInstance());
 //      Startup Engines
         new ModController();
-//      GUI Udates
+//      GUI Updates
         GUI.INSTANCE.setBotRunning(true);
         GUI.INSTANCE.updateStatistics();
         GUI.INSTANCE.startRuntimeMeasuring();
@@ -189,7 +189,7 @@ public class Bot {
 		CentralTimer.get().cancelAll();
 //		Shutdown operations
 		GuildUtilitiesList.getEngines().forEach((id, handler) -> handler.onShutdown(reason));
-//		Shutdown bot
+//		Shutdown Bot
 		jda.getPresence().setStatus(OnlineStatus.OFFLINE);
 		jda.shutdown();
 		GUI.INSTANCE.setBotRunning(false);

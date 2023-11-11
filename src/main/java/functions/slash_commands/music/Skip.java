@@ -8,9 +8,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import assets.functions.SlashCommandEventHandler;
 import engines.base.LanguageEngine;
-import engines.base.Toolbox;
 import engines.functions.GuildMusicManager;
 import engines.functions.PlayerManager;
+import engines.functions.TrackScheduler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -44,7 +44,7 @@ public class Skip implements SlashCommandEventHandler {
 		}
 		if (musicManager.scheduler.queue.isEmpty()) {
 			event.replyEmbeds(LanguageEngine.getMessageEmbed(guild, user, this, "noskip")).queue();
-			Toolbox.stopMusicAndLeaveOn(guild);
+			TrackScheduler.stopMusicAndLeaveOn(guild);
 			return;
 		}
 		AudioTrack nextTrack = musicManager.scheduler.queue.poll();

@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import assets.base.exceptions.EntityNotFoundException;
 import assets.data.single.AutoMessageData;
 import assets.data.single.GiveawayData;
 import assets.data.single.Join2CreateChannelData;
@@ -56,11 +57,12 @@ public class GuildData {
         }
 
 //	      0-Layer Nesting
-        this.admin_roles = DataTools.getIdsFromArrayKeys(data, Key.STATIC_ROLES, Key.ADMIN_ROLES);
-        this.moderation_roles = DataTools.getIdsFromArrayKeys(data, Key.STATIC_ROLES, Key.MODERATION_ROLES);
-        this.support_roles = DataTools.getIdsFromArrayKeys(data, Key.STATIC_ROLES, Key.SUPPORT_ROLES);
-        this.bot_auto_roles = DataTools.getIdsFromArrayKeys(data, Key.AUTO_ROLES, Key.BOT_AUTO_ROLES);
-        this.user_auto_roles = DataTools.getIdsFromArrayKeys(data, Key.AUTO_ROLES, Key.USER_AUTO_ROLES);
+        JSONObject static_roles = data.getJSONObject(Key.STATIC_ROLES);
+        this.admin_roles = DataTools.convertJSONArrayListToLongList(static_roles.getJSONArray(Key.ADMIN_ROLES));
+        this.moderation_roles = DataTools.convertJSONArrayListToLongList(static_roles.getJSONArray(Key.MODERATION_ROLES));
+        this.support_roles = DataTools.convertJSONArrayListToLongList(static_roles.getJSONArray(Key.SUPPORT_ROLES));
+        this.bot_auto_roles = DataTools.convertJSONArrayListToLongList(static_roles.getJSONArray(Key.BOT_AUTO_ROLES));
+        this.user_auto_roles = DataTools.convertJSONArrayListToLongList(static_roles.getJSONArray(Key.USER_AUTO_ROLES));
 
         JSONObject static_channels = data.getJSONObject(Key.STATIC_CHANNELS);
         this.community_inbox_channel = static_channels.getLong(Key.COMMUNITY_INBOX_CHANNEL);
@@ -87,9 +89,10 @@ public class GuildData {
         JSONObject j2c_channels_data = data.getJSONObject(Key.AUTO_CHANNELS).getJSONObject(Key.JOIN2CREATE_CHANNELS);
         j2c_channels_data.keySet().forEach(channelId -> {
             VoiceChannel channel = guild.getVoiceChannelById(channelId);
-            if (channel != null) {
+            JSONObject j2c_channel_data =  j2c_channels_data.getJSONObject(channelId);
+            if (channel != null && !j2c_channel_data.isEmpty()) {
                 join2create_channels.put(Long.valueOf(channelId),
-                        new Join2CreateChannelData(channel, j2c_channels_data.getJSONObject(channelId)));
+                        new Join2CreateChannelData(channel, j2c_channel_data));
             }
         });
 
@@ -160,7 +163,12 @@ public class GuildData {
                     JSONObject giveaway_data = giveaway_sub_data.getJSONObject(messageId);
                     Message message = channel.retrieveMessageById(messageId).complete();
                     if (message != null && !giveaway_data.isEmpty()) {
-                        giveawaySubMap.put(Long.valueOf(messageId), new GiveawayData(channel, message, giveaway_data));
+                    	try {
+                    		GiveawayData giveawayData = new GiveawayData(channel, message, giveaway_data);
+                            giveawaySubMap.put(Long.valueOf(messageId), giveawayData);
+                    	} catch (EntityNotFoundException e) {
+                    		message.delete().queue();
+                    	}
                     }
                 });
                 if (!giveawaySubMap.isEmpty()) {
@@ -286,15 +294,15 @@ public class GuildData {
     }
 
     public List<Role> getAdminRoles() {
-        return DataTools.getRolesFromIds(this.getGuild(), this.admin_roles);
+        return DataTools.convertIdListToRoleList(this.getGuild(), this.admin_roles);
     }
 
     public void setAdminRoles(List<Role> roles) {
-        DataTools.setList(this.admin_roles, List.of(DataTools.convertRoleListToIds(roles)));
+        DataTools.setList(this.admin_roles, List.of(DataTools.convertRoleListToIdArray(roles)));
     }
 
     public void addAdminRoles(Role... roles) {
-        DataTools.addToList(this.admin_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.addToList(this.admin_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
     public void removeAdminRoles(int... indices) {
@@ -302,7 +310,7 @@ public class GuildData {
     }
 
     public void removeAdminRolesByRole(Role... roles) {
-        DataTools.removeValuesFromList(this.admin_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.removeValuesFromList(this.admin_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
     public List<Long> getModerationRoleIds() {
@@ -310,15 +318,15 @@ public class GuildData {
     }
 
     public List<Role> getModerationRoles() {
-        return DataTools.getRolesFromIds(this.getGuild(), this.moderation_roles);
+        return DataTools.convertIdListToRoleList(this.getGuild(), this.moderation_roles);
     }
 
     public void setModerationRoles(List<Role> roles) {
-        DataTools.setList(this.moderation_roles, List.of(DataTools.convertRoleListToIds(roles)));
+        DataTools.setList(this.moderation_roles, List.of(DataTools.convertRoleListToIdArray(roles)));
     }
 
     public void addModerationRoles(Role... roles) {
-        DataTools.addToList(this.moderation_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.addToList(this.moderation_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
     public void removeModerationRoles(int... indices) {
@@ -326,7 +334,7 @@ public class GuildData {
     }
 
     public void removeModerationRolesByRole(Role... roles) {
-        DataTools.addToList(this.moderation_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.addToList(this.moderation_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
     public List<Long> getSupportRoleIds() {
@@ -334,15 +342,15 @@ public class GuildData {
     }
 
     public List<Role> getSupportRoles() {
-        return DataTools.getRolesFromIds(this.getGuild(), this.support_roles);
+        return DataTools.convertIdListToRoleList(this.getGuild(), this.support_roles);
     }
 
     public void setSupportRoles(List<Role> roles) {
-        DataTools.setList(this.support_roles, List.of(DataTools.convertRoleListToIds(roles)));
+        DataTools.setList(this.support_roles, List.of(DataTools.convertRoleListToIdArray(roles)));
     }
 
     public void addSupportRoles(Role... roles) {
-        DataTools.addToList(this.support_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.addToList(this.support_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
     public void removeSupportRoles(int... indices) {
@@ -350,7 +358,7 @@ public class GuildData {
     }
 
     public void removeSupportRolesByRole(Role... roles) {
-        DataTools.removeValuesFromList(this.support_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.removeValuesFromList(this.support_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
 //  Auto Roles
@@ -359,15 +367,15 @@ public class GuildData {
     }
 
     public List<Role> getBotAutoRoles() {
-        return DataTools.getRolesFromIds(this.getGuild(), this.bot_auto_roles);
+        return DataTools.convertIdListToRoleList(this.getGuild(), this.bot_auto_roles);
     }
 
     public void setBotAutoRoles(List<Role> roles) {
-        DataTools.setList(this.bot_auto_roles, List.of(DataTools.convertRoleListToIds(roles)));
+        DataTools.setList(this.bot_auto_roles, List.of(DataTools.convertRoleListToIdArray(roles)));
     }
 
     public void addBotAutoRoles(Role... roles) {
-        DataTools.addToList(this.bot_auto_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.addToList(this.bot_auto_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
     public void removeBotAutoRoles(int... indices) {
@@ -375,7 +383,7 @@ public class GuildData {
     }
 
     public void removeBotAutoRolesByRole(Role... roles) {
-        DataTools.removeValuesFromList(this.bot_auto_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.removeValuesFromList(this.bot_auto_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
     public List<Long> getUserAutoRoleIds() {
@@ -383,15 +391,15 @@ public class GuildData {
     }
 
     public List<Role> getUserAutoRoles() {
-        return DataTools.getRolesFromIds(this.getGuild(), this.user_auto_roles);
+        return DataTools.convertIdListToRoleList(this.getGuild(), this.user_auto_roles);
     }
 
     public void setUserAutoRoles(List<Role> roles) {
-        DataTools.setList(this.user_auto_roles, List.of(DataTools.convertRoleListToIds(roles)));
+        DataTools.setList(this.user_auto_roles, List.of(DataTools.convertRoleListToIdArray(roles)));
     }
 
     public void addUserAutoRoles(Role... roles) {
-        DataTools.addToList(this.user_auto_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.addToList(this.user_auto_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
     public void removeUserAutoRoles(int... indices) {
@@ -399,7 +407,7 @@ public class GuildData {
     }
 
     public void removeUserAutoRolesByRole(Role... roles) {
-        DataTools.removeValuesFromList(this.user_auto_roles, DataTools.convertRoleArrayToIds(roles));
+        DataTools.removeValuesFromList(this.user_auto_roles, DataTools.convertRoleArrayToIdArray(roles));
     }
 
 //  Static Messages

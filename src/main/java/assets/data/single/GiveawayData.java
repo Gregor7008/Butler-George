@@ -2,62 +2,66 @@ package assets.data.single;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import assets.base.exceptions.EntityNotFoundException;
+import assets.base.exceptions.EntityNotFoundException.ReferenceType;
+import assets.data.DataTools;
 import assets.data.MessageConnection;
 import base.Bot;
 import engines.base.CentralTimer;
 import engines.data.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 public class GiveawayData implements MessageConnection {
     
-    private final Guild guild;
-    private final TextChannel text_channel;
-    private final User user;
-    private Message message;
+	private final long guild_id, text_channel_id, user_id;
+    private long message_id;
     private String title, description = "N/A";
     private boolean anonymous = false;
     private OffsetDateTime time_limit = OffsetDateTime.now().plusWeeks(1);
     private List<String> prizes = new ArrayList<>();
-    private List<Member> sign_ups = new ArrayList<>();
-    private List<Role> allowed_roles = new ArrayList<>();
+    private List<Long> sign_ups = new ArrayList<>();	//List<MemberId>
+    private List<Long> allowed_roles = new ArrayList<>();	//List<RoleId>
     
 //  Temporary runtime data
     private long timer_operation_id = 0L;
 
-	public GiveawayData(TextChannel channel, Message message, JSONObject data) {
-	    this.guild = message.getGuild();
-	    this.text_channel = message.getChannel().asTextChannel();
-	    this.message = message;
-	    this.user = Bot.getAPI().retrieveUserById(data.getLong(Key.USER_ID)).complete();
+	public GiveawayData(TextChannel channel, Message message, JSONObject data) throws EntityNotFoundException {
+	    this.guild_id = message.getGuild().getIdLong();
+	    this.text_channel_id = message.getChannel().asTextChannel().getIdLong();
+	    this.message_id = message.getIdLong();
+    	long raw_user_id = data.getLong(Key.USER_ID);
+	    try {
+	    	this.user_id = Bot.getAPI().retrieveUserById(raw_user_id).complete().getIdLong();
+	    } catch (ErrorResponseException | NullPointerException e) {
+	    	throw new EntityNotFoundException(ReferenceType.USER, e, raw_user_id);
+	    }
 	    this.instanciateFromJSON(data);
 	}
 	
-	public GiveawayData(Guild guild, TextChannel channel, User user) {
-	    this.guild = guild;
-	    this.text_channel = channel;
-	    this.user = user;
+	public GiveawayData(Guild guild, Message message, User user) {
+		 this.guild_id = message.getGuild().getIdLong();
+		 this.text_channel_id = message.getChannel().asTextChannel().getIdLong();
+		 this.message_id = message.getIdLong();
+		 this.user_id = user.getIdLong();
 	}
 
     public GiveawayData instanciateFromJSON(JSONObject data) {
         this.title = data.getString(Key.TITLE);
-        this.description = this.message.getEmbeds().get(0).getDescription();
+        this.description = data.getString(Key.DESCRIPTION);
         
         this.anonymous = data.getBoolean(Key.ANONYMOUS);
         
         this.time_limit = OffsetDateTime.parse(data.getString(Key.TIME_LIMIT), ConfigLoader.DATA_TIME_SAVE_FORMAT);
-        this.timer_operation_id = CentralTimer.get().schedule(() ->  message.editMessageEmbeds(buildEndEmbed()).setComponents().queue(), this.time_limit);
         
         JSONArray prizes_array = data.getJSONArray(Key.PRIZES);
         for (int i = 0; i < prizes_array.length(); i++) {
@@ -65,18 +69,16 @@ public class GiveawayData implements MessageConnection {
         }
         
         JSONArray sign_ups_array = data.getJSONArray(Key.SIGN_UPS);
-        List<Long> memberIds = new ArrayList<>();
-        for (int i = 0; i < sign_ups_array.length(); i++) {
-            memberIds.add(sign_ups_array.getLong(i));
-        }
-        this.sign_ups.addAll(guild.retrieveMembersByIds(memberIds).get());
-        this.sign_ups.removeAll(Collections.singleton(null));
+        List<Long> memberIds = DataTools.convertJSONArrayListToLongList(sign_ups_array);
+        DataTools.validateMemberIdList(guild_id, memberIds);
+        this.sign_ups.addAll(memberIds);
         
         JSONArray allowed_roles_array = data.getJSONArray(Key.ALLOWED_ROLES);
-        for (int i = 0; i < allowed_roles_array.length(); i++) {
-            this.allowed_roles.add(guild.getRoleById(allowed_roles_array.getLong(i)));
-            this.allowed_roles.removeAll(Collections.singleton(null));
-        }
+        List<Long> roleIds = DataTools.convertJSONArrayListToLongList(allowed_roles_array);
+        DataTools.validateRoleIdList(guild_id, roleIds);
+        this.allowed_roles = roleIds;
+        
+        this.timer_operation_id = CentralTimer.get().schedule(() ->  closeGivewawayEntry(), this.time_limit);
         return this;
     }
 
@@ -84,38 +86,52 @@ public class GiveawayData implements MessageConnection {
         JSONObject compiledData = new JSONObject();
         return compiledData;
     }
-
-    @Override
-    public TextChannel getChannel() {
-        return this.text_channel;
+    
+    public Guild getGuild() {
+        return Bot.getAPI().getGuildById(guild_id);
     }
 
     @Override
     public Long getChannelId() {
-        return this.text_channel.getIdLong();
+        return this.text_channel_id;
     }
 
     @Override
-    public Message getMessage() {
-        return this.message;
+    public TextChannel getChannel() {
+    	return this.getGuild().getTextChannelById(text_channel_id);
     }
 
     @Override
     public Long getMessageId() {
-        return this.message.getIdLong();
+        return this.message_id;
+    }
+
+    @Override
+    public Message getMessage() {
+        return this.getChannel().retrieveMessageById(message_id).complete();
+    }
+    
+    public Long getUserId() {
+    	return this.user_id;
     }
     
     public User getUser() {
-        return this.user;
+        return Bot.getAPI().retrieveUserById(user_id).complete();
     }
 
     private MessageEmbed buildEndEmbed() {
+    	//TODO
         return null;
     }
     
-    private static abstract class Key {
+    private void closeGivewawayEntry() {
+    	//TODO
+    }
+    
+    public static abstract class Key {
         public static final String USER_ID = "user_id";
         public static final String TITLE = "title";
+        public static final String DESCRIPTION = "description";
         public static final String PRIZES = "prizes";
         public static final String SIGN_UPS = "sign_ups";
         public static final String ANONYMOUS = "anonymous";

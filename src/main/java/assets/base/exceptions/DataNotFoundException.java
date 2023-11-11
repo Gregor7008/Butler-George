@@ -1,8 +1,9 @@
 package assets.base.exceptions;
 
 public class DataNotFoundException extends Exception {
-    
-    public final String path, key;
+ 
+	private static final long serialVersionUID = -5748618338146782831L;
+	public final String path, key;
 
     public DataNotFoundException(String path, String key) {
         this.path = path;

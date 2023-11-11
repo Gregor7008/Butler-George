@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
+import base.Bot;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public abstract class DataTools {
@@ -102,26 +102,19 @@ public abstract class DataTools {
     }
     
 //  Data conversion tools
-    public static List<Long> getIdsFromArrayKeys(JSONObject data, String primary, @Nullable String secondary) {
-        if (data != null && !data.isEmpty()) {
-            try {
-                JSONArray values = null;
-                if (secondary == null) {
-                    values = data.getJSONArray(primary);
-                } else {
-                    values = data.getJSONObject(primary).getJSONArray(secondary);
-                }
-                List<Long> values_list = new ArrayList<>();
-                for (int i = 0; i < values.length(); i++) {
-                    values_list.add(values.getLong(i));
-                }
-                return values_list;
-            } catch (JSONException e) {}
-        }
-        return new ArrayList<>();
-    }
+	public static List<Long> convertJSONArrayListToLongList(JSONArray array) {
+		if (array != null && !array.isEmpty()) {
+			List<Long> values_list = new ArrayList<>();
+			for (int i = 0; i < array.length(); i++) {
+				values_list.add(array.getLong(i));
+			}
+			return values_list;
+		} else {
+			return new ArrayList<>();
+		}
+	}
     
-    public static List<Role> getRolesFromIds(Guild guild, List<Long> ids) {
+    public static List<Role> convertIdListToRoleList(Guild guild, List<Long> ids) {
         List<Role> roles = new ArrayList<>();
         if (ids != null) {
             for (int i = 0; i < ids.size(); i++) {
@@ -137,17 +130,17 @@ public abstract class DataTools {
         return roles;
     }
     
-    public static Long[] convertRoleArrayToIds(Role[] roles) {
+    public static Long[] convertRoleArrayToIdArray(Role[] roles) {
         ArrayList<Role> roles_list = new ArrayList<>();
         for (Role role : roles) {
             if (role != null) {
                 roles_list.add(role);
             }
         }
-        return DataTools.convertRoleListToIds(roles_list);
+        return DataTools.convertRoleListToIdArray(roles_list);
     }
     
-    public static Long[] convertRoleListToIds(List<Role> roles) {
+    public static Long[] convertRoleListToIdArray(List<Role> roles) {
         ArrayList<Long> ids = new ArrayList<>();
         if (roles != null) {
             for (int i = 0; i < roles.size(); i++) {
@@ -232,14 +225,14 @@ public abstract class DataTools {
     }
     
 //  Data validation tools
-    public static <T extends MessageConnection> void validateMesConMap(@NotNull Guild guild, boolean validate_messages, ConcurrentHashMap<Long, ConcurrentHashMap<Long, T>> source_map) {
+    public static <T extends MessageConnection> void validateChannelMessageMap(@NotNull Guild guild, ConcurrentHashMap<Long, ConcurrentHashMap<Long, T>> source_map, boolean validate_messages) {
         List<Long> channel_ids_to_remove = new ArrayList<>();
         for (Map.Entry<Long, ConcurrentHashMap<Long, T>> entry : source_map.entrySet()) {
             TextChannel channel = guild.getTextChannelById(entry.getKey());
             if (channel == null) {
                 channel_ids_to_remove.add(entry.getKey());
             } else if (validate_messages) {
-                DataTools.validateMapKeyMessageIds(channel, entry.getValue());
+                DataTools.validateMessageMap(channel, entry.getValue());
             }
         }
         for (long id : channel_ids_to_remove) {
@@ -247,7 +240,7 @@ public abstract class DataTools {
         }
     }
     
-    public static <T> void validateMapKeyMessageIds(@NotNull TextChannel channel, ConcurrentHashMap<Long, T> source_map) {
+    public static <T> void validateMessageMap(@NotNull TextChannel channel, ConcurrentHashMap<Long, T> source_map) {
         List<Long> message_ids_to_remove = new ArrayList<>();
         for (Map.Entry<Long, T> entry : source_map.entrySet()) {
             if (channel.retrieveMessageById(entry.getKey()) == null) {
@@ -257,5 +250,51 @@ public abstract class DataTools {
         for (long id : message_ids_to_remove) {
             source_map.remove(id);
         }
+    }
+    
+    public static boolean validateUser(long user_id) {
+    	User user = null;
+    	try {
+    		user = Bot.getAPI().retrieveUserById(user_id).complete();
+    	} catch (Exception e) {}
+		return user != null;
+    }
+    
+    public static boolean validateMember(long guild_id, long member_id) {
+    	Member member = null;
+    	try {
+    		member = Bot.getAPI().getGuildById(guild_id).retrieveMemberById(member_id).complete();
+    	} catch (Exception e) {}
+    	return member != null;
+    }
+    
+    public static void validateMemberIdList(long guild_id, List<Long> member_id_list) {
+    	List<Long> valid_ids = Bot.getAPI().getGuildById(guild_id).retrieveMembersByIds(member_id_list).get()
+    			.stream()
+    			.filter(member -> {return member != null;})
+    			.map(member -> member.getIdLong())
+    			.toList();
+    	member_id_list.clear();
+    	member_id_list.addAll(valid_ids);
+    }
+    
+    public static void validateRoleIdList(long guild_id, List<Long> role_id_list) {
+    	List<Long> valid_ids = Bot.getAPI().getGuildById(guild_id).getRoles()
+    			.stream()
+    			.map(role -> role.getIdLong())
+    			.filter(role_id -> {return role_id_list.contains(role_id);})
+    			.toList();
+    	role_id_list.clear();
+    	role_id_list.addAll(valid_ids);
+    }
+    
+    public static void validateChannelIdList(long guild_id, List<Long> channel_id_list) {
+    	List<Long> valid_ids = Bot.getAPI().getGuildById(guild_id).getChannels()
+    			.stream()
+    			.map(channel -> channel.getIdLong())
+    			.filter(channel_id -> {return channel_id_list.contains(channel_id);})
+    			.toList();
+    	channel_id_list.clear();
+    	channel_id_list.addAll(valid_ids);
     }
 }

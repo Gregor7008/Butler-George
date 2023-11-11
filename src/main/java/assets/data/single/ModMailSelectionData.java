@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 
 public class ModMailSelectionData {
     
-    private Guild guild;
+    private final long guild_id;
     private int ticket_id = 0;
     
     public ModMailSelectionData(JSONObject data) {
