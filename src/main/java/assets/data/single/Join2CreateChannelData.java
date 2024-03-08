@@ -1,4 +1,4 @@
-package assets.data.single;
+*package assets.data.single;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +14,6 @@ import assets.data.DataTools;
 import base.GUI;
 import engines.base.Check;
 import engines.data.ConfigLoader;
-import engines.functions.TrackScheduler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -31,7 +30,7 @@ public class Join2CreateChannelData {
     private String name_format = "{member}'s channel";
     private int limit_preset = -1;
     private boolean configurable = false;
-    private ConcurrentHashMap<Long, Long> children = new ConcurrentHashMap<>();		//Map(ChannelId, OwnerId)
+    private ConcurrentHashMap<Long, Long> children = new ConcurrentHashMap<>();		//Map(ChannelId, OwnerUserId)
     
     public static Join2CreateChannelData getParentOf(VoiceChannel children) {
         List<Join2CreateChannelData> join2create_channel_guild_data = JOIN2CREATE_CHANNEL_LIST.get(children.getGuild());
@@ -74,7 +73,7 @@ public class Join2CreateChannelData {
 				newChannel.getManager().setUserLimit(join2createChannel.getLimitPreset()).queue();
 			}
 			guild.moveVoiceMember(member, newChannel).queue();
-			join2createChannel.addChild(newChannel, member);
+			join2createChannel.addChild(newChannel, member.getUser());
 //			Update GUI information
 			GUI.INSTANCE.increaseJ2CCounter();
 		}
@@ -132,7 +131,7 @@ public class Join2CreateChannelData {
 						audioChannel.getManager().setName(name).queue(sc -> {}, er -> {});
 						audioChannel.getPermissionContainer().upsertPermissionOverride(newowner).setAllowed(perms).queue(sc -> {}, er -> {});
 						audioChannel.getPermissionContainer().getPermissionOverride(member).delete().queue(sc -> {}, er -> {});
-						audioChannel.getPermissionContainer().getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(guild.getMember(user)).setName(name).queue(sc -> {}, er -> {});
+						audioChannel.getPermissionContainer().getManager().putPermissionOverride(newowner, perms, null).removePermissionOverride(member).setName(name).queue(sc -> {}, er -> {});
 					}
 				}
 				i = parentChannels.size();
@@ -186,26 +185,39 @@ public class Join2CreateChannelData {
         return compiledData;
     }
     
-    public List<Long> getChildrenIds() {
+    public List<Long> getChildrenChannelIds() {
         return Collections.list(this.children.keys());
     }
     
-    public List<VoiceChannel> getChildren() {
-    	List<VoiceChannel> return_value = new ArrayList<>();
-    	List<Long> childrenIds = this.getChildrenIds();
-    	for (long childrenId : childrenIds) {
-    		return_value.add()
-    	}
-    	return return_value;
+    public List<VoiceChannel> getChildrenChannels() {
+        
     }
     
-    public Join2CreateChannelData setChildren(List<VoiceChannel> children) {
-        DataTools.setList(this.children, children);
+    public ConcurrentHashMap<Long, Long> getChildrenIds() {
+        return this.children;
+    }
+    
+    public ConcurrentHashMap<VoiceChannel, User> getChildren() {
+    	
+    }
+    
+    public Join2CreateChannelData setChildrenIds(ConcurrentHashMap<Long, Long> children) {
+        DataTools.setMap(this.children, children);
         return this;
     }
     
-    public Join2CreateChannelData addChildren(VoiceChannel... childrens) {
-        DataTools.addToList(this.children, childrens);
+    public Join2CreateChannelData setChildren(ConcurrentHashMap<VoiceChannel, User> children) {
+        
+        return this;
+    }
+    
+    public Join2CreateChannelData addChild(VoiceChannel channel, User owner) {
+        this.children.put(channel.getIdLong(), owner.getIdLong());
+        return this;
+    }
+    
+    public Join2CreateChannelData addChildren(ConcurrentHashMap<VoiceChannel, User> children) {
+        children.forEach((channel, owner) -> this.addChild(channel, owner));
         return this;
     }
     

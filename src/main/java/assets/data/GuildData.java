@@ -89,7 +89,7 @@ public class GuildData {
         JSONObject j2c_channels_data = data.getJSONObject(Key.AUTO_CHANNELS).getJSONObject(Key.JOIN2CREATE_CHANNELS);
         j2c_channels_data.keySet().forEach(channelId -> {
             VoiceChannel channel = guild.getVoiceChannelById(channelId);
-            JSONObject j2c_channel_data =  j2c_channels_data.getJSONObject(channelId);
+            JSONObject j2c_channel_data = j2c_channels_data.getJSONObject(channelId);
             if (channel != null && !j2c_channel_data.isEmpty()) {
                 join2create_channels.put(Long.valueOf(channelId),
                         new Join2CreateChannelData(channel, j2c_channel_data));
@@ -163,12 +163,12 @@ public class GuildData {
                     JSONObject giveaway_data = giveaway_sub_data.getJSONObject(messageId);
                     Message message = channel.retrieveMessageById(messageId).complete();
                     if (message != null && !giveaway_data.isEmpty()) {
-                    	try {
-                    		GiveawayData giveawayData = new GiveawayData(channel, message, giveaway_data);
+                        try {
+                            GiveawayData giveawayData = new GiveawayData(channel, message, giveaway_data);
                             giveawaySubMap.put(Long.valueOf(messageId), giveawayData);
-                    	} catch (EntityNotFoundException e) {
-                    		message.delete().queue();
-                    	}
+                        } catch (EntityNotFoundException e) {
+                            message.delete().queue();
+                        }
                     }
                 });
                 if (!giveawaySubMap.isEmpty()) {
@@ -241,8 +241,8 @@ public class GuildData {
         JSONObject polls_object = new JSONObject();
         polls.forEach((channel, message_map) -> {
             JSONObject message_map_object = new JSONObject();
-            message_map
-                    .forEach((message, data) -> message_map_object.put(String.valueOf(message), data.compileToJSON()));
+            message_map.forEach(
+                    (message, data) -> message_map_object.put(String.valueOf(message), data.compileToJSON()));
             if (!message_map_object.isEmpty()) {
                 polls_object.put(String.valueOf(channel), message_map_object);
             }
@@ -252,8 +252,8 @@ public class GuildData {
         JSONObject reaction_roles_object = new JSONObject();
         reaction_roles.forEach((channel, message_map) -> {
             JSONObject message_map_object = new JSONObject();
-            message_map
-                    .forEach((message, data) -> message_map_object.put(String.valueOf(message), data.compileToJSON()));
+            message_map.forEach(
+                    (message, data) -> message_map_object.put(String.valueOf(message), data.compileToJSON()));
             if (!message_map_object.isEmpty()) {
                 reaction_roles_object.put(String.valueOf(channel), message_map_object);
             }
@@ -263,8 +263,8 @@ public class GuildData {
         JSONObject giveaways_object = new JSONObject();
         giveaways.forEach((channel, message_map) -> {
             JSONObject message_map_object = new JSONObject();
-            message_map
-                    .forEach((message, data) -> message_map_object.put(String.valueOf(message), data.compileToJSON()));
+            message_map.forEach(
+                    (message, data) -> message_map_object.put(String.valueOf(message), data.compileToJSON()));
             if (!message_map_object.isEmpty()) {
                 giveaways_object.put(String.valueOf(channel), message_map_object);
             }
@@ -759,7 +759,7 @@ public class GuildData {
         }
         return return_value;
     }
-    
+
     public ReactionRoleData getReactionRole(long channelId, long messageId) {
         ConcurrentHashMap<Long, ReactionRoleData> returned_map = this.reaction_roles.get(channelId);
         if (returned_map != null) {
@@ -839,8 +839,7 @@ public class GuildData {
     }
 
     public void setGiveawaysByChannel(TextChannel channel, ConcurrentHashMap<Message, GiveawayData> giveaways) {
-        ConcurrentHashMap<Long, GiveawayData> converted_map = DataTools.convertMesConMapOfChannelToIds(channel,
-                giveaways);
+        ConcurrentHashMap<Long, GiveawayData> converted_map = DataTools.convertMesConMapOfChannelToIds(channel, giveaways);
         if (!converted_map.isEmpty()) {
             this.giveaways.put(channel.getIdLong(), converted_map);
         }
