@@ -18,7 +18,6 @@
 <p><h1 align="right">Butler George
     	<span style="float:left;">
 
-[![Discord][discordshield]][discordinvite]
 ![Version][versionshield]
 ![Milestones][milestonesshield]
         </span></h1>
@@ -27,11 +26,15 @@
 <p align="right">Everything you need, right here: Moderation, Administration, Configuration...</p>
 
 ## 🌐 Overview
-**Butler George** is a complex [Discord](https://discord.com) bot including not only all commonly used functions of popular Discord bots, but also everything else you will ever need.<br>
+**Butler George** was a complex [Discord](https://discord.com) bot including not only all commonly used functions of popular Discord bots, but also everything else you will ever need.<br>
 Combined neatly into one single bot, so no one can ever complain about too many bots on your server!
 
+> [!CAUTION]
+> **This repository is no longer maintained, as Butler George has reached EOL and is no longer being worked on. Development has been discontinued as we've moved on to different projects.<br> [Contact us](https://github.com/Gregor7008/Butler-George#-contact-us) for further information or any other questions!**
+
+
 ## 📈 Functions
-The newest version of **Butler George** will feature:
+The newest version of **Butler George** would've featured:
   - **Hosting**:
     - GUI for easier access and controlling of the bot
     - Support for AutoStart and AutoFill for the bot token<br>and the database connection details
@@ -473,10 +476,13 @@ You may contact us...
   - in urgent cases via [E-mail](mailto:gregor7009@gmail.com)
 
 ## 🧭 Credits
-<a href="https://github.com/anuraghazra/github-readme-stats">ReadMe Statistics</a> by <a href="https://github.com/anuraghazra">@anuraghazra</a><br>
-<a href="https://github.com/gautamkrishnar/blog-post-workflow">Blog Post Workflow</a> by <a href="https://github.com/gautamkrishnar">@gautamkrishnar</a><br>
+<a href="https://github.com/stats-organization/github-stats-extended">ReadMe Statistics</a> by <a href="https://github.com/anuraghazra">@anuraghazra</a><br>
 <a href="https://github.com/lowlighter/metrics">Metrics</a> by <a href="https://github.com/lowlighter">@lowlighter</a><br>
 Shields by <a href="https://shields.io">shields.io</a><br>
 Activity recorded by <a href="https://wakatime.com">wakatime.com</a>
 
+<<<<<<< Updated upstream
 #### ©️ [Gregor7008](https://github.com/Gregor7008) - 2022
+=======
+#### ©️ [Gregor7008](https://github.com/Gregor7008) - 2026
+>>>>>>> Stashed changes
