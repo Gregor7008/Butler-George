@@ -481,8 +481,4 @@ You may contact us...
 Shields by <a href="https://shields.io">shields.io</a><br>
 Activity recorded by <a href="https://wakatime.com">wakatime.com</a>
 
-<<<<<<< Updated upstream
-#### ©️ [Gregor7008](https://github.com/Gregor7008) - 2022
-=======
 #### ©️ [Gregor7008](https://github.com/Gregor7008) - 2026
->>>>>>> Stashed changes
